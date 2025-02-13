@@ -1,0 +1,13 @@
+#IDE
+.vscode/
+.idea/
+.env
+**/.DS_Store
+
+# Jupyter Notebooks
+**/test.ipynb
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*$py.class
+**/__pycache__/
