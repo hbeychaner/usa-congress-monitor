@@ -8,6 +8,7 @@ import time
 
 from tqdm import tqdm
 
+from src.data_collection.client import RESPONSE_FORMAT, CDGClient
 from src.data_structures.bills import Bill, ResultType 
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ API_HEADERS = {
     "x-api-key": congress_api_key}
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 RATE_LIMIT_CONSTANT = 5000 / 60 / 60 # 5000 requests per hour
+client = CDGClient(api_key=os.environ["CONGRESS_API_KEY"], response_format=RESPONSE_FORMAT)
 
 
 def extract_offset(url: str) -> int:
