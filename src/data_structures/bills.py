@@ -1,102 +1,179 @@
-"""This module contains the data structures used in the application, including bills, amendments, congresses, and more."""
-
 from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional 
+from typing import List, Optional
 from pydantic import BaseModel, HttpUrl
 
-
-class ResultType(StrEnum):
-    JSON = "json"
+class Summary(BaseModel):
+    actionDate: datetime
+    actionDesc: str
+    text: str
+    updateDate: datetime
+    versionCode: str
 
 class Chamber(StrEnum):
     HOUSE = "House"
     SENATE = "Senate"
 
-class SessionType(StrEnum):
-    REGULAR = "regular"
-    SPECIAL = "special"
+class CommitteeType(StrEnum):
+    STANDING = "Standing"
+    SELECT = "Select"
+    SPECIAL = "Special"
+    JOINT = "Joint"
+    TASK_FORCE = "Task Force"
+    OTHER = "Other"
+    SUBCOMMITTEE = "Subcommittee"
+    COMMISSION_OR_CAUCUS = "Commission or Caucus"
 
-class AmendmentType(StrEnum):
-    HAMDT = "hamdt"
-    SAMDT = "samdt"
-    SUAMDT = "suamdt"
+#Possible values are "Referred to", "Re-Referred to", "Hearings by", "Markup by", "Reported by", "Reported original measure", "Committed to", "Re-Committed to", and "Legislative Interest".
+class ActivityType(StrEnum):
+    REFERRED_TO = "Referred to"
+    RE_REFERRED_TO = "Re-Referred to"
+    HEARINGS_BY = "Hearings by"
+    MARKUP_BY = "Markup by"
+    REPORTED_BY = "Reported by"
+    REPORTED_ORIGINAL_MEASURE = "Reported original measure"
+    COMMITTED_TO = "Committed to"
+    RE_COMMITTED_TO = "Re-Committed to"
+    LEGISLATIVE_INTEREST = "Legislative Interest"
 
-class AmendmentList(BaseModel):
-    count: int
+class Activity(BaseModel):
+    name: ActivityType
+    date: datetime
+
+class Committee(BaseModel):
+    name: str
+    systemCode: str
     url: HttpUrl
+    chamber: Optional[Chamber] = None
+    type: Optional[CommitteeType] = None
+    subcommittees: str
+    activities: Optional[List[Activity]] = None
 
-class CosponsorCount(BaseModel):
-    count: int
-    countIncludingWithdrawnCosponsors: int
-    url: HttpUrl
-
-class Party(StrEnum):
-    DEMOCRAT = "D"
-    REPUBLICAN = "R"
-    GREEN = "G"
-    INDEPENDENT = "I"
-    TEA_PARTY = "T"
-
-class BillType(StrEnum):
-    CONCURRENT_RESOLUTION = "HCONRES"
-    JOINT_RESOLUTION = "HJRES"
-    HOUSE_BILL = "HR"
-    HOUSE_RESOLUTION = "HRES"
-    SENATE_BILL = "S"
-    SENATE_CONCURRENT_RESOLUTION = "SCONRES"
-    SENATE_JOINT_RESOLUTION = "SJRES"
-    SENATE_RESOLUTION = "SRES"
-
+    
 class SourceSystem(BaseModel):
-    code: int
     name: str
 
-class VoteEvent(BaseModel):
-    chamber: Chamber
-    congress: int
-    date: datetime
-    rollNumber: int
-    sessionNumber: int
-    url: HttpUrl
-
-class ActionDetails(BaseModel):
-    actionCode: str
-    recordedVotes: Optional[VoteEvent]
-    sourceSystem: SourceSystem
-    actionDate: datetime
-
 class Action(BaseModel):
+    actionDate: Optional[datetime] = None
+    committees: Optional[List[Committee]] = None
+    sourceSystem: SourceSystem
     text: str
     type: str
-    details: Optional[ActionDetails]
-    
-class BillDetails(BaseModel):
-    actions: List[Action]
-    amendments: List[str]
-    cboCostEstimates: List[str]
-    committeeReports: List[str]
-    committees: List[str]
-    constitutionalAuthorityStatementText: str
-    cosponsors: List[str]
-    introducedDate: datetime
-    laws: List[str]
-    policyArea: str
-    relatedBills: List[str]
-    sponsors: List[str]
-    subjects: List[str]
-    summaries: List[str]
-    textVersions: List[str]
-    titles: List[str]
+    actionCode: Optional[str] = None
+    actionTime: Optional[datetime] = None
 
+class Activity(BaseModel):
+    date: datetime
+    name: str
+
+class Committee(BaseModel):
+    activities: List[Activity]
+    chamber: Chamber
+    name: str
+    systemCode: str
+    type: str
+    url: HttpUrl
+
+class LatestAction(BaseModel):
+    actionDate: datetime
+    text: str
+
+class Amendment(BaseModel):
+    congress: int
+    latestAction: LatestAction
+    number: str
+    purpose: str
+    type: str
+    updateDate: datetime
+    url: HttpUrl
+
+class RelationshipDetail(BaseModel):
+    identifiedBy: str
+    type: str
+
+class BillMetadata(BaseModel):
+    congress: int
+    latestAction: LatestAction
+    number: int
+    relationshipDetails: Optional[List[RelationshipDetail]] = []
+    title: str
+    type: str
+    url: HttpUrl
+
+class Title(BaseModel):
+    title: str
+    titleType: str
+    titleTypeCode: int
+    updateDate: datetime
+    billTextVersionCode: Optional[str] = None
+    billTextVersionName: Optional[str] = None
+    
+class Format(BaseModel):
+    type: str
+    url: HttpUrl
+
+class TextVersion(BaseModel):
+    date: datetime
+    formats: List[Format]
+    type: str
+
+class PolicyArea(BaseModel):
+    name: str
+    updateDate: Optional[datetime] = None
+
+class LegislativeSubject(BaseModel):
+    name: str
+    updateDate: datetime
+
+class Subjects(BaseModel):
+    legislativeSubjects: List[LegislativeSubject]
+    policyArea: PolicyArea
+
+class CountUrl(BaseModel):
+    count: int
+    url: HttpUrl
+
+class LatestAction(BaseModel):
+    actionDate: datetime
+    text: str
+    actionTime: Optional[datetime] = None
+
+class cboCostEstimate(BaseModel):
+    pubDate: datetime
+    title: str
+    url: HttpUrl
+    description: Optional[str] = None
+
+class Member(BaseModel):
+    bioguideId: str
+    firstName: str
+    fullName: str
+    lastName: str
+    party: str
+    state: str
+    url: HttpUrl
+    middleName: Optional[str]
+    district: Optional[int]
+    isOriginalCosponsor: Optional[bool] = None
+    cboCostEstimates: Optional[List[cboCostEstimate]]
+    isByRequest: Optional[str]
+
+class ChamberCode(StrEnum):
+    house = "H"
+    senate = "S"
+    
 class Bill(BaseModel):
     congress: int
-    latestAction: dict
-    number: int | str
-    originChamber: str
-    originChamberCode: str
+    constitutionalAuthorityStatementText: str
+    introducedDate: datetime
+    latestAction: LatestAction
+    number: str
+    originChamber: Chamber
+    originChamberCode: ChamberCode
+    policyArea: PolicyArea
+    sponsors: List[Member]
     title: str
-    type: BillType
+    type: str
     updateDate: datetime
     updateDateIncludingText: datetime
-    url: HttpUrl
+
