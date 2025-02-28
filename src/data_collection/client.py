@@ -5,8 +5,11 @@
     @license: CC0 1.0
 """
 from urllib.parse import urljoin
-
 import requests
+import logging 
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 API_VERSION = "v3"
@@ -25,12 +28,10 @@ class _MethodWrapper:
         response = self._method(
             urljoin(self._parent.base_url, endpoint), *args, **kwargs
         )
-        # unpack
         if response.headers.get("content-type", "").startswith("application/json"):
             return response.json()
         else:
             return response.content
-
 
 class CDGClient:
     """ A sample client to interface with Congress.gov. """
@@ -41,6 +42,7 @@ class CDGClient:
         api_version=API_VERSION,
         response_format=RESPONSE_FORMAT,
         raise_on_error=True,
+        added_headers=None
     ):
         self.base_url = urljoin(ROOT_URL, api_version) + "/"
         self._session = requests.Session()
@@ -48,6 +50,8 @@ class CDGClient:
         # do not use url parameters, even if offered, use headers
         self._session.params = {"format": response_format}
         self._session.headers.update({"x-api-key": api_key})
+        if added_headers:
+            self._session.headers.update(added_headers)
 
         if raise_on_error:
             self._session.hooks = {
