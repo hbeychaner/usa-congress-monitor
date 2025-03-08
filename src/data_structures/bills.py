@@ -6,6 +6,25 @@ from typing import List, Annotated, Optional
 class Format(BaseModel):
     type: str
     url: HttpUrl
+    full_text: str = "" # This needs to be retrieved from the url
+
+class BehalfType(StrEnum):
+    #This can be "Submitted on behalf of" the sponsor and/or "Proposed on behalf of" the sponsor. Assign value based on first word of input
+    SUBMITTED = "Submitted"
+    PROPOSED = "Proposed"
+
+    def __init__(self, value):
+        self._value_ = value
+        self.type_url = value.split()[0]
+
+class AmendmentType(StrEnum):
+    SAMDT = "SAMDT" # Senate Amendment
+    HAMDT = "HAMDT" # House Amendment
+    SUAMDT = "SUAMDT" # Senate Unnumbered Amendment
+
+    def __init__(self, value):
+        self._value_ = value
+        self.type_url = value.lower()
 
 class TextVersion(BaseModel):
     date: datetime
@@ -36,7 +55,7 @@ class LawType(StrEnum):
             self.type_url = "priv"
 
 class LatestAction(BaseModel):
-    action_date: Annotated[datetime, Field(alias="actionDate")]
+    action_date: Annotated[datetime, Field(alias="actionDate")] = None
     text: str
 
 class Note(BaseModel):
@@ -59,6 +78,13 @@ class CommitteeMetadata(BaseModel):
     
 class SourceSystem(BaseModel):
     name: str
+    code: int = -1
+
+class ActionSourceSystem(StrEnum):
+    SENATE = "0"
+    LIBRARY_OF_CONGRESS = "9"
+    HOUSE1 = "1"
+    HOUSE2 = "2"
 
 class Activity(BaseModel):
     date: datetime
@@ -117,6 +143,12 @@ class Member(BaseModel):
     is_original_cosponsor: Annotated[bool, Field(alias='isOriginalCosponsor')] = False
     is_by_request: Annotated[str, Field(alias='isByRequest')] = ""
 
+class Sponsor(Member):
+    sponsorship_date: Annotated[datetime, Field(alias='sponsorshipDate')]
+    is_original_cosponsor: Annotated[bool, Field(alias='isOriginalCosponsor')] = False
+    sponsorship_withrawn_date: Annotated[datetime, Field(alias='sponsorshipWithdrawnDate')] = None
+
+
 class LawMetadata(BaseModel):
     number: str
     law_type: Annotated[LawType, Field(alias="type")]
@@ -150,23 +182,56 @@ class Committee(BaseModel):
     type: str
     url: HttpUrl
 
+class RecordedVote(BaseModel):
+    roll_number: Annotated[int, Field(alias='rollNumber')]
+    url: HttpUrl
+    chamber: Annotated[Chamber, Field(alias='chamber')]
+    congress: int
+    date: datetime
+    session_number: Annotated[int, Field(alias='sessionNumber')]
+
 class Action(BaseModel):
-    action_date: Annotated[datetime, Field(alias='actionDate')] = None
+    action_date: Annotated[datetime, Field(alias='actionDate')]
     committees: Optional[List[CommitteeMetadata]] = []
-    source_system: Annotated[SourceSystem, Field(alias='sourceSystem')]
+    source_system: Annotated[SourceSystem, Field(alias='sourceSystem')] = None
     text: str
     type: str
     action_code: Annotated[str, Field(alias='actionCode')] = ""
     action_time: Annotated[datetime, Field(alias='actionTime')] = None
+    recorded_votes: Annotated[List[RecordedVote], Field(alias='recordedVotes')] = []
 
-class Amendment(BaseModel):
+class AmendmentMetadata(BaseModel):
     congress: int
-    latest_action: Annotated[LatestAction, Field(alias='latestAction')]
+    latest_action: Annotated[LatestAction, Field(alias='latestAction')] = None
     number: str
-    purpose: str
+    purpose: str = ""
     type: str
     update_date: Annotated[datetime, Field(alias='updateDate')]
     url: HttpUrl
+
+class Treaty(BaseModel):
+    congress: int
+    treaty_number: Annotated[str, Field(alias='treatyNumber')]
+    url: HttpUrl
+
+class Amendment(BaseModel):
+    congress: int
+    description: str
+    purpose: str = ""
+    latest_action: Annotated[LatestAction, Field(alias='latestAction')] = None
+    number: str
+    type: str
+    update_date: Annotated[datetime, Field(alias='updateDate')]
+    url: HttpUrl
+    sponsors: List[Member] = []
+    cosponsors: List[Member] = [] # Note that this needs to be populated in a separate step
+    on_behalf_of_sponsor: Annotated[Member, Field(alias='onBehalfOfSponsor')] = None
+    behalf_type: Annotated[BehalfType, Field(alias='behalfType')] = None
+    proposed_date: Annotated[datetime, Field(alias='proposedDate')] = None
+    submitted_date: Annotated[datetime, Field(alias='submittedDate')] = None
+    chamber: Annotated[Chamber, Field(alias='chamber')] = None
+    amended_treaty: Annotated[Treaty, Field(alias='amendedTreaty')] = None
+    actions: List[Action] = [] # This needs to be populated in a separate step
 
 class BillMetadata(BaseModel):
     congress: int
@@ -178,7 +243,7 @@ class BillMetadata(BaseModel):
     url: HttpUrl
 
 class Subjects(BaseModel):
-    legislative_subjects: Optional[List[LegislativeSubject]] = []
+    legislative_subjects: Annotated[List[LegislativeSubject], Field(alias='legislativeSubjects')] = []
     policy_area: Annotated[PolicyArea, Field(alias='policyArea')]
 
 class Bill(BaseModel):
