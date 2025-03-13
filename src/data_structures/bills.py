@@ -1,12 +1,20 @@
 from datetime import datetime
 from enum import StrEnum
-from pydantic import BaseModel, HttpUrl, Field, field_validator
+from pydantic import AliasChoices, BaseModel, HttpUrl, Field, field_validator
 from typing import List, Annotated, Optional
+from bs4 import BeautifulSoup
+
 
 class Format(BaseModel):
     type: str
     url: HttpUrl
-    full_text: str = "" # This needs to be retrieved from the url
+
+class Session(BaseModel):
+    chamber: str
+    end_date: Annotated[datetime, Field(alias='endDate')]
+    number: int
+    start_date: Annotated[datetime, Field(alias='startDate')]
+    type: str
 
 class BehalfType(StrEnum):
     #This can be "Submitted on behalf of" the sponsor and/or "Proposed on behalf of" the sponsor. Assign value based on first word of input
@@ -59,7 +67,7 @@ class LatestAction(BaseModel):
     text: str
 
 class Note(BaseModel):
-    texts: Annotated[List[str], Field(alias='text')]
+    texts: Annotated[List[str], Field(alias='text')] = []
     text: str = ""
     def __init__(self, text: str):
         self.text = ["\n".join(x["text"]) for x in text]
@@ -129,26 +137,6 @@ class BillType(StrEnum):
     HRES = "HRES" # Simple resolution introduced in House
     SRES = "SRES" # Simple resolution introduced in Senate
 
-class Member(BaseModel):
-    bioguide_id: Annotated[str, Field(alias='bioguideId')]
-    firstName: str
-    first_name: Annotated[str, Field(alias='firstName')]
-    full_name: Annotated[str, Field(alias='fullName')]
-    last_name: Annotated[str, Field(alias='lastName')]
-    party: str
-    state: str
-    url: HttpUrl
-    middle_name: Annotated[str, Field(alias='middleName')] = ""
-    district: Optional[int] = None
-    is_original_cosponsor: Annotated[bool, Field(alias='isOriginalCosponsor')] = False
-    is_by_request: Annotated[str, Field(alias='isByRequest')] = ""
-
-class Sponsor(Member):
-    sponsorship_date: Annotated[datetime, Field(alias='sponsorshipDate')]
-    is_original_cosponsor: Annotated[bool, Field(alias='isOriginalCosponsor')] = False
-    sponsorship_withrawn_date: Annotated[datetime, Field(alias='sponsorshipWithdrawnDate')] = None
-
-
 class LawMetadata(BaseModel):
     number: str
     law_type: Annotated[LawType, Field(alias="type")]
@@ -160,19 +148,6 @@ class LawMetadata(BaseModel):
         elif value == "Private Law":
             return LawType.PRIVATE
         raise ValueError("Invalid law type")
-
-class Law(BaseModel):
-    congress: int
-    latest_action: Annotated[LatestAction, Field(alias="latestAction")]
-    laws: List[LawMetadata]
-    number: str
-    origin_chamber: Annotated[Chamber, Field(alias="originChamber")]
-    origin_chamber_code: Annotated[ChamberCode, Field(alias="originChamberCode")]
-    title: str
-    bill_type: Annotated[BillType, Field(alias="type")]
-    update_date: Annotated[datetime, Field(alias="updateDate")]
-    update_date_including_text: Annotated[datetime, Field(alias="updateDateIncludingText")]
-    url: HttpUrl
 
 class Committee(BaseModel):
     activities: List[Activity]
@@ -191,12 +166,12 @@ class RecordedVote(BaseModel):
     session_number: Annotated[int, Field(alias='sessionNumber')]
 
 class Action(BaseModel):
-    action_date: Annotated[datetime, Field(alias='actionDate')]
-    committees: Optional[List[CommitteeMetadata]] = []
+    action_date: Annotated[datetime, Field(alias='actionDate')] = None
+    action_code: Annotated[str, Field(alias='actionCode')] = ""
     source_system: Annotated[SourceSystem, Field(alias='sourceSystem')] = None
     text: str
-    type: str
-    action_code: Annotated[str, Field(alias='actionCode')] = ""
+    type: str | None = ""
+    committees: Optional[List[CommitteeMetadata]] = []
     action_time: Annotated[datetime, Field(alias='actionTime')] = None
     recorded_votes: Annotated[List[RecordedVote], Field(alias='recordedVotes')] = []
 
@@ -214,24 +189,9 @@ class Treaty(BaseModel):
     treaty_number: Annotated[str, Field(alias='treatyNumber')]
     url: HttpUrl
 
-class Amendment(BaseModel):
-    congress: int
-    description: str
-    purpose: str = ""
-    latest_action: Annotated[LatestAction, Field(alias='latestAction')] = None
-    number: str
-    type: str
-    update_date: Annotated[datetime, Field(alias='updateDate')]
-    url: HttpUrl
-    sponsors: List[Member] = []
-    cosponsors: List[Member] = [] # Note that this needs to be populated in a separate step
-    on_behalf_of_sponsor: Annotated[Member, Field(alias='onBehalfOfSponsor')] = None
-    behalf_type: Annotated[BehalfType, Field(alias='behalfType')] = None
-    proposed_date: Annotated[datetime, Field(alias='proposedDate')] = None
-    submitted_date: Annotated[datetime, Field(alias='submittedDate')] = None
-    chamber: Annotated[Chamber, Field(alias='chamber')] = None
-    amended_treaty: Annotated[Treaty, Field(alias='amendedTreaty')] = None
-    actions: List[Action] = [] # This needs to be populated in a separate step
+class Subjects(BaseModel):
+    legislative_subjects: Annotated[List[LegislativeSubject], Field(alias='legislativeSubjects')] = []
+    policy_area: Annotated[PolicyArea, Field(alias='policyArea')]
 
 class BillMetadata(BaseModel):
     congress: int
@@ -242,13 +202,94 @@ class BillMetadata(BaseModel):
     type: str
     url: HttpUrl
 
-class Subjects(BaseModel):
-    legislative_subjects: Annotated[List[LegislativeSubject], Field(alias='legislativeSubjects')] = []
-    policy_area: Annotated[PolicyArea, Field(alias='policyArea')]
+class Amendment(BaseModel):
+    # Fields added by collecting additional data with client object
+    actions: List[Action] = []
+    cosponsors: List[Member] = []
+    text_versions: List[TextVersion] = []
+    # Normal fields
+    congress: int
+    description: str
+    purpose: str = ""
+    latest_action: Annotated[LatestAction, Field(alias='latestAction')] = None
+    number: str
+    type: str
+    update_date: Annotated[datetime, Field(alias='updateDate')]
+    url: HttpUrl
+    sponsors: List[Member] = []
+    on_behalf_of_sponsor: Annotated[Member, Field(alias='onBehalfOfSponsor')] = None
+    behalf_type: Annotated[BehalfType, Field(alias='behalfType')] = None
+    proposed_date: Annotated[datetime, Field(alias='proposedDate')] = None
+    submitted_date: Annotated[datetime, Field(alias='submittedDate')] = None
+    chamber: Annotated[Chamber, Field(alias='chamber')] = None
+    amended_treaty: Annotated[Treaty, Field(alias='amendedTreaty')] = None
+    full_text: str = ""
+
+
+    def add_full_text(self, client):
+        for text_version in self.text_versions:
+            for format in text_version.formats:
+                # Check if the format type is "Formatted Text"
+                if "Formatted" in format.type:
+                    try:
+                        # Retrieve HTML content from the URL
+                        html = client.get(format.url)
+                        # Parse the HTML content
+                        soup = BeautifulSoup(html, "html.parser")
+                        full_text = soup.get_text()
+                    except Exception as e:
+                        raise Exception(f"Failed to retrieve full text for text version {self.type}") from e
+                    return full_text
+                
+    def get_amendment_details(self, client):
+        """
+        Retrieve additional data for an amendment.
+
+        Args:
+            client (CDGClient): The client object.
+            amendment_metadata (AmendmentMetadata): The amendment metadata.
+
+        Returns:
+            Amendment: The amendment object.
+        """
+        amendment_data = {}
+        congress = self.congress
+        amendment_type = self.type
+        amendment_number = self.number
+        additional_amendment_data = {
+            'actions': 'actions',
+            'cosponsors': 'cosponsors', 
+            'textVersions': 'text',
+            'amendments': 'amendments'
+        }
+
+        for key, endpoint in additional_amendment_data.items():
+            data = client.get(f"amendment/{congress}/{amendment_type.lower()}/{amendment_number}/{endpoint}", params={"format":None})
+            amendment_data[key] = data[key]
+
+        print(amendment_data)
+
+        self.actions = [Action(**x) for x in amendment_data["actions"]]
+        self.cosponsors = [Member(**x) for x in amendment_data["cosponsors"]]
+        self.text_versions = [TextVersion(**x) for x in amendment_data["textVersions"]]
+        self.full_text = self.add_full_text(client)
 
 class Bill(BaseModel):
+    # Fields added by collecting additional data with client object
+    actions: List[Action] = []
+    amendments: List[Amendment] = []
+    committees: List[Committee] = []
+    cosponsors: List[Sponsor] = []
+    related_bills: List[BillMetadata] = []
+    subjects: Subjects
+    summaries: List[Summary] = []
+    text_versions: List[TextVersion] = []
+    titles: List[Title] = []
+    full_text: str = ""
+
+    # Fields from original data
     congress: int
-    constitutional_authority_statement_text: Annotated[str, Field(alias="constitutionalAuthorityStatement")] = ""
+    constitutional_authority_statement_text: Annotated[str, Field(alias="constitutionalAuthorityStatementText")] = ""
     introduced_date: Annotated[datetime, Field(alias="introducedDate")] = None
     latest_action: Annotated[LatestAction, Field(alias="latestAction")]
     laws: Annotated[List[LawMetadata], Field(alias="laws")] = []
@@ -256,9 +297,64 @@ class Bill(BaseModel):
     origin_chamber: Annotated[Chamber, Field(alias="originChamber")]
     origin_chamber_code: Annotated[ChamberCode, Field(alias="originChamberCode")]
     policy_area: Annotated[PolicyArea, Field(alias="policyArea")] = None
-    sponsors: List[Member] = []
+    sponsors: List[Sponsor] = []
     title: str
-    type: str
+    type: BillType
     update_date: Annotated[datetime, Field(alias="updateDate")]
     update_date_including_text: Annotated[datetime, Field(alias="updateDateIncludingText")]
     notes: Annotated[Note, Field(alias="notes")] = None
+
+    def add_full_text(self, client):
+        for text_version in self.text_versions:
+            for format in text_version.formats:
+                # Check if the format type is "Formatted Text"
+                if format.type == "Formatted Text":
+                    try:
+                        # Retrieve HTML content from the URL
+                        html = client.get(format.url)
+                        # Parse the HTML content
+                        soup = BeautifulSoup(html, "html.parser")
+                        full_text = soup.get_text()
+                    except Exception as e:
+                        raise Exception(f"Failed to retrieve full text for text version {self.type}") from e
+                    return full_text
+
+    def add_bill_details(self, client):
+        """
+        Retrieve additional data for a bill.
+
+        Args:
+            client: A CGDClient object.
+        """
+        bill_data = {}
+        # Currently available endpoints for additional data on bills
+        additional_bill_data = {
+            'actions': 'actions',
+            'amendments': 'amendments',
+            'committees': 'committees',
+            'cosponsors': 'cosponsors',
+            'relatedBills': 'relatedbills',
+            'subjects': 'subjects',
+            'summaries': 'summaries',
+            'textVersions': 'text',
+            'titles': 'titles'
+        }
+        congress = self.congress
+        bill_type = self.type.lower()
+        bill_number = self.number
+        for key, endpoint in additional_bill_data.items():
+            data = client.get(f"bill/{congress}/{bill_type}/{bill_number}/{endpoint}")
+            bill_data[key] = data[key]
+        
+        self.actions = [Action(**x) for x in bill_data["actions"]]
+        self.amendments = [AmendmentMetadata(**x) for x in bill_data["amendments"]]
+        self.cosponsors = [Sponsor(**x) for x in bill_data["cosponsors"]]
+        self.related_bills = [BillMetadata(**x) for x in bill_data["relatedBills"]]
+        self.subjects = Subjects(**bill_data["subjects"])
+        self.summaries = [Summary(**x) for x in bill_data["summaries"]]
+        self.text_versions = [TextVersion(**x) for x in bill_data["textVersions"]]
+        self.titles = [Title(**x) for x in bill_data["titles"]]
+        self.full_text = self.add_full_text(client)
+
+class Law(Bill): # This class is a subclass of Bill
+    is_law: bool = True

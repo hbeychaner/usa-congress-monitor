@@ -1,10 +1,13 @@
 from urllib.parse import urljoin, urlparse, parse_qs
+from pydantic import HttpUrl
 import requests
 import logging
 import os
 import time
 from tqdm import tqdm
-from src.data_structures.bills import *
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from selenium import webdriver
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -76,126 +79,64 @@ class CDGClient:
         bills = response.get("bills", [])
         if "next" in response.get("pagination", {}):
             offset = self.extract_offset(response["pagination"]["next"])
-            return (bills, response, offset, response["pagination"]["count"])
+            return (bills, offset, response["pagination"]["count"])
         return (bills, response, -1, 0)
     
-    def get_bill_details(self, bill_metadata: BillMetadata) -> Bill:
+    def get_laws_metadata(self, congress: int, offset: int = 0) -> list:
         """
-        Retrieve additional data for a bill.
+        Retrieve metadata for laws.
 
         Args:
             client (CDGClient): The client object.
-            bill_data (BillMetadata): The bill metadata.
+            congress (int): The congress number.
 
         Returns:
-            Bill: The bill object.
+            list: A list of law metadata.
         """
-        bill_data = {}
-        # Currently available endpoints for additional data on bills
-        additional_bill_data = {
-            'actions': 'actions',
-            'amendments': 'amendments',
-            'committees': 'committees',
-            'cosponsors': 'cosponsors',
-            'relatedBills': 'relatedbills',
-            'subjects': 'subjects',
-            'summaries': 'summaries',
-            'textVersions': 'text',
-            'titles': 'titles'
-        }
-        congress = bill_metadata.congress
-        bill_type = bill_metadata.type.lower()
-        bill_number = bill_metadata.number
-        for key, endpoint in additional_bill_data.items():
-            data = self.get(f"bill/{congress}/{bill_type}/{bill_number}/{endpoint}")
-            bill_data[key] = data[key]
-        bill_data.update(bill_metadata.model_dump())
-        return bill_data
-    
-    def get_laws_metadata(self, start_date: str, end_date: str, congress: int, offset: int = 0):
         params = {
-            "fromDateTime": start_date,
-            "toDateTime": end_date
+            "limit": RESULT_LIMIT,
         }
         if offset > 0:
             params["offset"] = offset
         response = self.get(f"law/{congress}", params=params)
-        laws = response.get("laws", [])
+        laws = response.get("bills", [])
         if "next" in response.get("pagination", {}):
             offset = self.extract_offset(response["pagination"]["next"])
             return (laws, offset, response["pagination"]["count"])
         return (laws, -1, 0)
     
-    def get_law_details(self, law_metadata: LawMetadata) -> Law:
+    def get_amendments_metadata(self, from_date_time: str, to_date_time: str, offset: int = 0, limit: int = RESULT_LIMIT) -> list:
         """
-        Retrieve additional data for a law.
+        Retrieve metadata for amendments.
 
         Args:
-            client (CDGClient): The client object.
-            law_metadata (LawMetadata): The law metadata.
+            from_date_time (str): The start date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
+            to_date_time (str): The end date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
+            offset (int): The offset for the request.
+            limit (int): The number of results to return.
 
         Returns:
-            Law: The law object.
+            list: A list of amendment metadata.
         """
-        law_data = {}
-        congress = law_metadata.congress
-        law_type = law_metadata.type.lower()
-        law_number = law_metadata.number
-        additional_law_data = {
-            'actions': 'actions',
-            'amendments': 'amendments',
-            'cosponsors': 'cosponsors',
-            'textVersions': 'text'
+        params = {
+            "limit": limit,
+            "fromDateTime": from_date_time,
+            "toDateTime": to_date_time
         }
-        for key, endpoint in additional_law_data.items():
-            data = self.get(f"law/{congress}/{law_type}/{law_number}/{endpoint}")
-            law_data[key] = data[key]
-        law_data.update(law_metadata.model_dump())
-        law = Law(**law_data)
-        return law
-    
-    def get_amendments_metadata(self, bill_number: int, congress: int, amendment_type: AmendmentType):
-        response = self.get(f"amendment/{congress}/{amendment_type.type_url}/{bill_number}")
+        if offset > 0:
+            params["offset"] = offset
+        response = self.get("amendment", params=params)
+        amendments = response.get("amendments", [])
+        if "next" in response.get("pagination", {}):
+            offset = self.extract_offset(response["pagination"]["next"])
+            return (amendments, offset, response["pagination"]["count"])
+        return (amendments, -1, 0)
 
-        return response
-    
-    def get_amendment_details(self, amendment_metadata: AmendmentMetadata) -> Amendment:
-        """
-        Retrieve additional data for an amendment.
-
-        Args:
-            client (CDGClient): The client object.
-            amendment_metadata (AmendmentMetadata): The amendment metadata.
-
-        Returns:
-            Amendment: The amendment object.
-        """
-        amendment_data = {}
-        congress = amendment_metadata.congress
-        amendment_type = amendment_metadata.type
-        amendment_number = amendment_metadata.number
-        additional_amendment_data = {
-            'actions': 'actions',
-            'amendedBill': 'bill',
-            'cosponsors': 'cosponsors', 
-            'text': 'textVersions'
-        }
-
-        for key, endpoint in additional_amendment_data.items():
-            data = self.get(f"amendment/{congress}/{amendment_type.type_url}/{amendment_number}/{endpoint}")
-            amendment_data[key] = data[key]
-        amendment_data.update(amendment_metadata.model_dump())
-        amendment = Amendment(**amendment_data)
-        return amendment
         
     def extract_offset(self, url: str) -> int:
         parsed_url = urlparse(url)
         offset = parse_qs(parsed_url.query).get('offset', [0])[0]
         return int(offset)
-
-    def get_congresses(self):
-        """Retrieve a list of congresses and congressional sessions."""
-        return self.get("congress")
 
     def get_congress_details(self, congress: int):
         """Retrieve detailed information for a specified congress."""
@@ -277,10 +218,6 @@ class CDGClient:
         """Retrieve the list of Senate communications associated with a specified congressional committee."""
         return self.get(f"committee/{chamber}/{committee_code}/senate-communication")
 
-    def get_committee_reports(self):
-        """Retrieve a list of committee reports."""
-        return self.get("committee-report")
-
     def get_committee_reports_by_congress(self, congress: int):
         """Retrieve a list of committee reports filtered by the specified congress."""
         return self.get(f"committee-report/{congress}")
@@ -349,9 +286,29 @@ class CDGClient:
         """Retrieve detailed information for a specified hearing."""
         return self.get(f"hearing/{congress}/{chamber}/{jacket_number}")
 
-    def get_congressional_records(self):
-        """Retrieve a list of congressional record issues sorted by most recent."""
-        return self.get("congressional-record")
+    def get_congressional_records(self, offset: int = 0):
+        """Retrieve a list of congressional record issues sorted by most recent.
+        
+        Args:
+            offset (int): The offset for the request.
+            
+        Returns:
+            tuple: A tuple containing the list of records, the offset, and the count.
+        """
+        params = {
+            "limit": RESULT_LIMIT
+        }
+        if offset > 0:
+            params["offset"] = offset
+        response = self.get("congressional-record", params=params)
+        records = response.get("Results",{}).get("Issues", [])
+        total_results = response.get("Results",{}).get("TotalCount")
+        current_offset = response.get("Results",{}).get("IndexStart")
+        new_offset = current_offset + len(response.get("Results",{}).get("Issues", []))
+        if new_offset >= total_results:
+            new_offset = -1
+        return (records, new_offset, total_results)
+
 
     def get_daily_congressional_records(self):
         """Retrieve a list of daily congressional record issues sorted by most recent."""
@@ -562,3 +519,105 @@ def gather_congress_bills(client: CDGClient, from_date: str, to_date: str) -> li
     if pbar:
         pbar.close()
     return bills
+
+def gather_congressional_records(client: CDGClient) -> list:
+    """
+    Gather all congressional records for a given date.
+
+    Args:
+        client (CDGClient): The client object.
+
+    Returns:
+        list: A list of congressional record metadata.
+    """
+    start = time.time()
+    records = []
+    offset = 0
+    total_count = None
+    pbar = None
+    while offset != -1:
+        result, offset, count = client.get_congressional_records(offset=offset)
+        records.extend(result)
+        if total_count is None:
+            total_count = count
+            pbar = tqdm(total=total_count, desc="Retrieving records")
+        pbar.update(len(result))
+        determine_pagination_wait(start, offset)  # Prevent rate limiting
+    if pbar:
+        pbar.close()
+    return records
+
+def gather_congresses(client: CDGClient) -> list:
+    """ 
+    Gather all congresses.
+    
+    Args:
+        client (CDGClient): The client object.
+        
+    Returns:
+        list: A list of congress metadata.
+    """
+    congress_data = []
+    current_congress = client.get_current_congress()["congress"]["number"]
+    for i in tqdm(range(1, current_congress + 1), desc="Retrieving congresses"):
+        congress = client.get_congress_details(i)
+        congress_data.append(congress["congress"])
+    return congress_data
+
+
+def download_pdf(lnk: HttpUrl) -> str:
+    """
+    Download a PDF from a link using Selenium
+
+    Args:
+        lnk (HttpUrl): The link to the PDF
+
+    Returns:
+        str: The filename of the downloaded PDF
+    """
+    options = webdriver.ChromeOptions()
+    download_folder = os.path.join(os.getcwd(), "tmp")  
+    profile = {"plugins.plugins_list": [{"enabled": False,
+                                         "name": "Chrome PDF Viewer"}],
+               "download.default_directory": download_folder,
+               "download.extensions_to_open": "",
+               "plugins.always_open_pdf_externally": True}
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-software-rasterizer")
+    options.add_argument("--disable-features=VizDisplayCompositor")
+    options.add_experimental_option("prefs", profile)        
+    driver = webdriver.Chrome(options = options)
+    driver.get(lnk)
+    
+    filename = lnk.split("/")[-1]
+    print("File: {}".format(filename))
+    print("Status: Download Complete.")
+    print("Folder: {}".format(download_folder))
+    # Save the file
+    time.sleep(3)
+    driver.close()
+    return filename
+
+def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)):
+    session = requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+        raise_on_status=False
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    # Set a User-Agent header
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    })
+    return session
