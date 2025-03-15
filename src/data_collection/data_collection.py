@@ -547,23 +547,6 @@ def gather_congressional_records(client: CDGClient) -> list:
         pbar.close()
     return records
 
-def gather_congresses(client: CDGClient) -> list:
-    """ 
-    Gather all congresses.
-    
-    Args:
-        client (CDGClient): The client object.
-        
-    Returns:
-        list: A list of congress metadata.
-    """
-    congress_data = []
-    current_congress = client.get_current_congress()["congress"]["number"]
-    for i in tqdm(range(1, current_congress + 1), desc="Retrieving congresses"):
-        congress = client.get_congress_details(i)
-        congress_data.append(congress["congress"])
-    return congress_data
-
 
 def download_pdf(lnk: HttpUrl) -> str:
     """
@@ -621,3 +604,11 @@ def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
     })
     return session
+
+def gather_congresses(client: CDGClient) -> list:
+    congresses = []
+    current_congress_id = client.get("congress/current")["congress"]["number"]
+    for i in tqdm(range(1, current_congress_id+1)):
+        congresses.append(client.get(f"congress/{i}")["congress"])
+    return congresses
+

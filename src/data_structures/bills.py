@@ -1,20 +1,15 @@
 from datetime import datetime
 from enum import StrEnum
-from pydantic import AliasChoices, BaseModel, HttpUrl, Field, field_validator
+from pydantic import BaseModel, HttpUrl, Field, field_validator
 from typing import List, Annotated, Optional
 from bs4 import BeautifulSoup
+
+from src.data_structures.people import Member, Sponsor, Chamber
 
 
 class Format(BaseModel):
     type: str
     url: HttpUrl
-
-class Session(BaseModel):
-    chamber: str
-    end_date: Annotated[datetime, Field(alias='endDate')]
-    number: int
-    start_date: Annotated[datetime, Field(alias='startDate')]
-    type: str
 
 class BehalfType(StrEnum):
     #This can be "Submitted on behalf of" the sponsor and/or "Proposed on behalf of" the sponsor. Assign value based on first word of input
@@ -46,10 +41,6 @@ class PolicyArea(BaseModel):
 class LegislativeSubject(BaseModel):
     name: str
     update_date: Annotated[datetime, Field(alias='updateDate')] = None
-
-class Chamber(StrEnum):
-    HOUSE = "House"
-    SENATE = "Senate"
 
 class LawType(StrEnum):
     PUBLIC = "Public Law"

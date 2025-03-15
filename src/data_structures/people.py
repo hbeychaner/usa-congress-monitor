@@ -1,8 +1,18 @@
 from datetime import datetime
+from enum import StrEnum
 from pydantic import AliasChoices, BaseModel, HttpUrl, Field
 from typing import List, Annotated, Optional
 
-from src.data_structures.bills import Chamber, Session
+class Chamber(StrEnum):
+    HOUSE = "House"
+    SENATE = "Senate"
+
+class Session(BaseModel):
+    chamber: str
+    end_date: Annotated[datetime, Field(alias='endDate', default=None)]
+    number: Annotated[int | None, Field(alias='number', default=0)]
+    start_date: Annotated[datetime, Field(alias='startDate')]
+    type: str
 
 class Congress(BaseModel):
     number: int
@@ -15,7 +25,6 @@ class Congress(BaseModel):
 
 class CongressMetadata(BaseModel):
     number: int
-
 
 class Depiction(BaseModel): 
     attribution: str
