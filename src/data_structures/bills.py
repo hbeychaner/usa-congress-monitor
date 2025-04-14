@@ -69,11 +69,6 @@ class Summary(BaseModel):
     text: str
     updateDate: Annotated[datetime, Field(alias='updateDate')]
     version_code: Annotated[str, Field(alias='versionCode')]
-
-class CommitteeMetadata(BaseModel):
-    name: str
-    system_code: Annotated[str, Field(alias='systemCode')]
-    url: HttpUrl
     
 class SourceSystem(BaseModel):
     name: str
@@ -140,7 +135,7 @@ class LawMetadata(BaseModel):
             return LawType.PRIVATE
         raise ValueError("Invalid law type")
 
-class Committee(BaseModel):
+class CommitteeMetadata(BaseModel):
     activities: List[Activity]
     chamber: str
     name: str
@@ -269,7 +264,7 @@ class Bill(BaseModel):
     # Fields added by collecting additional data with client object
     actions: List[Action] = []
     amendments: List[Amendment] = []
-    committees: List[Committee] = []
+    committees: List[CommitteeMetadata] = []
     cosponsors: List[Sponsor] = []
     related_bills: List[BillMetadata] = []
     subjects: Subjects
@@ -347,5 +342,6 @@ class Bill(BaseModel):
         self.titles = [Title(**x) for x in bill_data["titles"]]
         self.full_text = self.add_full_text(client)
 
-class Law(Bill): # This class is a subclass of Bill
+class Law(Bill):
     is_law: bool = True
+

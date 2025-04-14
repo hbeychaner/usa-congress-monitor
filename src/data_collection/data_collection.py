@@ -1,3 +1,4 @@
+from datetime import datetime
 from urllib.parse import urljoin, urlparse, parse_qs
 from pydantic import HttpUrl
 import requests
@@ -17,6 +18,23 @@ ROOT_URL = "https://api.congress.gov/"
 RESPONSE_FORMAT = "json"
 RESULT_LIMIT = 250
 RATE_LIMIT_CONSTANT = 5000 / 60 / 60  # 5000 requests per hour
+
+def datetime_convert(date_str: str) -> str: 
+    """
+    Convert a date string to the format YYYY-MM-DDTHH:MM:SSZ from format YYYY-MM-DD.
+
+    Args:
+        date_str (str): The date string to convert.
+
+    Returns:
+        str: The converted date string in the format YYYY-MM-DDTHH:MM:SSZ.
+    """
+    # Convert the date string to a datetime object
+    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+    # Format the datetime object to the desired format
+    formatted_date = date_obj.strftime("%Y-%m-%dT%H:%M:%SZ")
+    return formatted_date
+    
 
 class _MethodWrapper:
     """ Wrap request method to facilitate queries.  Supports requests signature. """
@@ -66,15 +84,27 @@ class CDGClient:
         return method
 
     def get_bills_metadata(self, from_date: str, to_date: str, offset: int = 0):
+        """
+        Retrieve metadata for bills.
+
+        Args:
+            from_date (str): The start date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
+            to_date (str): The end date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
+            offset (int): The offset for the request.
+            limit (int): The number of results to return.
+        Returns:
+            list: A list of bill metadata.
+        """
+        # Convert the date strings to the desired format
+        from_date = datetime_convert(from_date)
+        to_date = datetime_convert(to_date)
         params = {
             "limit": RESULT_LIMIT,
             "fromDateTime": from_date,
             "toDateTime": to_date
         }
-        
         if offset > 0:
             params["offset"] = offset
-
         response = self.get("bill", params=params)
         bills = response.get("bills", [])
         if "next" in response.get("pagination", {}):
@@ -105,7 +135,7 @@ class CDGClient:
             return (laws, offset, response["pagination"]["count"])
         return (laws, -1, 0)
     
-    def get_amendments_metadata(self, from_date_time: str, to_date_time: str, offset: int = 0, limit: int = RESULT_LIMIT) -> list:
+    def get_amendments_metadata(self, from_date: str, to_date: str, offset: int = 0, limit: int = RESULT_LIMIT) -> list:
         """
         Retrieve metadata for amendments.
 
@@ -118,10 +148,13 @@ class CDGClient:
         Returns:
             list: A list of amendment metadata.
         """
+        # Convert the date strings to the desired format
+        from_date = datetime_convert(from_date)
+        to_date = datetime_convert(to_date)
         params = {
             "limit": limit,
-            "fromDateTime": from_date_time,
-            "toDateTime": to_date_time
+            "fromDateTime": from_date,
+            "toDateTime": to_date
         }
         if offset > 0:
             params["offset"] = offset
@@ -131,7 +164,6 @@ class CDGClient:
             offset = self.extract_offset(response["pagination"]["next"])
             return (amendments, offset, response["pagination"]["count"])
         return (amendments, -1, 0)
-
         
     def extract_offset(self, url: str) -> int:
         parsed_url = urlparse(url)
@@ -146,7 +178,7 @@ class CDGClient:
         """Retrieve detailed information for the current congress."""
         return self.get("congress/current")
 
-    def get_members(self):
+    def get_members_list(self):
         """Retrieve a list of congressional members."""
         return self.get("member")
 
@@ -308,7 +340,6 @@ class CDGClient:
         if new_offset >= total_results:
             new_offset = -1
         return (records, new_offset, total_results)
-
 
     def get_daily_congressional_records(self):
         """Retrieve a list of daily congressional record issues sorted by most recent."""
@@ -502,6 +533,9 @@ def gather_congress_bills(client: CDGClient, from_date: str, to_date: str) -> li
     Returns:
         list: A list of bill metadata
     """
+    # Convert the date strings to the desired format
+    from_date = datetime_convert(from_date)
+    to_date = datetime_convert(to_date)
     start = time.time()
     bills = []
     offset = 0
@@ -519,6 +553,7 @@ def gather_congress_bills(client: CDGClient, from_date: str, to_date: str) -> li
     if pbar:
         pbar.close()
     return bills
+
 
 def gather_congressional_records(client: CDGClient) -> list:
     """
@@ -585,6 +620,7 @@ def download_pdf(lnk: HttpUrl) -> str:
     driver.close()
     return filename
 
+
 def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)):
     session = requests.Session()
     retry = Retry(
@@ -605,6 +641,7 @@ def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=
     })
     return session
 
+
 def gather_congresses(client: CDGClient) -> list:
     congresses = []
     current_congress_id = client.get("congress/current")["congress"]["number"]
@@ -612,3 +649,59 @@ def gather_congresses(client: CDGClient) -> list:
         congresses.append(client.get(f"congress/{i}")["congress"])
     return congresses
 
+
+def gather_bound_congressional_records(client: CDGClient) -> list:
+    """
+    Gather all bound congressional records for a given date.
+
+    Args:
+        client (CDGClient): The client object.
+
+    Returns:
+        list: A list of bound congressional record metadata.
+    """
+    start = time.time()
+    records = []
+    offset = 0
+    total_count = None
+    pbar = None
+    while offset != -1:
+        result, offset, count = client.get_bound_congressional_records(offset=offset)
+        records.extend(result["dailyCongressionalRecord"])
+        if total_count is None:
+            total_count = count
+            pbar = tqdm(total=total_count, desc="Retrieving bound records")
+        pbar.update(len(result))
+        determine_pagination_wait(start, offset)  # Prevent rate limiting
+    if pbar:
+        pbar.close()
+    return records
+
+
+def gather_laws(client: CDGClient, congress: int) -> list:
+    """
+    Gather all laws for a given congress.
+
+    Args:
+        client (CDGClient): The client object.
+        congress (int): The congress number.
+
+    Returns:
+        list: A list of law metadata.
+    """
+    start = time.time()
+    laws = []
+    offset = 0
+    total_count = None
+    pbar = None
+    while offset != -1:
+        result, offset, count = client.get_laws_metadata(congress, offset)
+        laws.extend(result)
+        if total_count is None:
+            total_count = count
+            pbar = tqdm(total=total_count, desc="Retrieving laws")
+        pbar.update(len(result))
+        determine_pagination_wait(start, offset)  # Prevent rate limiting
+    if pbar:
+        pbar.close()
+    return laws
