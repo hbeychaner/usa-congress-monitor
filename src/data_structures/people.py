@@ -30,6 +30,10 @@ class Depiction(BaseModel):
     attribution: str
     image_url: Annotated[HttpUrl, Field(alias='imageUrl')]
 
+    @staticmethod
+    def empty() -> "Depiction":
+        return Depiction(attribution="", image_url=HttpUrl(""))
+
 class Term(BaseModel):
     chamber: Chamber
     end_year: Annotated[int, Field(alias='endYear', default=None)]
@@ -47,9 +51,9 @@ class Member(BaseModel):
     district: Optional[int] = None
     is_original_cosponsor: Annotated[bool, Field(alias='isOriginalCosponsor')] = False
     is_by_request: Annotated[str, Field(alias='isByRequest')] = ""
-    depiction: Annotated[Depiction, Field(alias='depiction')] = ""
+    depiction: Annotated[Depiction, Field(alias='depiction')] = Depiction.empty()
 
 class Sponsor(Member):
     sponsorship_date: Annotated[datetime, Field(alias='sponsorshipDate')]
     is_original_cosponsor: Annotated[bool, Field(alias='isOriginalCosponsor')] = False
-    sponsorship_withrawn_date: Annotated[datetime, Field(alias='sponsorshipWithdrawnDate')] = None
+    sponsorship_withrawn_date: Annotated[Optional[datetime], Field(alias='sponsorshipWithdrawnDate')] = None

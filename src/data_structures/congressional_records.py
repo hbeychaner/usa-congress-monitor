@@ -7,6 +7,7 @@ from pydantic import BaseModel, HttpUrl, Field
 from typing import List, Annotated, Optional
 from requests.exceptions import ChunkedEncodingError
 import requests
+from requests import Response
 
 from src.data_collection.data_collection import create_session_with_retries, download_pdf
 
@@ -44,14 +45,14 @@ class CongressionalPDFLink(BaseModel):
             print(f"Request error occurred: {req_err}")
         except Exception as e:
             print(f"An error occurred: {e}")
-        return None
+        return Response()
 
     def extract_text_from_pdf(self) -> str:
         """
         Extract the text from the pdf
         """
         text = ""
-        response = self.session_get(self.url)
+        response = self.session_get(str(self.url))
         if response is None:
             print(f"Failed to retrieve the PDF from {self.url}")
             try: 
@@ -117,8 +118,8 @@ class CongressionalRecordLinkCollection(BaseModel):
     """
     digest: Annotated[CongressionalDigest, Field(description="The daily digest", alias="Digest")]
     full_record: Annotated[CongressionalDigest, Field(description="The entire issue", alias="FullRecord")]
-    house: Annotated[CongressionalDigest, Field(description="The house section", alias="House")] = None
-    remarks: Annotated[CongressionalDigest, Field(description="The extensions of remarks section", alias="Remarks")] = None
+    house: Annotated[Optional[CongressionalDigest], Field(description="The house section", alias="House")] = None
+    remarks: Annotated[Optional[CongressionalDigest], Field(description="The extensions of remarks section", alias="Remarks")] = None
 
 class BoundCongressionalRecord(BaseModel):
     """

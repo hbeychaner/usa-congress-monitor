@@ -1,17 +1,22 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from typing import Optional
+
+from sqlalchemy import Column, DateTime, Integer, String, create_engine, inspect
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from src.data_structures.bills import Bill
 
 Base = declarative_base()
+# Create an SQLite database in memory or on disk
+engine = create_engine("sqlite:///congress_bills.db")
+
 
 class BillModel(Base):
     """
     A SQLAlchemy model for the bills table.
     """
-    __tablename__ = 'bills'
-    
+
+    __tablename__ = "bills"
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     congress = Column(Integer, nullable=False)
     latest_action_date = Column(DateTime, nullable=False)
@@ -25,8 +30,6 @@ class BillModel(Base):
     update_date_including_text = Column(DateTime, nullable=False)
     url = Column(String, nullable=False)
 
-# Create an SQLite database in memory or on disk
-engine = create_engine('sqlite:///congress_bills.db') 
 
 # Create all tables
 def create_tables():
@@ -34,12 +37,15 @@ def create_tables():
     Create the tables in the database.
     """
     # Check if table exists
-    if not engine.dialect.has_table(engine, BillModel.__tablename__):
+    inspector = inspect(engine)
+    if not inspector.has_table(BillModel.__tablename__):
         Base.metadata.create_all(engine)
+
 
 # Create a configured "Session" class
 Session = sessionmaker(bind=engine)
 session = Session()
+
 
 def insert_bills_into_db(bills: list[Bill], session) -> None:
     """
@@ -55,22 +61,30 @@ def insert_bills_into_db(bills: list[Bill], session) -> None:
     for bill in bills:
         bill_model = BillModel(
             congress=bill.congress,
-            latest_action_date=bill.latestAction.actionDate,
-            latest_action_text=bill.latestAction.text,
+            latest_action_date=bill.latest_action.action_date,
+            latest_action_text=bill.latest_action.text,
             number=bill.number,
-            origin_chamber=bill.originChamber,
-            origin_chamber_code=bill.originChamberCode,
+            origin_chamber=bill.origin_chamber,
+            origin_chamber_code=bill.origin_chamber_code,
             title=bill.title,
             type=bill.type,
-            update_date=bill.updateDate,
-            update_date_including_text=bill.updateDateIncludingText,
-            url=bill.url
+            update_date=bill.update_date,
+            update_date_including_text=bill.update_date_including_text,
+            url=bill.url,  # type: ignore
         )
         session.add(bill_model)
     session.commit()
 
 
-def get_bills_from_db(session, congress: int = None, chamber: str = None, from_date: str = None, to_date: str = None, latest_action_date: str = None, number: int = None) -> list[BillModel]:
+def get_bills_from_db(
+    session,
+    congress: Optional[int] = None,
+    chamber: Optional[str] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    latest_action_date: Optional[str] = None,
+    number: Optional[int] = None,
+) -> list[BillModel]:
     """
     Retrieve bills from the database based on the provided filters.
 
