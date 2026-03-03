@@ -6,11 +6,18 @@ CDG Client - An example client for the Congress.gov API.
 """
 
 import logging
+import os
 from typing import Any
 from urllib.parse import urljoin
-
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from dotenv import load_dotenv
 from requests import Response
+
+load_dotenv()
+
+congress_api_key = os.getenv("CONGRESS_API_KEY", "")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -52,7 +59,7 @@ class CDGClient:
         added_headers: dict[str, str] | None = None,
     ) -> None:
         self.base_url = urljoin(ROOT_URL, api_version) + "/"
-        self._session = requests.Session()
+        self._session = create_session_with_retries()
 
         # do not use url parameters, even if offered, use headers
         self._session.params = {"format": response_format}
@@ -62,7 +69,7 @@ class CDGClient:
 
         if raise_on_error:
             self._session.hooks = {
-                "response": lambda r, *args, **kwargs: ( # type: ignore
+                "response": lambda r, *args, **kwargs: (  # type: ignore
                     r.raise_for_status() if isinstance(r, Response) else None
                 )
             }
@@ -76,3 +83,28 @@ class CDGClient:
         method = _MethodWrapper(self, method_name)
         self.__dict__[method_name] = method
         return method
+
+
+def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)):
+    session = requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+        raise_on_status=False,
+        allowed_methods=["HEAD", "GET", "OPTIONS"],
+        respect_retry_after_header=True
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    # Set a User-Agent header
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    })
+    return session
+
+client = CDGClient(api_key=congress_api_key)

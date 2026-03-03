@@ -28,11 +28,11 @@ class CongressMetadata(BaseModel):
 
 class Depiction(BaseModel): 
     attribution: str
-    image_url: Annotated[HttpUrl, Field(alias='imageUrl')]
+    image_url: Annotated[Optional[HttpUrl], Field(alias='imageUrl', default=None)]
 
     @staticmethod
     def empty() -> "Depiction":
-        return Depiction(attribution="", image_url=HttpUrl(""))
+        return Depiction(attribution="", image_url=None)
 
 class Term(BaseModel):
     chamber: Chamber

@@ -10,6 +10,6 @@ if os.path.exists(dotenv_path):
 
 # Set up environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-TIMEOUT_SECS = int(os.getenv("TIMEOUT_SECS"))
+TIMEOUT_SECS = int(os.getenv("TIMEOUT_SECS", "30"))
 CONGRESS_API_KEY = os.getenv("CONGRESS_API_KEY")
 CONGRESS_API_URL = os.getenv("CONGRESS_API_URL")

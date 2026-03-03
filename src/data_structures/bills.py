@@ -1,11 +1,20 @@
+
 from datetime import datetime
 from enum import StrEnum
 from pydantic import BaseModel, HttpUrl, Field, field_validator
 from typing import List, Annotated, Optional, Any
 from bs4 import BeautifulSoup
-
 from src.data_structures.people import Member, Sponsor, Chamber
 from src.data_collection.data_collection import CDGClient
+
+# Hearing model
+class Hearing(BaseModel):
+    title: str
+    url: HttpUrl
+    chamber: Chamber
+    committee_name: Optional[str] = None
+    hearing_date: Optional[datetime] = None
+    type: Optional[str] = None
 
 
 class Format(BaseModel):
@@ -137,6 +146,23 @@ class LawMetadata(BaseModel):
             return LawType.PRIVATE
         raise ValueError("Invalid law type")
 
+
+# General Committee model (API entity)
+class Committee(BaseModel):
+    name: str
+    chamber: str
+    type: str
+    system_code: Annotated[str, Field(alias='systemCode')]
+    url: HttpUrl
+    activities: List[Activity] = []
+    subcommittees: List['Committee'] = []
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        # Ensure subcommittees are Committee instances
+        self.subcommittees = [Committee(**sc) if isinstance(sc, dict) else sc for sc in self.subcommittees]
+
+# Metadata-only model for committee lists
 class CommitteeMetadata(BaseModel):
     activities: List[Activity]
     chamber: str
@@ -350,3 +376,29 @@ class Bill(BaseModel):
 class Law(Bill):
     is_law: bool = True
 
+# Committee Report model
+class CommitteeReport(BaseModel):
+    citation: str
+    url: HttpUrl
+    chamber: Chamber
+    committee_name: Optional[str] = None
+    report_date: Optional[datetime] = None
+    type: Optional[str] = None
+
+# Committee Print model
+class CommitteePrint(BaseModel):
+    title: str
+    url: HttpUrl
+    chamber: Chamber
+    committee_name: Optional[str] = None
+    print_date: Optional[datetime] = None
+    type: Optional[str] = None
+
+# Committee Meeting model
+class CommitteeMeeting(BaseModel):
+    name: str
+    url: HttpUrl
+    chamber: Chamber
+    committee_name: Optional[str] = None
+    meeting_date: Optional[datetime] = None
+    type: Optional[str] = None
