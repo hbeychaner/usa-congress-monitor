@@ -10,7 +10,6 @@ from src.data_collection.endpoints.amendment import (
     get_amendments_metadata,
     get_amendments_metadata_paginated,
 )
-from src.data_collection.endpoints.bill import get_bills_metadata
 from src.data_collection.endpoints.bound_congressional_record import get_bound_congressional_records
 from src.data_collection.endpoints.committee import get_committees
 from src.data_collection.endpoints.committee_meeting import get_committee_meetings
@@ -24,6 +23,7 @@ from src.data_collection.endpoints.hearing import get_hearings
 from src.data_collection.endpoints.house_communication import get_house_communications
 from src.data_collection.endpoints.house_requirement import get_house_requirements
 from src.data_collection.endpoints.house_roll_call_vote import get_house_roll_call_votes
+from src.data_collection.endpoints.bill import get_bills_metadata, get_bills_metadata_by_date
 from src.data_collection.endpoints.law import get_laws, get_laws_metadata
 from src.data_collection.endpoints.member import get_members_list
 from src.data_collection.endpoints.nomination import get_nominations
@@ -43,7 +43,13 @@ from src.models.committees import (
     CommitteeReportListItem,
     HearingListItem,
 )
-from src.models.legislation import AmendmentListItem, BillListItem, LawListItem, TreatyListItem
+from src.models.legislation import (
+    AmendmentListItem,
+    BillListItem,
+    HouseRollCallVoteListItem,
+    LawListItem,
+    TreatyListItem,
+)
 from src.models.nominations import NominationListItem
 from src.models.people_lists import MemberListItem
 from src.models.records import (
@@ -110,6 +116,16 @@ def test_amendment_endpoint(client):
 def test_amendment_metadata_endpoint(client):
     results, _, _ = get_response_with_retries(
         get_amendments_metadata,
+        client,
+        from_date="2025-01-01",
+        to_date="2025-01-05",
+    )
+    assert results is not None
+
+
+def test_bill_metadata_by_date_endpoint(client):
+    results, _, _ = get_response_with_retries(
+        get_bills_metadata_by_date,
         client,
         from_date="2025-01-01",
         to_date="2025-01-05",
