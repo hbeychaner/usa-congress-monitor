@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image
-from src.streamlit_components import init_footer
+from src.streamlit.components import init_footer
 
 # Set page config
 st.set_page_config(

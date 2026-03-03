@@ -92,27 +92,37 @@ results = collect_with_details(
 This pattern is intended for scheduled, incremental collection (e.g., daily runs). The
 checkpoint files allow the job to resume without duplicating previously collected data.
 
+## Streamlit App
+
+The Streamlit app now lives under app/. Launch it from the repository root with:
+
+```
+streamlit run app/dashboard.py
+```
+
+Additional Streamlit pages are located in app/pages.
+
 ## Documentation Index
 
-- [Documentation/AmendmentEndpoint.md](Documentation/AmendmentEndpoint.md)
-- [Documentation/BillEndpoint.md](Documentation/BillEndpoint.md)
-- [Documentation/BoundCongressionalRecordEndpoint.md](Documentation/BoundCongressionalRecordEndpoint.md)
-- [Documentation/CommitteeEndpoint.md](Documentation/CommitteeEndpoint.md)
-- [Documentation/CommitteeMeetingEndpoint.md](Documentation/CommitteeMeetingEndpoint.md)
-- [Documentation/CommitteePrintEndpoint.md](Documentation/CommitteePrintEndpoint.md)
-- [Documentation/CommitteeReportEndpoint.md](Documentation/CommitteeReportEndpoint.md)
-- [Documentation/CongressEndpoint.md](Documentation/CongressEndpoint.md)
-- [Documentation/CRSReportEndpoint.md](Documentation/CRSReportEndpoint.md)
-- [Documentation/DailyCongressionalRecordEndpoint.md](Documentation/DailyCongressionalRecordEndpoint.md)
-- [Documentation/HearingEndpoint.md](Documentation/HearingEndpoint.md)
-- [Documentation/HouseCommunicationEndpoint.md](Documentation/HouseCommunicationEndpoint.md)
-- [Documentation/HouseRequirementEndpoint.md](Documentation/HouseRequirementEndpoint.md)
-- [Documentation/HouseRollCallVoteEndpoint.md](Documentation/HouseRollCallVoteEndpoint.md)
-- [Documentation/MemberEndpoint.md](Documentation/MemberEndpoint.md)
-- [Documentation/NominationEndpoint.md](Documentation/NominationEndpoint.md)
-- [Documentation/SenateCommunicationEndpoint.md](Documentation/SenateCommunicationEndpoint.md)
-- [Documentation/SummariesEndpoint.md](Documentation/SummariesEndpoint.md)
-- [Documentation/TreatyEndpoint.md](Documentation/TreatyEndpoint.md)
+- [AmendmentEndpoint.md](AmendmentEndpoint.md)
+- [BillEndpoint.md](BillEndpoint.md)
+- [BoundCongressionalRecordEndpoint.md](BoundCongressionalRecordEndpoint.md)
+- [CommitteeEndpoint.md](CommitteeEndpoint.md)
+- [CommitteeMeetingEndpoint.md](CommitteeMeetingEndpoint.md)
+- [CommitteePrintEndpoint.md](CommitteePrintEndpoint.md)
+- [CommitteeReportEndpoint.md](CommitteeReportEndpoint.md)
+- [CongressEndpoint.md](CongressEndpoint.md)
+- [CRSReportEndpoint.md](CRSReportEndpoint.md)
+- [DailyCongressionalRecordEndpoint.md](DailyCongressionalRecordEndpoint.md)
+- [HearingEndpoint.md](HearingEndpoint.md)
+- [HouseCommunicationEndpoint.md](HouseCommunicationEndpoint.md)
+- [HouseRequirementEndpoint.md](HouseRequirementEndpoint.md)
+- [HouseRollCallVoteEndpoint.md](HouseRollCallVoteEndpoint.md)
+- [MemberEndpoint.md](MemberEndpoint.md)
+- [NominationEndpoint.md](NominationEndpoint.md)
+- [SenateCommunicationEndpoint.md](SenateCommunicationEndpoint.md)
+- [SummariesEndpoint.md](SummariesEndpoint.md)
+- [TreatyEndpoint.md](TreatyEndpoint.md)
 
 ## People & Identity
 
