@@ -2,8 +2,9 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
+
 
 def get_summaries(client: CDGClient, offset: int = 0, pageSize: int = 250):
     """
@@ -18,7 +19,9 @@ def get_summaries(client: CDGClient, offset: int = 0, pageSize: int = 250):
     return client.get("summaries", params={"offset": offset, "pageSize": pageSize})
 
 
-def gather_summaries(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_summaries(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all summaries using pagination.
     Args:
@@ -29,10 +32,12 @@ def gather_summaries(client: CDGClient, pageSize: int = 250, wait: Optional[floa
         list: A list of summaries metadata.
     """
     return gather_paginated_metadata(
-            lambda offset, page_size: get_summaries(client, offset=offset, pageSize=page_size),
-            data_key=CongressDataType.SUMMARIES,
-            desc="Summaries",
-            unit="summary",
-            page_size=pageSize,
-            wait=wait,
-        )
+        lambda offset, page_size: get_summaries(
+            client, offset=offset, pageSize=page_size
+        ),
+        data_key=CongressDataType.SUMMARIES,
+        desc="Summaries",
+        unit="summary",
+        page_size=pageSize,
+        wait=wait,
+    )

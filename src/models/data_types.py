@@ -5,6 +5,7 @@ from enum import StrEnum
 
 class CongressDataType(StrEnum):
     """String enum mapping for list keys in API responses."""
+
     AMENDMENTS = "amendments"
     BILLS = "bills"
     MEMBERS = "members"

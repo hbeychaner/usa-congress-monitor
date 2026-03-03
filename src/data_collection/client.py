@@ -87,7 +87,9 @@ class CDGClient:
         return method
 
 
-def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)):
+def create_session_with_retries(
+    retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)
+):
     """Create a requests session configured with retry and backoff behavior."""
     session = requests.Session()
     retry = Retry(
@@ -98,16 +100,19 @@ def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=
         status_forcelist=status_forcelist,
         raise_on_status=False,
         allowed_methods=["HEAD", "GET", "OPTIONS"],
-        respect_retry_after_header=True
+        respect_retry_after_header=True,
     )
     adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
 
     # Set a User-Agent header
-    session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-    })
+    session.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
+    )
     return session
+
 
 client = CDGClient(api_key=congress_api_key)

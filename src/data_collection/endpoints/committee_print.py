@@ -2,7 +2,7 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_single_page_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 
 
 def get_committee_prints(client: CDGClient):
@@ -53,6 +53,4 @@ def get_committee_print_text(
     client: CDGClient, congress: int, chamber: str, jacket_number: str
 ):
     """Retrieve the list of texts for a committee print."""
-    return client.get(
-        f"committee-print/{congress}/{chamber}/{jacket_number}/text"
-    )
+    return client.get(f"committee-print/{congress}/{chamber}/{jacket_number}/text")

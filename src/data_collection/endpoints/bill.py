@@ -64,7 +64,9 @@ def gather_congress_bills(client: CDGClient, from_date: str, to_date: str) -> li
     total_count = None
     pbar = None
     while offset != -1:
-        result, offset, count = get_bills_metadata_by_date(client, from_date, to_date, offset)
+        result, offset, count = get_bills_metadata_by_date(
+            client, from_date, to_date, offset
+        )
         bills.extend(result)
         if total_count is None:
             total_count = count

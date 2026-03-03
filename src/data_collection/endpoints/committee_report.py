@@ -2,7 +2,7 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_single_page_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 
 
 def get_committee_reports(client: CDGClient, offset: int = 0, pageSize: int = 250):
@@ -17,7 +17,9 @@ def get_committee_reports(client: CDGClient, offset: int = 0, pageSize: int = 25
     Returns:
         dict: Dictionary containing committee reports data.
     """
-    return client.get("committee-report", params={"offset": offset, "pageSize": pageSize})
+    return client.get(
+        "committee-report", params={"offset": offset, "pageSize": pageSize}
+    )
 
 
 def gather_committee_reports(client: CDGClient) -> list:
@@ -59,6 +61,4 @@ def get_committee_report_text(
     client: CDGClient, congress: int, report_type: str, report_number: int
 ):
     """Retrieve the list of texts for a committee report."""
-    return client.get(
-        f"committee-report/{congress}/{report_type}/{report_number}/text"
-    )
+    return client.get(f"committee-report/{congress}/{report_type}/{report_number}/text")

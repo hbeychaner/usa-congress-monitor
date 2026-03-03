@@ -2,8 +2,9 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
+
 
 def get_house_roll_call_votes(client: CDGClient, offset: int = 0, pageSize: int = 250):
     """
@@ -18,7 +19,9 @@ def get_house_roll_call_votes(client: CDGClient, offset: int = 0, pageSize: int 
     return client.get("house-vote", params={"offset": offset, "pageSize": pageSize})
 
 
-def gather_house_roll_call_votes(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_house_roll_call_votes(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all House roll call votes using pagination.
     Args:

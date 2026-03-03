@@ -2,8 +2,9 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
+
 
 def get_house_requirements(client: CDGClient, offset: int = 0, pageSize: int = 250):
     """
@@ -15,10 +16,14 @@ def get_house_requirements(client: CDGClient, offset: int = 0, pageSize: int = 2
     Returns:
         dict: Dictionary containing House requirement data.
     """
-    return client.get("house-requirement", params={"offset": offset, "pageSize": pageSize})
+    return client.get(
+        "house-requirement", params={"offset": offset, "pageSize": pageSize}
+    )
 
 
-def gather_house_requirements(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_house_requirements(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all House requirements using pagination.
     Args:

@@ -2,10 +2,13 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
 
-def get_daily_congressional_records(client: CDGClient, offset: int = 0, pageSize: int = 250):
+
+def get_daily_congressional_records(
+    client: CDGClient, offset: int = 0, pageSize: int = 250
+):
     """
     Retrieve daily congressional records metadata (paginated).
     Args:
@@ -15,10 +18,14 @@ def get_daily_congressional_records(client: CDGClient, offset: int = 0, pageSize
     Returns:
         dict: Dictionary containing daily congressional record data.
     """
-    return client.get("daily-congressional-record", params={"offset": offset, "pageSize": pageSize})
+    return client.get(
+        "daily-congressional-record", params={"offset": offset, "pageSize": pageSize}
+    )
 
 
-def gather_daily_congressional_records(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_daily_congressional_records(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all daily congressional records using pagination.
     Args:

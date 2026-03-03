@@ -2,8 +2,9 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
+
 
 def get_congressional_records(
     client: CDGClient,
@@ -49,6 +50,7 @@ def gather_congressional_records(
     Returns:
         list: A list of congressional record metadata.
     """
+
     def fetch_page(offset: int, page_size: int) -> dict:
         return get_congressional_records(
             client,

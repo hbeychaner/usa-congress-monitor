@@ -1,10 +1,10 @@
-
 """Endpoint helpers for committee meeting resources."""
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
+
 
 def get_committee_meetings(client: CDGClient, offset: int = 0, pageSize: int = 250):
     """
@@ -16,10 +16,14 @@ def get_committee_meetings(client: CDGClient, offset: int = 0, pageSize: int = 2
     Returns:
         dict: Dictionary containing committee meeting data.
     """
-    return client.get("committee-meeting", params={"offset": offset, "pageSize": pageSize})
+    return client.get(
+        "committee-meeting", params={"offset": offset, "pageSize": pageSize}
+    )
 
 
-def gather_committee_meetings(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_committee_meetings(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all committee meetings using pagination.
     Args:

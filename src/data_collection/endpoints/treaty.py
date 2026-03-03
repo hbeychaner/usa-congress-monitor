@@ -2,8 +2,9 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
+
 
 def get_treaties(client: CDGClient, offset: int = 0, pageSize: int = 250):
     """
@@ -18,7 +19,9 @@ def get_treaties(client: CDGClient, offset: int = 0, pageSize: int = 250):
     return client.get("treaty", params={"offset": offset, "pageSize": pageSize})
 
 
-def gather_treaties(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_treaties(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all treaties using pagination.
     Args:
@@ -29,7 +32,9 @@ def gather_treaties(client: CDGClient, pageSize: int = 250, wait: Optional[float
         list: A list of treaty metadata.
     """
     return gather_paginated_metadata(
-        lambda offset, page_size: get_treaties(client, offset=offset, pageSize=page_size),
+        lambda offset, page_size: get_treaties(
+            client, offset=offset, pageSize=page_size
+        ),
         data_key=CongressDataType.TREATIES,
         desc="Treaties",
         unit="treaty",
@@ -37,13 +42,16 @@ def gather_treaties(client: CDGClient, pageSize: int = 250, wait: Optional[float
         wait=wait,
     )
 
+
 def get_treaties_by_congress(client: CDGClient, congress: int):
     """Retrieve treaties filtered by Congress."""
     return client.get(f"treaty/{congress}")
 
+
 def get_treaty_details(client: CDGClient, congress: int, treaty_number: int):
     """Retrieve detailed information for a treaty."""
     return client.get(f"treaty/{congress}/{treaty_number}")
+
 
 def get_partitioned_treaty_details(
     client: CDGClient, congress: int, treaty_number: int, treaty_suffix: str
@@ -51,15 +59,18 @@ def get_partitioned_treaty_details(
     """Retrieve detailed information for a partitioned treaty."""
     return client.get(f"treaty/{congress}/{treaty_number}/{treaty_suffix}")
 
+
 def get_treaty_actions(client: CDGClient, congress: int, treaty_number: int):
     """Retrieve actions for a treaty."""
     return client.get(f"treaty/{congress}/{treaty_number}/actions")
+
 
 def get_partitioned_treaty_actions(
     client: CDGClient, congress: int, treaty_number: int, treaty_suffix: str
 ):
     """Retrieve actions for a partitioned treaty."""
     return client.get(f"treaty/{congress}/{treaty_number}/{treaty_suffix}/actions")
+
 
 def get_treaty_committees(client: CDGClient, congress: int, treaty_number: int):
     """Retrieve committees associated with a treaty."""

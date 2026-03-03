@@ -31,7 +31,7 @@ page = get_members_list(client, offset=0, pageSize=250)
 members = gather_members(client)
 ```
 
-For paginated endpoints that expose list-level results, use the shared pagination helpers in src/data_collection/utils.py. They accept a page-fetcher and the response list key from `CongressDataType` in src/data_collection/data_types.py.
+For paginated endpoints that expose list-level results, use the shared pagination helpers in src/data_collection/utils.py. They accept a page-fetcher and the response list key from `CongressDataType` in src/models/data_types.py.
 
 ```python
 from src.data_collection.client import CDGClient

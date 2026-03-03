@@ -10,27 +10,37 @@ from src.data_collection.endpoints.amendment import (
     get_amendments_metadata,
     get_amendments_metadata_paginated,
 )
-from src.data_collection.endpoints.bound_congressional_record import get_bound_congressional_records
+from src.data_collection.endpoints.bound_congressional_record import (
+    get_bound_congressional_records,
+)
 from src.data_collection.endpoints.committee import get_committees
 from src.data_collection.endpoints.committee_meeting import get_committee_meetings
 from src.data_collection.endpoints.committee_print import get_committee_prints
 from src.data_collection.endpoints.committee_report import get_committee_reports
 from src.data_collection.endpoints.congressional_record import get_congressional_records
-from src.data_collection.endpoints.congress import get_congress_details, get_current_congress
+from src.data_collection.endpoints.congress import (
+    get_congress_details,
+    get_current_congress,
+)
 from src.data_collection.endpoints.crs_report import get_crs_reports
-from src.data_collection.endpoints.daily_congressional_record import get_daily_congressional_records
+from src.data_collection.endpoints.daily_congressional_record import (
+    get_daily_congressional_records,
+)
 from src.data_collection.endpoints.hearing import get_hearings
 from src.data_collection.endpoints.house_communication import get_house_communications
 from src.data_collection.endpoints.house_requirement import get_house_requirements
 from src.data_collection.endpoints.house_roll_call_vote import get_house_roll_call_votes
-from src.data_collection.endpoints.bill import get_bills_metadata, get_bills_metadata_by_date
+from src.data_collection.endpoints.bill import (
+    get_bills_metadata,
+    get_bills_metadata_by_date,
+)
 from src.data_collection.endpoints.law import get_laws, get_laws_metadata
 from src.data_collection.endpoints.member import get_members_list
 from src.data_collection.endpoints.nomination import get_nominations
 from src.data_collection.endpoints.senate_communication import get_senate_communications
 from src.data_collection.endpoints.summaries import get_summaries
 from src.data_collection.endpoints.treaty import get_treaties
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from src.models.communications import (
     HouseCommunicationListItem,
     HouseRequirementListItem,
@@ -68,7 +78,9 @@ def client():
     return CDGClient(api_key=api_key)
 
 
-def get_response_with_retries(func, *args, retries: int = 3, **kwargs) -> Mapping[str, Any]:
+def get_response_with_retries(
+    func, *args, retries: int = 3, **kwargs
+) -> Mapping[str, Any]:
     for attempt in range(retries):
         try:
             return func(*args, **kwargs)
@@ -106,7 +118,9 @@ def test_member_endpoint(client):
 
 
 def test_amendment_endpoint(client):
-    response = get_response_with_retries(get_amendments_metadata_paginated, client, pageSize=1)
+    response = get_response_with_retries(
+        get_amendments_metadata_paginated, client, pageSize=1
+    )
     amendment_data = get_first_item(response, CongressDataType.AMENDMENTS)
     assert_model_covers_keys(AmendmentListItem, amendment_data)
     amendment_obj = AmendmentListItem(**amendment_data)
@@ -158,7 +172,9 @@ def test_law_endpoint(client):
 
 
 def test_law_metadata_endpoint(client):
-    results, _, _ = get_response_with_retries(get_laws_metadata, client, congress=118, offset=0)
+    results, _, _ = get_response_with_retries(
+        get_laws_metadata, client, congress=118, offset=0
+    )
     assert results is not None
 
 
@@ -259,7 +275,9 @@ def test_treaty_endpoint(client):
 
 
 def test_bound_congressional_record_endpoint(client):
-    response = get_response_with_retries(get_bound_congressional_records, client, pageSize=1)
+    response = get_response_with_retries(
+        get_bound_congressional_records, client, pageSize=1
+    )
     record_data = get_first_item(response, CongressDataType.BOUND_CONGRESSIONAL_RECORD)
     assert_model_covers_keys(BoundCongressionalRecordListItem, record_data)
     record_obj = BoundCongressionalRecordListItem(**record_data)
@@ -267,7 +285,9 @@ def test_bound_congressional_record_endpoint(client):
 
 
 def test_daily_congressional_record_endpoint(client):
-    response = get_response_with_retries(get_daily_congressional_records, client, pageSize=1)
+    response = get_response_with_retries(
+        get_daily_congressional_records, client, pageSize=1
+    )
     record_data = get_first_item(response, CongressDataType.DAILY_CONGRESSIONAL_RECORD)
     assert_model_covers_keys(DailyCongressionalRecordIssue, record_data)
     record_obj = DailyCongressionalRecordIssue(**record_data)
@@ -289,5 +309,7 @@ def test_congress_endpoints(client):
     congress_number = response.get("congress", {}).get("number")
     assert congress_number is not None
 
-    details = get_response_with_retries(get_congress_details, client, congress=congress_number)
+    details = get_response_with_retries(
+        get_congress_details, client, congress=congress_number
+    )
     assert details.get("congress", {}).get("number") == congress_number

@@ -1,15 +1,19 @@
 """Endpoint helpers for law resources."""
 
 from src.data_collection.client import CDGClient
-from src.data_collection.utils import extract_offset, gather_paginated_metadata, determine_pagination_wait
-from src.data_collection.data_types import CongressDataType
+from src.data_collection.utils import (
+    extract_offset,
+    gather_paginated_metadata,
+    determine_pagination_wait,
+)
+from src.models.data_types import CongressDataType
 from typing import Any
-from datetime import datetime
 from tqdm import tqdm
 import time
 
 # You may want to import these from a shared config/constants module
 RESULT_LIMIT = 100
+
 
 def get_laws_metadata(
     client: CDGClient, congress: int, offset: int = 0
@@ -84,7 +88,9 @@ def get_laws(client: CDGClient, congress: int, offset: int = 0, pageSize: int = 
     Returns:
         dict: Dictionary containing law data.
     """
-    return client.get(f"law/{congress}", params={"offset": offset, "pageSize": pageSize})
+    return client.get(
+        f"law/{congress}", params={"offset": offset, "pageSize": pageSize}
+    )
 
 
 def gather_laws_paginated(

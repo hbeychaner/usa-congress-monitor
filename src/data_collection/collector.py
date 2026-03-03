@@ -23,7 +23,9 @@ DetailFetcher = Callable[[Mapping[str, Any]], Mapping[str, Any]]
 IdGetter = Callable[[Mapping[str, Any]], str]
 
 
-def retry_call(func: Callable[[], Mapping[str, Any]], retries: int = 3, backoff: float = 0.5) -> Mapping[str, Any]:
+def retry_call(
+    func: Callable[[], Mapping[str, Any]], retries: int = 3, backoff: float = 0.5
+) -> Mapping[str, Any]:
     """Execute a callable with retry and exponential backoff."""
     for attempt in range(retries):
         try:
@@ -31,7 +33,7 @@ def retry_call(func: Callable[[], Mapping[str, Any]], retries: int = 3, backoff:
         except Exception:
             if attempt >= retries - 1:
                 raise
-            time.sleep(backoff * (2 ** attempt))
+            time.sleep(backoff * (2**attempt))
     raise RuntimeError("Retry loop exhausted unexpectedly.")
 
 
@@ -48,7 +50,9 @@ def collect_paginated_list(
     offset = 0
     records: list[Mapping[str, Any]] = []
     if checkpoint_path and checkpoint_path.exists():
-        offset = json.loads(checkpoint_path.read_text(encoding="utf-8")).get("offset", 0)
+        offset = json.loads(checkpoint_path.read_text(encoding="utf-8")).get(
+            "offset", 0
+        )
     if results_path and results_path.exists():
         records = json.loads(results_path.read_text(encoding="utf-8"))
 
@@ -98,10 +102,14 @@ def enrich_records(
     completed_ids: set[str] = set()
 
     if results_path and results_path.exists():
-        enriched = {r["_id"]: r for r in json.loads(results_path.read_text(encoding="utf-8"))}
+        enriched = {
+            r["_id"]: r for r in json.loads(results_path.read_text(encoding="utf-8"))
+        }
         completed_ids = set(enriched.keys())
     if checkpoint_path and checkpoint_path.exists():
-        completed_ids.update(json.loads(checkpoint_path.read_text(encoding="utf-8")).get("completed", []))
+        completed_ids.update(
+            json.loads(checkpoint_path.read_text(encoding="utf-8")).get("completed", [])
+        )
 
     items_list = list(items)
     pbar = tqdm(total=len(items_list), desc="Enriching records", unit="item")
@@ -112,15 +120,21 @@ def enrich_records(
         if record_id in completed_ids:
             continue
 
-        detail = retry_call(lambda: detail_fetcher(item), retries=retries, backoff=backoff)
+        detail = retry_call(
+            lambda: detail_fetcher(item), retries=retries, backoff=backoff
+        )
         enriched[record_id] = {"_id": record_id, **detail}
         completed_ids.add(record_id)
         pbar.update(1)
 
         if results_path:
-            results_path.write_text(json.dumps(list(enriched.values())), encoding="utf-8")
+            results_path.write_text(
+                json.dumps(list(enriched.values())), encoding="utf-8"
+            )
         if checkpoint_path:
-            checkpoint_path.write_text(json.dumps({"completed": sorted(completed_ids)}), encoding="utf-8")
+            checkpoint_path.write_text(
+                json.dumps({"completed": sorted(completed_ids)}), encoding="utf-8"
+            )
 
     pbar.close()
     return list(enriched.values())

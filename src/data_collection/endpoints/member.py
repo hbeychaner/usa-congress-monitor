@@ -2,7 +2,7 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_single_page_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 
 
 def get_members_list(client: CDGClient, offset: int = 0, pageSize: int = 250):

@@ -26,15 +26,23 @@ def iter_endpoint_getters() -> Iterable[Tuple[str, str]]:
         module_file = Path(getattr(module, "__file__", ""))
         referenced_getters: Set[str] = set()
         if module_file.is_file():
-            tree = ast.parse(module_file.read_text(encoding="utf-8"), filename=str(module_file))
+            tree = ast.parse(
+                module_file.read_text(encoding="utf-8"), filename=str(module_file)
+            )
             for node in tree.body:
-                if isinstance(node, ast.FunctionDef) and node.name.startswith("gather_"):
+                if isinstance(node, ast.FunctionDef) and node.name.startswith(
+                    "gather_"
+                ):
                     for inner in ast.walk(node):
                         if isinstance(inner, ast.Call):
                             func = inner.func
-                            if isinstance(func, ast.Name) and func.id.startswith("get_"):
+                            if isinstance(func, ast.Name) and func.id.startswith(
+                                "get_"
+                            ):
                                 referenced_getters.add(func.id)
-                            elif isinstance(func, ast.Attribute) and func.attr.startswith("get_"):
+                            elif isinstance(
+                                func, ast.Attribute
+                            ) and func.attr.startswith("get_"):
                                 referenced_getters.add(func.attr)
         for name, obj in inspect.getmembers(module, inspect.isfunction):
             if obj.__module__ != module.__name__:
@@ -63,7 +71,11 @@ def test_endpoint_getter_coverage() -> None:
     """Ensure all endpoint getter functions are called in integration tests."""
     tests_dir = Path(__file__).resolve().parent
     referenced_names = collect_referenced_names(tests_dir)
-    missing = [qualified for qualified, name in iter_endpoint_getters() if name not in referenced_names]
+    missing = [
+        qualified
+        for qualified, name in iter_endpoint_getters()
+        if name not in referenced_names
+    ]
     assert not missing, (
         "Missing integration test coverage for endpoint getters: "
         + ", ".join(sorted(missing))

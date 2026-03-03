@@ -2,10 +2,13 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
 
-def get_bound_congressional_records(client: CDGClient, offset: int = 0, pageSize: int = 250):
+
+def get_bound_congressional_records(
+    client: CDGClient, offset: int = 0, pageSize: int = 250
+):
     """
     Retrieve bound congressional records metadata (paginated).
     Args:
@@ -15,10 +18,14 @@ def get_bound_congressional_records(client: CDGClient, offset: int = 0, pageSize
     Returns:
         dict: Dictionary containing bound congressional record data.
     """
-    return client.get("bound-congressional-record", params={"offset": offset, "pageSize": pageSize})
+    return client.get(
+        "bound-congressional-record", params={"offset": offset, "pageSize": pageSize}
+    )
 
 
-def gather_bound_congressional_records(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_bound_congressional_records(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all bound congressional records using pagination.
     Args:

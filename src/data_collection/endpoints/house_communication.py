@@ -2,8 +2,9 @@
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
+from src.models.data_types import CongressDataType
 from typing import Optional
+
 
 def get_house_communications(client: CDGClient, offset: int = 0, pageSize: int = 250):
     """
@@ -15,10 +16,14 @@ def get_house_communications(client: CDGClient, offset: int = 0, pageSize: int =
     Returns:
         dict: Dictionary containing House communication data.
     """
-    return client.get("house-communication", params={"offset": offset, "pageSize": pageSize})
+    return client.get(
+        "house-communication", params={"offset": offset, "pageSize": pageSize}
+    )
 
 
-def gather_house_communications(client: CDGClient, pageSize: int = 250, wait: Optional[float] = None) -> list:
+def gather_house_communications(
+    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+) -> list:
     """
     Gather all House communications using pagination.
     Args:
@@ -29,15 +34,15 @@ def gather_house_communications(client: CDGClient, pageSize: int = 250, wait: Op
         list: A list of House communication metadata.
     """
     return gather_paginated_metadata(
-            lambda offset, page_size: get_house_communications(
-                client, offset=offset, pageSize=page_size
-            ),
-            data_key=CongressDataType.HOUSE_COMMUNICATIONS,
-            desc="House Communications",
-            unit="communication",
-            page_size=pageSize,
-            wait=wait,
-        )
+        lambda offset, page_size: get_house_communications(
+            client, offset=offset, pageSize=page_size
+        ),
+        data_key=CongressDataType.HOUSE_COMMUNICATIONS,
+        desc="House Communications",
+        unit="communication",
+        page_size=pageSize,
+        wait=wait,
+    )
 
 
 def get_house_communications_by_congress(client: CDGClient, congress: int):
