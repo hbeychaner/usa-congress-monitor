@@ -7,6 +7,9 @@ from src.data_collection.utils import (
     determine_pagination_wait,
 )
 from src.models.data_types import CongressDataType
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 from typing import Any
 from tqdm import tqdm
 import time

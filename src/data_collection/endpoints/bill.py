@@ -11,6 +11,9 @@ from src.data_collection.utils import (
     determine_pagination_wait,
     extract_offset,
 )
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 RESULT_LIMIT = 100
 

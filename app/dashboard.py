@@ -1,6 +1,10 @@
 import streamlit as st
 from PIL import Image
+
 from src.streamlit.components import init_footer
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 # Set page config
 st.set_page_config(

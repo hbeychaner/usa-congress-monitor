@@ -3,6 +3,10 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 import streamlit as st
 
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
 Base = declarative_base()
 
 

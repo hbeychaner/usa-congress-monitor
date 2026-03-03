@@ -3,14 +3,23 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from datetime import datetime
+from dataclasses import dataclass
+from math import ceil
 from typing import Callable, Optional
 from urllib.parse import parse_qs, urlparse
 
+from pydantic import HttpUrl
 from requests.exceptions import ChunkedEncodingError
+from selenium import webdriver
 from tqdm import tqdm
 from urllib3.exceptions import ProtocolError
+
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 RESULT_LIMIT = 100
 RATE_LIMIT_CONSTANT = 5000 / 60 / 60  # 5000 requests per hour, divided into seconds
@@ -56,6 +65,7 @@ def checkpointed_paginate(
                 results, next_offset, count = endpoint_func(*args, **call_kwargs)
                 break
             except (ChunkedEncodingError, ProtocolError) as exc:
+                logger.warning("Paginated request failed: %s", exc)
                 time.sleep(2)
         else:
             break
@@ -78,6 +88,111 @@ def extract_offset(url: str) -> int:
     parsed_url = urlparse(url)
     offset = parse_qs(parsed_url.query).get("offset", [0])[0]
     return int(offset)
+
+
+def _extract_query_int(url: str, keys: tuple[str, ...]) -> Optional[int]:
+    parsed_url = urlparse(url)
+    params = parse_qs(parsed_url.query)
+    for key in keys:
+        if key in params and params[key]:
+            try:
+                return int(params[key][0])
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
+def extract_offset_from_url(
+    url: str,
+    *,
+    offset_param_names: tuple[str, ...] = ("offset", "start", "skip"),
+    page_param_names: tuple[str, ...] = ("page", "pageNumber", "page_number"),
+    page_size: Optional[int] = None,
+) -> Optional[int]:
+    """Extract an offset or page from a URL query string."""
+    offset = _extract_query_int(url, offset_param_names)
+    if offset is not None:
+        return offset
+    page = _extract_query_int(url, page_param_names)
+    if page is not None and page_size:
+        return max(0, (page - 1) * page_size)
+    return None
+
+
+@dataclass(frozen=True)
+class PaginationMeta:
+    next_offset: int
+    total: int
+    page_size: int
+
+
+@dataclass(frozen=True)
+class PaginatedFetchResult:
+    records: list
+    total: int
+    last_page: int
+    total_pages: int
+    page_size: int
+
+
+def resolve_pagination(
+    response: dict,
+    *,
+    records_len: int,
+    offset: int,
+    page_size: int,
+    offset_param_names: tuple[str, ...] = ("offset", "start", "skip"),
+    page_param_names: tuple[str, ...] = ("page", "pageNumber", "page_number"),
+) -> PaginationMeta:
+    """Resolve pagination metadata from a response with varied conventions."""
+    pagination = response.get("pagination")
+    if isinstance(pagination, dict):
+        total = int(pagination.get("count") or pagination.get("total") or 0)
+        effective_page_size = int(
+            pagination.get("limit")
+            or pagination.get("pageSize")
+            or pagination.get("pagesize")
+            or page_size
+            or records_len
+            or 0
+        )
+        next_offset = -1
+        next_url = pagination.get("next") or pagination.get("nextPage")
+        if isinstance(next_url, str):
+            extracted = extract_offset_from_url(
+                next_url,
+                offset_param_names=offset_param_names,
+                page_param_names=page_param_names,
+                page_size=effective_page_size or page_size,
+            )
+            if extracted is not None:
+                next_offset = extracted
+        else:
+            offset_value = pagination.get("offset")
+            if offset_value is not None:
+                try:
+                    next_offset = int(offset_value)
+                except (TypeError, ValueError):
+                    next_offset = -1
+        return PaginationMeta(next_offset=next_offset, total=total, page_size=effective_page_size)
+
+    results = response.get("Results")
+    if isinstance(results, dict):
+        total = int(results.get("TotalCount") or results.get("total") or 0)
+        index_start = results.get("IndexStart")
+        effective_page_size = page_size or records_len or 0
+        if index_start is None:
+            return PaginationMeta(next_offset=-1, total=total, page_size=effective_page_size)
+        try:
+            index_start_int = int(index_start)
+        except (TypeError, ValueError):
+            index_start_int = offset
+        next_offset = index_start_int + records_len
+        if total and next_offset >= total:
+            next_offset = -1
+        return PaginationMeta(next_offset=next_offset, total=total, page_size=effective_page_size)
+
+    return PaginationMeta(next_offset=-1, total=0, page_size=page_size or records_len or 0)
 
 
 def determine_pagination_wait(start_time: float, offset: int) -> None:
@@ -117,24 +232,82 @@ def gather_paginated_metadata(
     wait: Optional[float] = None,
 ) -> list:
     """Aggregate list results across paginated endpoint responses."""
+    result = gather_paginated_records(
+        fetch_page,
+        data_key=data_key,
+        desc=desc,
+        unit=unit,
+        page_size=page_size,
+        wait=wait,
+        progress_mode="record",
+    )
+    return result.records
+
+
+def gather_paginated_records(
+    fetch_page: Callable[[int, int], dict],
+    *,
+    data_key: str,
+    desc: str,
+    unit: str,
+    page_size: int = 250,
+    wait: Optional[float] = None,
+    progress_mode: str = "record",
+    on_progress: Optional[Callable[[int, int, int, int], None]] = None,
+    offset_param_names: tuple[str, ...] = ("offset", "start", "skip"),
+    page_param_names: tuple[str, ...] = ("page", "pageNumber", "page_number"),
+) -> PaginatedFetchResult:
+    """Aggregate list results across paginated endpoint responses."""
     offset = 0
-    all_records = []
+    all_records: list = []
     wait_val = resolve_pagination_wait(page_size, wait)
     pbar = tqdm(desc=desc, unit=unit)
+    total = 0
+    total_pages = 0
+    page_index = 0
+    effective_page_size = page_size
     while True:
         response = fetch_page(offset, page_size)
         records = response.get(str(data_key), [])
         if not records:
             break
         all_records.extend(records)
-        pbar.update(len(records))
-        new_offset = extract_offset(response)
-        if new_offset is None or new_offset == offset:
+        meta = resolve_pagination(
+            response,
+            records_len=len(records),
+            offset=offset,
+            page_size=page_size,
+            offset_param_names=offset_param_names,
+            page_param_names=page_param_names,
+        )
+        if total == 0 and meta.total:
+            total = meta.total
+            effective_page_size = meta.page_size or len(records) or page_size
+            total_pages = ceil(total / effective_page_size) if effective_page_size else 0
+            if progress_mode == "page" and total_pages:
+                pbar.total = total_pages
+                pbar.refresh()
+        page_index += 1
+        if progress_mode == "page":
+            pbar.update(1)
+            if total_pages:
+                pbar.set_postfix_str(f"{page_index}/{total_pages}")
+        else:
+            pbar.update(len(records))
+        if on_progress:
+            on_progress(offset, page_index, total_pages, effective_page_size)
+        if meta.next_offset == -1 or meta.next_offset == offset:
             break
-        offset = new_offset
+        offset = meta.next_offset
         time.sleep(wait_val)
     pbar.close()
-    return all_records
+    return PaginatedFetchResult(
+        records=all_records,
+        total=total,
+        last_page=page_index,
+        total_pages=total_pages,
+        page_size=effective_page_size,
+    )
 
 
 def gather_single_page_metadata(fetch_page: Callable[[], dict], data_key: str) -> list:
@@ -168,3 +341,34 @@ def gather_data(
     if pbar:
         pbar.close()
     return all_results
+
+
+def download_pdf(lnk: HttpUrl) -> str:
+    """Download a PDF from a link using Selenium.
+
+    Returns the filename of the downloaded PDF.
+    """
+    options = webdriver.ChromeOptions()
+    download_folder = os.path.join(os.getcwd(), "tmp")
+    profile = {
+        "plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}],
+        "download.default_directory": download_folder,
+        "download.extensions_to_open": "",
+        "plugins.always_open_pdf_externally": True,
+    }
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-software-rasterizer")
+    options.add_argument("--disable-features=VizDisplayCompositor")
+    options.add_experimental_option("prefs", profile)
+    driver = webdriver.Chrome(options=options)
+    driver.get(str(lnk))
+
+    filename = str(lnk).split("/")[-1]
+    logger.info("Downloaded PDF: %s", filename)
+    time.sleep(3)
+    driver.close()
+    return filename

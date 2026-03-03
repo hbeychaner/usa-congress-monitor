@@ -16,6 +16,9 @@ from typing import Any, Callable, Iterable, Mapping, MutableMapping, Optional
 from tqdm import tqdm
 
 from src.data_collection.utils import extract_offset, resolve_pagination_wait
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 ListFetcher = Callable[[int, int], Mapping[str, Any]]
@@ -31,6 +34,7 @@ def retry_call(
         try:
             return func()
         except Exception:
+            logger.warning("Retry attempt %s failed", attempt + 1)
             if attempt >= retries - 1:
                 raise
             time.sleep(backoff * (2**attempt))

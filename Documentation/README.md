@@ -92,6 +92,12 @@ results = collect_with_details(
 This pattern is intended for scheduled, incremental collection (e.g., daily runs). The
 checkpoint files allow the job to resume without duplicating previously collected data.
 
+## Daily Window Collector
+
+Use src/data_collection/daily_collector.py to gather all top-level list endpoints in a
+24-hour window, fetch detail records for each item URL, and collect member metadata
+referenced by any details. Outputs are written as JSON files grouped by endpoint name.
+
 ## Streamlit App
 
 The Streamlit app now lives under app/. Launch it from the repository root with:

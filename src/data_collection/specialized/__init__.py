@@ -1,0 +1,1 @@
+"""Specialized per-endpoint sync logic and registry."""

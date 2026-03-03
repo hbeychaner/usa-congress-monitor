@@ -5,6 +5,9 @@ from __future__ import annotations
 from tqdm import tqdm
 
 from src.data_collection.client import CDGClient
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_congress_details(client: CDGClient, congress: int):

@@ -10,6 +10,14 @@ from typing import Annotated, Any, List, Optional
 from pydantic import BaseModel, Field, HttpUrl
 
 
+class RecordTypeBase(BaseModel):
+    """Base model that carries the knowledgebase record type."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = ""
+
+
 class Subject(BaseModel):
     """Structured subject label with optional update timing."""
 
@@ -199,8 +207,12 @@ class MemberTerms(BaseModel):
     ] = None
 
 
-class HouseCommunicationListItem(BaseModel):
+class HouseCommunicationListItem(RecordTypeBase):
     """List-level House communication entry."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-house-communications"
 
     chamber: Annotated[str, Field(description="Which chamber sent the communication.")]
     number: Annotated[int, Field(description="What the communication number is.")]
@@ -237,8 +249,12 @@ class HouseCommunicationListItem(BaseModel):
     ]
 
 
-class SenateCommunicationListItem(BaseModel):
+class SenateCommunicationListItem(RecordTypeBase):
     """List-level Senate communication entry."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-senate-communications"
 
     chamber: Annotated[str, Field(description="Which chamber sent the communication.")]
     number: Annotated[int, Field(description="What the communication number is.")]
@@ -267,8 +283,12 @@ class SenateCommunicationListItem(BaseModel):
     ]
 
 
-class HouseRequirementListItem(BaseModel):
+class HouseRequirementListItem(RecordTypeBase):
     """List-level House requirement entry."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-house-requirements"
 
     number: Annotated[int, Field(description="What the requirement number is.")]
     update_date: Annotated[
@@ -322,8 +342,12 @@ class NominationTypeInfo(BaseModel):
     ]
 
 
-class NominationListItem(BaseModel):
+class NominationListItem(RecordTypeBase):
     """List-level nomination entry with citation and action data."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-nominations"
 
     congress: Annotated[
         int, Field(description="Which Congress the nomination belongs to.")
@@ -382,8 +406,12 @@ class NominationListItem(BaseModel):
     ] = None
 
 
-class CRSReportListItem(BaseModel):
+class CRSReportListItem(RecordTypeBase):
     """List-level CRS report entry with status and metadata."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-crs-reports"
 
     status: Annotated[
         Optional[str], Field(description="What the CRS report status is.")
@@ -461,8 +489,12 @@ class BillSummaryBill(BaseModel):
     ]
 
 
-class BillSummaryListItem(BaseModel):
+class BillSummaryListItem(RecordTypeBase):
     """List-level bill summary entry with action and version details."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-summaries"
 
     bill: Annotated[
         BillSummaryBill, Field(description="Which bill the summary applies to.")
@@ -528,8 +560,12 @@ class BillSummaryListItem(BaseModel):
     ]
 
 
-class HouseRollCallVoteListItem(BaseModel):
+class HouseRollCallVoteListItem(RecordTypeBase):
     """List-level roll call vote entry for the House."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-house-votes"
 
     start_date: Annotated[
         Optional[datetime],
@@ -636,8 +672,12 @@ class HouseRollCallVoteListItem(BaseModel):
     ] = None
 
 
-class DailyCongressionalRecordIssue(BaseModel):
+class DailyCongressionalRecordIssue(RecordTypeBase):
     """List-level daily congressional record issue entry."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-daily-congressional-records"
 
     congress: Annotated[
         Optional[int], Field(description="Which Congress the record issue belongs to.")
@@ -682,8 +722,12 @@ class DailyCongressionalRecordIssue(BaseModel):
     ]
 
 
-class BoundCongressionalRecordListItem(BaseModel):
+class BoundCongressionalRecordListItem(RecordTypeBase):
     """List-level bound congressional record entry."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-bound-congressional-records"
 
     date: Annotated[
         Optional[datetime], Field(description="When the bound record was published.")
@@ -720,8 +764,12 @@ class BoundCongressionalRecordListItem(BaseModel):
     ] = None
 
 
-class CongressionalRecordIssue(BaseModel):
+class CongressionalRecordIssue(RecordTypeBase):
     """Issue metadata from the Congressional Record feed."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-congressional-records"
 
     congress: Annotated[
         Optional[str],
@@ -769,8 +817,12 @@ class CongressionalRecordIssue(BaseModel):
     ]
 
 
-class CommitteeListItem(BaseModel):
+class CommitteeListItem(RecordTypeBase):
     """List-level committee entry with system code and metadata."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-committees"
 
     url: Annotated[
         Optional[HttpUrl],
@@ -808,8 +860,12 @@ class CommitteeListItem(BaseModel):
     ]
 
 
-class CommitteeReportListItem(BaseModel):
+class CommitteeReportListItem(RecordTypeBase):
     """List-level committee report entry with citation metadata."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-committee-reports"
 
     citation: Annotated[
         Optional[str], Field(description="What the committee report citation is.")
@@ -874,8 +930,12 @@ class AmendmentLatestAction(BaseModel):
     ] = None
 
 
-class AmendmentListItem(BaseModel):
+class AmendmentListItem(RecordTypeBase):
     """List-level amendment entry with latest action and type."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-amendments"
 
     congress: Annotated[
         Optional[int], Field(description="Which Congress the amendment belongs to.")
@@ -939,8 +999,12 @@ class LawEntry(BaseModel):
     ] = None
 
 
-class BillListItem(BaseModel):
+class BillListItem(RecordTypeBase):
     """List-level bill entry with title and latest action."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-bills"
 
     congress: Annotated[
         Optional[int], Field(description="Which Congress the bill belongs to.")
@@ -995,8 +1059,12 @@ class BillListItem(BaseModel):
     ] = None
 
 
-class LawListItem(BaseModel):
+class LawListItem(RecordTypeBase):
     """List-level law entry derived from bill data."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-laws"
 
     congress: Annotated[
         Optional[int], Field(description="Which Congress the law belongs to.")
@@ -1055,8 +1123,12 @@ class LawListItem(BaseModel):
     ] = None
 
 
-class CommitteePrintListItem(BaseModel):
+class CommitteePrintListItem(RecordTypeBase):
     """List-level committee print entry."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-committee-prints"
 
     jacket_number: Annotated[
         Optional[int],
@@ -1086,8 +1158,12 @@ class CommitteePrintListItem(BaseModel):
     ] = None
 
 
-class CommitteeMeetingListItem(BaseModel):
+class CommitteeMeetingListItem(RecordTypeBase):
     """List-level committee meeting entry."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-committee-meetings"
 
     event_id: Annotated[
         Optional[int],
@@ -1117,8 +1193,12 @@ class CommitteeMeetingListItem(BaseModel):
     ] = None
 
 
-class HearingListItem(BaseModel):
+class HearingListItem(RecordTypeBase):
     """List-level hearing entry with jacket number and metadata."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-hearings"
 
     jacket_number: Annotated[
         Optional[int],
@@ -1154,8 +1234,12 @@ class HearingListItem(BaseModel):
     ] = None
 
 
-class TreatyListItem(BaseModel):
+class TreatyListItem(RecordTypeBase):
     """List-level treaty entry with congress and numbering info."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-treaties"
 
     congress_received: Annotated[
         Optional[int],
@@ -1207,8 +1291,12 @@ class TreatyListItem(BaseModel):
     ] = None
 
 
-class MemberListItem(BaseModel):
+class MemberListItem(RecordTypeBase):
     """List-level member entry with name, party, and term data."""
+
+    recordType: Annotated[
+        str, Field(description="Which knowledgebase index this record belongs to.")
+    ] = "congress-members"
 
     bioguide_id: Annotated[
         str,

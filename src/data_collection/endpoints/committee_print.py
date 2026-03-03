@@ -3,6 +3,9 @@
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import gather_single_page_metadata
 from src.models.data_types import CongressDataType
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_committee_prints(client: CDGClient):

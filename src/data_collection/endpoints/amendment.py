@@ -4,6 +4,9 @@ from typing import Any
 
 from src.data_collection.client import CDGClient
 from src.data_collection.utils import datetime_convert, extract_offset
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 RESULT_LIMIT = 100
 

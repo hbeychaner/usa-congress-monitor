@@ -4,22 +4,19 @@ Provides `CDGClient` for authenticated API access and a `create_session_with_ret
 helper that configures robust HTTP retry behavior.
 """
 
-import logging
-import os
 from typing import Any
 from urllib.parse import urljoin
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from dotenv import load_dotenv
 from requests import Response
 
-load_dotenv()
+from src.utils.logger import get_logger
+from settings import CONGRESS_API_KEY
 
-congress_api_key = os.getenv("CONGRESS_API_KEY", "")
+congress_api_key = CONGRESS_API_KEY
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = get_logger(__name__)
 
 
 API_VERSION = "v3"

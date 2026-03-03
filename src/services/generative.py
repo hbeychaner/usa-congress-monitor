@@ -1,6 +1,9 @@
 from openai import OpenAI
 
 from settings import OPENAI_API_KEY, TIMEOUT_SECS
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_client() -> OpenAI:

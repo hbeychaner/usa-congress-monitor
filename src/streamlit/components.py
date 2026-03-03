@@ -1,3 +1,8 @@
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+
 def init_footer():
     return """<style>
 a:link , a:visited{

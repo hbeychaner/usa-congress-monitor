@@ -5,9 +5,9 @@ openai==1.61.1
 plotly==5.18.0
 PyPDF2==3.0.1
 python-dotenv==1.0.1
+elasticsearch==9.3.0
 pytest==9.0.2
 selenium==4.29.0
 smolagents==1.8.1
 streamlit==1.42.0
 streamlit_agraph==0.0.45
-sqlalchemy==2.0.38
