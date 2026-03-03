@@ -1,9 +1,11 @@
+"""Database utilities and ORM models for storing bill metadata."""
+
 from typing import Optional
 
 from sqlalchemy import Column, DateTime, Integer, String, create_engine, inspect
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from src.data_structures.bills import Bill
+from src.models.bills import Bill
 
 Base = declarative_base()
 # Create an SQLite database in memory or on disk

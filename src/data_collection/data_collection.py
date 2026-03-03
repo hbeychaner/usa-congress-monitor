@@ -1,3 +1,9 @@
+"""Legacy data collection helpers.
+
+Prefer the endpoint modules in src.data_collection.endpoints and shared utilities in
+src.data_collection.utils for new code.
+"""
+
 import json
 import logging
 import os
@@ -211,6 +217,7 @@ def get_amendments_metadata(
 
 
 def extract_offset(url: str) -> int:
+    """Extract the pagination offset from a URL query string."""
     parsed_url = urlparse(url)
     offset = parse_qs(parsed_url.query).get("offset", [0])[0]
     return int(offset)
@@ -751,7 +758,7 @@ def gather_paginated_metadata(
     pbar = tqdm(desc=desc, unit=unit)
     while True:
         response = fetch_page(offset, page_size)
-        records = response.get(data_key, [])
+        records = response.get(str(data_key), [])
         if not records:
             break
         all_records.extend(records)
@@ -780,7 +787,7 @@ def gather_single_page_metadata(
         list: The list of records from the response.
     """
     response = fetch_page()
-    return response.get(data_key, [])
+    return response.get(str(data_key), [])
 
 
 def gather_data(

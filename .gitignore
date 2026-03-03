@@ -6,6 +6,23 @@
 
 # Jupyter Notebooks
 **/test.ipynb
+*.ipynb*
+
+# pytest / test artifacts
+.pytest_cache/
+**/.pytest_cache/
+**/tmp/
+**/checkpoints/
+
+# Data snapshots / outputs
+*_checkpoint.json
+*_results.json
+*snapshot*.json
+*.db
+
+
+# Whoosh index
+whoosh_members_index/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

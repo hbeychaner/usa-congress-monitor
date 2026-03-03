@@ -1,8 +1,7 @@
-"""
-CDG Client - An example client for the Congress.gov API.
+"""Congress.gov API client and retry-capable session factory.
 
-@copyright: 2022, Library of Congress
-@license: CC0 1.0
+Provides `CDGClient` for authenticated API access and a `create_session_with_retries`
+helper that configures robust HTTP retry behavior.
 """
 
 import logging
@@ -29,7 +28,7 @@ RESPONSE_FORMAT = "json"
 
 
 class _MethodWrapper:
-    """Wrap request method to facilitate queries.  Supports requests signature."""
+    """Wrap a requests method to add base URL resolution and JSON handling."""
 
     def __init__(self, parent: "CDGClient", http_method: str) -> None:
         self._parent: CDGClient = parent
@@ -38,6 +37,7 @@ class _MethodWrapper:
     def __call__(
         self, endpoint: str, *args: Any, **kwargs: Any
     ) -> dict[str, Any] | bytes:
+        """Invoke the HTTP method and return JSON or raw bytes based on content type."""
         response = self._method(
             urljoin(self._parent.base_url, endpoint), *args, **kwargs
         )
@@ -48,7 +48,7 @@ class _MethodWrapper:
 
 
 class CDGClient:
-    """A sample client to interface with Congress.gov."""
+    """Client for Congress.gov API requests with optional error raising."""
 
     def __init__(
         self,
@@ -58,6 +58,7 @@ class CDGClient:
         raise_on_error: bool = True,
         added_headers: dict[str, str] | None = None,
     ) -> None:
+        """Initialize the client with API key, format, and retry-enabled session."""
         self.base_url = urljoin(ROOT_URL, api_version) + "/"
         self._session = create_session_with_retries()
 
@@ -76,16 +77,18 @@ class CDGClient:
 
     @property
     def session(self) -> requests.Session:
+        """Return the underlying requests session."""
         return self._session
 
     def __getattr__(self, method_name: str) -> Any:
-        """Find the session method dynamically and cache for later."""
+        """Find the session method dynamically and cache it for later reuse."""
         method = _MethodWrapper(self, method_name)
         self.__dict__[method_name] = method
         return method
 
 
 def create_session_with_retries(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)):
+    """Create a requests session configured with retry and backoff behavior."""
     session = requests.Session()
     retry = Retry(
         total=retries,
