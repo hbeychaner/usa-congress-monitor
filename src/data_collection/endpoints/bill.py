@@ -1,14 +1,21 @@
 """Endpoint helpers for Congress.gov bill resources."""
 
-from src.data_collection.client import CDGClient
-from src.data_collection.utils import datetime_convert, determine_pagination_wait, extract_offset
-from typing import Any
-from tqdm import tqdm
 import time
+from typing import Any
+
+from tqdm import tqdm
+
+from src.data_collection.client import CDGClient
+from src.data_collection.utils import (
+    datetime_convert,
+    determine_pagination_wait,
+    extract_offset,
+)
 
 RESULT_LIMIT = 100
 
-def get_bills_metadata(
+
+def get_bills_metadata_by_date(
     client: CDGClient, from_date: str, to_date: str, offset: int = 0
 ) -> tuple[list[Any], int, int]:
     """
@@ -57,7 +64,7 @@ def gather_congress_bills(client: CDGClient, from_date: str, to_date: str) -> li
     total_count = None
     pbar = None
     while offset != -1:
-        result, offset, count = get_bills_metadata(client, from_date, to_date, offset)
+        result, offset, count = get_bills_metadata_by_date(client, from_date, to_date, offset)
         bills.extend(result)
         if total_count is None:
             total_count = count
@@ -68,6 +75,7 @@ def gather_congress_bills(client: CDGClient, from_date: str, to_date: str) -> li
     if pbar:
         pbar.close()
     return bills
+
 
 def get_bills_metadata(client: CDGClient, offset: int = 0, pageSize: int = 250):
     """

@@ -116,35 +116,10 @@ def datetime_convert(date_str: str) -> str:
 def get_bills_metadata(
     client: CDGClient, from_date: str, to_date: str, offset: int = 0
 ) -> tuple[list[Any], int, int]:
-    """
-    Retrieve metadata for bills.
+    """Legacy wrapper for date-range bill metadata retrieval."""
+    from src.data_collection.endpoints.bill import get_bills_metadata_by_date
 
-    Args:
-        from_date (str): The start date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
-        to_date (str): The end date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
-        offset (int): The offset for the request.
-        limit (int): The number of results to return.
-    Returns:
-        list: A list of bill metadata.
-    """
-    # Convert the date strings to the desired format
-    from_date = datetime_convert(from_date)
-    to_date = datetime_convert(to_date)
-    params = {"limit": RESULT_LIMIT, "fromDateTime": from_date, "toDateTime": to_date}
-    if offset > 0:
-        params["offset"] = offset
-    response = client.get("bill", params=params)
-    if isinstance(response, dict):
-        bills = list(response.get("bills", []))  # type: ignore
-        pagination = response.get("pagination", {})
-        if isinstance(pagination, dict) and "next" in pagination:
-            offset = extract_offset(url=pagination["next"])
-            count = int(pagination.get("count", 0))
-            return (bills, offset, count)
-        return (bills, -1, 0)
-    else:
-        # Unexpected non-JSON response
-        return ([], -1, 0)
+    return get_bills_metadata_by_date(client, from_date, to_date, offset)
 
 
 def get_laws_metadata(

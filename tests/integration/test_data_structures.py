@@ -2,7 +2,7 @@ import os
 import pytest
 from src.data_collection.client import CDGClient
 from src.data_collection.endpoints.member import get_members_list
-from src.models.other_models import MemberListItem
+from src.models.people_lists import MemberListItem
 from src.data_collection.data_types import CongressDataType
 
 @pytest.fixture(scope="module")

@@ -1,10 +1,12 @@
 """Endpoint helpers for Congress.gov amendment resources."""
 
-from src.data_collection.client import CDGClient
-from src.data_collection.utils import datetime_convert, extract_offset
 from typing import Any
 
+from src.data_collection.client import CDGClient
+from src.data_collection.utils import datetime_convert, extract_offset
+
 RESULT_LIMIT = 100
+
 
 def get_amendments_metadata(
     client: CDGClient,
@@ -42,7 +44,9 @@ def get_amendments_metadata(
         return ([], -1, 0)
 
 
-def get_amendments_metadata_paginated(client: CDGClient, offset: int = 0, pageSize: int = 250):
+def get_amendments_metadata_paginated(
+    client: CDGClient, offset: int = 0, pageSize: int = 250
+):
     """
     Retrieve amendments metadata (paginated).
     Args:

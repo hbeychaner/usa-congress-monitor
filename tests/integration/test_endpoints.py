@@ -31,28 +31,27 @@ from src.data_collection.endpoints.senate_communication import get_senate_commun
 from src.data_collection.endpoints.summaries import get_summaries
 from src.data_collection.endpoints.treaty import get_treaties
 from src.data_collection.data_types import CongressDataType
-from src.models.other_models import (
-    AmendmentListItem,
-    BillSummaryListItem,
-    BillListItem,
-    BoundCongressionalRecordListItem,
+from src.models.communications import (
+    HouseCommunicationListItem,
+    HouseRequirementListItem,
+    SenateCommunicationListItem,
+)
+from src.models.committees import (
     CommitteeListItem,
     CommitteeMeetingListItem,
     CommitteePrintListItem,
     CommitteeReportListItem,
-    CongressionalRecordIssue,
-    CRSReportListItem,
-    DailyCongressionalRecordIssue,
     HearingListItem,
-    HouseCommunicationListItem,
-    HouseRequirementListItem,
-    HouseRollCallVoteListItem,
-    LawListItem,
-    MemberListItem,
-    NominationListItem,
-    SenateCommunicationListItem,
-    TreatyListItem,
 )
+from src.models.legislation import AmendmentListItem, BillListItem, LawListItem, TreatyListItem
+from src.models.nominations import NominationListItem
+from src.models.people_lists import MemberListItem
+from src.models.records import (
+    BoundCongressionalRecordListItem,
+    CongressionalRecordIssue,
+    DailyCongressionalRecordIssue,
+)
+from src.models.reports import BillSummaryListItem, CRSReportListItem
 
 
 @pytest.fixture(scope="module")

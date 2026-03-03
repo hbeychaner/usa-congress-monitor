@@ -1,12 +1,14 @@
+from sqlalchemy import Column, DateTime, Integer, String, and_, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
 import streamlit as st
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, and_
 
 Base = declarative_base()
 
+
 class BillModel(Base):
-    __tablename__ = 'bills'
-    
+    __tablename__ = "bills"
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     congress = Column(Integer, nullable=False)
     latest_action_date = Column(DateTime, nullable=False)
@@ -20,16 +22,19 @@ class BillModel(Base):
     update_date_including_text = Column(DateTime, nullable=False)
     url = Column(String, nullable=False)
 
+
 # Set up the database connection
-engine = create_engine('sqlite:///congress_bills.db')
+engine = create_engine("sqlite:///congress_bills.db")
 Session = sessionmaker(bind=engine)
 session = Session()
 
 # Streamlit form for input
 st.title("Congress Bills Filter")
 
-with st.form("filter_form"): # Every input should have a on/off tick box
-    congress_number = st.number_input("Congress Number", min_value=0, step=1, format="%d")
+with st.form("filter_form"):  # Every input should have a on/off tick box
+    congress_number = st.number_input(
+        "Congress Number", min_value=0, step=1, format="%d"
+    )
     congress_number_box = st.checkbox("Filter Congress")
     chamber = st.selectbox("Chamber", options=["", "House", "Senate"])
     chamber_box = st.checkbox("Filter Chamber")
@@ -39,7 +44,7 @@ with st.form("filter_form"): # Every input should have a on/off tick box
     latest_action_date_box = st.checkbox("Filter Latest Action Date")
     number = st.number_input("Bill Number", min_value=0, step=1, format="%d")
     number_box = st.checkbox("Filter Bill Number")
-    
+
     # Submit button
     submitted = st.form_submit_button("Search")
 
@@ -56,7 +61,7 @@ if submitted:
         query = query.filter(
             and_(
                 BillModel.latest_action_date >= from_date,
-                BillModel.latest_action_date <= to_date
+                BillModel.latest_action_date <= to_date,
             )
         )
     if latest_action_date_box:
@@ -67,10 +72,14 @@ if submitted:
     results = query.all()
     st.write(f"Found {len(results)} bills")
     for bill in results:
-        st.write(f"Title: {bill.title}, Congress: {bill.congress}, Chamber: {bill.origin_chamber}, Date: {bill.latest_action_date}")
+        st.write(
+            f"Title: {bill.title}, Congress: {bill.congress}, Chamber: {bill.origin_chamber}, Date: {bill.latest_action_date}"
+        )
 
 # Add button for printing all records in the whole database
 if st.button("Print All Records"):
     all_bills = session.query(BillModel).all()
     for bill in all_bills:
-        st.write(f"Title: {bill.title}, Congress: {bill.congress}, Chamber: {bill.origin_chamber}, Date: {bill.latest_action_date}")
+        st.write(
+            f"Title: {bill.title}, Congress: {bill.congress}, Chamber: {bill.origin_chamber}, Date: {bill.latest_action_date}"
+        )
