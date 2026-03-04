@@ -41,10 +41,6 @@ def ensure_state_index(client: Elasticsearch) -> None:
         return
     legacy_index = "kb-sync-state"
     if client.indices.exists(index=legacy_index):
-        client.indices.put_mapping(
-            index=legacy_index,
-            properties=STATE_MAPPING.get("mappings", {}).get("properties", {}),
-        )
         if not client.indices.exists_alias(name=STATE_INDEX):
             client.indices.put_alias(index=legacy_index, name=STATE_INDEX)
         return

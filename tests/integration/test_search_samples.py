@@ -37,10 +37,13 @@ def print_hits(label: str, response: dict[str, Any], max_hits: int = 3) -> None:
     print(f"{label}: {len(hits)} hits")
     for hit in hits[:max_hits]:
         source = hit.get("_source", {})
-        print("  -", source.get("title") or source.get("fullName") or source.get("name"))
+        print(
+            "  -", source.get("title") or source.get("fullName") or source.get("name")
+        )
 
 
-def test_member_search(client: Elasticsearch) -> None:
+def test_member_search() -> None:
+    client = get_client()
     index_name = "congress-members"
     sample = get_sample_doc(client, index_name)
     if not sample:
@@ -54,11 +57,14 @@ def test_member_search(client: Elasticsearch) -> None:
 
     text_value = sample.get("fullName") or sample.get("name") or sample.get("party")
     if text_value:
-        resp = search_text_only(client, index_name, str(text_value), ["fullName", "name", "party", "state"])  # noqa: E501
+        resp = search_text_only(
+            client, index_name, str(text_value), ["fullName", "name", "party", "state"]
+        )  # noqa: E501
         print_hits("Member text-only search", resp)
 
 
-def test_bill_search(client: Elasticsearch) -> None:
+def test_bill_search() -> None:
+    client = get_client()
     index_name = "congress-bills"
     sample = get_sample_doc(client, index_name)
     if not sample:
@@ -66,7 +72,9 @@ def test_bill_search(client: Elasticsearch) -> None:
         return
 
     title = sample.get("title") or "energy"
-    resp = search_text_only(client, index_name, str(title), ["title", "latestAction.text"])  # noqa: E501
+    resp = search_text_only(
+        client, index_name, str(title), ["title", "latestAction.text"]
+    )  # noqa: E501
     print_hits("Bill text-only search", resp)
 
     resp = search_semantic_only(client, index_name, str(title), "title.semantic")

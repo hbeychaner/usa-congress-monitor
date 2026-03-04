@@ -256,9 +256,10 @@ def gather_paginated_records(
     on_progress: Optional[Callable[[int, int, int, int], None]] = None,
     offset_param_names: tuple[str, ...] = ("offset", "start", "skip"),
     page_param_names: tuple[str, ...] = ("page", "pageNumber", "page_number"),
+    start_offset: int = 0,
 ) -> PaginatedFetchResult:
     """Aggregate list results across paginated endpoint responses."""
-    offset = 0
+    offset = start_offset
     all_records: list = []
     wait_val = resolve_pagination_wait(page_size, wait)
     pbar = tqdm(desc=desc, unit=unit)

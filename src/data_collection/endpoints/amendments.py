@@ -3,6 +3,7 @@
 from typing import Any
 
 from src.data_collection.client import CDGClient
+from src.data_collection.endpoints.common import get_list
 from src.data_collection.utils import datetime_convert, extract_offset
 from src.utils.logger import get_logger
 
@@ -18,17 +19,7 @@ def get_amendments_metadata(
     offset: int = 0,
     limit: int = RESULT_LIMIT,
 ) -> tuple[list[Any], int, int]:
-    """
-    Retrieve metadata for amendments.
-    Args:
-        client (CDGClient): The client object.
-        from_date (str): The start date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
-        to_date (str): The end date for the search in the format "YYYY-MM-DDTHH:MM:SSZ".
-        offset (int): The offset for the request.
-        limit (int): The number of results to return.
-    Returns:
-        tuple: (list of amendment metadata, next offset, total count)
-    """
+    """Retrieve metadata for amendments by date range."""
     from_date = datetime_convert(from_date)
     to_date = datetime_convert(to_date)
     params = {"limit": limit, "fromDateTime": from_date, "toDateTime": to_date}
@@ -43,20 +34,13 @@ def get_amendments_metadata(
             count = int(pagination.get("count", 0))
             return (amendments, offset, count)
         return (amendments, -1, 0)
-    else:
-        return ([], -1, 0)
+    return ([], -1, 0)
 
 
 def get_amendments_metadata_paginated(
-    client: CDGClient, offset: int = 0, pageSize: int = 250
+    client: CDGClient,
+    offset: int = 0,
+    limit: int = 250,
 ):
-    """
-    Retrieve amendments metadata (paginated).
-    Args:
-        client (CDGClient): The client object.
-        offset (int): The offset for pagination.
-        pageSize (int): Number of items per page.
-    Returns:
-        dict: Dictionary containing amendments data.
-    """
-    return client.get("amendment", params={"offset": offset, "pageSize": pageSize})
+    """Retrieve amendments metadata (paginated)."""
+    return get_list(client, "amendment", offset=offset, limit=limit)

@@ -1,45 +1,49 @@
-import os
 import time
 from typing import Any, Mapping, Type
 
 import pytest
 from requests import HTTPError
 
+from settings import CONGRESS_API_KEY
 from src.data_collection.client import CDGClient
-from src.data_collection.endpoints.amendment import (
+from src.data_collection.endpoints.amendments import (
     get_amendments_metadata,
     get_amendments_metadata_paginated,
 )
-from src.data_collection.endpoints.bound_congressional_record import (
-    get_bound_congressional_records,
+from src.data_collection.endpoints.committee_artifacts import (
+    get_committee_meetings,
+    get_committee_prints,
+    get_committee_reports,
 )
-from src.data_collection.endpoints.committee import get_committees
-from src.data_collection.endpoints.committee_meeting import get_committee_meetings
-from src.data_collection.endpoints.committee_print import get_committee_prints
-from src.data_collection.endpoints.committee_report import get_committee_reports
-from src.data_collection.endpoints.congressional_record import get_congressional_records
+from src.data_collection.endpoints.committees import get_committees
 from src.data_collection.endpoints.congress import (
     get_congress_details,
     get_current_congress,
 )
-from src.data_collection.endpoints.crs_report import get_crs_reports
-from src.data_collection.endpoints.daily_congressional_record import (
-    get_daily_congressional_records,
+from src.data_collection.endpoints.communications import (
+    get_house_communications,
+    get_senate_communications,
 )
-from src.data_collection.endpoints.hearing import get_hearings
-from src.data_collection.endpoints.house_communication import get_house_communications
-from src.data_collection.endpoints.house_requirement import get_house_requirements
-from src.data_collection.endpoints.house_roll_call_vote import get_house_roll_call_votes
-from src.data_collection.endpoints.bill import (
+from src.data_collection.endpoints.hearings import get_hearings
+from src.data_collection.endpoints.bills import (
     get_bills_metadata,
     get_bills_metadata_by_date,
 )
-from src.data_collection.endpoints.law import get_laws, get_laws_metadata
-from src.data_collection.endpoints.member import get_members_list
-from src.data_collection.endpoints.nomination import get_nominations
-from src.data_collection.endpoints.senate_communication import get_senate_communications
-from src.data_collection.endpoints.summaries import get_summaries
-from src.data_collection.endpoints.treaty import get_treaties
+from src.data_collection.endpoints.laws import get_laws, get_laws_metadata
+from src.data_collection.endpoints.members import get_members_list
+from src.data_collection.endpoints.nominations import get_nominations
+from src.data_collection.endpoints.other import (
+    get_crs_reports,
+    get_house_requirements,
+    get_house_roll_call_votes,
+    get_summaries,
+    get_treaties,
+)
+from src.data_collection.endpoints.records import (
+    get_bound_congressional_records,
+    get_congressional_records,
+    get_daily_congressional_records,
+)
 from src.models.data_types import CongressDataType
 from src.models.communications import (
     HouseCommunicationListItem,
@@ -72,10 +76,9 @@ from src.models.reports import BillSummaryListItem, CRSReportListItem
 
 @pytest.fixture(scope="module")
 def client():
-    api_key = os.getenv("CONGRESS_API_KEY", "")
-    if not api_key:
+    if not CONGRESS_API_KEY:
         pytest.skip("No API key set in environment")
-    return CDGClient(api_key=api_key)
+    return CDGClient(api_key=CONGRESS_API_KEY)
 
 
 def get_response_with_retries(
@@ -110,7 +113,7 @@ def assert_model_covers_keys(model_cls: Type[Any], data: Mapping[str, Any]) -> N
 
 
 def test_member_endpoint(client):
-    response = get_response_with_retries(get_members_list, client, pageSize=1)
+    response = get_response_with_retries(get_members_list, client, limit=1)
     member_data = get_first_item(response, CongressDataType.MEMBERS)
     assert_model_covers_keys(MemberListItem, member_data)
     member_obj = MemberListItem(**member_data)
@@ -119,7 +122,7 @@ def test_member_endpoint(client):
 
 def test_amendment_endpoint(client):
     response = get_response_with_retries(
-        get_amendments_metadata_paginated, client, pageSize=1
+        get_amendments_metadata_paginated, client, limit=1
     )
     amendment_data = get_first_item(response, CongressDataType.AMENDMENTS)
     assert_model_covers_keys(AmendmentListItem, amendment_data)
@@ -148,7 +151,7 @@ def test_bill_metadata_by_date_endpoint(client):
 
 
 def test_bill_endpoint(client):
-    response = get_response_with_retries(get_bills_metadata, client, pageSize=1)
+    response = get_response_with_retries(get_bills_metadata, client, limit=1)
     bill_data = get_first_item(response, CongressDataType.BILLS)
     assert_model_covers_keys(BillListItem, bill_data)
     bill_obj = BillListItem(**bill_data)
@@ -156,7 +159,7 @@ def test_bill_endpoint(client):
 
 
 def test_committee_endpoint(client):
-    response = get_response_with_retries(get_committees, client, pageSize=1)
+    response = get_response_with_retries(get_committees, client, limit=1)
     committee_data = get_first_item(response, CongressDataType.COMMITTEES)
     assert_model_covers_keys(CommitteeListItem, committee_data)
     committee_obj = CommitteeListItem(**committee_data)
@@ -164,7 +167,7 @@ def test_committee_endpoint(client):
 
 
 def test_law_endpoint(client):
-    response = get_response_with_retries(get_laws, client, congress=118, pageSize=1)
+    response = get_response_with_retries(get_laws, client, congress=118, limit=1)
     law_data = get_first_item(response, CongressDataType.LAWS)
     assert_model_covers_keys(LawListItem, law_data)
     law_obj = LawListItem(**law_data)
@@ -179,7 +182,7 @@ def test_law_metadata_endpoint(client):
 
 
 def test_committee_report_endpoint(client):
-    response = get_response_with_retries(get_committee_reports, client, pageSize=1)
+    response = get_response_with_retries(get_committee_reports, client, limit=1)
     report_data = get_first_item(response, CongressDataType.REPORTS)
     assert_model_covers_keys(CommitteeReportListItem, report_data)
     report_obj = CommitteeReportListItem(**report_data)
@@ -195,7 +198,7 @@ def test_committee_print_endpoint(client):
 
 
 def test_committee_meeting_endpoint(client):
-    response = get_response_with_retries(get_committee_meetings, client, pageSize=1)
+    response = get_response_with_retries(get_committee_meetings, client, limit=1)
     meeting_data = get_first_item(response, CongressDataType.COMMITTEE_MEETINGS)
     assert_model_covers_keys(CommitteeMeetingListItem, meeting_data)
     meeting_obj = CommitteeMeetingListItem(**meeting_data)
@@ -203,7 +206,7 @@ def test_committee_meeting_endpoint(client):
 
 
 def test_hearing_endpoint(client):
-    response = get_response_with_retries(get_hearings, client, pageSize=1)
+    response = get_response_with_retries(get_hearings, client, limit=1)
     hearing_data = get_first_item(response, CongressDataType.HEARINGS)
     assert_model_covers_keys(HearingListItem, hearing_data)
     hearing_obj = HearingListItem(**hearing_data)
@@ -211,7 +214,7 @@ def test_hearing_endpoint(client):
 
 
 def test_house_communication_endpoint(client):
-    response = get_response_with_retries(get_house_communications, client, pageSize=1)
+    response = get_response_with_retries(get_house_communications, client, limit=1)
     comm_data = get_first_item(response, CongressDataType.HOUSE_COMMUNICATIONS)
     assert_model_covers_keys(HouseCommunicationListItem, comm_data)
     comm_obj = HouseCommunicationListItem(**comm_data)
@@ -219,7 +222,7 @@ def test_house_communication_endpoint(client):
 
 
 def test_house_requirement_endpoint(client):
-    response = get_response_with_retries(get_house_requirements, client, pageSize=1)
+    response = get_response_with_retries(get_house_requirements, client, limit=1)
     req_data = get_first_item(response, CongressDataType.HOUSE_REQUIREMENTS)
     assert_model_covers_keys(HouseRequirementListItem, req_data)
     req_obj = HouseRequirementListItem(**req_data)
@@ -227,7 +230,7 @@ def test_house_requirement_endpoint(client):
 
 
 def test_house_roll_call_vote_endpoint(client):
-    response = get_response_with_retries(get_house_roll_call_votes, client, pageSize=1)
+    response = get_response_with_retries(get_house_roll_call_votes, client, limit=1)
     vote_data = get_first_item(response, CongressDataType.HOUSE_ROLL_CALL_VOTES)
     assert_model_covers_keys(HouseRollCallVoteListItem, vote_data)
     vote_obj = HouseRollCallVoteListItem(**vote_data)
@@ -235,15 +238,23 @@ def test_house_roll_call_vote_endpoint(client):
 
 
 def test_senate_communication_endpoint(client):
-    response = get_response_with_retries(get_senate_communications, client, pageSize=1)
+    response = get_response_with_retries(get_senate_communications, client, limit=1)
     comm_data = get_first_item(response, CongressDataType.SENATE_COMMUNICATIONS)
     assert_model_covers_keys(SenateCommunicationListItem, comm_data)
     comm_obj = SenateCommunicationListItem(**comm_data)
     assert comm_obj.number is not None
 
 
+def test_amendment_limit_respected(client):
+    response = get_response_with_retries(
+        get_amendments_metadata_paginated, client, limit=5
+    )
+    items = response.get(str(CongressDataType.AMENDMENTS), [])
+    assert len(items) == 5, f"Expected 5 items, got {len(items)}"
+
+
 def test_nomination_endpoint(client):
-    response = get_response_with_retries(get_nominations, client, pageSize=1)
+    response = get_response_with_retries(get_nominations, client, limit=1)
     nomination_data = get_first_item(response, CongressDataType.NOMINATIONS)
     assert_model_covers_keys(NominationListItem, nomination_data)
     nomination_obj = NominationListItem(**nomination_data)
@@ -251,7 +262,7 @@ def test_nomination_endpoint(client):
 
 
 def test_crs_report_endpoint(client):
-    response = get_response_with_retries(get_crs_reports, client, pageSize=1)
+    response = get_response_with_retries(get_crs_reports, client, limit=1)
     report_data = get_first_item(response, CongressDataType.CRS_REPORTS)
     assert_model_covers_keys(CRSReportListItem, report_data)
     report_obj = CRSReportListItem(**report_data)
@@ -259,7 +270,7 @@ def test_crs_report_endpoint(client):
 
 
 def test_summaries_endpoint(client):
-    response = get_response_with_retries(get_summaries, client, pageSize=1)
+    response = get_response_with_retries(get_summaries, client, limit=1)
     summary_data = get_first_item(response, CongressDataType.SUMMARIES)
     assert_model_covers_keys(BillSummaryListItem, summary_data)
     summary_obj = BillSummaryListItem(**summary_data)
@@ -267,7 +278,7 @@ def test_summaries_endpoint(client):
 
 
 def test_treaty_endpoint(client):
-    response = get_response_with_retries(get_treaties, client, pageSize=1)
+    response = get_response_with_retries(get_treaties, client, limit=1)
     treaty_data = get_first_item(response, CongressDataType.TREATIES)
     assert_model_covers_keys(TreatyListItem, treaty_data)
     treaty_obj = TreatyListItem(**treaty_data)
@@ -276,7 +287,7 @@ def test_treaty_endpoint(client):
 
 def test_bound_congressional_record_endpoint(client):
     response = get_response_with_retries(
-        get_bound_congressional_records, client, pageSize=1
+        get_bound_congressional_records, client, limit=1
     )
     record_data = get_first_item(response, CongressDataType.BOUND_CONGRESSIONAL_RECORD)
     assert_model_covers_keys(BoundCongressionalRecordListItem, record_data)
@@ -286,7 +297,7 @@ def test_bound_congressional_record_endpoint(client):
 
 def test_daily_congressional_record_endpoint(client):
     response = get_response_with_retries(
-        get_daily_congressional_records, client, pageSize=1
+        get_daily_congressional_records, client, limit=1
     )
     record_data = get_first_item(response, CongressDataType.DAILY_CONGRESSIONAL_RECORD)
     assert_model_covers_keys(DailyCongressionalRecordIssue, record_data)

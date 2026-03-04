@@ -15,7 +15,7 @@ from src.data_collection.specialized.common import (
 from knowledgebase.ids import law_id
 from knowledgebase.indices import LAWS_MAPPING
 from src.data_collection.client import CDGClient
-from src.data_collection.endpoints.law import get_laws
+from src.data_collection.endpoints.laws import get_laws
 INDEX_NAME = "congress-laws"
 ENDPOINT_NAME = "law"
 
@@ -51,7 +51,10 @@ def sync_laws(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, Any]
         result = sync_paginated_index(
             es_client,
             fetch_page=lambda offset, page_size: get_laws(
-                cdg_client, congress=congress, offset=offset, pageSize=page_size
+                cdg_client,
+                congress=congress,
+                offset=offset,
+                limit=page_size,
             ),
             spec=spec,
             state_id=state_id,

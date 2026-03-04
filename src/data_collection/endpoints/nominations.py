@@ -1,47 +1,29 @@
 """Endpoint helpers for nomination resources."""
 
 from src.data_collection.client import CDGClient
-from src.data_collection.utils import gather_paginated_metadata
+from src.data_collection.endpoints.common import gather_paginated, get_list
 from src.models.data_types import CongressDataType
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
-from typing import Optional
 
 
-def get_nominations(client: CDGClient, offset: int = 0, pageSize: int = 250):
-    """
-    Retrieve nominations metadata (paginated).
-    Args:
-        client (CDGClient): The client object.
-        offset (int): The offset for pagination.
-        pageSize (int): Number of items per page.
-    Returns:
-        dict: Dictionary containing nomination data.
-    """
-    return client.get("nomination", params={"offset": offset, "pageSize": pageSize})
+def get_nominations(client: CDGClient, offset: int = 0, limit: int = 250):
+    """Retrieve nominations metadata (paginated)."""
+    return get_list(client, "nomination", offset=offset, limit=limit)
 
 
 def gather_nominations(
-    client: CDGClient, pageSize: int = 250, wait: Optional[float] = None
+    client: CDGClient, limit: int = 250, wait: float | None = None
 ) -> list:
-    """
-    Gather all nominations using pagination.
-    Args:
-        client (CDGClient): The client object.
-        pageSize (int): Number of items per page.
-        wait (float): Seconds to wait between requests (default: auto).
-    Returns:
-        list: A list of nomination metadata.
-    """
-    return gather_paginated_metadata(
-        lambda offset, page_size: get_nominations(
-            client, offset=offset, pageSize=page_size
-        ),
+    """Gather all nominations using pagination."""
+    return gather_paginated(
+        client,
+        "nomination",
         data_key=CongressDataType.NOMINATIONS,
         desc="Nominations",
         unit="nomination",
-        page_size=pageSize,
+        limit=limit,
         wait=wait,
     )
 

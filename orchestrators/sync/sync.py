@@ -43,7 +43,7 @@ def run_target(target: str) -> None:
     if handler is None:
         raise RuntimeError(f"Unknown sync target: {target}")
     cdg_client, es_client = _build_clients()
-    with tqdm(total=1, desc=f"Sync {target}", unit="run") as bar:
+    with tqdm(desc=f"Sync {target}", unit="run") as bar:
         result = handler(cdg_client, es_client)
         logger.info("Sync result: %s", result)
         bar.update(1)

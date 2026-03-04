@@ -9,7 +9,7 @@ from src.data_collection.specialized.common import PaginatedSyncSpec, sync_pagin
 from knowledgebase.ids import member_id
 from knowledgebase.indices import MEMBERS_MAPPING
 from src.data_collection.client import CDGClient
-from src.data_collection.endpoints.member import get_members_list
+from src.data_collection.endpoints.members import get_members_list
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -35,7 +35,7 @@ def sync_members(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, A
     result = sync_paginated_index(
         es_client,
         fetch_page=lambda offset, page_size: get_members_list(
-            cdg_client, offset=offset, pageSize=page_size
+            cdg_client, offset=offset, limit=page_size
         ),
         spec=spec,
     )

@@ -11,10 +11,16 @@ from elasticsearch.helpers import scan
 from knowledgebase.indexing import index_records
 from knowledgebase.setup import IndexSpec, KnowledgebaseSetup
 from src.data_collection.specialized.state import get_state, upsert_state
-from src.data_collection.utils import PaginatedFetchResult, gather_paginated_records, resolve_pagination
+from src.data_collection.utils import (
+    PaginatedFetchResult,
+    gather_paginated_records,
+    resolve_pagination,
+)
 
 
-def ensure_index(client: Elasticsearch, index_name: str, mapping: dict[str, Any]) -> None:
+def ensure_index(
+    client: Elasticsearch, index_name: str, mapping: dict[str, Any]
+) -> None:
     setup = KnowledgebaseSetup(client)
     setup.create_index(IndexSpec(name=index_name, mapping=mapping))
 
@@ -80,6 +86,7 @@ def fetch_paginated(
     unit: str,
     page_size: int,
     on_progress: Callable[[int, int, int, int], None] | None = None,
+    start_offset: int = 0,
 ) -> PaginatedFetchResult:
     return gather_paginated_records(
         fetch_page,
@@ -89,6 +96,7 @@ def fetch_paginated(
         page_size=page_size,
         progress_mode="page",
         on_progress=on_progress,
+        start_offset=start_offset,
     )
 
 
@@ -174,6 +182,15 @@ def sync_paginated_index(
 ) -> dict[str, Any]:
     ensure_index(es_client, spec.index_name, spec.mapping)
     state_key = state_id or spec.index_name
+    state = get_state(es_client, state_key)
+    resume_offset = int(state.get("offset") or 0)
+
+    last_progress = {
+        "offset": resume_offset,
+        "page": int(state.get("page") or 0),
+        "pages": int(state.get("pages") or 0),
+        "page_size": int(state.get("page_size") or spec.page_size),
+    }
 
     current_total = fetch_total(fetch_page, data_key=spec.data_key)
     if current_total == 0:
@@ -186,7 +203,6 @@ def sync_paginated_index(
         }
 
     es_count = int(es_client.count(index=spec.index_name).get("count", 0))
-    state = get_state(es_client, state_key)
     previous_total = int(state.get("total", 0))
 
     if compare_index_count:
@@ -212,6 +228,14 @@ def sync_paginated_index(
         total_pages: int,
         effective_page_size: int,
     ) -> None:
+        last_progress.update(
+            {
+                "offset": last_offset,
+                "page": last_page,
+                "pages": total_pages or last_progress.get("pages", 0),
+                "page_size": effective_page_size,
+            }
+        )
         upsert_state(
             es_client,
             state_key,
@@ -226,57 +250,95 @@ def sync_paginated_index(
             status="running",
         )
 
-    result = fetch_paginated(
-        fetch_page,
-        data_key=spec.data_key,
-        desc=spec.progress_desc,
-        unit=spec.progress_unit,
-        page_size=spec.page_size,
-        on_progress=_store_progress,
-    )
-    if result.total:
-        current_total = result.total
-
-    for record in result.records:
-        spec.id_builder(record)
-
-    existing_ids_set = existing if existing is not None else existing_ids(
-        es_client, spec.index_name
-    )
-    missing_records = [
-        r for r in result.records if str(r.get("id")) not in existing_ids_set
-    ]
-
     indexed = 0
     errors: list[dict[str, Any]] = []
-    if missing_records:
-        indexed, errors = index_missing_records(
-            es_client,
-            spec.index_name,
-            missing_records,
-            spec.id_builder,
-            chunk_size=spec.chunk_size,
-        )
-        if indexed and existing is not None:
-            existing.update(str(r.get("id")) for r in missing_records)
-
-    upsert_state(
-        es_client,
-        state_key,
-        spec.endpoint,
-        index=spec.index_name,
-        total=current_total,
-        indexed=int(es_client.count(index=spec.index_name).get("count", 0)),
-        offset=0,
-        page=result.last_page,
-        page_size=result.page_size,
-        pages=result.total_pages or None,
-        status="complete",
+    existing_ids_set = (
+        existing if existing is not None else existing_ids(es_client, spec.index_name)
     )
+    page_index = int(resume_offset / (spec.page_size or 1)) if spec.page_size else 0
+
+    try:
+        offset = resume_offset
+        total_pages = 0
+        effective_page_size = spec.page_size
+        while True:
+            response = fetch_page(offset, spec.page_size)
+            records = response.get(str(spec.data_key), [])
+            if not records:
+                break
+
+            meta = resolve_pagination(
+                response,
+                records_len=len(records),
+                offset=offset,
+                page_size=spec.page_size,
+            )
+            if meta.total:
+                current_total = meta.total
+            effective_page_size = meta.page_size or len(records) or spec.page_size
+            if current_total and effective_page_size:
+                total_pages = (
+                    current_total + effective_page_size - 1
+                ) // effective_page_size
+
+            page_index += 1
+            _store_progress(offset, page_index, total_pages, effective_page_size)
+
+            for record in records:
+                spec.id_builder(record)
+            missing_records = [
+                r for r in records if str(r.get("id")) not in existing_ids_set
+            ]
+            if missing_records:
+                new_indexed, new_errors = index_missing_records(
+                    es_client,
+                    spec.index_name,
+                    missing_records,
+                    spec.id_builder,
+                    chunk_size=spec.chunk_size,
+                )
+                indexed += new_indexed
+                errors.extend(new_errors)
+                if new_indexed:
+                    existing_ids_set.update(str(r.get("id")) for r in missing_records)
+
+            next_offset = meta.next_offset
+            if next_offset == -1 or next_offset == offset:
+                break
+            offset = next_offset
+
+        upsert_state(
+            es_client,
+            state_key,
+            spec.endpoint,
+            index=spec.index_name,
+            total=current_total,
+            indexed=int(es_client.count(index=spec.index_name).get("count", 0)),
+            offset=0,
+            page=page_index,
+            page_size=effective_page_size,
+            pages=total_pages or None,
+            status="complete",
+        )
+    except Exception:
+        upsert_state(
+            es_client,
+            state_key,
+            spec.endpoint,
+            index=spec.index_name,
+            total=current_total,
+            indexed=int(es_client.count(index=spec.index_name).get("count", 0)),
+            offset=last_progress.get("offset", resume_offset),
+            page=last_progress.get("page"),
+            page_size=last_progress.get("page_size"),
+            pages=last_progress.get("pages") or None,
+            status="failed",
+        )
+        raise
 
     return {
         "indexed": indexed,
-        "missing": len(missing_records),
+        "missing": None,
         "current_total": current_total,
         "previous_total": previous_total,
         "errors": errors,

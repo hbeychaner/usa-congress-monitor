@@ -1,40 +1,23 @@
 """Endpoint helpers for committee resources."""
 
 from src.data_collection.client import CDGClient
-from src.data_collection.utils import gather_single_page_metadata
+from src.data_collection.endpoints.common import gather_single_page, get_list
 from src.models.data_types import CongressDataType
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-def get_committees(client: CDGClient, offset: int = 0, pageSize: int = 250):
-    """
-    Retrieve committees metadata (paginated).
-
-    Args:
-        client (CDGClient): The client object.
-        offset (int): The offset for pagination.
-        pageSize (int): Number of items per page.
-
-    Returns:
-        dict: Dictionary containing committees data.
-    """
-    return client.get("committee", params={"offset": offset, "pageSize": pageSize})
+def get_committees(client: CDGClient, offset: int = 0, limit: int = 250):
+    """Retrieve committees metadata (paginated)."""
+    return get_list(client, "committee", offset=offset, limit=limit)
 
 
 def gather_committees(client: CDGClient) -> list:
-    """
-    Gather all congressional committees. (No pagination supported)
-
-    Args:
-        client (CDGClient): The client object.
-
-    Returns:
-        list: A list of committee metadata.
-    """
-    return gather_single_page_metadata(
-        lambda: get_committees(client),
+    """Gather all congressional committees. (No pagination supported)"""
+    return gather_single_page(
+        client,
+        "committee",
         data_key=CongressDataType.COMMITTEES,
     )
 

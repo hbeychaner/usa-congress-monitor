@@ -9,7 +9,7 @@ from src.data_collection.specialized.common import PaginatedSyncSpec, sync_pagin
 from knowledgebase.ids import bill_id
 from knowledgebase.indices import BILLS_MAPPING
 from src.data_collection.client import CDGClient
-from src.data_collection.endpoints.bill import get_bills_metadata
+from src.data_collection.endpoints.bills import get_bills_metadata
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -35,7 +35,7 @@ def sync_bills(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, Any
     result = sync_paginated_index(
         es_client,
         fetch_page=lambda offset, page_size: get_bills_metadata(
-            cdg_client, offset=offset, pageSize=page_size
+            cdg_client, offset=offset, limit=page_size
         ),
         spec=spec,
     )
