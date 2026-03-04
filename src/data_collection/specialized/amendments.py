@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 
 from knowledgebase.ids import amendment_id
 from knowledgebase.indices import AMENDMENTS_MAPPING
@@ -19,7 +19,9 @@ INDEX_NAME = "congress-amendments"
 ENDPOINT_NAME = "amendment"
 
 
-def sync_amendments(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, Any]:
+async def sync_amendments(
+    cdg_client: CDGClient, es_client: AsyncElasticsearch
+) -> dict[str, Any]:
     """Sync amendment records and update state in Elasticsearch."""
     spec = PaginatedSyncSpec(
         index_name=INDEX_NAME,
@@ -27,13 +29,13 @@ def sync_amendments(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str
         mapping=AMENDMENTS_MAPPING,
         data_key="amendments",
         id_builder=amendment_id,
-        page_size=250,
+        page_size=20,
         chunk_size=200,
         progress_desc="Amendments pages",
         progress_unit="page",
     )
 
-    result = sync_paginated_index(
+    result = await sync_paginated_index(
         es_client,
         fetch_page=lambda offset, page_size: get_amendments_metadata_paginated(
             cdg_client, offset=offset, limit=page_size

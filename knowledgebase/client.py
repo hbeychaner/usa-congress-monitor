@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 
 
-def build_client(url: str, api_key: str) -> Elasticsearch:
-    """Create an Elasticsearch client using API key auth."""
+def build_client(url: str, api_key: str) -> AsyncElasticsearch:
+    """Create an async Elasticsearch client using API key auth."""
     if not url:
         raise ValueError("ELASTIC_API_URL is required.")
     if not api_key:
         raise ValueError("ELASTIC_API_KEY is required.")
-    return Elasticsearch(url, api_key=api_key, request_timeout=60)
+    return AsyncElasticsearch(url, api_key=api_key, request_timeout=60)

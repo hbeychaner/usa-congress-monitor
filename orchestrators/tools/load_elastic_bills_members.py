@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import json
 from pathlib import Path
 from typing import Any, Iterable
 
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
+from elasticsearch import AsyncElasticsearch
+from elasticsearch.helpers import async_bulk
 
 from settings import ELASTIC_API_KEY, ELASTIC_API_URL, ES_LOCAL_API_KEY, ES_LOCAL_URL
 from src.utils.logger import get_logger
@@ -84,22 +85,22 @@ MEMBERS_MAPPING = {
 }
 
 
-def build_client(url: str | None, api_key: str | None) -> Elasticsearch:
+def build_client(url: str | None, api_key: str | None) -> AsyncElasticsearch:
     """Create an Elasticsearch client using API key auth."""
     if not url:
         raise ValueError("ELASTIC_API_URL is required.")
     if not api_key:
         raise ValueError("ELASTIC_API_KEY is required.")
-    return Elasticsearch(url, api_key=api_key, request_timeout=60)
+    return AsyncElasticsearch(url, api_key=api_key, request_timeout=60)
 
 
-def ensure_index(
-    client: Elasticsearch, index_name: str, mapping: dict[str, Any]
+async def ensure_index(
+    client: AsyncElasticsearch, index_name: str, mapping: dict[str, Any]
 ) -> None:
     """Create the index if it does not exist."""
-    if client.indices.exists(index=index_name):
+    if await client.indices.exists(index=index_name):
         return
-    client.indices.create(
+    await client.indices.create(
         index=index_name,
         settings=mapping.get("settings", {}),
         mappings=mapping.get("mappings", {}),
@@ -151,26 +152,31 @@ def build_actions(
     return actions
 
 
-def load_index(
-    client: Elasticsearch, index_name: str, records: list[dict[str, Any]], id_builder
+async def load_index(
+    client: AsyncElasticsearch,
+    index_name: str,
+    records: list[dict[str, Any]],
+    id_builder,
 ) -> int:
     """Load data into Elasticsearch using bulk indexing."""
     actions = build_actions(index_name, records, id_builder)
     if not actions:
         return 0
-    success, _ = bulk(client, actions, chunk_size=500, request_timeout=120)
+    success, _ = await async_bulk(
+        client, actions, chunk_size=500, request_timeout=120
+    )
     return success
 
 
-def run(data_dir: Path, bills_index: str, members_index: str) -> None:
+async def run(data_dir: Path, bills_index: str, members_index: str) -> None:
     """Load bill and member list data into Elasticsearch."""
     url = ELASTIC_API_URL or ES_LOCAL_URL
     api_key = ELASTIC_API_KEY or ES_LOCAL_API_KEY
 
     client = build_client(url, api_key)
 
-    ensure_index(client, bills_index, BILLS_MAPPING)
-    ensure_index(client, members_index, MEMBERS_MAPPING)
+    await ensure_index(client, bills_index, BILLS_MAPPING)
+    await ensure_index(client, members_index, MEMBERS_MAPPING)
 
     bills_path = data_dir / "bill" / "list.json"
     members_path = data_dir / "member" / "list.json"
@@ -178,11 +184,12 @@ def run(data_dir: Path, bills_index: str, members_index: str) -> None:
     bills = load_json(bills_path)
     members = load_json(members_path)
 
-    bills_loaded = load_index(client, bills_index, bills, bill_id)
-    members_loaded = load_index(client, members_index, members, member_id)
+    bills_loaded = await load_index(client, bills_index, bills, bill_id)
+    members_loaded = await load_index(client, members_index, members, member_id)
 
     logger.info("Loaded %s bill records into %s", bills_loaded, bills_index)
     logger.info("Loaded %s member records into %s", members_loaded, members_index)
+    await client.close()
 
 
 def main() -> None:
@@ -210,7 +217,7 @@ def main() -> None:
     if not data_dir.is_absolute():
         data_dir = repo_root / data_dir
 
-    run(data_dir, args.bills_index, args.members_index)
+    asyncio.run(run(data_dir, args.bills_index, args.members_index))
 
 
 if __name__ == "__main__":

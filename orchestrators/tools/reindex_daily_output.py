@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from pathlib import Path
 from typing import Any, Callable
@@ -84,10 +85,10 @@ def normalize_dates(records: list[dict[str, Any]]) -> None:
             record["updateDate"] = value.replace(" ", "T", 1)
 
 
-def ensure_indices(client) -> None:
+async def ensure_indices(client) -> None:
     """Create all knowledgebase indices if missing."""
     setup = KnowledgebaseSetup(client)
-    setup.ensure_indices(build_default_specs())
+    await setup.ensure_indices(build_default_specs())
 
 
 def resolve_index_name(folder: str, records: list[dict[str, Any]]) -> str:
@@ -99,12 +100,12 @@ def resolve_index_name(folder: str, records: list[dict[str, Any]]) -> str:
     raise ValueError(f"Missing recordType for folder: {folder}")
 
 
-def main(data_dir: str | Path = "daily_output_7d") -> None:
+async def main(data_dir: str | Path = "daily_output_7d") -> None:
     """Reindex data from daily output files."""
     url = ELASTIC_API_URL or ES_LOCAL_URL
     api_key = ELASTIC_API_KEY or ES_LOCAL_API_KEY
     client = build_client(url, api_key)
-    ensure_indices(client)
+    await ensure_indices(client)
 
     base = Path(data_dir)
     if not base.is_absolute():
@@ -120,7 +121,9 @@ def main(data_dir: str | Path = "daily_output_7d") -> None:
         for record in records:
             id_builder(record)
         index_name = resolve_index_name(folder, records)
-        indexed, errors = index_records(client, index_name, records, id_builder)
+        indexed, errors = await index_records(
+            client, index_name, records, id_builder
+        )
         total_indexed += indexed
         if errors:
             logger.warning(
@@ -133,7 +136,8 @@ def main(data_dir: str | Path = "daily_output_7d") -> None:
         logger.info("Indexed %s records into %s", indexed, index_name)
 
     logger.info("Total indexed records: %s", total_indexed)
+    await client.close()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

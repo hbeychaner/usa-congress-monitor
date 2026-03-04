@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
+from math import ceil
 from typing import Any, Callable
 
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import scan
+from elasticsearch import AsyncElasticsearch
+from elasticsearch.helpers import async_scan
 
 from knowledgebase.indexing import index_records
 from knowledgebase.setup import IndexSpec, KnowledgebaseSetup
@@ -16,22 +18,29 @@ from src.data_collection.utils import (
     gather_paginated_records,
     resolve_pagination,
 )
+from src.utils.logger import get_logger
+from tqdm import tqdm
+
+logger = get_logger(__name__)
 
 
-def ensure_index(
-    client: Elasticsearch, index_name: str, mapping: dict[str, Any]
+async def ensure_index(
+    client: AsyncElasticsearch, index_name: str, mapping: dict[str, Any]
 ) -> None:
     setup = KnowledgebaseSetup(client)
-    setup.create_index(IndexSpec(name=index_name, mapping=mapping))
+    await setup.create_index(IndexSpec(name=index_name, mapping=mapping))
 
 
-def existing_ids(client: Elasticsearch, index_name: str) -> set[str]:
-    hits = scan(client, index=index_name, _source=False)
-    return {str(hit.get("_id")) for hit in hits}
+async def existing_ids(client: AsyncElasticsearch, index_name: str) -> set[str]:
+    hits = async_scan(client, index=index_name, _source=False)
+    results: set[str] = set()
+    async for hit in hits:
+        results.add(str(hit.get("_id")))
+    return results
 
 
-def index_missing_records(
-    client: Elasticsearch,
+async def index_missing_records(
+    client: AsyncElasticsearch,
     index_name: str,
     records: list[dict[str, Any]],
     id_builder: Callable[[dict[str, Any]], Any],
@@ -40,7 +49,7 @@ def index_missing_records(
 ) -> tuple[int, list[dict[str, Any]]]:
     if not records:
         return 0, []
-    indexed, errors = index_records(
+    indexed, errors = await index_records(
         client,
         index_name,
         records,
@@ -61,6 +70,8 @@ class PaginatedSyncSpec:
     chunk_size: int = 200
     progress_desc: str = "Pages"
     progress_unit: str = "page"
+    queue_size: int = 100
+    worker_count: int = 2
 
 
 def fetch_total(
@@ -100,8 +111,8 @@ def fetch_paginated(
     )
 
 
-def sync_records(
-    es_client: Elasticsearch,
+async def sync_records(
+    es_client: AsyncElasticsearch,
     *,
     index_name: str,
     endpoint: str,
@@ -113,10 +124,10 @@ def sync_records(
     chunk_size: int = 200,
     compare_index_count: bool = True,
 ) -> dict[str, Any]:
-    ensure_index(es_client, index_name, mapping)
+    await ensure_index(es_client, index_name, mapping)
     state_key = state_id or index_name
-    es_count = int(es_client.count(index=index_name).get("count", 0))
-    state = get_state(es_client, state_key)
+    es_count = int((await es_client.count(index=index_name)).get("count", 0))
+    state = await get_state(es_client, state_key)
     previous_total = int(state.get("total", 0))
 
     if compare_index_count:
@@ -139,13 +150,13 @@ def sync_records(
     for record in records:
         id_builder(record)
 
-    existing = existing_ids(es_client, index_name)
+    existing = await existing_ids(es_client, index_name)
     missing_records = [r for r in records if str(r.get("id")) not in existing]
 
     indexed = 0
     errors: list[dict[str, Any]] = []
     if missing_records:
-        indexed, errors = index_missing_records(
+        indexed, errors = await index_missing_records(
             es_client,
             index_name,
             missing_records,
@@ -153,13 +164,13 @@ def sync_records(
             chunk_size=chunk_size,
         )
 
-    upsert_state(
+    await upsert_state(
         es_client,
         state_key,
         endpoint,
         index=index_name,
         total=current_total,
-        indexed=int(es_client.count(index=index_name).get("count", 0)),
+        indexed=int((await es_client.count(index=index_name)).get("count", 0)),
     )
 
     return {
@@ -171,8 +182,8 @@ def sync_records(
     }
 
 
-def sync_paginated_index(
-    es_client: Elasticsearch,
+async def sync_paginated_index(
+    es_client: AsyncElasticsearch,
     *,
     fetch_page: Callable[[int, int], dict],
     spec: PaginatedSyncSpec,
@@ -180,9 +191,9 @@ def sync_paginated_index(
     existing: set[str] | None = None,
     compare_index_count: bool = True,
 ) -> dict[str, Any]:
-    ensure_index(es_client, spec.index_name, spec.mapping)
+    await ensure_index(es_client, spec.index_name, spec.mapping)
     state_key = state_id or spec.index_name
-    state = get_state(es_client, state_key)
+    state = await get_state(es_client, state_key)
     resume_offset = int(state.get("offset") or 0)
 
     last_progress = {
@@ -192,7 +203,20 @@ def sync_paginated_index(
         "page_size": int(state.get("page_size") or spec.page_size),
     }
 
-    current_total = fetch_total(fetch_page, data_key=spec.data_key)
+    async def _fetch_page(offset: int, page_size: int) -> dict:
+        return await asyncio.to_thread(fetch_page, offset, page_size)
+
+    async def _fetch_total() -> int:
+        response = await _fetch_page(0, 1)
+        meta = resolve_pagination(
+            response,
+            records_len=len(response.get(str(spec.data_key), [])),
+            offset=0,
+            page_size=1,
+        )
+        return meta.total
+
+    current_total = await _fetch_total()
     if current_total == 0:
         return {
             "indexed": 0,
@@ -202,7 +226,7 @@ def sync_paginated_index(
             "errors": [],
         }
 
-    es_count = int(es_client.count(index=spec.index_name).get("count", 0))
+    es_count = int((await es_client.count(index=spec.index_name)).get("count", 0))
     previous_total = int(state.get("total", 0))
 
     if compare_index_count:
@@ -222,47 +246,109 @@ def sync_paginated_index(
                 "previous_total": previous_total,
             }
 
-    def _store_progress(
-        last_offset: int,
-        last_page: int,
-        total_pages: int,
-        effective_page_size: int,
-    ) -> None:
-        last_progress.update(
-            {
-                "offset": last_offset,
-                "page": last_page,
-                "pages": total_pages or last_progress.get("pages", 0),
-                "page_size": effective_page_size,
-            }
-        )
-        upsert_state(
-            es_client,
-            state_key,
-            spec.endpoint,
-            index=spec.index_name,
-            total=current_total,
-            indexed=es_count,
-            offset=last_offset,
-            page=last_page,
-            page_size=effective_page_size,
-            pages=total_pages or None,
-            status="running",
-        )
-
     indexed = 0
     errors: list[dict[str, Any]] = []
-    existing_ids_set = (
-        existing if existing is not None else existing_ids(es_client, spec.index_name)
-    )
+    if existing is not None:
+        existing_ids_set = existing
+    else:
+        logger.info("Scanning existing ids for %s...", spec.index_name)
+        existing_ids_set = await existing_ids(es_client, spec.index_name)
+        logger.info(
+            "Loaded %s existing ids for %s", len(existing_ids_set), spec.index_name
+        )
     page_index = int(resume_offset / (spec.page_size or 1)) if spec.page_size else 0
 
     try:
         offset = resume_offset
         total_pages = 0
         effective_page_size = spec.page_size
+        base_count = es_count
+
+        logger.info(
+            "Starting paginated sync for %s (resume offset=%s)",
+            spec.index_name,
+            resume_offset,
+        )
+        pbar = tqdm(desc=spec.progress_desc, unit=spec.progress_unit)
+        if page_index:
+            pbar.n = page_index
+            pbar.refresh()
+
+        queue: asyncio.Queue[dict[str, Any] | None] = asyncio.Queue(
+            maxsize=spec.queue_size
+        )
+
+        async def _store_progress(
+            last_offset: int,
+            last_page: int,
+            total_pages_value: int,
+            effective_size: int,
+            status: str,
+        ) -> None:
+            last_progress.update(
+                {
+                    "offset": last_offset,
+                    "page": last_page,
+                    "pages": total_pages_value or last_progress.get("pages", 0),
+                    "page_size": effective_size,
+                }
+            )
+            await upsert_state(
+                es_client,
+                state_key,
+                spec.endpoint,
+                index=spec.index_name,
+                total=current_total,
+                indexed=base_count + indexed,
+                offset=last_offset,
+                page=last_page,
+                page_size=effective_size,
+                pages=total_pages_value or None,
+                status=status,
+            )
+
+        async def worker() -> None:
+            nonlocal indexed, errors
+            while True:
+                item = await queue.get()
+                if item is None:
+                    queue.task_done()
+                    break
+                records = item["records"]
+                meta = item["meta"]
+                for record in records:
+                    spec.id_builder(record)
+                missing_records = [
+                    r for r in records if str(r.get("id")) not in existing_ids_set
+                ]
+                if missing_records:
+                    new_indexed, new_errors = await index_missing_records(
+                        es_client,
+                        spec.index_name,
+                        missing_records,
+                        spec.id_builder,
+                        chunk_size=spec.chunk_size,
+                    )
+                    indexed += new_indexed
+                    errors.extend(new_errors)
+                    if new_indexed:
+                        existing_ids_set.update(
+                            str(r.get("id")) for r in missing_records
+                        )
+                await _store_progress(
+                    meta["offset"],
+                    meta["page"],
+                    meta["pages"],
+                    meta["page_size"],
+                    status="running",
+                )
+                pbar.update(1)
+                queue.task_done()
+
+        workers = [asyncio.create_task(worker()) for _ in range(spec.worker_count)]
+
         while True:
-            response = fetch_page(offset, spec.page_size)
+            response = await _fetch_page(offset, spec.page_size)
             records = response.get(str(spec.data_key), [])
             if not records:
                 break
@@ -277,57 +363,47 @@ def sync_paginated_index(
                 current_total = meta.total
             effective_page_size = meta.page_size or len(records) or spec.page_size
             if current_total and effective_page_size:
-                total_pages = (
-                    current_total + effective_page_size - 1
-                ) // effective_page_size
+                total_pages = ceil(current_total / effective_page_size)
+                if pbar.total != total_pages:
+                    pbar.total = total_pages
+                    pbar.refresh()
 
             page_index += 1
-            _store_progress(offset, page_index, total_pages, effective_page_size)
-
-            for record in records:
-                spec.id_builder(record)
-            missing_records = [
-                r for r in records if str(r.get("id")) not in existing_ids_set
-            ]
-            if missing_records:
-                new_indexed, new_errors = index_missing_records(
-                    es_client,
-                    spec.index_name,
-                    missing_records,
-                    spec.id_builder,
-                    chunk_size=spec.chunk_size,
-                )
-                indexed += new_indexed
-                errors.extend(new_errors)
-                if new_indexed:
-                    existing_ids_set.update(str(r.get("id")) for r in missing_records)
+            await queue.put(
+                {
+                    "records": records,
+                    "meta": {
+                        "offset": offset,
+                        "page": page_index,
+                        "page_size": effective_page_size,
+                        "pages": total_pages,
+                    },
+                }
+            )
 
             next_offset = meta.next_offset
             if next_offset == -1 or next_offset == offset:
                 break
             offset = next_offset
 
-        upsert_state(
-            es_client,
-            state_key,
-            spec.endpoint,
-            index=spec.index_name,
-            total=current_total,
-            indexed=int(es_client.count(index=spec.index_name).get("count", 0)),
-            offset=0,
-            page=page_index,
-            page_size=effective_page_size,
-            pages=total_pages or None,
-            status="complete",
+        for _ in workers:
+            await queue.put(None)
+        await queue.join()
+        await asyncio.gather(*workers)
+
+        pbar.close()
+
+        await _store_progress(
+            0, page_index, total_pages, effective_page_size, "complete"
         )
     except Exception:
-        upsert_state(
+        await upsert_state(
             es_client,
             state_key,
             spec.endpoint,
             index=spec.index_name,
             total=current_total,
-            indexed=int(es_client.count(index=spec.index_name).get("count", 0)),
+            indexed=int((await es_client.count(index=spec.index_name)).get("count", 0)),
             offset=last_progress.get("offset", resume_offset),
             page=last_progress.get("page"),
             page_size=last_progress.get("page_size"),

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, AsyncGenerator
 from uuid import uuid4
 
 import pytest
-from elasticsearch import ApiError, Elasticsearch, NotFoundError
+from elasticsearch import ApiError, AsyncElasticsearch, NotFoundError
 
 from knowledgebase.client import build_client
 from knowledgebase.indexing import index_records
@@ -26,18 +26,27 @@ from settings import (
 
 
 @pytest.fixture(scope="module")
-def elastic_client() -> Elasticsearch:
+def anyio_backend() -> str:
+    return "asyncio"
+
+
+@pytest.fixture(scope="module")
+async def elastic_client() -> AsyncGenerator[AsyncElasticsearch, None]:
     url = ELASTIC_API_URL or ES_LOCAL_URL
     api_key = ELASTIC_API_KEY or ES_LOCAL_API_KEY
     if not url or not api_key:
         pytest.skip("Elasticsearch credentials not configured")
-    return build_client(url, api_key)
+    client = build_client(url, api_key)
+    try:
+        yield client
+    finally:
+        await client.close()
 
 
-def _has_inference_endpoint(client: Elasticsearch, endpoint_id: str) -> bool:
+async def _has_inference_endpoint(client: AsyncElasticsearch, endpoint_id: str) -> bool:
     path = f"/_inference/sparse_embedding/{endpoint_id}"
     try:
-        client.transport.perform_request(
+        await client.transport.perform_request(
             "GET", path, headers={"accept": "application/json"}
         )
         return True
@@ -48,8 +57,12 @@ def _has_inference_endpoint(client: Elasticsearch, endpoint_id: str) -> bool:
 
 
 @pytest.fixture()
-def es_test_index(elastic_client: Elasticsearch) -> dict[str, Any]:
-    semantic_enabled = _has_inference_endpoint(elastic_client, SEMANTIC_INFERENCE_ID)
+async def es_test_index(
+    elastic_client: AsyncElasticsearch,
+) -> AsyncGenerator[dict[str, Any], None]:
+    semantic_enabled = await _has_inference_endpoint(
+        elastic_client, SEMANTIC_INFERENCE_ID
+    )
     index_name = f"kb-test-{uuid4().hex[:8]}"
 
     if semantic_enabled:
@@ -69,15 +82,15 @@ def es_test_index(elastic_client: Elasticsearch) -> dict[str, Any]:
         }
     }
 
-    elastic_client.indices.create(index=index_name, mappings=mapping["mappings"])
+    await elastic_client.indices.create(index=index_name, mappings=mapping["mappings"])
 
     try:
         yield {"name": index_name, "semantic": semantic_enabled}
     finally:
-        elastic_client.indices.delete(index=index_name, ignore_unavailable=True)
+        await elastic_client.indices.delete(index=index_name, ignore_unavailable=True)
 
 
-def _index_sample_docs(client: Elasticsearch, index_name: str) -> None:
+async def _index_sample_docs(client: AsyncElasticsearch, index_name: str) -> None:
     docs = [
         {
             "id": "doc-1",
@@ -91,37 +104,48 @@ def _index_sample_docs(client: Elasticsearch, index_name: str) -> None:
         },
     ]
 
-    index_records(client, index_name, docs, lambda record: record["id"], chunk_size=50)
-    client.indices.refresh(index=index_name)
+    await index_records(
+        client, index_name, docs, lambda record: record["id"], chunk_size=50
+    )
+    await client.indices.refresh(index=index_name)
 
 
-def test_indexing_and_keyword_search(elastic_client: Elasticsearch, es_test_index) -> None:
+@pytest.mark.anyio
+async def test_indexing_and_keyword_search(
+    elastic_client: AsyncElasticsearch, es_test_index
+) -> None:
     index_name = es_test_index["name"]
-    _index_sample_docs(elastic_client, index_name)
+    await _index_sample_docs(elastic_client, index_name)
 
-    response = search_by_id(elastic_client, index_name, "doc-1")
+    response = await search_by_id(elastic_client, index_name, "doc-1")
     hits = response.get("hits", {}).get("hits", [])
     assert hits, "Expected at least one hit for id query"
     assert hits[0].get("_source", {}).get("id") == "doc-1"
 
 
-def test_text_search(elastic_client: Elasticsearch, es_test_index) -> None:
+@pytest.mark.anyio
+async def test_text_search(elastic_client: AsyncElasticsearch, es_test_index) -> None:
     index_name = es_test_index["name"]
-    _index_sample_docs(elastic_client, index_name)
+    await _index_sample_docs(elastic_client, index_name)
 
-    response = search_text_only(elastic_client, index_name, "tax credits", ["title", "text"])
+    response = await search_text_only(
+        elastic_client, index_name, "tax credits", ["title", "text"]
+    )
     hits = response.get("hits", {}).get("hits", [])
     assert hits, "Expected hits for text query"
 
 
-def test_semantic_and_hybrid_search(elastic_client: Elasticsearch, es_test_index) -> None:
+@pytest.mark.anyio
+async def test_semantic_and_hybrid_search(
+    elastic_client: AsyncElasticsearch, es_test_index
+) -> None:
     if not es_test_index["semantic"]:
         pytest.skip("Semantic inference endpoint not available")
 
     index_name = es_test_index["name"]
-    _index_sample_docs(elastic_client, index_name)
+    await _index_sample_docs(elastic_client, index_name)
 
-    semantic_response = search_semantic_only(
+    semantic_response = await search_semantic_only(
         elastic_client,
         index_name,
         "pipeline approval",
@@ -130,7 +154,7 @@ def test_semantic_and_hybrid_search(elastic_client: Elasticsearch, es_test_index
     semantic_hits = semantic_response.get("hits", {}).get("hits", [])
     assert semantic_hits, "Expected hits for semantic query"
 
-    hybrid_response = search_hybrid(
+    hybrid_response = await search_hybrid(
         elastic_client,
         index_name,
         "clean energy",

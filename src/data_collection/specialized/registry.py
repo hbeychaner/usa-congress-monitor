@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Callable, Dict
+from typing import Awaitable, Callable, Dict
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 
 from src.data_collection.client import CDGClient
 from src.data_collection.specialized.congresses import sync_congresses
@@ -13,7 +13,7 @@ from src.data_collection.specialized.bills import sync_bills
 from src.data_collection.specialized.laws import sync_laws
 from src.data_collection.specialized.amendments import sync_amendments
 
-SyncHandler = Callable[[CDGClient, Elasticsearch], dict]
+SyncHandler = Callable[[CDGClient, AsyncElasticsearch], Awaitable[dict]]
 
 REGISTRY: Dict[str, SyncHandler] = {
     "amendment": sync_amendments,

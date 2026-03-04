@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 
 STATE_INDEX = "kb-tracking"
 
@@ -36,15 +36,15 @@ STATE_MAPPING: dict[str, Any] = {
 }
 
 
-def ensure_state_index(client: Elasticsearch) -> None:
-    if client.indices.exists(index=STATE_INDEX):
+async def ensure_state_index(client: AsyncElasticsearch) -> None:
+    if await client.indices.exists(index=STATE_INDEX):
         return
     legacy_index = "kb-sync-state"
-    if client.indices.exists(index=legacy_index):
-        if not client.indices.exists_alias(name=STATE_INDEX):
-            client.indices.put_alias(index=legacy_index, name=STATE_INDEX)
+    if await client.indices.exists(index=legacy_index):
+        if not await client.indices.exists_alias(name=STATE_INDEX):
+            await client.indices.put_alias(index=legacy_index, name=STATE_INDEX)
         return
-    client.indices.create(
+    await client.indices.create(
         index=STATE_INDEX,
         settings=STATE_MAPPING.get("settings", {}),
         mappings=STATE_MAPPING.get("mappings", {}),
@@ -70,17 +70,17 @@ def _normalize_state(source: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-def get_state(client: Elasticsearch, state_id: str) -> dict[str, Any]:
-    ensure_state_index(client)
+async def get_state(client: AsyncElasticsearch, state_id: str) -> dict[str, Any]:
+    await ensure_state_index(client)
     try:
-        response = client.get(index=STATE_INDEX, id=state_id)
+        response = await client.get(index=STATE_INDEX, id=state_id)
     except Exception:
         return {}
     return _normalize_state(dict(response.get("_source", {})))
 
 
-def upsert_state(
-    client: Elasticsearch,
+async def upsert_state(
+    client: AsyncElasticsearch,
     state_id: str,
     endpoint: str,
     *,
@@ -93,7 +93,7 @@ def upsert_state(
     pages: int | None = None,
     status: str | None = None,
 ) -> None:
-    ensure_state_index(client)
+    await ensure_state_index(client)
     body = {
         "index": index,
         "endpoint": endpoint,
@@ -111,4 +111,4 @@ def upsert_state(
         body["pages"] = pages
     if status is not None:
         body["status"] = status
-    client.index(index=STATE_INDEX, id=state_id, document=body)
+    await client.index(index=STATE_INDEX, id=state_id, document=body)

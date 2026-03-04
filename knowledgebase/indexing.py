@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Iterable, cast
 
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
+from elasticsearch import AsyncElasticsearch
+from elasticsearch.helpers import async_bulk
 
 
 def build_actions(
@@ -31,8 +31,8 @@ def build_actions(
     return actions
 
 
-def index_records(
-    client: Elasticsearch,
+async def index_records(
+    client: AsyncElasticsearch,
     index_name: str,
     records: list[dict[str, Any]],
     id_builder,
@@ -44,7 +44,7 @@ def index_records(
     if not actions:
         return 0, []
     bulk_client = client.options(request_timeout=request_timeout)
-    success, errors = bulk(
+    success, errors = await async_bulk(
         bulk_client,
         actions,
         chunk_size=chunk_size,

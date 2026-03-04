@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 
 from knowledgebase.ids import congress_id
 from knowledgebase.indices import CONGRESSES_MAPPING
@@ -26,11 +26,13 @@ def _current_total(client: CDGClient) -> int:
     return int(current.get("number", 0))
 
 
-def sync_congresses(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, Any]:
+async def sync_congresses(
+    cdg_client: CDGClient, es_client: AsyncElasticsearch
+) -> dict[str, Any]:
     """Sync congress records and update state in Elasticsearch."""
     current_total = _current_total(cdg_client)
     records = gather_congresses(cdg_client)
-    result = sync_records(
+    result = await sync_records(
         es_client,
         index_name=INDEX_NAME,
         endpoint=ENDPOINT_NAME,

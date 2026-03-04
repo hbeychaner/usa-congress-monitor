@@ -4,17 +4,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 
 
-def search_index(
-    client: Elasticsearch,
+async def search_index(
+    client: AsyncElasticsearch,
     index_name: str,
     query: dict[str, Any],
     size: int = 10,
 ) -> dict[str, Any]:
     """Run a search query against an index."""
-    return client.search(index=index_name, query=query, size=size)
+    return await client.search(index=index_name, query=query, size=size)
 
 
 def multi_match_query(text: str, fields: list[str]) -> dict[str, Any]:
@@ -60,40 +60,42 @@ def hybrid_query(
     return {"bool": {"should": should_clauses, "minimum_should_match": 1}}
 
 
-def search_by_id(
-    client: Elasticsearch,
+async def search_by_id(
+    client: AsyncElasticsearch,
     index_name: str,
     id_value: str,
     field: str = "id",
 ) -> dict[str, Any]:
     """Keyword-only search by id field."""
-    return search_index(client, index_name, keyword_id_query(id_value, field), size=1)
+    return await search_index(
+        client, index_name, keyword_id_query(id_value, field), size=1
+    )
 
 
-def search_text_only(
-    client: Elasticsearch,
+async def search_text_only(
+    client: AsyncElasticsearch,
     index_name: str,
     text: str,
     fields: list[str],
     size: int = 10,
 ) -> dict[str, Any]:
     """Text-only search across fields."""
-    return search_index(client, index_name, text_query(text, fields), size=size)
+    return await search_index(client, index_name, text_query(text, fields), size=size)
 
 
-def search_semantic_only(
-    client: Elasticsearch,
+async def search_semantic_only(
+    client: AsyncElasticsearch,
     index_name: str,
     text: str,
     field: str,
     size: int = 10,
 ) -> dict[str, Any]:
     """Semantic-only search for a single semantic_text field."""
-    return search_index(client, index_name, semantic_query(text, field), size=size)
+    return await search_index(client, index_name, semantic_query(text, field), size=size)
 
 
-def search_hybrid(
-    client: Elasticsearch,
+async def search_hybrid(
+    client: AsyncElasticsearch,
     index_name: str,
     text: str,
     text_fields: list[str],
@@ -110,4 +112,4 @@ def search_hybrid(
         text_boost=text_boost,
         semantic_boost=semantic_boost,
     )
-    return search_index(client, index_name, query, size=size)
+    return await search_index(client, index_name, query, size=size)

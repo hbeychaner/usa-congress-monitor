@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 from typing import Callable
 
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 from tqdm import tqdm
 
 from knowledgebase.client import build_client
@@ -17,7 +18,7 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-def _build_clients() -> tuple[CDGClient, Elasticsearch]:
+def _build_clients() -> tuple[CDGClient, AsyncElasticsearch]:
     if not CONGRESS_API_KEY:
         raise RuntimeError("CONGRESS_API_KEY not set")
 
@@ -29,24 +30,30 @@ def _build_clients() -> tuple[CDGClient, Elasticsearch]:
     return cdg_client, es_client
 
 
-def run_all() -> None:
+async def run_all() -> None:
     cdg_client, es_client = _build_clients()
-    items = list(REGISTRY.items())
-    for name, handler in tqdm(items, desc="Sync endpoints", unit="endpoint"):
-        logger.info("Running sync for %s", name)
-        result = handler(cdg_client, es_client)
-        logger.info("%s sync result: %s", name, result)
+    try:
+        items = list(REGISTRY.items())
+        for name, handler in tqdm(items, desc="Sync endpoints", unit="endpoint"):
+            logger.info("Running sync for %s", name)
+            result = await handler(cdg_client, es_client)
+            logger.info("%s sync result: %s", name, result)
+    finally:
+        await es_client.close()
 
 
-def run_target(target: str) -> None:
+async def run_target(target: str) -> None:
     handler: Callable | None = REGISTRY.get(target)
     if handler is None:
         raise RuntimeError(f"Unknown sync target: {target}")
     cdg_client, es_client = _build_clients()
-    with tqdm(desc=f"Sync {target}", unit="run") as bar:
-        result = handler(cdg_client, es_client)
-        logger.info("Sync result: %s", result)
-        bar.update(1)
+    try:
+        with tqdm(desc=f"Sync {target}", unit="run") as bar:
+            result = await handler(cdg_client, es_client)
+            logger.info("Sync result: %s", result)
+            bar.update(1)
+    finally:
+        await es_client.close()
 
 
 def main() -> None:
@@ -60,9 +67,9 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.target == "all":
-        run_all()
+        asyncio.run(run_all())
     else:
-        run_target(args.target)
+        asyncio.run(run_target(args.target))
 
 
 if __name__ == "__main__":

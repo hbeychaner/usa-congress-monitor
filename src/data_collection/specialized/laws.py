@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from elasticsearch import Elasticsearch
+import asyncio
+
+from elasticsearch import AsyncElasticsearch
 from tqdm import tqdm
 
 from src.data_collection.specialized.common import (
@@ -25,7 +27,9 @@ def _current_congress(client: CDGClient) -> int:
     return int(current.get("number", 0))
 
 
-def sync_laws(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, Any]:
+async def sync_laws(
+    cdg_client: CDGClient, es_client: AsyncElasticsearch
+) -> dict[str, Any]:
     """Sync law records and update state in Elasticsearch."""
     spec = PaginatedSyncSpec(
         index_name=INDEX_NAME,
@@ -33,13 +37,13 @@ def sync_laws(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, Any]
         mapping=LAWS_MAPPING,
         data_key="bills",
         id_builder=law_id,
-        page_size=250,
+        page_size=20,
         chunk_size=200,
         progress_desc="Laws pages",
         progress_unit="page",
     )
-    existing = existing_ids(es_client, INDEX_NAME)
-    current_congress = _current_congress(cdg_client)
+    existing = await existing_ids(es_client, INDEX_NAME)
+    current_congress = await asyncio.to_thread(_current_congress, cdg_client)
 
     total_indexed = 0
     total_missing = 0
@@ -48,7 +52,7 @@ def sync_laws(cdg_client: CDGClient, es_client: Elasticsearch) -> dict[str, Any]
     congress_range = range(1, current_congress + 1)
     for congress in tqdm(congress_range, desc="Laws congresses", unit="congress"):
         state_id = f"{INDEX_NAME}:{congress}"
-        result = sync_paginated_index(
+        result = await sync_paginated_index(
             es_client,
             fetch_page=lambda offset, page_size: get_laws(
                 cdg_client,
