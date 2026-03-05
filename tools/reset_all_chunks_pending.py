@@ -7,7 +7,6 @@ from settings import ELASTIC_API_URL, ELASTIC_API_KEY
 
 
 async def reset_all_pending():
-    from elasticsearch import AsyncElasticsearch
 
     es = build_client(ELASTIC_API_URL, ELASTIC_API_KEY)
     # Get all chunk docs

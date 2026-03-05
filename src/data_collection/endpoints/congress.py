@@ -27,3 +27,9 @@ def gather_congresses(client: CDGClient) -> list:
     for i in tqdm(range(1, current_congress_id + 1)):
         congresses.append(client.get(f"congress/{i}")["congress"])
     return congresses
+
+
+# Alias for single congress retrieval for naming consistency
+def get_congress(client: CDGClient, congress: int):
+    """Retrieve detailed information for a specified Congress (alias for get_congress_details)."""
+    return get_congress_details(client, congress)

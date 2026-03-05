@@ -14,63 +14,64 @@ from typing import Any, Callable
 from knowledgebase.ids import (
     amendment_id,
     bill_id,
-    law_id,
-    member_id,
+    bound_congressional_record_id,
     committee_id,
     committee_meeting_id,
     committee_report_id,
-    hearing_id,
-    nomination_id,
-    bound_congressional_record_id,
-    daily_congressional_record_id,
     crs_report_id,
-    summary_id,
-    treaty_id,
+    daily_congressional_record_id,
+    hearing_id,
     house_requirement_id,
     house_vote_id,
+    law_id,
+    member_id,
+    nomination_id,
+    summary_id,
+    treaty_id,
 )
 from knowledgebase.indices import (
     AMENDMENTS_MAPPING,
     BILLS_MAPPING,
-    LAWS_MAPPING,
-    MEMBERS_MAPPING,
-    COMMITTEES_MAPPING,
-    CONGRESSES_MAPPING,
+    BOUND_CONGRESSIONAL_RECORDS_MAPPING,
     COMMITTEE_MEETINGS_MAPPING,
     COMMITTEE_REPORTS_MAPPING,
-    HEARINGS_MAPPING,
-    NOMINATIONS_MAPPING,
-    BOUND_CONGRESSIONAL_RECORDS_MAPPING,
-    DAILY_CONGRESSIONAL_RECORDS_MAPPING,
+    COMMITTEES_MAPPING,
+    CONGRESSES_MAPPING,
     CRS_REPORTS_MAPPING,
-    SUMMARIES_MAPPING,
-    TREATIES_MAPPING,
+    DAILY_CONGRESSIONAL_RECORDS_MAPPING,
+    HEARINGS_MAPPING,
     HOUSE_REQUIREMENTS_MAPPING,
     HOUSE_VOTES_MAPPING,
-)
-from src.data_collection.endpoints.committees import get_committees
-from src.data_collection.endpoints.committee_artifacts import (
-    get_committee_meetings,
-    get_committee_reports,
-)
-from src.data_collection.endpoints.hearings import get_hearings
-from src.data_collection.endpoints.nominations import get_nominations
-from src.data_collection.endpoints.records import (
-    get_bound_congressional_records,
-    get_daily_congressional_records,
-)
-from src.data_collection.endpoints.other import (
-    get_crs_reports,
-    get_summaries,
-    get_treaties,
-    get_house_requirements,
-    get_house_roll_call_votes,
+    LAWS_MAPPING,
+    MEMBERS_MAPPING,
+    NOMINATIONS_MAPPING,
+    SUMMARIES_MAPPING,
+    TREATIES_MAPPING,
 )
 from src.data_collection.client import CDGClient
 from src.data_collection.endpoints.amendments import get_amendments_metadata_paginated
 from src.data_collection.endpoints.bills import get_bills_metadata
+from src.data_collection.endpoints.committee_artifacts import (
+    get_committee_meetings,
+    get_committee_reports,
+)
+from src.data_collection.endpoints.committees import get_committees
+from src.data_collection.endpoints.congress import gather_congresses, get_congress
+from src.data_collection.endpoints.hearings import get_hearings
 from src.data_collection.endpoints.laws import get_laws
 from src.data_collection.endpoints.members import get_members_list
+from src.data_collection.endpoints.nominations import get_nominations
+from src.data_collection.endpoints.other import (
+    get_crs_reports,
+    get_house_requirements,
+    get_house_roll_call_votes,
+    get_summaries,
+    get_treaties,
+)
+from src.data_collection.endpoints.records import (
+    get_bound_congressional_records,
+    get_daily_congressional_records,
+)
 
 
 @dataclass(frozen=True)
@@ -395,6 +396,21 @@ def fetch_page(target: str, client: CDGClient, *, offset: int, limit: int) -> di
         return get_house_requirements(client, offset=offset, limit=limit)
     if target == "house-vote":
         return get_house_roll_call_votes(client, offset=offset, limit=limit)
+    if target == "congress":
+        # Gather all congresses, then paginate
+        all_congresses = gather_congresses(client)
+        paged = all_congresses[offset : offset + limit]
+        # For single congress retrieval, use get_congress, but always return a list
+        if limit == 1 and len(paged) == 1:
+            paged = [get_congress(client, paged[0]["number"])]
+        return {
+            "congresses": paged,
+            "pagination": {
+                "count": len(all_congresses),
+                "offset": offset,
+                "page_size": limit,
+            },
+        }
     raise ValueError(f"Unknown target: {target}")
 
 
