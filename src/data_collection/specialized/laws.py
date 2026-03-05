@@ -18,6 +18,7 @@ from knowledgebase.ids import law_id
 from knowledgebase.indices import LAWS_MAPPING
 from src.data_collection.client import CDGClient
 from src.data_collection.endpoints.laws import get_laws
+
 INDEX_NAME = "congress-laws"
 ENDPOINT_NAME = "law"
 
@@ -39,6 +40,9 @@ async def sync_laws(
         id_builder=law_id,
         page_size=20,
         chunk_size=200,
+        queue_size=50,
+        worker_count=4,
+        api_worker_count=4,
         progress_desc="Laws pages",
         progress_unit="page",
     )

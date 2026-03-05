@@ -147,7 +147,7 @@ def resolve_pagination(
     """Resolve pagination metadata from a response with varied conventions."""
     pagination = response.get("pagination")
     if isinstance(pagination, dict):
-        total = int(pagination.get("count") or pagination.get("total") or 0)
+        total = int(pagination.get("total") or pagination.get("count") or 0)
         effective_page_size = int(
             pagination.get("limit")
             or pagination.get("pageSize")

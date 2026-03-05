@@ -5,7 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from elasticsearch import AsyncElasticsearch
-from src.data_collection.specialized.common import PaginatedSyncSpec, sync_paginated_index
+from src.data_collection.specialized.common import (
+    PaginatedSyncSpec,
+    sync_paginated_index,
+)
 from knowledgebase.ids import member_id
 from knowledgebase.indices import MEMBERS_MAPPING
 from src.data_collection.client import CDGClient
@@ -30,6 +33,9 @@ async def sync_members(
         id_builder=member_id,
         page_size=20,
         chunk_size=200,
+        queue_size=50,
+        worker_count=4,
+        api_worker_count=4,
         progress_desc="Members pages",
         progress_unit="page",
     )

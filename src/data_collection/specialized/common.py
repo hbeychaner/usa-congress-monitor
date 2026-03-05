@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from math import ceil
+from time import monotonic
 from typing import Any, Callable
 
 from elasticsearch import AsyncElasticsearch
@@ -72,6 +73,22 @@ class PaginatedSyncSpec:
     progress_unit: str = "page"
     queue_size: int = 100
     worker_count: int = 2
+    rate_limit_per_hour: int = 5000
+    api_worker_count: int = 2
+
+
+class _RateLimiter:
+    def __init__(self, max_per_hour: int) -> None:
+        self._interval = 3600 / max_per_hour if max_per_hour > 0 else 0
+        self._next_time = 0.0
+
+    async def wait(self) -> None:
+        if self._interval <= 0:
+            return
+        now = monotonic()
+        if now < self._next_time:
+            await asyncio.sleep(self._next_time - now)
+        self._next_time = max(self._next_time, now) + self._interval
 
 
 def fetch_total(
@@ -203,7 +220,10 @@ async def sync_paginated_index(
         "page_size": int(state.get("page_size") or spec.page_size),
     }
 
+    limiter = _RateLimiter(spec.rate_limit_per_hour)
+
     async def _fetch_page(offset: int, page_size: int) -> dict:
+        await limiter.wait()
         return await asyncio.to_thread(fetch_page, offset, page_size)
 
     async def _fetch_total() -> int:
@@ -347,44 +367,131 @@ async def sync_paginated_index(
 
         workers = [asyncio.create_task(worker()) for _ in range(spec.worker_count)]
 
-        while True:
-            response = await _fetch_page(offset, spec.page_size)
-            records = response.get(str(spec.data_key), [])
-            if not records:
-                break
+        first_response = await _fetch_page(offset, spec.page_size)
+        first_records = first_response.get(str(spec.data_key), [])
+        if not first_records:
+            for _ in workers:
+                await queue.put(None)
+            await queue.join()
+            await asyncio.gather(*workers)
+            pbar.close()
+            return {
+                "indexed": indexed,
+                "missing": None,
+                "current_total": current_total,
+                "previous_total": previous_total,
+                "errors": errors,
+            }
 
-            meta = resolve_pagination(
-                response,
-                records_len=len(records),
-                offset=offset,
-                page_size=spec.page_size,
-            )
-            if meta.total:
-                current_total = meta.total
-            effective_page_size = meta.page_size or len(records) or spec.page_size
-            if current_total and effective_page_size:
-                total_pages = ceil(current_total / effective_page_size)
-                if pbar.total != total_pages:
-                    pbar.total = total_pages
-                    pbar.refresh()
+        first_meta = resolve_pagination(
+            first_response,
+            records_len=len(first_records),
+            offset=offset,
+            page_size=spec.page_size,
+        )
+        if first_meta.total:
+            current_total = first_meta.total
+        effective_page_size = (
+            first_meta.page_size or len(first_records) or spec.page_size
+        )
+        if current_total and effective_page_size:
+            total_pages = ceil(current_total / effective_page_size)
+            if pbar.total != total_pages:
+                pbar.total = total_pages
+                pbar.refresh()
 
-            page_index += 1
-            await queue.put(
-                {
-                    "records": records,
-                    "meta": {
-                        "offset": offset,
-                        "page": page_index,
-                        "page_size": effective_page_size,
-                        "pages": total_pages,
-                    },
-                }
-            )
+        page_index += 1
+        await queue.put(
+            {
+                "records": first_records,
+                "meta": {
+                    "offset": offset,
+                    "page": page_index,
+                    "page_size": effective_page_size,
+                    "pages": total_pages,
+                },
+            }
+        )
 
-            next_offset = meta.next_offset
-            if next_offset == -1 or next_offset == offset:
-                break
+        next_offset = first_meta.next_offset
+        if next_offset != -1 and next_offset != offset and total_pages:
+            step = next_offset - offset if next_offset > offset else effective_page_size
+            remaining_pages = max(0, total_pages - page_index)
+            offsets_queue: asyncio.Queue[tuple[int, int] | None] = asyncio.Queue()
+            for i in range(1, remaining_pages + 1):
+                offsets_queue.put_nowait((offset + step * i, page_index + i))
+
+            async def fetch_worker() -> None:
+                while True:
+                    item = await offsets_queue.get()
+                    if item is None:
+                        offsets_queue.task_done()
+                        break
+                    next_off, page_no = item
+                    response = await _fetch_page(next_off, spec.page_size)
+                    records = response.get(str(spec.data_key), [])
+                    if records:
+                        meta = resolve_pagination(
+                            response,
+                            records_len=len(records),
+                            offset=next_off,
+                            page_size=spec.page_size,
+                        )
+                        await queue.put(
+                            {
+                                "records": records,
+                                "meta": {
+                                    "offset": next_off,
+                                    "page": page_no,
+                                    "page_size": meta.page_size
+                                    or len(records)
+                                    or spec.page_size,
+                                    "pages": total_pages,
+                                },
+                            }
+                        )
+                    offsets_queue.task_done()
+
+            fetch_workers = [
+                asyncio.create_task(fetch_worker())
+                for _ in range(spec.api_worker_count)
+            ]
+            for _ in fetch_workers:
+                offsets_queue.put_nowait(None)
+            await offsets_queue.join()
+            await asyncio.gather(*fetch_workers)
+        else:
             offset = next_offset
+            while True:
+                if offset == -1 or offset == first_meta.next_offset:
+                    break
+                response = await _fetch_page(offset, spec.page_size)
+                records = response.get(str(spec.data_key), [])
+                if not records:
+                    break
+                meta = resolve_pagination(
+                    response,
+                    records_len=len(records),
+                    offset=offset,
+                    page_size=spec.page_size,
+                )
+                page_index += 1
+                await queue.put(
+                    {
+                        "records": records,
+                        "meta": {
+                            "offset": offset,
+                            "page": page_index,
+                            "page_size": meta.page_size
+                            or len(records)
+                            or spec.page_size,
+                            "pages": total_pages,
+                        },
+                    }
+                )
+                if meta.next_offset == -1 or meta.next_offset == offset:
+                    break
+                offset = meta.next_offset
 
         for _ in workers:
             await queue.put(None)
@@ -396,6 +503,21 @@ async def sync_paginated_index(
         await _store_progress(
             0, page_index, total_pages, effective_page_size, "complete"
         )
+    except asyncio.CancelledError:
+        await upsert_state(
+            es_client,
+            state_key,
+            spec.endpoint,
+            index=spec.index_name,
+            total=current_total,
+            indexed=int((await es_client.count(index=spec.index_name)).get("count", 0)),
+            offset=last_progress.get("offset", resume_offset),
+            page=last_progress.get("page"),
+            page_size=last_progress.get("page_size"),
+            pages=last_progress.get("pages") or None,
+            status="cancelled",
+        )
+        raise
     except Exception:
         await upsert_state(
             es_client,
