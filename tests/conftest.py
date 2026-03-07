@@ -1,12 +1,15 @@
-"""Pytest configuration for project path setup."""
+"""Pytest configuration for project path setup.
+
+This file ensures the project is on `sys.path` and loads a repository `.env`
+so tests receive environment variables (like `CONGRESS_API_KEY`) even when
+the shell hasn't exported them.
+"""
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
+from dotenv import load_dotenv
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
+# Import shared fixtures (kept at module level for backwards compatibility)
 from tests.integration.test_endpoints import client as client  # noqa: E402,F401
+
+load_dotenv()

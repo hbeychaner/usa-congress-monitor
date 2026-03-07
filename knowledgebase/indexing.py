@@ -6,6 +6,13 @@ from typing import Any, Iterable, cast
 
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.helpers import async_bulk
+import datetime
+
+try:
+    # pydantic v1/v2 compatibility: HttpUrl is in pydantic.networks
+    from pydantic.networks import HttpUrl  # type: ignore
+except Exception:
+    HttpUrl = None
 
 
 def build_actions(
@@ -20,12 +27,36 @@ def build_actions(
         if not record_id:
             continue
         record["id"] = record_id
+
+        def _sanitize(obj: Any) -> Any:
+            if obj is None:
+                return None
+            if isinstance(obj, (str, int, float, bool)):
+                return obj
+            if isinstance(obj, (datetime.datetime, datetime.date)):
+                return obj.isoformat()
+            # pydantic HttpUrl -> str
+            try:
+                if HttpUrl is not None and isinstance(obj, HttpUrl):
+                    return str(obj)
+            except Exception:
+                pass
+            if isinstance(obj, dict):
+                return {k: _sanitize(v) for k, v in obj.items()}
+            if isinstance(obj, (list, tuple)):
+                return [_sanitize(v) for v in obj]
+            try:
+                return str(obj)
+            except Exception:
+                return None
+
+        safe_record = _sanitize(record)
         actions.append(
             {
                 "_op_type": "index",
                 "_index": index_name,
                 "_id": record_id,
-                "_source": record,
+                "_source": safe_record,
             }
         )
     return actions

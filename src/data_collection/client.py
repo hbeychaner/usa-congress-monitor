@@ -4,15 +4,18 @@ Provides `CDGClient` for authenticated API access and a `create_session_with_ret
 helper that configures robust HTTP retry behavior.
 """
 
+import threading
 from typing import Any
 from urllib.parse import urljoin
+import time
+
 import requests
+from requests import Response
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from requests import Response
 
-from src.utils.logger import get_logger
 from settings import CONGRESS_API_KEY
+from src.utils.logger import get_logger
 
 congress_api_key = CONGRESS_API_KEY
 
@@ -35,9 +38,11 @@ class _MethodWrapper:
         self, endpoint: str, *args: Any, **kwargs: Any
     ) -> dict[str, Any] | bytes:
         """Invoke the HTTP method and return JSON or raw bytes based on content type."""
-        response = self._method(
-            urljoin(self._parent.base_url, endpoint), *args, **kwargs
-        )
+        self._parent._rate_limited()
+        # Enforce a sensible request timeout to avoid hanging indefinitely during tests
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = 10
+        response = self._method(urljoin(self._parent.base_url, endpoint), *args, **kwargs)
         if response.headers.get("content-type", "").startswith("application/json"):
             return response.json()
         else:
@@ -71,6 +76,10 @@ class CDGClient:
                     r.raise_for_status() if isinstance(r, Response) else None
                 )
             }
+        # Rate limiting: 5000 requests per hour = 1 request every 0.72 seconds
+        self._rate_limit_lock = threading.Lock()
+        self._rate_limit_last_call = 0.0
+        self._rate_limit_interval = 3600.0 / 5000.0  # ~0.72 seconds
 
     @property
     def session(self) -> requests.Session:
@@ -82,6 +91,14 @@ class CDGClient:
         method = _MethodWrapper(self, method_name)
         self.__dict__[method_name] = method
         return method
+
+    def _rate_limited(self):
+        with self._rate_limit_lock:
+            now = time.time()
+            elapsed = now - self._rate_limit_last_call
+            if elapsed < self._rate_limit_interval:
+                time.sleep(self._rate_limit_interval - elapsed)
+            self._rate_limit_last_call = time.time()
 
 
 def create_session_with_retries(

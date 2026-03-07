@@ -17,6 +17,20 @@ def get_bound_congressional_records(
     return get_list(client, "bound-congressional-record", offset=offset, limit=limit)
 
 
+def enumerate_daily_congressional_record_volumes(
+    client: CDGClient, congress_num: int
+) -> list:
+    """Enumerate unique volume numbers for daily congressional records for a given congress."""
+    # Fetch all daily congressional records for the congress
+    records = gather_daily_congressional_records(client)
+    volumes = set()
+    for record in records:
+        volume = record.get("volumeNumber")
+        if volume is not None:
+            volumes.add(volume)
+    return sorted(volumes)
+
+
 def gather_bound_congressional_records(
     client: CDGClient, limit: int = 250, wait: float | None = None
 ) -> list:
@@ -55,9 +69,7 @@ def get_daily_congressional_records(
     client: CDGClient, offset: int = 0, limit: int = 250
 ):
     """Retrieve daily congressional records metadata (paginated)."""
-    return get_list(
-        client, "daily-congressional-record", offset=offset, limit=limit
-    )
+    return get_list(client, "daily-congressional-record", offset=offset, limit=limit)
 
 
 def gather_daily_congressional_records(

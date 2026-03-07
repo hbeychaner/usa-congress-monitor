@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Callable
+from pydantic import BaseModel
 
 from knowledgebase.ids import (
     amendment_id,
@@ -54,6 +55,9 @@ from src.data_collection.endpoints.bills import get_bills_metadata
 from src.data_collection.endpoints.committee_artifacts import (
     get_committee_meetings,
     get_committee_reports,
+    get_committee_reports_by_congress,
+    get_committee_reports_by_congress_and_type,
+    get_committee_prints,
 )
 from src.data_collection.endpoints.committees import get_committees
 from src.data_collection.endpoints.congress import gather_congresses, get_congress
@@ -68,10 +72,15 @@ from src.data_collection.endpoints.other import (
     get_summaries,
     get_treaties,
 )
+from src.data_collection.endpoints.communications import (
+    get_house_communications,
+    get_senate_communications,
+)
 from src.data_collection.endpoints.records import (
     get_bound_congressional_records,
     get_daily_congressional_records,
 )
+from src.models import meta_models
 
 
 @dataclass(frozen=True)
@@ -87,6 +96,14 @@ class QueueSpec:
         [dict, int | None], str
     ]  # Function to build chunk key from meta and law_congress
     meta_fields: list[str]  # List of meta fields to include in payload
+    # Optional: explicit list of allowed API param names (query/path) for this endpoint.
+    # If None, `meta_fields` will be used as the allowed set.
+    allowed_params: list[str] | None = None
+    # Optional mapping from chunk/meta keys to API parameter names (e.g., "report_type" -> "reportType").
+    param_mapping: dict[str, str] | None = None
+    # Optional Pydantic models to coerce meta and parse responses
+    meta_model: type[BaseModel] | None = None
+    response_model: type[BaseModel] | None = None
 
 
 SPECS: dict[str, QueueSpec] = {
@@ -103,6 +120,8 @@ SPECS: dict[str, QueueSpec] = {
             meta.get("congress", law_congress or "")
         ),
         meta_fields=["congress"],
+        meta_model=meta_models.CongressMeta,
+        response_model=meta_models.CongressListResponse,
     ),
     # Bills by congress and bill type
     "bill": QueueSpec(
@@ -117,6 +136,8 @@ SPECS: dict[str, QueueSpec] = {
             f"{meta.get('congress', law_congress or '')}:{meta.get('type', '')}"
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress", "type"],
+        meta_model=meta_models.BillMeta,
+        response_model=meta_models.BillListResponse,
     ),
     # Members by congress
     "member": QueueSpec(
@@ -131,6 +152,8 @@ SPECS: dict[str, QueueSpec] = {
             meta.get("congress", law_congress or "")
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.MemberListResponse,
     ),
     # Laws by congress
     "law": QueueSpec(
@@ -145,6 +168,8 @@ SPECS: dict[str, QueueSpec] = {
             meta.get("congress", law_congress or "")
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.BillListResponse,
     ),
     # Amendments by congress and amendment type
     "amendment": QueueSpec(
@@ -159,6 +184,8 @@ SPECS: dict[str, QueueSpec] = {
             f"{meta.get('congress', law_congress or '')}:{meta.get('type', '')}"
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress", "type"],
+        meta_model=meta_models.AmendmentMeta,
+        response_model=meta_models.AmendmentsResponse,
     ),
     # Committees by congress and chamber
     "committee": QueueSpec(
@@ -180,6 +207,8 @@ SPECS: dict[str, QueueSpec] = {
             "congress",
             "chamber",
         ],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.CommitteeListResponse,
     ),
     # Committee meetings by congress and chamber
     "committee-meeting": QueueSpec(
@@ -201,12 +230,37 @@ SPECS: dict[str, QueueSpec] = {
             "congress",
             "chamber",
         ],
+        meta_model=meta_models.CommitteeMeetingMeta,
+        response_model=meta_models.CommitteeMeetingsResponse,
+    ),
+    # Committee prints by congress and chamber (optional ingestion)
+    "committee-print": QueueSpec(
+        endpoint="committee-print",
+        es_index="congress-committee-prints",
+        api_data_key="committeePrints",
+        id_func=lambda x: str(x.get("jacketNumber") or x.get("jacket_number") or ""),
+        es_mapping=COMMITTEE_MEETINGS_MAPPING,
+        chunk_key_format="congress:chamber (e.g., 117:house)",
+        description="Committee prints by congress and chamber",
+        chunk_key_func=lambda meta, law_congress=None: (
+            f"{meta.get('congress', law_congress or '')}:{meta.get('chamber', '')}"
+        ),
+        meta_fields=[
+            "offset",
+            "page",
+            "page_size",
+            "total_pages",
+            "congress",
+            "chamber",
+        ],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.CommitteePrintsResponse,
     ),
     # Committee reports by congress and report type
     "committee-report": QueueSpec(
         endpoint="committee-report",
         es_index="congress-committee-reports",
-        api_data_key="committeeReports",
+        api_data_key="reports",
         id_func=committee_report_id,
         es_mapping=COMMITTEE_REPORTS_MAPPING,
         chunk_key_format="congress:report_type (e.g., 117:hrpt)",
@@ -222,6 +276,10 @@ SPECS: dict[str, QueueSpec] = {
             "congress",
             "report_type",
         ],
+        # map internal snake_case to API camelCase param
+        param_mapping={"report_type": "reportType"},
+        meta_model=meta_models.CommitteeReportMeta,
+        response_model=meta_models.CommitteeReportsResponse,
     ),
     # Hearings by congress and chamber
     "hearing": QueueSpec(
@@ -243,6 +301,8 @@ SPECS: dict[str, QueueSpec] = {
             "congress",
             "chamber",
         ],
+        meta_model=meta_models.HearingMeta,
+        response_model=meta_models.HearingsResponse,
     ),
     # Nominations by congress
     "nomination": QueueSpec(
@@ -257,44 +317,84 @@ SPECS: dict[str, QueueSpec] = {
             meta.get("congress", law_congress or "")
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.NominationListResponse,
     ),
     # Bound Congressional Record by year
     "bound-congressional-record": QueueSpec(
         endpoint="bound-congressional-record",
         es_index="congress-bound-congressional-records",
-        api_data_key="boundCongressionalRecords",
+        api_data_key="boundCongressionalRecord",
         id_func=bound_congressional_record_id,
         es_mapping=BOUND_CONGRESSIONAL_RECORDS_MAPPING,
         chunk_key_format="year (e.g., 1990)",
         description="Bound Congressional Record by year",
         chunk_key_func=lambda meta, law_congress=None: str(meta.get("year", "")),
         meta_fields=["offset", "page", "page_size", "total_pages", "year"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.BoundCongressionalRecordResponse,
     ),
     # Daily Congressional Record by volumeNumber
     "daily-congressional-record": QueueSpec(
         endpoint="daily-congressional-record",
         es_index="congress-daily-congressional-records",
-        api_data_key="dailyCongressionalRecords",
+        api_data_key="dailyCongressionalRecord",
         id_func=daily_congressional_record_id,
         es_mapping=DAILY_CONGRESSIONAL_RECORDS_MAPPING,
-        chunk_key_format="volumeNumber (e.g., 167)",
-        description="Daily Congressional Record by volumeNumber",
+        chunk_key_format="congress (e.g., 117)",
+        description="Daily Congressional Record by congress (paginated)",
         chunk_key_func=lambda meta, law_congress=None: str(
-            meta.get("volumeNumber", "")
+            meta.get("congress", law_congress or "")
         ),
-        meta_fields=["offset", "page", "page_size", "total_pages", "volumeNumber"],
+        meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.DailyCongressionalRecordResponse,
     ),
     # CRS Reports by year
     "crsreport": QueueSpec(
         endpoint="crsreport",
         es_index="congress-crs-reports",
-        api_data_key="crsReports",
+        api_data_key="CRSReports",
         id_func=crs_report_id,
         es_mapping=CRS_REPORTS_MAPPING,
         chunk_key_format="year (e.g., 2023)",
         description="CRS Reports by year",
         chunk_key_func=lambda meta, law_congress=None: str(meta.get("year", "")),
         meta_fields=["offset", "page", "page_size", "total_pages", "year"],
+        meta_model=meta_models.CRSReportMeta,
+        response_model=meta_models.CRSReportsResponse,
+    ),
+    # House communications (paginated)
+    "house-communication": QueueSpec(
+        endpoint="house-communication",
+        es_index="congress-house-communications",
+        api_data_key="houseCommunications",
+        id_func=lambda x: f"{x.get('congress', '')}-{x.get('number', '')}",
+        es_mapping=MEMBERS_MAPPING,
+        chunk_key_format="congress (e.g., 117)",
+        description="House communications by congress",
+        chunk_key_func=lambda meta, law_congress=None: str(
+            meta.get("congress", law_congress or "")
+        ),
+        meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.HouseCommunicationsResponse,
+    ),
+    # Senate communications (paginated)
+    "senate-communication": QueueSpec(
+        endpoint="senate-communication",
+        es_index="congress-senate-communications",
+        api_data_key="senateCommunications",
+        id_func=lambda x: f"{x.get('congress', '')}-{x.get('number', '')}",
+        es_mapping=MEMBERS_MAPPING,
+        chunk_key_format="congress (e.g., 117)",
+        description="Senate communications by congress",
+        chunk_key_func=lambda meta, law_congress=None: str(
+            meta.get("congress", law_congress or "")
+        ),
+        meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.SenateCommunicationsResponse,
     ),
     # Summaries by congress and bill type
     "summaries": QueueSpec(
@@ -309,6 +409,8 @@ SPECS: dict[str, QueueSpec] = {
             f"{meta.get('congress', law_congress or '')}:{meta.get('type', '')}"
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress", "type"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.SummariesResponse,
     ),
     # Treaties by congress
     "treaty": QueueSpec(
@@ -323,6 +425,8 @@ SPECS: dict[str, QueueSpec] = {
             meta.get("congress", law_congress or "")
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.TreatyListResponse,
     ),
     # House requirements by congress
     "house-requirement": QueueSpec(
@@ -337,12 +441,14 @@ SPECS: dict[str, QueueSpec] = {
             meta.get("congress", law_congress or "")
         ),
         meta_fields=["offset", "page", "page_size", "total_pages", "congress"],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.HouseRequirementsResponse,
     ),
     # House votes by congress and session
     "house-vote": QueueSpec(
         endpoint="house-vote",
         es_index="congress-house-votes",
-        api_data_key="houseVotes",
+        api_data_key="houseRollCallVotes",
         id_func=house_vote_id,
         es_mapping=HOUSE_VOTES_MAPPING,
         chunk_key_format="congress:session (e.g., 118:2)",
@@ -358,11 +464,15 @@ SPECS: dict[str, QueueSpec] = {
             "congress",
             "session",
         ],
+        meta_model=meta_models.GenericChunkMeta,
+        response_model=meta_models.HouseVotesResponse,
     ),
 }
 
 
-def fetch_page(target: str, client: CDGClient, *, offset: int, limit: int) -> dict:
+def fetch_page(
+    target: str, client: CDGClient, *, offset: int, limit: int, meta: dict | None = None
+) -> dict:
     if target == "bill":
         return get_bills_metadata(client, offset=offset, limit=limit)
     if target == "member":
@@ -377,7 +487,30 @@ def fetch_page(target: str, client: CDGClient, *, offset: int, limit: int) -> di
     if target == "committee-meeting":
         return get_committee_meetings(client, offset=offset, limit=limit)
     if target == "committee-report":
+        # Route according to meta: congress + report_type -> specific endpoint
+        if (
+            meta
+            and meta.get("congress")
+            and (meta.get("report_type") or meta.get("reportType"))
+        ):
+            # accept either internal snake_case or API camelCase param
+            rpt = meta.get("report_type") or meta.get("reportType")
+            return get_committee_reports_by_congress_and_type(
+                client,
+                congress=int(meta.get("congress") or 0),
+                reportType=str(rpt or ""),
+                offset=offset,
+                limit=limit,
+            )
+        if meta and meta.get("congress"):
+            return get_committee_reports_by_congress(
+                client,
+                congress=int(meta.get("congress") or 0),
+                offset=offset,
+                limit=limit,
+            )
         return get_committee_reports(client, offset=offset, limit=limit)
+
     if target == "hearing":
         return get_hearings(client, offset=offset, limit=limit)
     if target == "nomination":
@@ -388,6 +521,12 @@ def fetch_page(target: str, client: CDGClient, *, offset: int, limit: int) -> di
         return get_daily_congressional_records(client, offset=offset, limit=limit)
     if target == "crsreport":
         return get_crs_reports(client, offset=offset, limit=limit)
+    if target == "committee-print":
+        return get_committee_prints(client, offset=offset, limit=limit)
+    if target == "house-communication":
+        return get_house_communications(client, offset=offset, limit=limit)
+    if target == "senate-communication":
+        return get_senate_communications(client, offset=offset, limit=limit)
     if target == "summaries":
         return get_summaries(client, offset=offset, limit=limit)
     if target == "treaty":
@@ -397,12 +536,20 @@ def fetch_page(target: str, client: CDGClient, *, offset: int, limit: int) -> di
     if target == "house-vote":
         return get_house_roll_call_votes(client, offset=offset, limit=limit)
     if target == "congress":
-        # Gather all congresses, then paginate
+        if limit == 1:
+            # Offset is the congress id (1-based)
+            congress_number = offset
+            return {
+                "congresses": [get_congress(client, congress=congress_number)],
+                "pagination": {
+                    "count": 1,
+                    "offset": offset,
+                    "page_size": limit,
+                },
+            }
+        # Otherwise, batch fetch
         all_congresses = gather_congresses(client)
         paged = all_congresses[offset : offset + limit]
-        # For single congress retrieval, use get_congress, but always return a list
-        if limit == 1 and len(paged) == 1:
-            paged = [get_congress(client, paged[0]["number"])]
         return {
             "congresses": paged,
             "pagination": {
@@ -412,6 +559,101 @@ def fetch_page(target: str, client: CDGClient, *, offset: int, limit: int) -> di
             },
         }
     raise ValueError(f"Unknown target: {target}")
+
+
+def _snake_to_camel(s: str) -> str:
+    parts = s.split("_")
+    return parts[0] + "".join(p.title() for p in parts[1:])
+
+
+def normalize_meta_for_api(meta: dict | None, spec: QueueSpec) -> dict:
+    """Normalize meta keys to the API parameter names using `spec.param_mapping` or camelCase conversion."""
+    if not meta:
+        return {}
+    mapping = spec.param_mapping or {}
+    api_meta: dict = {}
+    for k, v in meta.items():
+        if k in mapping:
+            api_meta[mapping[k]] = v
+        elif "_" in k:
+            api_meta[_snake_to_camel(k)] = v
+        else:
+            api_meta[k] = v
+    return api_meta
+
+
+def prepare_api_meta(
+    spec: QueueSpec, meta: dict | None
+) -> tuple[dict, object | None, dict]:
+    """Prepare API meta parameters for a spec.
+
+    Returns (api_meta, meta_obj, filtered_meta) where `meta_obj` is the
+    validated Pydantic model instance when `spec.meta_model` is provided
+    and validation succeeds, otherwise None. `filtered_meta` contains the
+    raw meta filtered to allowed fields and is useful for legacy paths.
+    """
+    if not meta:
+        return {}, None, {}
+    api_meta: dict = {}
+    meta_obj = None
+    filtered_meta: dict = {}
+    # Attempt Pydantic coercion when a meta_model is present
+    if spec.meta_model is not None:
+        try:
+            meta_obj = spec.meta_model.model_validate(meta)
+            api_meta_all = meta_obj.model_dump(by_alias=True, exclude_none=True)
+            allowed_args = spec.allowed_params or list(spec.meta_fields)
+            # Build allowed API arg names, including both snake_case and alias/camelCase
+            allowed_api_args = set()
+            for a in allowed_args:
+                allowed_api_args.add(a)
+                if spec.param_mapping and a in spec.param_mapping:
+                    allowed_api_args.add(spec.param_mapping[a])
+                elif "_" in a:
+                    allowed_api_args.add(_snake_to_camel(a))
+            api_meta = {k: v for k, v in api_meta_all.items() if k in allowed_api_args}
+            return api_meta, meta_obj, filtered_meta
+        except Exception:
+            pass
+    # Legacy fallback: filter raw meta and normalize
+    allowed_args = spec.allowed_params or list(spec.meta_fields)
+    filtered_meta = {k: v for k, v in (meta or {}).items() if k in allowed_args}
+    try:
+        api_meta = normalize_meta_for_api(filtered_meta, spec)
+    except Exception:
+        api_meta = dict(filtered_meta)
+    return api_meta, meta_obj, filtered_meta
+
+
+def resolve_pagination_for_consumer(
+    endpoint: str,
+    spec: QueueSpec,
+    meta: dict | None,
+    meta_obj: object | None,
+    filtered_meta: dict,
+) -> tuple[int, int]:
+    """Resolve offset and limit for a consumer run.
+
+    Prefers values from `meta_obj` when available, otherwise falls back
+    to `filtered_meta` or raw `meta` via `resolve_offset_limit`.
+    """
+    if endpoint == "congress":
+        offset = int((meta or {}).get("congress", 0))
+        return offset, 1
+    if meta_obj is not None:
+        try:
+            offset = int(getattr(meta_obj, "offset", 0) or 0)
+            limit = int(getattr(meta_obj, "limit", 250) or 250)
+            return offset, limit
+        except Exception:
+            pass
+    # Fallback to existing utility
+    from src.data_collection.utils import resolve_offset_limit as _resolve
+
+    offset, limit = _resolve(
+        filtered_meta or meta or {}, default_offset=0, default_limit=250
+    )
+    return offset, limit
 
 
 def fetch_law_page(

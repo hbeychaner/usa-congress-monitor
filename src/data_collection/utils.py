@@ -223,6 +223,21 @@ def determine_simple_wait(start_time: float, api_call_count: int) -> None:
         time.sleep(wait_time)
 
 
+def resolve_offset_limit(meta: dict | None, *, default_offset: int = 0, default_limit: int = 250) -> tuple[int, int]:
+    """Return a normalized (offset, limit) tuple from chunk meta, coercing types and applying defaults."""
+    if not meta:
+        return default_offset, default_limit
+    try:
+        offset = int(meta.get("offset", default_offset) or default_offset)
+    except (TypeError, ValueError):
+        offset = default_offset
+    try:
+        limit = int(meta.get("limit", default_limit) or default_limit)
+    except (TypeError, ValueError):
+        limit = default_limit
+    return offset, limit
+
+
 def gather_paginated_metadata(
     fetch_page: Callable[[int, int], dict],
     data_key: str,

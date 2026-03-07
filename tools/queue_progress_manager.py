@@ -32,6 +32,17 @@ async def queue_chunk(chunk: dict, rabbitmq_url: str, queue_name: str):
         conn = await aio_pika.connect_robust(rabbitmq_url)
         channel = await conn.channel()
         await channel.declare_queue(queue_name, durable=True)
+        # Validate meta: require at least one non-None value
+        def _has_valid_meta(m: dict) -> bool:
+            if not isinstance(m, dict):
+                return False
+            return any(v is not None for v in m.values())
+
+        if not _has_valid_meta(meta):
+            print(f"Skipping publish: chunk {chunk['chunk_key']} for endpoint {endpoint} has empty meta.")
+            await conn.close()
+            return
+
         payload = {
             "endpoint": endpoint,
             "chunk_key": chunk["chunk_key"],

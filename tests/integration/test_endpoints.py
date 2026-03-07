@@ -19,6 +19,7 @@ from src.data_collection.endpoints.committees import get_committees
 from src.data_collection.endpoints.congress import (
     get_congress_details,
     get_current_congress,
+    get_congress,
 )
 from src.data_collection.endpoints.communications import (
     get_house_communications,
@@ -86,13 +87,30 @@ def get_response_with_retries(
 ) -> Mapping[str, Any]:
     for attempt in range(retries):
         try:
-            return func(*args, **kwargs)
+            start = time.time()
+            print(
+                f"[test helper] calling {getattr(func, '__name__', str(func))} attempt={attempt + 1}"
+            )
+            result = func(*args, **kwargs)
+            elapsed = time.time() - start
+            print(
+                f"[test helper] {getattr(func, '__name__', str(func))} returned in {elapsed:.2f}s"
+            )
+            return result
         except HTTPError as exc:
             status = getattr(exc.response, "status_code", None)
+            print(
+                f"[test helper] HTTPError from {getattr(func, '__name__', str(func))}: status={status}"
+            )
             if status is not None and status >= 500 and attempt < retries - 1:
                 time.sleep(1.5 * (attempt + 1))
                 continue
             pytest.skip(f"Upstream API unavailable (status {status}).")
+        except Exception as exc:  # broaden to catch timeouts and others for debugging
+            print(
+                f"[test helper] Exception calling {getattr(func, '__name__', str(func))}: {exc!r}"
+            )
+            raise
     raise RuntimeError("Failed to retrieve response after retries.")
 
 
@@ -323,4 +341,15 @@ def test_congress_endpoints(client):
     details = get_response_with_retries(
         get_congress_details, client, congress=congress_number
     )
+    assert details.get("congress", {}).get("number") == congress_number
+
+
+def test_get_congress_endpoint(client):
+    # Use the current congress number for a valid test
+    current = get_response_with_retries(get_current_congress, client)
+    congress_number = current.get("congress", {}).get("number")
+    assert congress_number is not None
+
+    # Now test get_congress
+    details = get_response_with_retries(get_congress, client, congress=congress_number)
     assert details.get("congress", {}).get("number") == congress_number
