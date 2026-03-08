@@ -14,7 +14,8 @@ async def search_index(
     size: int = 10,
 ) -> dict[str, Any]:
     """Run a search query against an index."""
-    return await client.search(index=index_name, query=query, size=size)
+    result = await client.search(index=index_name, query=query, size=size)
+    return result.to_dict()
 
 
 def multi_match_query(text: str, fields: list[str]) -> dict[str, Any]:

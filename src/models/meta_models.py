@@ -40,6 +40,14 @@ class GenericChunkMeta(BaseChunkMeta):
     congress: Optional[int] = Field(None, description="Congress number")
     type: Optional[str] = Field(None, description="Record type or bill type")
     chamber: Optional[str] = Field(None, description="Chamber filter (house/senate)")
+    from_date_time: Optional[str] = Field(
+        None,
+        alias="fromDateTime",
+        description="Start datetime for date-filtered endpoints",
+    )
+    to_date_time: Optional[str] = Field(
+        None, alias="toDateTime", description="End datetime for date-filtered endpoints"
+    )
     year: Optional[int] = Field(None, description="Year for year-scoped endpoints")
     page: Optional[int] = Field(None, description="Page number from API metadata")
     page_size: Optional[int] = Field(
@@ -114,55 +122,73 @@ class CongressMeta(BaseChunkMeta):
 
 
 class CongressListResponse(BaseModel):
-    congresses: List[Any] = Field(default_factory=list, description="List of congress items")
+    congresses: List[Any] = Field(
+        default_factory=list, description="List of congress items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class CommitteeListResponse(BaseModel):
-    committees: List[CommitteeListItem] = Field(default_factory=list, description="List of committee items")
+    committees: List[CommitteeListItem] = Field(
+        default_factory=list, description="List of committee items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class NominationListResponse(BaseModel):
-    nominations: List[NominationListItem] = Field(default_factory=list, description="List of nomination items")
+    nominations: List[NominationListItem] = Field(
+        default_factory=list, description="List of nomination items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class BoundCongressionalRecordResponse(BaseModel):
-    boundCongressionalRecord: List[Any] = Field(default_factory=list, description="List of bound congressional record items")
+    boundCongressionalRecord: List[Any] = Field(
+        default_factory=list, description="List of bound congressional record items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class DailyCongressionalRecordResponse(BaseModel):
-    dailyCongressionalRecord: List[Any] = Field(default_factory=list, description="List of daily congressional record items")
+    dailyCongressionalRecord: List[Any] = Field(
+        default_factory=list, description="List of daily congressional record items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class SummariesResponse(BaseModel):
-    summaries: List[BillSummaryListItem] = Field(default_factory=list, description="List of summary items")
+    summaries: List[BillSummaryListItem] = Field(
+        default_factory=list, description="List of summary items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class TreatyListResponse(BaseModel):
-    treaties: List[TreatyListItem] = Field(default_factory=list, description="List of treaty items")
+    treaties: List[TreatyListItem] = Field(
+        default_factory=list, description="List of treaty items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class HouseRequirementsResponse(BaseModel):
-    houseRequirements: List[HouseRequirementListItem] = Field(default_factory=list, description="List of house requirement items")
+    houseRequirements: List[HouseRequirementListItem] = Field(
+        default_factory=list, description="List of house requirement items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
 
 class HouseVotesResponse(BaseModel):
-    houseRollCallVotes: List[Any] = Field(default_factory=list, description="List of house roll call vote items")
+    houseRollCallVotes: List[Any] = Field(
+        default_factory=list, description="List of house roll call vote items"
+    )
     pagination: Optional[dict] = None
     model_config = ConfigDict(validate_by_name=True)
 
