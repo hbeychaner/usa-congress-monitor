@@ -5,7 +5,7 @@ Each model includes per-field descriptions that explain what each attribute answ
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, List, Optional
+from typing import Annotated, Any, List, Optional, Union
 
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field, HttpUrl, field_validator
@@ -76,6 +76,21 @@ class TextVersion(BaseModel):
         List[Format], Field(description="Which formats are available for this text.")
     ]
     type: Annotated[str, Field(description="What type of text version this is.")]
+
+
+class BillTextResponse(BaseModel):
+    """Response wrapper for bill text endpoints (list of text versions)."""
+
+    pagination: Annotated[
+        Optional[dict],
+        Field(default=None, description="Pagination metadata if present"),
+    ] = None
+    request: Annotated[
+        Optional[dict], Field(default=None, description="Original request metadata")
+    ] = None
+    textVersions: Annotated[
+        List[TextVersion], Field(description="List of available text versions")
+    ] = []
 
 
 class PolicyArea(BaseModel):
@@ -459,24 +474,30 @@ class Amendment(BaseModel):
 
     # Fields added by collecting additional data with client object
     actions: Annotated[
-        List[Action],
+        Optional[Union[List[Action], "CountUrl"]],
         Field(description="Which actions are associated with the amendment."),
-    ] = []
+    ] = None
     cosponsors: Annotated[
-        List[Member], Field(description="Which members cosponsored the amendment.")
-    ] = []
+        Optional[Union[List[Member], "CountUrl"]],
+        Field(description="Which members cosponsored the amendment."),
+    ] = None
     text_versions: Annotated[
-        List[TextVersion],
-        Field(description="Which text versions are available for the amendment."),
-    ] = []
+        Optional[Union[List[TextVersion], "CountUrl"]],
+        Field(
+            alias="textVersions",
+            description="Which text versions are available for the amendment.",
+        ),
+    ] = None
     # Normal fields
     congress: Annotated[
         int, Field(description="Which Congress the amendment belongs to.")
     ]
     description: Annotated[
-        str, Field(description="What the amendment description says.")
-    ]
-    purpose: Annotated[str, Field(description="What purpose the amendment states.")]
+        Optional[str], Field(description="What the amendment description says.")
+    ] = None
+    purpose: Annotated[
+        Optional[str], Field(description="What purpose the amendment states.")
+    ] = None
     latest_action: Annotated[
         Optional[LatestAction],
         Field(alias="latestAction", description="What the latest action is."),
@@ -488,8 +509,9 @@ class Amendment(BaseModel):
         Field(alias="updateDate", description="When the amendment was last updated."),
     ]
     url: Annotated[
-        HttpUrl, Field(description="Where to retrieve the amendment in the API.")
-    ]
+        Optional[HttpUrl],
+        Field(description="Where to retrieve the amendment in the API."),
+    ] = None
     sponsors: Annotated[
         List[Member], Field(description="Which members sponsored the amendment.")
     ] = []
@@ -522,6 +544,33 @@ class Amendment(BaseModel):
             description="Which chamber the amendment is associated with.",
         ),
     ] = None
+
+    @field_validator("chamber", mode="before")
+    def _normalize_chamber(cls, v):
+        """Normalize slightly different chamber strings into the `Chamber` enum.
+
+        Accepts values like 'House of Representatives', 'house', 'H', 'Senate',
+        'S', and various casing/abbreviations and returns a `Chamber` value.
+        """
+        if v is None:
+            return None
+        if isinstance(v, Chamber):
+            return v
+        raw = str(v).strip().lower()
+        # common indicators for House
+        if "house" in raw or "represent" in raw or raw in ("h", "hr"):
+            return Chamber.HOUSE
+        # common indicators for Senate (accept 'sen', 'sen.', 'senate')
+        if raw.startswith("sen") or "senate" in raw or raw in ("s",):
+            return Chamber.SENATE
+        # fallback: try to match exact enum names
+        if raw.capitalize() == Chamber.HOUSE.value:
+            return Chamber.HOUSE
+        if raw.capitalize() == Chamber.SENATE.value:
+            return Chamber.SENATE
+        # unknown/unrecognized chamber strings -> normalize to None
+        return None
+
     amended_treaty: Annotated[
         Optional[Treaty],
         Field(
@@ -603,36 +652,41 @@ class Bill(BaseModel):
 
     # Fields added by collecting additional data with client object
     actions: Annotated[
-        List[Action], Field(description="Which actions are associated with the bill.")
-    ] = []
+        Optional[Union[List[Action], "CountUrl"]],
+        Field(description="Which actions are associated with the bill."),
+    ] = None
     amendments: Annotated[
-        List[Amendment],
+        Optional[Union[List[Amendment], "CountUrl"]],
         Field(description="Which amendments are associated with the bill."),
-    ] = []
+    ] = None
     committees: Annotated[
-        List[CommitteeMetadata],
+        Optional[Union[List[CommitteeMetadata], "CountUrl"]],
         Field(description="Which committees are associated with the bill."),
-    ] = []
+    ] = None
     cosponsors: Annotated[
-        List[Sponsor], Field(description="Which members cosponsored the bill.")
-    ] = []
+        Optional[Union[List[Sponsor], "CountUrl"]],
+        Field(description="Which members cosponsored the bill."),
+    ] = None
     related_bills: Annotated[
-        List[BillMetadata],
+        Optional[Union[List[BillMetadata], "CountUrl"]],
         Field(description="Which related bills are linked to this bill."),
-    ] = []
+    ] = None
     subjects: Annotated[
-        Subjects, Field(description="What subject metadata is available for the bill.")
-    ]
+        Optional[Union[Subjects, "CountUrl"]],
+        Field(description="What subject metadata is available for the bill."),
+    ] = None
     summaries: Annotated[
-        List[Summary], Field(description="Which summaries are available for the bill.")
-    ] = []
+        Optional[Union[List[Summary], "CountUrl"]],
+        Field(description="Which summaries are available for the bill."),
+    ] = None
     text_versions: Annotated[
-        List[TextVersion],
+        Optional[Union[List[TextVersion], "CountUrl"]],
         Field(description="Which text versions are available for the bill."),
-    ] = []
+    ] = None
     titles: Annotated[
-        List[Title], Field(description="Which titles are recorded for the bill.")
-    ] = []
+        Optional[Union[List[Title], "CountUrl"]],
+        Field(description="Which titles are recorded for the bill."),
+    ] = None
     full_text: Annotated[str, Field(description="What the full bill text is.")] = ""
 
     # Fields from original data
@@ -675,8 +729,9 @@ class Bill(BaseModel):
         ),
     ] = None
     sponsors: Annotated[
-        List[Sponsor], Field(description="Which members sponsored the bill.")
-    ] = []
+        Optional[Union[List[Sponsor], "CountUrl"]],
+        Field(description="Which members sponsored the bill."),
+    ] = None
     title: Annotated[str, Field(description="What the bill title is.")]
     type: Annotated[BillType, Field(description="What type of bill this is.")]
     update_date: Annotated[
@@ -836,3 +891,66 @@ class CommitteeMeeting(BaseModel):
     type: Annotated[
         Optional[str], Field(description="What type of meeting this is.")
     ] = None
+
+
+# Response wrapper models for bill sub-endpoints (defined after referenced types)
+class BillActionsResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    actions: Annotated[List[Action], Field(default_factory=list)] = Field(
+        default_factory=list
+    )
+
+
+class BillAmendmentsResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    amendments: Annotated[List[AmendmentMetadata], Field(default_factory=list)] = Field(
+        default_factory=list
+    )
+
+
+class BillCommitteesResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    committees: Annotated[List[CommitteeMetadata], Field(default_factory=list)] = Field(
+        default_factory=list
+    )
+
+
+class BillCosponsorsResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    cosponsors: Annotated[List[Sponsor], Field(default_factory=list)] = Field(
+        default_factory=list
+    )
+
+
+class BillRelatedBillsResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    relatedBills: Annotated[List[BillMetadata], Field(default_factory=list)] = Field(
+        default_factory=list, alias="relatedBills"
+    )
+
+
+class BillSubjectsResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    subjects: Annotated[Optional[Subjects], Field(default=None)] = None
+
+
+class BillSummariesResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    summaries: Annotated[List[Summary], Field(default_factory=list)] = Field(
+        default_factory=list
+    )
+
+
+class BillTitlesResponse(BaseModel):
+    pagination: Annotated[Optional[dict], Field(default=None)] = None
+    request: Annotated[Optional[dict], Field(default=None)] = None
+    titles: Annotated[List[Title], Field(default_factory=list)] = Field(
+        default_factory=list
+    )

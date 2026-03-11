@@ -66,8 +66,21 @@ class CongressMetadata(BaseModel):
     """Minimal Congress metadata used in nested API responses."""
 
     number: Annotated[
-        int, Field(description="Which Congress number this metadata refers to.")
+        Optional[int], Field(default=None, description="Which Congress number this metadata refers to.")
     ]
+    url: Annotated[
+        Optional[HttpUrl], Field(default=None, description="Link to the congress item")
+    ]
+    name: Annotated[Optional[str], Field(default=None, description="Display name of the congress")] = None
+    update_date: Annotated[
+        Optional[datetime], Field(alias="updateDate", default=None, description="When the Congress record was last updated.")
+    ] = None
+    start_year: Annotated[
+        Optional[int], Field(alias="startYear", default=None, description="Start year")
+    ] = None
+    end_year: Annotated[
+        Optional[int], Field(alias="endYear", default=None, description="End year")
+    ] = None
 
 
 class Depiction(BaseModel):
@@ -177,9 +190,8 @@ class Member(BaseModel):
 
 class Sponsor(Member):
     """A member acting as sponsor, with sponsorship timing metadata."""
-
     sponsorship_date: Annotated[
-        datetime, Field(alias="sponsorshipDate", description="When sponsorship began.")
+        Optional[datetime], Field(alias="sponsorshipDate", default=None, description="When sponsorship began.")
     ]
     is_original_cosponsor: Annotated[
         bool,
