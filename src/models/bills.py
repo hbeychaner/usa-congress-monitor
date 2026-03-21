@@ -1111,6 +1111,28 @@ class Bill(EntityBase):
         Field(alias="notes", description="What notes are attached to the bill."),
     ] = None
 
+    url: Annotated[
+        Optional[HttpUrl],
+        Field(
+            default=None,
+            alias="legislationUrl",
+            description="Canonical legislation URL (API uses `legislationUrl`).",
+        ),
+    ] = None
+
+    @model_validator(mode="before")
+    def _populate_url_from_legislation_url(cls, values: dict):
+        # Accept the API's `legislationUrl` key and map it to `url` so the
+        # canonical `url` attribute is populated on Bill instances.
+        if not isinstance(values, dict):
+            return values
+        if values.get("legislationUrl") and not values.get("url"):
+            values["url"] = values.get("legislationUrl")
+        # Remove the raw key so downstream model parsing uses `url` uniformly
+        if "legislationUrl" in values:
+            values.pop("legislationUrl", None)
+        return values
+
     def add_full_text(self, client: CDGClient) -> str:
         """Fetch and return the full bill text from formatted text versions."""
         import requests

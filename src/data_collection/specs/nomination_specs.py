@@ -30,10 +30,11 @@ item_spec = EndpointSpec(
             location=ParamLocation.PATH,
             required=True,
             source_field="number",
+            extract_from_url_segment="nomination",
         ),
     ],
     data_key=None,
-    unwrap_key=None,
+    unwrap_key="nomination",
     response_model=Nomination,
 )
 

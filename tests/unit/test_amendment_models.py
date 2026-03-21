@@ -34,7 +34,8 @@ def test_amendment_model_parse():
 
     a = Amendment.model_validate(sample)
     assert a.congress == 116
-    assert a.number == "1"
+    # model now stores `number` as int
+    assert a.number == 1
     assert a.type == "SAMDT"
     # update_date should be parsed
     assert isinstance(a.update_date, datetime)

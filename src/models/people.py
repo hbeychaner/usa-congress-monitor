@@ -120,6 +120,22 @@ class Depiction(BaseModel):
         return Depiction(attribution="", image_url=None)
 
 
+class MemberAddress(BaseModel):
+    """Member office/address contact details."""
+
+    city: Annotated[Optional[str], Field(default=None)] = None
+    district: Annotated[Optional[str], Field(default=None)] = None
+    office_address: Annotated[
+        Optional[str], Field(default=None, alias="officeAddress")
+    ] = None
+    phone_number: Annotated[Optional[str], Field(default=None, alias="phoneNumber")] = (
+        None
+    )
+    zip_code: Annotated[Optional[int], Field(default=None, alias="zipCode")] = None
+
+    model_config = {"populate_by_name": True}
+
+
 class Term(BaseModel):
     """Service term for a member, including chamber and year range."""
 
@@ -208,6 +224,30 @@ class Member(EntityBase):
             description="What image information is available for the member.",
         ),
     ] = Depiction.empty()
+    address_information: Annotated[
+        Optional[MemberAddress],
+        Field(
+            default=None,
+            alias="addressInformation",
+            description="Member address/contact info.",
+        ),
+    ] = None
+    official_website_url: Annotated[
+        Optional[HttpUrl],
+        Field(
+            default=None,
+            alias="officialWebsiteUrl",
+            description="Member's official/personal website.",
+        ),
+    ] = None
+    leadership: Annotated[
+        Optional[List[dict]],
+        Field(
+            default=None,
+            alias="leadership",
+            description="Leadership role info when present.",
+        ),
+    ] = None
 
     # Additional item-level fields returned by the API
     birth_year: Annotated[
@@ -365,11 +405,63 @@ class Member(EntityBase):
                 try:
                     return parse_url_to_id(str(url))
                 except Exception as exc:
-                    logger.exception("Failed to parse URL to id in Member.build_id: %s", exc)
+                    logger.exception(
+                        "Failed to parse URL to id in Member.build_id: %s", exc
+                    )
             mapping = self.model_dump() if hasattr(self, "model_dump") else dict(self)
             return f"record:{abs(hash(str(mapping))) % (10**12)}"
         except Exception:
             return f"record:{abs(hash(str(getattr(self, 'full_name', 'member')))) % (10**12)}"
+
+    @model_validator(mode="after")
+    def _populate_common_fields(cls, model):
+        """Ensure `id`, `url`, `member_type`, and `state_code` are populated when possible.
+
+        - Sets `id` using `build_id()` when missing.
+        - Synthesizes an API `url` from `bioguide_id` when missing.
+        - Copies `member_type` and `state_code` from the first `terms` entry when absent.
+        """
+        try:
+            if not getattr(model, "id", None):
+                model.id = model.build_id()
+        except Exception:
+            pass
+
+        try:
+            if not getattr(model, "url", None):
+                bid = getattr(model, "bioguide_id", None)
+                if bid:
+                    model.url = f"https://api.congress.gov/v3/member/{bid}?format=json"
+        except Exception:
+            pass
+
+        try:
+            if not getattr(model, "member_type", None):
+                terms = getattr(model, "terms", None)
+                if isinstance(terms, list) and terms:
+                    first = terms[0]
+                    mt = first.get("memberType") if isinstance(first, dict) else None
+                    if not mt:
+                        mt = getattr(first, "member_type", None)
+                    if mt:
+                        model.member_type = mt
+        except Exception:
+            pass
+
+        try:
+            if not getattr(model, "state_code", None):
+                terms = getattr(model, "terms", None)
+                if isinstance(terms, list) and terms:
+                    first = terms[0]
+                    sc = first.get("stateCode") if isinstance(first, dict) else None
+                    if not sc:
+                        sc = getattr(first, "state_code", None)
+                    if sc:
+                        model.state_code = sc
+        except Exception:
+            pass
+
+        return model
 
     @model_validator(mode="before")
     def _populate_from_alternate_fields(cls, values: dict):
@@ -427,17 +519,11 @@ class SponsorRef(BaseModel):
     failing when a full `Member` object isn't available.
     """
 
-    bioguide_id: Annotated[
-        Optional[str], Field(default=None, alias="bioguideId")
-    ] = None
-    first_name: Annotated[
-        Optional[str], Field(default=None, alias="firstName")
-    ] = None
-    last_name: Annotated[
-        Optional[str], Field(default=None, alias="lastName")
-    ] = None
-    full_name: Annotated[
-        Optional[str], Field(default=None, alias="fullName")
-    ] = None
+    bioguide_id: Annotated[Optional[str], Field(default=None, alias="bioguideId")] = (
+        None
+    )
+    first_name: Annotated[Optional[str], Field(default=None, alias="firstName")] = None
+    last_name: Annotated[Optional[str], Field(default=None, alias="lastName")] = None
+    full_name: Annotated[Optional[str], Field(default=None, alias="fullName")] = None
     state: Annotated[Optional[str], Field(default=None)] = None
     url: Annotated[Optional[HttpUrl], Field(default=None)] = None

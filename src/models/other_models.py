@@ -290,14 +290,75 @@ class SenateCommunication(EntityBase):
         return values
 
 
+class NomineePosition(BaseModel):
+    """Position-level nominee entry for a nomination (nominees list)."""
+
+    ordinal: Annotated[Optional[int], Field(default=None)] = None
+    nominee_count: Annotated[
+        Optional[int], Field(default=None, alias="nomineeCount")
+    ] = None
+    organization: Annotated[Optional[str], Field(default=None)] = None
+    position_title: Annotated[
+        Optional[str], Field(default=None, alias="positionTitle")
+    ] = None
+    intro_text: Annotated[Optional[str], Field(default=None, alias="introText")] = None
+    url: Annotated[Optional[HttpUrl], Field(default=None)] = None
+
+
 class Nomination(EntityBase):
     """Nomination record with nominee, position, and status information."""
 
+    # core identifiers
     congress: Annotated[
         int, Field(description="Which Congress the nomination belongs to.")
     ]
-    nominee: Annotated[str, Field(description="Who the nominee is.")]
-    position: Annotated[str, Field(description="Which position the nominee is for.")]
+    number: Annotated[int, Field(description="What the nomination number is.")]
+    part_number: Annotated[
+        Optional[int | str],
+        Field(
+            default=None,
+            alias="partNumber",
+            description="What the nomination part number is.",
+        ),
+    ] = None
+
+    # descriptive fields
+    citation: Annotated[Optional[str], Field(default=None)] = None
+    description: Annotated[Optional[str], Field(default=None)] = None
+
+    # date fields from API (aliases preserved)
+    authority_date: Annotated[
+        Optional[datetime], Field(default=None, alias="authorityDate")
+    ] = None
+    received_date: Annotated[
+        Optional[datetime], Field(default=None, alias="receivedDate")
+    ] = None
+    update_date: Annotated[
+        Optional[datetime], Field(default=None, alias="updateDate")
+    ] = None
+
+    # embedded metadata
+    nomination_type: Annotated[
+        Optional["NominationTypeInfo"], Field(default=None, alias="nominationType")
+    ] = None
+    latest_action: Annotated[
+        Optional["NominationLatestAction"], Field(default=None, alias="latestAction")
+    ] = None
+
+    # list-of / count-url embedded resources
+    nominees: Annotated[Optional[List["NomineePosition"]], Field(default=None)] = None
+    actions: Annotated[Optional[CountUrl], Field(default=None)] = None
+    hearings: Annotated[Optional[CountUrl], Field(default=None)] = None
+    committees: Annotated[Optional[CountUrl], Field(default=None)] = None
+
+    # convenience/derived fields (kept for backwards compatibility)
+    nominee: Annotated[
+        Optional[str], Field(default=None, description="Who the nominee is.")
+    ] = None
+    position: Annotated[
+        Optional[str],
+        Field(default=None, description="Which position the nominee is for."),
+    ] = None
     date: Annotated[
         Optional[datetime],
         Field(description="When the nomination was submitted or received."),
@@ -310,14 +371,72 @@ class Nomination(EntityBase):
         Optional[HttpUrl],
         Field(description="Where to retrieve the nomination record in the API."),
     ] = None
-    committees: Annotated[
-        Optional[List[str]],
-        Field(description="Which committees are associated with the nomination."),
-    ] = None
     subjects: Annotated[
         Optional[List[Subject]],
         Field(description="What subjects are tagged to the nomination."),
     ] = None
+
+    @model_validator(mode="before")
+    def _populate_common_fields(cls, values: dict):
+        # Accept camelCase input from API and copy into our snake_case aliases
+        if values.get("authorityDate") and not values.get("authority_date"):
+            values["authority_date"] = values.get("authorityDate")
+        if values.get("receivedDate") and not values.get("received_date"):
+            values["received_date"] = values.get("receivedDate")
+        if values.get("updateDate") and not values.get("update_date"):
+            values["update_date"] = values.get("updateDate")
+        if values.get("nominationType") and not values.get("nomination_type"):
+            values["nomination_type"] = values.get("nominationType")
+        if values.get("latestAction") and not values.get("latest_action"):
+            values["latest_action"] = values.get("latestAction")
+        if values.get("partNumber") and not values.get("part_number"):
+            values["part_number"] = values.get("partNumber")
+        # preserve simple nominee/position fields when present
+        if values.get("position") and not values.get("position"):
+            values["position"] = values.get("position")
+        if values.get("nominee") and not values.get("nominee"):
+            values["nominee"] = values.get("nominee")
+
+        # populate `date` from authorityDate or receivedDate when missing
+        if not values.get("date"):
+            if values.get("authorityDate"):
+                values["date"] = values.get("authorityDate")
+            elif values.get("authority_date"):
+                values["date"] = values.get("authority_date")
+            elif values.get("receivedDate"):
+                values["date"] = values.get("receivedDate")
+            elif values.get("received_date"):
+                values["date"] = values.get("received_date")
+
+        # derive `position` from first nominee positionTitle if missing
+        if not values.get("position") and values.get("nominees"):
+            try:
+                first = values.get("nominees")[0]
+                if isinstance(first, dict):
+                    values["position"] = first.get("positionTitle") or first.get(
+                        "position_title"
+                    )
+                else:
+                    values["position"] = getattr(first, "position_title", None)
+            except Exception:
+                pass
+
+        # derive `nominee` from first nominee organization/intro_text if missing
+        if not values.get("nominee") and values.get("nominees"):
+            try:
+                first = values.get("nominees")[0]
+                if isinstance(first, dict):
+                    values["nominee"] = first.get("organization") or first.get(
+                        "introText"
+                    )
+                else:
+                    values["nominee"] = getattr(first, "organization", None) or getattr(
+                        first, "intro_text", None
+                    )
+            except Exception:
+                pass
+
+        return values
 
 
 class CRSReport(EntityBase):
@@ -1336,27 +1455,34 @@ class BoundCongressionalRecordListItem(EntityBase, RecordTypeBase):
     @model_validator(mode="before")
     def _normalize_bound_record_fields(cls, values: dict):
         # Normalize dailyDigest which may be returned in multiple shapes
-        dd = values.get("dailyDigest")
+        # Accept either camelCase `dailyDigest` or snake_case `daily_digest` from raw payloads
+        dd = (
+            values.get("dailyDigest")
+            if "dailyDigest" in values
+            else values.get("daily_digest")
+        )
         if dd is not None and not isinstance(dd, dict):
             # Accept list or string shapes and coerce to a dict for the model
             try:
                 if isinstance(dd, list) and dd:
                     first = dd[0]
                     if isinstance(first, dict):
-                        values["dailyDigest"] = first
+                        normalized = first
                     else:
-                        values["dailyDigest"] = {"value": first}
+                        normalized = {"value": first}
                 elif isinstance(dd, str):
-                    values["dailyDigest"] = {"summary": dd}
+                    normalized = {"summary": dd}
                 else:
                     # fallback: coerce to string representation
-                    values["dailyDigest"] = {"value": str(dd)}
+                    normalized = {"value": str(dd)}
             except Exception:
-                values["dailyDigest"] = None
+                normalized = None
+        else:
+            normalized = dd if isinstance(dd, dict) else None
 
-        # If dailyDigest is now a dict, normalize any camelCase page keys inside it
-        if isinstance(values.get("dailyDigest"), dict):
-            ddn = values.get("dailyDigest")
+        # If we have a normalized dict, normalize any camelCase page keys inside it
+        if isinstance(normalized, dict):
+            ddn = normalized
             if ddn.get("startPage") and not ddn.get("start_page"):
                 ddn["start_page"] = ddn.get("startPage")
             if ddn.get("endPage") and not ddn.get("end_page"):
@@ -1365,6 +1491,9 @@ class BoundCongressionalRecordListItem(EntityBase, RecordTypeBase):
                 ddn.pop("startPage", None)
             if "endPage" in ddn:
                 ddn.pop("endPage", None)
+            # prefer storing the normalized daily digest under snake_case
+            values["daily_digest"] = ddn
+            # also set camelCase alias so Pydantic will pick it up regardless of aliasing mode
             values["dailyDigest"] = ddn
 
         # Preserve snake_case aliases and remove camelCase originals to avoid duplicates
@@ -1416,9 +1545,6 @@ class BoundCongressionalRecordListItem(EntityBase, RecordTypeBase):
         # Ensure daily_digest snake_case field populated from normalized dailyDigest
         if values.get("dailyDigest") and not values.get("daily_digest"):
             values["daily_digest"] = values.get("dailyDigest")
-        # drop the camelCase wrapper now that we've copied into snake_case
-        if "dailyDigest" in values:
-            values.pop("dailyDigest", None)
 
         return values
 
