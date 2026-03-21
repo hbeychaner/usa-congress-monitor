@@ -1,9 +1,20 @@
+"""Streamlit UI helper components used by the app.
+
+This module provides small presentation helpers used by the Streamlit
+front-end. Keep helpers minimal and return HTML/CSS snippets only.
+"""
+
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-def init_footer():
+def init_footer() -> str:
+    """Return the HTML/CSS snippet used for the app footer.
+
+    Returns:
+        str: HTML markup for the footer element.
+    """
     return """<style>
 a:link , a:visited{
 color: blue;

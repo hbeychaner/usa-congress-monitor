@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Type
-from enum import Enum
 from collections import OrderedDict as _OrderedDict
+from enum import Enum
+from typing import Dict, List, Optional, Type, Mapping, TypeAlias, Union, Any
 
-from pydantic import BaseModel, Field, model_validator, PrivateAttr, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
 
 class ParamLocation(str, Enum):
+    """Enumeration of locations where a parameter can appear in a request."""
     PATH = "path"
     QUERY = "query"
     HEADER = "header"
@@ -20,13 +21,29 @@ class SchemaSpec(BaseModel):
 
     type: Optional[str] = None
     format: Optional[str] = None
-    enum: Optional[List[Any]] = None
+    enum: Optional[List[str]] = None
     items: Optional[dict] = None
     minimum: Optional[float] = None
     maximum: Optional[float] = None
 
 
+# JSON-like alias for parameter values in endpoint specs.
+Json: TypeAlias = Union[str, int, float, bool, None, list["Json"], Mapping[str, "Json"]]
+
+
 class ParamSpec(BaseModel):
+    """Specification for a single parameter used in an endpoint.
+
+    Attributes:
+        name: Parameter name as used in path or query.
+        location: Where the parameter appears (path, query, header, etc.).
+        required: Whether the parameter is required for requests.
+        source_field: Optional field on a list-item used to derive the value.
+        extract_from_url_segment: Optional URL segment token to extract an id.
+        schema_spec: Optional lightweight schema describing expected type.
+        default: Optional default value when not provided at runtime.
+        description: Human-friendly description of the parameter.
+    """
     name: str
     location: ParamLocation = ParamLocation.QUERY
     required: bool = False
@@ -42,19 +59,30 @@ class ParamSpec(BaseModel):
     style: Optional[str] = None
     explode: Optional[bool] = None
     allow_empty_value: Optional[bool] = False
-    default: Optional[Any] = None
+    default: Optional[object] = None
     description: Optional[str] = None
-    example: Optional[Any] = None
+    example: Optional[object] = None
     deprecated: Optional[bool] = False
 
 
 class PaginationType(str, Enum):
+    """Enumeration of pagination strategies supported by endpoints.
+
+    - OFFSET: classic offset/limit pagination.
+    - PAGE: page-number based pagination.
+    - CURSOR: cursor-based pagination.
+    """
     OFFSET = "offset"
     PAGE = "page"
     CURSOR = "cursor"
 
 
 class PaginationSpec(BaseModel):
+    """Describe how an endpoint paginates results.
+
+    Supports common pagination styles (offset/limit, page numbers, cursors)
+    and the names used for parameters and response cursor fields.
+    """
     type: PaginationType = PaginationType.OFFSET
     offset_param: str = "offset"
     limit_param: str = "limit"
@@ -79,6 +107,13 @@ class EndpointSpec(BaseModel):
     data_key: Optional[str] = None
     unwrap_key: Optional[str] = None
     response_model: Optional[Type[BaseModel]] = None
+    # optional typed strategy to drive id/reference population and custom hooks
+    class IdStrategy(BaseModel):
+        reference_from: Optional[str] = None
+        unique_from: Optional[List[str]] = None
+        section_bounds: Optional[str] = None
+
+    id_strategy: Optional[IdStrategy] = None
     # dotted path to id builder or name; resolution can be performed at runtime
     id_builder_name: Optional[str] = None
 
@@ -88,11 +123,16 @@ class EndpointSpec(BaseModel):
 
     @model_validator(mode="after")
     def _build_param_map(self):
+        """Pydantic post-init validator that builds a name->ParamSpec map.
+
+        This populates the private ``_param_map`` attribute from
+        ``param_specs`` so lookup by name is efficient at runtime.
+        """
         specs = getattr(self, "param_specs", []) or []
         object.__setattr__(self, "_param_map", {p.name: p for p in specs})
         return self
 
-    def render_path(self, base_url: str, params: Dict[str, Any]) -> str:
+    def render_path(self, base_url: str, params: Mapping[str, object]) -> str:
         """Render the full URL by substituting path params into `path_template`.
 
         Raises ValueError when required path params are missing.
@@ -115,9 +155,9 @@ class EndpointSpec(BaseModel):
             raise ValueError(f"Missing path parameter for template: {e}")
         return base_url.rstrip("/") + rendered
 
-    def build_query(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def build_query(self, params: Mapping[str, object]) -> Dict[str, object]:
         """Return dict of query params from runtime params using `param_specs`."""
-        q: Dict[str, Any] = {}
+        q: Dict[str, object] = {}
         for name, p in self._param_map.items():
             if p.location == ParamLocation.QUERY and name in params:
                 q[name] = params[name]
@@ -129,7 +169,7 @@ class EndpointSpec(BaseModel):
                 q[name] = p.default
         return q
 
-    def validate_params(self, params: Dict[str, Any]) -> None:
+    def validate_params(self, params: Mapping[str, object]) -> None:
         """Basic validation of required params and simple type checks."""
         for name, p in self._param_map.items():
             if p.required and name not in params:
@@ -150,6 +190,15 @@ class EndpointSpec(BaseModel):
 
 
 class MetadataRecord(BaseModel):
+    """Container describing a specific endpoint invocation and its state.
+
+    Attributes:
+        endpoint: The ``EndpointSpec`` describing the endpoint to call.
+        runtime_params: Ordered runtime parameters resolved for the call.
+        offset: Optional pagination offset for list-style endpoints.
+        limit: Optional page size for list-style endpoints.
+        page: Optional page number when using page-based pagination.
+    """
     endpoint: EndpointSpec
     runtime_params: _OrderedDict = Field(default_factory=_OrderedDict)
     offset: Optional[int] = None

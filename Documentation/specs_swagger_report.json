@@ -1,0 +1,747 @@
+{
+  "generated_from": "/Users/acorn/Documents/Personal/Congress Tracker/documentation/original/swagger.yaml",
+  "entries": [
+    {
+      "endpoint": "congress",
+      "api_data_key": "congresses",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "bill",
+      "api_data_key": "bills",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "type": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        }
+      }
+    },
+    {
+      "endpoint": "member",
+      "api_data_key": "members",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "law",
+      "api_data_key": "bills",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "amendment",
+      "api_data_key": "amendments",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "type": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        }
+      }
+    },
+    {
+      "endpoint": "committee",
+      "api_data_key": "committees",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "chamber": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "committee-meeting",
+      "api_data_key": "committeeMeetings",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "chamber": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "committee-report",
+      "api_data_key": "reports",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "report_type": {
+          "exact": false,
+          "camel_case_variant": "reportType",
+          "camel_present": true,
+          "hyphen_variant": "report-type",
+          "hyphen_present": false
+        }
+      }
+    },
+    {
+      "endpoint": "hearing",
+      "api_data_key": "hearings",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "chamber": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "nomination",
+      "api_data_key": "nominations",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "bound-congressional-record",
+      "api_data_key": "boundCongressionalRecord",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "year": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "daily-congressional-record",
+      "api_data_key": "dailyCongressionalRecord",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "crsreport",
+      "api_data_key": "CRSReports",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "year": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "summaries",
+      "api_data_key": "summaries",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "type": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        }
+      }
+    },
+    {
+      "endpoint": "treaty",
+      "api_data_key": "treaties",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "house-requirement",
+      "api_data_key": "houseRequirements",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    },
+    {
+      "endpoint": "house-vote",
+      "api_data_key": "houseRollCallVotes",
+      "api_key_present_in_swagger": true,
+      "meta_fields": {
+        "offset": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "page": {
+          "exact": false,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": false
+        },
+        "page_size": {
+          "exact": false,
+          "camel_case_variant": "pageSize",
+          "camel_present": false,
+          "hyphen_variant": "page-size",
+          "hyphen_present": false
+        },
+        "total_pages": {
+          "exact": false,
+          "camel_case_variant": "totalPages",
+          "camel_present": false,
+          "hyphen_variant": "total-pages",
+          "hyphen_present": false
+        },
+        "congress": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        },
+        "session": {
+          "exact": true,
+          "camel_case_variant": null,
+          "camel_present": false,
+          "hyphen_variant": null,
+          "hyphen_present": true
+        }
+      }
+    }
+  ]
+}

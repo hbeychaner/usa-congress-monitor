@@ -5,18 +5,20 @@ from __future__ import annotations
 import json
 import os
 import time
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
 from math import ceil
 from typing import Callable, Optional
 from urllib.parse import parse_qs, urlparse
 
 from pydantic import HttpUrl
 from requests.exceptions import ChunkedEncodingError
-from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.webdriver import WebDriver as Chrome
 from tqdm import tqdm
 from urllib3.exceptions import ProtocolError
 
+from src.data_collection.id_utils import parse_url_to_id
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -36,8 +38,23 @@ def checkpointed_paginate(
 ):
     """Paginate with checkpointing and batch persistence to disk.
 
-    Filenames are derived from the endpoint function name and stored in the
-    current working directory.
+    This helper repeatedly calls ``endpoint_func`` with an ``offset`` and
+    stores progress to a checkpoint file and result file so the operation
+    can be resumed in case of failures.
+
+    Args:
+        endpoint_func: Callable to fetch a page of results. It should accept
+            parameters similar to ``(offset, limit, from_date=..., to_date=...)``
+            and return a tuple ``(results, next_offset, count)``.
+        from_date: Optional ISO date to bound results.
+        to_date: Optional ISO date to bound results.
+        max_retries: Number of retry attempts for transient failures.
+        start_offset: Initial offset to begin pagination from.
+        *args, **kwargs: Forwarded to ``endpoint_func``.
+
+    Returns:
+        None. Results are persisted to files named ``<func>_results.json`` and
+        checkpointed state is written to ``<func>_checkpoint.json``.
     """
     func_name = endpoint_func.__name__
     checkpoint_file = f"{func_name}_checkpoint.json"
@@ -91,6 +108,16 @@ def extract_offset(url: str) -> int:
 
 
 def _extract_query_int(url: str, keys: tuple[str, ...]) -> Optional[int]:
+    """Extract the first integer query parameter found for ``keys`` from ``url``.
+
+    Args:
+        url: URL string containing query parameters.
+        keys: Tuple of parameter names to search for in order.
+
+    Returns:
+        The integer value of the first matching query parameter, or ``None``
+        when no integer value could be parsed.
+    """
     parsed_url = urlparse(url)
     params = parse_qs(parsed_url.query)
     for key in keys:
@@ -121,6 +148,14 @@ def extract_offset_from_url(
 
 @dataclass(frozen=True)
 class PaginationMeta:
+    """Pagination metadata describing the next offset and totals.
+
+    Attributes:
+        next_offset: The offset to request for the next page, or -1 when none.
+        total: Total number of available records when known.
+        page_size: Effective page size used for pagination calculations.
+    """
+
     next_offset: int
     total: int
     page_size: int
@@ -128,6 +163,16 @@ class PaginationMeta:
 
 @dataclass(frozen=True)
 class PaginatedFetchResult:
+    """Result container for aggregated paginated fetch operations.
+
+    Attributes:
+        records: Aggregated list of records retrieved across pages.
+        total: Total number of available records when known.
+        last_page: Index of the last page retrieved.
+        total_pages: Computed total pages when known.
+        page_size: Effective page size used during fetching.
+    """
+
     records: list
     total: int
     last_page: int
@@ -174,7 +219,9 @@ def resolve_pagination(
                     next_offset = int(offset_value)
                 except (TypeError, ValueError):
                     next_offset = -1
-        return PaginationMeta(next_offset=next_offset, total=total, page_size=effective_page_size)
+        return PaginationMeta(
+            next_offset=next_offset, total=total, page_size=effective_page_size
+        )
 
     results = response.get("Results")
     if isinstance(results, dict):
@@ -182,7 +229,9 @@ def resolve_pagination(
         index_start = results.get("IndexStart")
         effective_page_size = page_size or records_len or 0
         if index_start is None:
-            return PaginationMeta(next_offset=-1, total=total, page_size=effective_page_size)
+            return PaginationMeta(
+                next_offset=-1, total=total, page_size=effective_page_size
+            )
         try:
             index_start_int = int(index_start)
         except (TypeError, ValueError):
@@ -190,9 +239,13 @@ def resolve_pagination(
         next_offset = index_start_int + records_len
         if total and next_offset >= total:
             next_offset = -1
-        return PaginationMeta(next_offset=next_offset, total=total, page_size=effective_page_size)
+        return PaginationMeta(
+            next_offset=next_offset, total=total, page_size=effective_page_size
+        )
 
-    return PaginationMeta(next_offset=-1, total=0, page_size=page_size or records_len or 0)
+    return PaginationMeta(
+        next_offset=-1, total=0, page_size=page_size or records_len or 0
+    )
 
 
 def determine_pagination_wait(start_time: float, offset: int) -> None:
@@ -223,7 +276,9 @@ def determine_simple_wait(start_time: float, api_call_count: int) -> None:
         time.sleep(wait_time)
 
 
-def resolve_offset_limit(meta: dict | None, *, default_offset: int = 0, default_limit: int = 250) -> tuple[int, int]:
+def resolve_offset_limit(
+    meta: dict | None, *, default_offset: int = 0, default_limit: int = 250
+) -> tuple[int, int]:
     """Return a normalized (offset, limit) tuple from chunk meta, coercing types and applying defaults."""
     if not meta:
         return default_offset, default_limit
@@ -273,7 +328,30 @@ def gather_paginated_records(
     page_param_names: tuple[str, ...] = ("page", "pageNumber", "page_number"),
     start_offset: int = 0,
 ) -> PaginatedFetchResult:
-    """Aggregate list results across paginated endpoint responses."""
+    """Aggregate list results across paginated endpoint responses.
+
+    This function repeatedly calls ``fetch_page(offset, page_size)`` to
+    accumulate records, respecting pagination conventions across different
+    APIs. Progress is shown via a progress bar and an optional ``on_progress``
+    callback is invoked for each page.
+
+    Args:
+        fetch_page: Callable accepting ``(offset, page_size)`` and returning a
+            response mapping containing the records under ``data_key``.
+        data_key: Key name in the response that contains the list of records.
+        desc: Description used for the progress bar.
+        unit: Unit label for the progress bar (e.g., "item").
+        page_size: Number of items to request per page.
+        wait: Optional delay between page requests.
+        progress_mode: Either "record" or "page" to control progress updates.
+        on_progress: Optional callback ``(offset, page_index, total_pages, page_size)``.
+        offset_param_names: Alternative offset parameter names to recognize.
+        page_param_names: Alternative page parameter names to recognize.
+        start_offset: Starting offset for pagination.
+
+    Returns:
+        A ``PaginatedFetchResult`` with aggregated records and metadata.
+    """
     offset = start_offset
     all_records: list = []
     wait_val = resolve_pagination_wait(page_size, wait)
@@ -299,7 +377,9 @@ def gather_paginated_records(
         if total == 0 and meta.total:
             total = meta.total
             effective_page_size = meta.page_size or len(records) or page_size
-            total_pages = ceil(total / effective_page_size) if effective_page_size else 0
+            total_pages = (
+                ceil(total / effective_page_size) if effective_page_size else 0
+            )
             if progress_mode == "page" and total_pages:
                 pbar.total = total_pages
                 pbar.refresh()
@@ -337,7 +417,20 @@ def gather_data(
     *args,
     **kwargs,
 ) -> list:
-    """Aggregate results from endpoints that return (results, next_offset, count)."""
+    """Aggregate results from endpoints that return ``(results, next_offset, count)``.
+
+    Repeatedly calls ``endpoint_func`` with an advancing ``offset`` until
+    ``next_offset`` equals -1. Displays a progress bar when the total count
+    becomes known.
+
+    Args:
+        endpoint_func: Callable returning ``(results, next_offset, count)``.
+        *args, **kwargs: Forwarded to ``endpoint_func`` (``offset`` may be
+            provided via kwargs to start from a non-zero offset).
+
+    Returns:
+        A list containing all aggregated result items.
+    """
     start = time.time()
     all_results = []
     offset = kwargs.pop("offset", 0)
@@ -360,11 +453,15 @@ def gather_data(
 
 
 def download_pdf(lnk: HttpUrl) -> str:
-    """Download a PDF from a link using Selenium.
+    """Download a PDF from a link using Selenium and return the filename.
 
-    Returns the filename of the downloaded PDF.
+    Args:
+        lnk: URL pointing to the PDF to download.
+
+    Returns:
+        The basename of the downloaded file saved into a temporary folder.
     """
-    options = webdriver.ChromeOptions()
+    options = Options()
     download_folder = os.path.join(os.getcwd(), "tmp")
     profile = {
         "plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}],
@@ -380,10 +477,17 @@ def download_pdf(lnk: HttpUrl) -> str:
     options.add_argument("--disable-software-rasterizer")
     options.add_argument("--disable-features=VizDisplayCompositor")
     options.add_experimental_option("prefs", profile)
-    driver = webdriver.Chrome(options=options)
+    driver = Chrome(options=options)
     driver.get(str(lnk))
 
-    filename = str(lnk).split("/")[-1]
+    try:
+        # Use the canonical URL->id parser and sanitize for filesystem use
+        filename = parse_url_to_id(str(lnk)).replace(":", "_")
+    except Exception:
+        # fallback to path basename when parsing fails
+        from urllib.parse import urlparse
+
+        filename = os.path.basename(urlparse(str(lnk)).path) or str(lnk)
     logger.info("Downloaded PDF: %s", filename)
     time.sleep(3)
     driver.close()

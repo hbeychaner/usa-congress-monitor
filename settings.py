@@ -30,3 +30,7 @@ RABBITMQ_PREFETCH = int(os.getenv("RABBITMQ_PREFETCH", "200"))
 RABBITMQ_RATE_LIMIT_PER_HOUR = int(os.getenv("RABBITMQ_RATE_LIMIT_PER_HOUR", "5000"))
 RABBITMQ_PAGE_SIZE = int(os.getenv("RABBITMQ_PAGE_SIZE", "250"))
 RABBITMQ_API_WORKERS = int(os.getenv("RABBITMQ_API_WORKERS", "4"))
+# When true, the client will raise an error if response fields are
+# present in the API payload but not represented in our Pydantic models.
+# Set via environment variable to one of: 1,true,yes
+CONGRESS_STRICT_FIELD_CHECK = os.getenv("CONGRESS_STRICT_FIELD_CHECK", "true").lower() in ("1", "true", "yes")

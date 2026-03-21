@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, MutableMapping, Optional
+from typing import Callable, Iterable, Mapping, MutableMapping, Optional, TypeAlias, Union
 
 from tqdm import tqdm
 
@@ -21,15 +21,30 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-ListFetcher = Callable[[int, int], Mapping[str, Any]]
-DetailFetcher = Callable[[Mapping[str, Any]], Mapping[str, Any]]
-IdGetter = Callable[[Mapping[str, Any]], str]
+Json: TypeAlias = Union[str, int, float, bool, None, list["Json"], Mapping[str, "Json"]]
+
+
+ListFetcher = Callable[[int, int], Mapping[str, Json]]
+DetailFetcher = Callable[[Mapping[str, Json]], Mapping[str, Json]]
+IdGetter = Callable[[Mapping[str, Json]], str]
 
 
 def retry_call(
-    func: Callable[[], Mapping[str, Any]], retries: int = 3, backoff: float = 0.5
-) -> Mapping[str, Any]:
-    """Execute a callable with retry and exponential backoff."""
+    func: Callable[[], Mapping[str, Json]], retries: int = 3, backoff: float = 0.5
+) -> Mapping[str, Json]:
+    """Call ``func`` with retries and exponential backoff.
+
+    Args:
+        func: zero-argument callable returning a JSON-like mapping.
+        retries: number of attempts before giving up.
+        backoff: base backoff seconds (exponential multiplier per attempt).
+
+    Returns:
+        The mapping returned by ``func`` on success.
+
+    Raises:
+        The last exception raised by ``func`` if all retries fail.
+    """
     for attempt in range(retries):
         try:
             return func()
@@ -49,10 +64,15 @@ def collect_paginated_list(
     wait: Optional[float] = None,
     checkpoint_path: Optional[Path] = None,
     results_path: Optional[Path] = None,
-) -> list[Mapping[str, Any]]:
-    """Collect list-level records from a paginated endpoint with checkpointing."""
+) -> list[Mapping[str, Json]]:
+    """Collect list-level records from a paginated endpoint with checkpointing.
+
+    This helper repeatedly calls ``fetch_page(offset, page_size)`` until no more
+    items are returned. Progress can be saved to ``results_path`` and
+    ``checkpoint_path`` so collection can be resumed.
+    """
     offset = 0
-    records: list[Mapping[str, Any]] = []
+    records: list[Mapping[str, Json]] = []
     if checkpoint_path and checkpoint_path.exists():
         offset = json.loads(checkpoint_path.read_text(encoding="utf-8")).get(
             "offset", 0
@@ -73,7 +93,7 @@ def collect_paginated_list(
         pbar.update(len(page_records))
 
         pagination = response.get("pagination", {})
-        next_url = pagination.get("next") if isinstance(pagination, dict) else None
+        next_url = pagination.get("next") if isinstance(pagination, Mapping) else None
         if not next_url:
             break
         new_offset = extract_offset(next_url)
@@ -92,7 +112,7 @@ def collect_paginated_list(
 
 
 def enrich_records(
-    items: Iterable[Mapping[str, Any]],
+    items: Iterable[Mapping[str, Json]],
     *,
     detail_fetcher: DetailFetcher,
     id_getter: IdGetter,
@@ -100,9 +120,22 @@ def enrich_records(
     results_path: Optional[Path] = None,
     retries: int = 3,
     backoff: float = 0.5,
-) -> list[Mapping[str, Any]]:
-    """Enrich list items by fetching detail records with checkpointing."""
-    enriched: MutableMapping[str, Mapping[str, Any]] = {}
+) -> list[Mapping[str, Json]]:
+    """Fetch detail records for each item and checkpoint progress.
+
+    Args:
+        items: iterable of list-item mappings returned by list endpoints.
+        detail_fetcher: callable that accepts a list-item mapping and returns the detail mapping.
+        id_getter: callable that returns a stable string id for a given list-item mapping.
+        checkpoint_path: optional Path to save completed ids for resuming.
+        results_path: optional Path to save enriched records as they are produced.
+        retries: retry attempts for individual detail fetches.
+        backoff: base backoff seconds between retries.
+
+    Returns:
+        List of enriched detail mappings, each including an ``_id`` key.
+    """
+    enriched: MutableMapping[str, Mapping[str, Json]] = {}
     completed_ids: set[str] = set()
 
     if results_path and results_path.exists():
@@ -124,9 +157,7 @@ def enrich_records(
         if record_id in completed_ids:
             continue
 
-        detail = retry_call(
-            lambda: detail_fetcher(item), retries=retries, backoff=backoff
-        )
+        detail = retry_call(lambda: detail_fetcher(item), retries=retries, backoff=backoff)
         enriched[record_id] = {"_id": record_id, **detail}
         completed_ids.add(record_id)
         pbar.update(1)
@@ -158,8 +189,12 @@ def collect_with_details(
     detail_results: Optional[Path] = None,
     retries: int = 3,
     backoff: float = 0.5,
-) -> list[Mapping[str, Any]]:
-    """Collect list items, then enrich them with detail data."""
+) -> list[Mapping[str, Json]]:
+    """Collect list items and enrich them with detail records.
+
+    This convenience function first collects the paginated list, then
+    fetches details for each list item with checkpointing.
+    """
     items = collect_paginated_list(
         fetch_page,
         data_key,

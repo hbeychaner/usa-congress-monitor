@@ -6,7 +6,7 @@ Run with: `export PYTHONPATH=$PWD && pytest -q tests/integration/test_congress_e
 from pprint import pprint
 
 from src.data_collection.client import get_client, resolve_runtime_params_from_record
-from src.data_collection.congress_specs import CONGRESS_LIST_SPEC, CONGRESS_ITEM_SPEC
+from src.data_collection.specs.congress_specs import CONGRESS_LIST_SPEC, CONGRESS_ITEM_SPEC
 
 
 def test_congress_list_and_items():

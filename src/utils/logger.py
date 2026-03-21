@@ -8,8 +8,7 @@ import os
 import queue
 from typing import Optional
 
-_CONFIGURED = False
-_QUEUE_LISTENER: logging.handlers.QueueListener | None = None
+_state: dict = {"configured": False, "queue_listener": None}
 
 
 def configure_logging(level: Optional[str] = None) -> None:
@@ -18,8 +17,7 @@ def configure_logging(level: Optional[str] = None) -> None:
     Uses a background `QueueListener` + `QueueHandler` so logging emits
     do not block asyncio event loops or other tight code paths.
     """
-    global _CONFIGURED, _QUEUE_LISTENER
-    if _CONFIGURED:
+    if _state["configured"]:
         return
     log_level = (level or os.getenv("LOG_LEVEL", "INFO")).upper()
 
@@ -40,10 +38,10 @@ def configure_logging(level: Optional[str] = None) -> None:
     root.addHandler(qh)
 
     # Start a listener that will consume the queue in a background thread
-    _QUEUE_LISTENER = logging.handlers.QueueListener(q, console)
-    _QUEUE_LISTENER.start()
+    _state["queue_listener"] = logging.handlers.QueueListener(q, console)
+    _state["queue_listener"].start()
 
-    _CONFIGURED = True
+    _state["configured"] = True
 
 
 def get_logger(name: str) -> logging.Logger:

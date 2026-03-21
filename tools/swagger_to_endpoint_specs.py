@@ -26,6 +26,16 @@ OUT_PATH = Path("documentation/generated_endpoint_specs.json")
 
 
 def schema_from_param(p: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract a minimal schema dict from an OpenAPI parameter object.
+
+    Returns a mapping compatible with :class:`SchemaSpec` constructor.
+
+    Args:
+        p: Parameter object from the OpenAPI spec.
+
+    Returns:
+        A dict with keys type/format/enum/items/minimum/maximum.
+    """
     s = p.get("schema") or {}
     return {
         "type": s.get("type"),
@@ -38,6 +48,11 @@ def schema_from_param(p: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def convert():
+    """Convert the OpenAPI JSON at ``SWAGGER_PATH`` into EndpointSpec dicts.
+
+    The resulting list of spec dictionaries is written to ``OUT_PATH`` in
+    a JSON file for later consumption by the code generator.
+    """
     if not SWAGGER_PATH.exists():
         raise SystemExit(f"Swagger file not found at {SWAGGER_PATH}")
     root = json.loads(SWAGGER_PATH.read_text())
