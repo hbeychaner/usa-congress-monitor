@@ -36,7 +36,7 @@ from cdm.ingest.resource_config import (
     congress_scoped,
     static_resources,
 )
-from cdm.ingest.runner import IngestRunner, Resource
+from cdm.ingest.runner import FatalIngestError, IngestRunner, Resource
 
 logger = logging.getLogger(__name__)
 
@@ -213,6 +213,9 @@ class Pipeline:
             )
 
             result.success = True
+        except FatalIngestError:
+            # Always propagate fatal errors — they require a code fix.
+            raise
         except Exception as exc:
             result.error = str(exc)
             logger.exception("Resource %s failed: %s", resource.value, exc)

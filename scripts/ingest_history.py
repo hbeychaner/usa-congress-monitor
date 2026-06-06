@@ -48,6 +48,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cdm.ingest.pipeline import Pipeline, PipelineConfig
+from cdm.ingest.runner import FatalIngestError
 from cdm.ingest.rate_limiter import TokenBucket
 from cdm.ingest.resource_config import (
     RESOURCE_CONFIGS,
@@ -294,6 +295,7 @@ def main() -> None:
 
         logger.info("[chunk %d] %s  (%d resources)", chunk_num, label, len(resources))
         pipeline = Pipeline(cfg)
+        # FatalIngestError propagates unconditionally — it stops the whole script.
         results = pipeline.run(resources)
 
         for r in results:

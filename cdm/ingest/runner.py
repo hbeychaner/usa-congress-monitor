@@ -26,6 +26,15 @@ from congress_sdk.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
+class FatalIngestError(RuntimeError):
+    """Raised when a non-recoverable error is detected during ingest.
+
+    The pipeline will stop processing further chunks when this is raised.
+    Typically triggered by a pycongress model bug (AttributeError / TypeError)
+    that indicates a code fix is required before continuing.
+    """
+
+
 def _attempt_law_fallback(
     client, meta_mapping: dict, meta, aggregated_items: list, seen_ids: set
 ) -> bool:
@@ -334,6 +343,7 @@ class IngestRunner:
         seen_ids: set = set()
         write_lock = threading.Lock()
         counters_lock = threading.Lock()
+        abort_event = threading.Event()  # set when a fatal error is detected
 
         # ── incremental resume ────────────────────────────────────────────
         items_jsonl_path = outdir / "items.jsonl"
@@ -383,6 +393,8 @@ class IngestRunner:
 
         def _do_fetch(idx_meta):
             idx, meta = idx_meta
+            if abort_event.is_set():
+                return  # another worker hit a fatal error — skip
             try:
                 item_data = self._fetch_single_item(meta, item_spec, outdir)
                 item_id = item_data.get("id")
@@ -403,6 +415,17 @@ class IngestRunner:
                         "Progress: %d/%d items fetched (%d failures so far)",
                         successes[0] + skipped, total, failures[0],
                     )
+            except (AttributeError, TypeError) as exc:
+                # These indicate a pycongress model bug — stop immediately so
+                # the code can be fixed before data is silently lost.
+                abort_event.set()
+                logger.critical(
+                    "FATAL error on item %d/%d (url=%s): %s — aborting run; "
+                    "fix the model and re-run with --resume",
+                    idx, total,
+                    getattr(meta, "url", "?"),
+                    exc,
+                )
             except Exception as exc:
                 with counters_lock:
                     failures[0] += 1
@@ -425,6 +448,12 @@ class IngestRunner:
             failures[0],
             outdir / "items.json",
         )
+
+        if abort_event.is_set():
+            raise FatalIngestError(
+                f"Aborted after fatal model error during {self.resource.value} item fetch. "
+                "Fix the pycongress model and re-run with --resume."
+            )
 
 
 def parse_args() -> argparse.Namespace:
