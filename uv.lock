@@ -1431,7 +1431,7 @@ wheels = [
 [[package]]
 name = "pycongress"
 version = "0.1.0"
-source = { git = "https://github.com/hbeychaner/pycongress.git#fe0496620de2610865990e22ad889f1efbb20b9e" }
+source = { git = "https://github.com/hbeychaner/pycongress.git#1c246420312758afa497649e375e3c7fc99c443e" }
 dependencies = [
     { name = "pydantic" },
     { name = "python-dotenv" },
