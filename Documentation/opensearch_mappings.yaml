@@ -1,0 +1,628 @@
+# Congress Tracker — OpenSearch Index Mappings
+# Revised: 2026-06-06
+#
+# Conventions
+# ───────────
+#   id format    : "{resource}:{key_parts}"  e.g. "bill:119:hr:1"
+#   date format  : strict_date_optional_time||yyyy-MM-dd
+#                  (handles "2025-01-01T00:00:00Z" and bare "2025-01-02")
+#   dynamic      : false  — unmapped fields silently dropped;
+#                  flip to "strict" once schema stabilises
+#   text+keyword : searchable text fields carry a .keyword sub-field
+#                  for aggregations and exact-match sorting
+#
+# Index consolidations (20 raw resources → 15 primary + 2 bridge indices)
+# ─────────────────────────────────────────────────────────────────────────
+#   legislation         ← bill + law          (source_type: "bill" | "law")
+#   communication       ← house_communication + senate_communication
+#                                              (chamber: "House" | "Senate")
+#   congressional_record← bound_congressional_record + daily_congressional_record
+#                                              (record_subtype: "bound" | "daily")
+#   summaries           → denormalised as nested legislation.summaries[]
+#                         join key: {congress}:{bill_type_lower}:{number}
+#
+# Bridge / join indices (derived; populated after item-level fetches)
+# ─────────────────────────────────────────────────────────────────────
+#   sponsorship   links member ↔ legislation (sponsor + cosponsor rows)
+#                 populated from: legislation item fetch
+#                 key query: "all bills for member X" / "all sponsors of bill Y"
+#                 enables: co-sponsorship network graphs
+#
+#   vote_position links member ↔ house_vote with Yea/Nay/Present/Not Voting
+#                 populated from: house_vote.source_data_url (clerk XML)
+#                 key query: "voting record of member X" / "who voted Yea on HR 1"
+#                 enables: party-unity scores, cross-aisle vote analysis
+#
+# Indices: 17 total (15 primary + 2 bridge)
+#   legislation, amendment, communication, committee, committee_meeting,
+#   committee_print, committee_report, congressional_record, hearing,
+#   house_vote, member, nomination, treaty, congress_ref, house_requirement,
+#   sponsorship, vote_position
+#
+# Usage: PUT /{index_name}  with the block below as the request body.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+# ── 1. legislation ────────────────────────────────────────────────────────────
+# Sources: bill + law
+# source_type="law" records populate law_number / law_type / is_enacted.
+# summaries[] is populated at index-time by joining on congress:bill_type:number.
+legislation:
+  settings:
+    number_of_shards: 3
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      # ── identity ──
+      id:            { type: keyword }             # bill:{congress}:{type_lower}:{number}
+      record_type:   { type: keyword }             # "congress-bills"
+      source_type:   { type: keyword }             # "bill" | "law"
+      url:           { type: keyword }
+
+      # ── bill fields ──
+      congress:      { type: integer }
+      bill_type:     { type: keyword }             # HR, S, HJRES, SRES, HRES, SCONRES…
+      number:        { type: integer }
+      title:
+        type: text
+        fields:
+          keyword:   { type: keyword, ignore_above: 512 }
+      origin_chamber:      { type: keyword }       # House | Senate
+      origin_chamber_code: { type: keyword }       # H | S
+
+      # ── dates ──
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      update_date_including_text:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+      # ── latest action (flattened from latest_action: {action_date, text}) ──
+      latest_action_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      latest_action_text:
+        type: text
+        fields:
+          keyword:   { type: keyword, ignore_above: 512 }
+
+      # ── law-specific (null for non-law source_type) ──
+      is_enacted:    { type: boolean }             # true when laws[] is non-empty
+      law_number:    { type: keyword }             # e.g. "119-95"  (laws[0].number)
+      law_type:      { type: keyword }             # "Public Law" | "Private Law"
+
+      # ── summaries (denormalised from summaries resource) ──
+      # Populated at index-time; absent until summaries ingest runs.
+      summaries:
+        type: nested
+        properties:
+          version_code:              { type: keyword }
+          action_desc:               { type: keyword }   # "Introduced in House", etc.
+          current_chamber:           { type: keyword }
+          action_date:
+            type: date
+            format: "strict_date_optional_time||yyyy-MM-dd"
+          last_summary_update_date:
+            type: date
+            format: "strict_date_optional_time||yyyy-MM-dd"
+          text:                      { type: text }
+
+
+# ── 2. amendment ──────────────────────────────────────────────────────────────
+# List-level data only; item fetch populates amended_bill_id and sponsor.
+# Amendments can target bills, treaties, or other amendments.
+amendment:
+  settings:
+    number_of_shards: 2
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:             { type: keyword }            # amendment:{congress}:{type}:{number}
+      record_type:    { type: keyword }            # "congress-amendments"
+      url:            { type: keyword }
+
+      congress:       { type: integer }
+      number:         { type: keyword }            # string in API ("1", "2A", …)
+      amendment_type: { type: keyword }            # SAMDT | HAMDT
+
+      # ── link to target bill (populated after item fetch) ──
+      amended_bill_id:      { type: keyword }      # legislation.id e.g. "bill:119:hr:1"
+      amended_bill_congress: { type: integer }
+      amended_bill_type:    { type: keyword }
+      amended_bill_number:  { type: integer }
+
+      # ── sponsor (populated after item fetch) ──
+      sponsor_bioguide_id:  { type: keyword }
+      sponsor_name:
+        type: text
+        fields:
+          keyword:    { type: keyword, ignore_above: 256 }
+
+      description:    { type: text }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 3. communication ──────────────────────────────────────────────────────────
+# Merges house_communication + senate_communication.  chamber discriminates.
+communication:
+  settings:
+    number_of_shards: 2
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:            { type: keyword }
+      record_type:   { type: keyword }             # "congress-communications"
+      url:           { type: keyword }
+
+      chamber:       { type: keyword }             # "House" | "Senate"
+      congress:      { type: integer }
+      number:        { type: integer }
+
+      # ── communication_type flattened from {code, name} ──
+      communication_type_code: { type: keyword }  # "EC", "PM", "POM", …
+      communication_type_name:
+        type: text
+        fields:
+          keyword:   { type: keyword, ignore_above: 256 }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 4. committee ──────────────────────────────────────────────────────────────
+committee:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:            { type: keyword }             # committee:{chamber_lower}:{system_code}
+      record_type:   { type: keyword }             # "congress-committees"
+      url:           { type: keyword }
+
+      system_code:   { type: keyword }             # e.g. "hsfa00"
+      name:
+        type: text
+        fields:
+          keyword:   { type: keyword, ignore_above: 512 }
+      chamber:             { type: keyword }       # House | Senate | Joint
+      committee_type_code: { type: keyword }       # "Committee" | "Subcommittee" | "Joint"
+
+      # ── parent (flattened from parent: {name, systemCode, url}) ──
+      parent_name:
+        type: text
+        fields:
+          keyword:   { type: keyword, ignore_above: 512 }
+      parent_system_code:  { type: keyword }
+      parent_url:          { type: keyword }
+
+      # ── subcommittees (flattened to array of system codes) ──
+      subcommittee_system_codes: { type: keyword }   # multi-value keyword array
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 5. committee_meeting ──────────────────────────────────────────────────────
+committee_meeting:
+  settings:
+    number_of_shards: 2
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:         { type: keyword }
+      record_type: { type: keyword }               # "congress-committee-meetings"
+      url:        { type: keyword }
+
+      event_id:   { type: integer }
+      congress:   { type: integer }
+      chamber:    { type: keyword }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 6. committee_print ────────────────────────────────────────────────────────
+committee_print:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:            { type: keyword }
+      record_type:   { type: keyword }             # "congress-committee-prints"
+      url:           { type: keyword }
+
+      congress:      { type: integer }
+      chamber:       { type: keyword }
+      jacket_number: { type: integer }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 7. committee_report ───────────────────────────────────────────────────────
+# No records in Jan 2025 sample; mapped for completeness.
+committee_report:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:          { type: keyword }
+      record_type: { type: keyword }               # "congress-committee-reports"
+      url:         { type: keyword }
+
+      congress:    { type: integer }
+      chamber:     { type: keyword }
+      citation:    { type: keyword }               # e.g. "H. Rept. 119-1"
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 8. congressional_record ───────────────────────────────────────────────────
+# Merges bound_congressional_record + daily_congressional_record.
+# record_subtype = "bound" | "daily"
+# issue_date normalised from: "date" (bound) → "issue_date" (daily)
+congressional_record:
+  settings:
+    number_of_shards: 2
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:             { type: keyword }
+      record_type:    { type: keyword }            # "congress-congressional-records"
+      record_subtype: { type: keyword }            # "bound" | "daily"
+      url:            { type: keyword }
+      reference_id:   { type: keyword }            # stable slug; bound records only
+
+      congress:        { type: integer }
+      volume_number:   { type: integer }
+      session_number:  { type: integer }
+      issue_number:    { type: keyword }           # daily only (e.g. "D1234")
+
+      issue_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 9. hearing ────────────────────────────────────────────────────────────────
+hearing:
+  settings:
+    number_of_shards: 2
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:            { type: keyword }
+      record_type:   { type: keyword }             # "congress-hearings"
+      url:           { type: keyword }
+
+      congress:      { type: integer }
+      chamber:       { type: keyword }
+      jacket_number: { type: integer }
+      number:        { type: integer }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 10. house_vote ────────────────────────────────────────────────────────────
+house_vote:
+  settings:
+    number_of_shards: 2
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:              { type: keyword }           # house-rollcall-vote:{congress}:{session}:{roll}
+      record_type:     { type: keyword }           # "congress-house-votes"
+      url:             { type: keyword }
+      source_data_url: { type: keyword }           # clerk.house.gov XML
+
+      congress:        { type: integer }
+      session_number:  { type: integer }
+      roll_call_number: { type: integer }
+      identifier:      { type: long }
+      vote_type:       { type: keyword }
+      result:          { type: keyword }           # "Passed" | "Failed" | …
+
+      # ── legislation reference (from list data) ──
+      legislation_type:   { type: keyword }        # HR, S, HJRES, …
+      legislation_number: { type: integer }
+      legislation_id:     { type: keyword }        # derived: "bill:{congress}:{type_lower}:{number}"
+
+      # ── amendment reference (when vote was on an amendment) ──
+      amendment_type:   { type: keyword }
+      amendment_number: { type: integer }
+      amendment_author: { type: keyword }
+
+      start_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 11. member ────────────────────────────────────────────────────────────────
+member:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:           { type: keyword }              # member:{bioguide_id}
+      record_type:  { type: keyword }              # "congress-members"
+      url:          { type: keyword }
+
+      bioguide_id:  { type: keyword }
+      name:
+        type: text
+        fields:
+          keyword:  { type: keyword, ignore_above: 256 }
+      state:        { type: keyword }
+      party_name:   { type: keyword }
+      district:     { type: integer }              # null for senators
+
+      image_url:    { type: keyword }              # flattened from depiction.image_url
+
+      # ── terms (nested; members serve multiple terms across congresses) ──
+      terms:
+        type: nested
+        properties:
+          chamber:    { type: keyword }            # "House of Representatives" | "Senate"
+          start_year: { type: integer }
+          end_year:   { type: integer }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 12. nomination ────────────────────────────────────────────────────────────
+nomination:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:          { type: keyword }               # nominations:{congress}:{number}-{part}
+      record_type: { type: keyword }               # "congress-nominations"
+      url:         { type: keyword }
+
+      congress:    { type: integer }
+      number:      { type: integer }
+      part_number: { type: keyword }
+      citation:    { type: keyword }               # "PN11-23"
+
+      description: { type: text }
+      organization:
+        type: text
+        fields:
+          keyword: { type: keyword, ignore_above: 512 }
+
+      # ── nomination_type flattened ──
+      is_civilian_nomination: { type: boolean }    # from nomination_type.is_civilian
+
+      received_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+      # ── latest_action flattened ──
+      latest_action_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      latest_action_text:
+        type: text
+        fields:
+          keyword: { type: keyword, ignore_above: 512 }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 13. treaty ────────────────────────────────────────────────────────────────
+treaty:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:               { type: keyword }          # treaty:{congress}:{number}{suffix}
+      record_type:      { type: keyword }          # "congress-treaties"
+      url:              { type: keyword }
+
+      congress_received: { type: integer }
+      number:           { type: integer }
+      suffix:           { type: keyword }          # "" for most; "A", "B" for multi-part
+
+      topic:
+        type: text
+        fields:
+          keyword:      { type: keyword, ignore_above: 512 }
+
+      transmitted_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 14. congress_ref ──────────────────────────────────────────────────────────
+# Reference table; one document per congress (1–119+).
+# id = "congress:{number}" — derived at index-time from URL path segment
+# (the congress list API does not return a number field directly).
+congress_ref:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:         { type: keyword }                # congress:{number}
+      url:        { type: keyword }
+
+      number:     { type: integer }
+      name:       { type: keyword }                # "119th Congress"
+      start_year: { type: integer }
+      end_year:   { type: integer }
+
+      # ── sessions (nested; each congress has 2+ sessions per chamber) ──
+      sessions:
+        type: nested
+        properties:
+          chamber:    { type: keyword }
+          number:     { type: integer }
+          type:       { type: keyword }            # "R" (regular) | "S" (special)
+          start_date:
+            type: date
+            format: "strict_date_optional_time||yyyy-MM-dd"
+          end_date:
+            type: date
+            format: "strict_date_optional_time||yyyy-MM-dd"
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 15. house_requirement ─────────────────────────────────────────────────────
+# Sparse reference data; reporting requirements for executive agencies.
+house_requirement:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:          { type: keyword }
+      record_type: { type: keyword }               # "congress-house-requirements"
+      url:         { type: keyword }
+
+      number:      { type: integer }
+
+      update_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 16. sponsorship  (bridge: member ↔ legislation) ─────────────────────────
+# One row per member-bill relationship.
+# Populated from legislation item fetch (sponsors[] + cosponsors[] arrays).
+# Enables:
+#   - "All bills sponsored/co-sponsored by member X"
+#   - "All members who sponsored bill Y"
+#   - Co-sponsorship network graphs (join on legislation_id, compare bioguide_ids)
+sponsorship:
+  settings:
+    number_of_shards: 2
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:               { type: keyword }  # sponsor:{bioguide_id}:{legislation_id}
+      bioguide_id:      { type: keyword }  # → member.bioguide_id
+      legislation_id:   { type: keyword }  # → legislation.id  e.g. bill:119:hr:1
+      congress:         { type: integer }
+
+      sponsorship_type: { type: keyword }  # "sponsor" | "cosponsor"
+      is_original_cosponsor: { type: boolean }
+
+      # member snapshot (denormalised for query convenience)
+      member_name:
+        type: text
+        fields:
+          keyword:      { type: keyword, ignore_above: 256 }
+      member_state:     { type: keyword }
+      member_party:     { type: keyword }
+
+      sponsorship_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      withdrawal_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 17. vote_position  (bridge: member ↔ house_vote) ────────────────────────
+# One row per member-vote cast.
+# Populated by parsing clerk.house.gov XML linked via house_vote.source_data_url.
+# Enables:
+#   - "Full voting record of member X" (filter by bioguide_id)
+#   - "Who voted Yea/Nay on roll call N" (filter by house_vote_id + position)
+#   - Party-unity scores (group by party + position per vote)
+#   - Cross-aisle vote analysis
+vote_position:
+  settings:
+    number_of_shards: 3
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:            { type: keyword }  # vote-pos:{congress}:{session}:{roll}:{bioguide_id}
+      bioguide_id:   { type: keyword }  # → member.bioguide_id
+      house_vote_id: { type: keyword }  # → house_vote.id
+      legislation_id: { type: keyword } # → legislation.id (denormalised for direct joins)
+
+      congress:        { type: integer }
+      session_number:  { type: integer }
+      roll_call_number: { type: integer }
+
+      position:      { type: keyword }  # "Yea" | "Nay" | "Present" | "Not Voting"
+      party:         { type: keyword }  # party at time of vote (from clerk XML)
+      state:         { type: keyword }
+
+      # member snapshot (denormalised for query convenience)
+      member_name:
+        type: text
+        fields:
+          keyword:   { type: keyword, ignore_above: 256 }
+
+      vote_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"

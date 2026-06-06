@@ -20,6 +20,13 @@
 *snapshot*.json
 *.db
 
+# Ingest output (large generated data — not committed)
+data/
+tmp/
+tmp_ingest/
+tmp_run/
+daily_output_7d/
+
 
 # Whoosh index
 whoosh_members_index/
