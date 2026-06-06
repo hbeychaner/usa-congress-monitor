@@ -66,6 +66,7 @@ logger = logging.getLogger("ingest_history")
 # e.g. 101 → 1989,  119 → 2025
 _CONGRESS_START_YEAR = {n: 2 * n + 1787 for n in range(93, 125)}
 
+
 # Reverse: first congress that starts in or before a given year
 def _congress_for_year(year: int) -> int:
     return max(n for n, y in _CONGRESS_START_YEAR.items() if y <= year)
@@ -83,6 +84,7 @@ def _congresses_for_years(from_year: int, to_year: int) -> list[int]:
 
 # ── Checkpoint helpers ────────────────────────────────────────────────────────
 
+
 def _is_done(outdir: Path, resource: Resource, fetch_items: bool) -> bool:
     """Return True if this resource chunk is fully complete.
 
@@ -99,6 +101,7 @@ def _is_done(outdir: Path, resource: Resource, fetch_items: bool) -> bool:
         return True
     # Resources that are list-only (no item endpoint)
     from cdm.ingest.resource_config import RESOURCE_CONFIGS
+
     cfg = RESOURCE_CONFIGS.get(resource)
     if cfg and (cfg.list_only or not cfg.fetch_items_default):
         return True  # items not expected for this resource
@@ -111,6 +114,7 @@ def _is_done(outdir: Path, resource: Resource, fetch_items: bool) -> bool:
 
 # ── Normalise date strings for the API ───────────────────────────────────────
 
+
 def _iso(date_str: str, end_of_day: bool = False) -> str:
     if "T" in date_str:
         return date_str
@@ -119,6 +123,7 @@ def _iso(date_str: str, end_of_day: bool = False) -> str:
 
 
 # ── Argument parsing ─────────────────────────────────────────────────────────
+
 
 def _parse_args() -> argparse.Namespace:
     this_year = datetime.now(timezone.utc).year
@@ -130,60 +135,128 @@ def _parse_args() -> argparse.Namespace:
     )
 
     # Year / congress range
-    p.add_argument("--from-year", type=int, default=1990, metavar="YYYY",
-                   help="Earliest year to ingest (default: 1990).")
-    p.add_argument("--to-year", type=int, default=this_year, metavar="YYYY",
-                   help=f"Latest year to ingest (default: {this_year}).")
-    p.add_argument("--from-congress", type=int, default=None, metavar="N",
-                   help="Override: start congress number (derived from --from-year if omitted).")
-    p.add_argument("--to-congress", type=int, default=None, metavar="N",
-                   help="Override: end congress number (derived from --to-year if omitted).")
+    p.add_argument(
+        "--from-year",
+        type=int,
+        default=1990,
+        metavar="YYYY",
+        help="Earliest year to ingest (default: 1990).",
+    )
+    p.add_argument(
+        "--to-year",
+        type=int,
+        default=this_year,
+        metavar="YYYY",
+        help=f"Latest year to ingest (default: {this_year}).",
+    )
+    p.add_argument(
+        "--from-congress",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Override: start congress number (derived from --from-year if omitted).",
+    )
+    p.add_argument(
+        "--to-congress",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Override: end congress number (derived from --to-year if omitted).",
+    )
 
     # Resource selection
-    p.add_argument("--resources", default=None, metavar="r1,r2,...",
-                   help="Comma-separated resource names (default: all).")
-    p.add_argument("--scope",
-                   choices=["date_window", "congress_scoped", "static", "all"],
-                   default="all",
-                   help="Restrict to resources of this scope type (default: all).")
+    p.add_argument(
+        "--resources",
+        default=None,
+        metavar="r1,r2,...",
+        help="Comma-separated resource names (default: all).",
+    )
+    p.add_argument(
+        "--scope",
+        choices=["date_window", "congress_scoped", "static", "all"],
+        default="all",
+        help="Restrict to resources of this scope type (default: all).",
+    )
 
     # Output
-    p.add_argument("--outdir", default="data/full_history",
-                   help="Root output directory (default: data/full_history).")
+    p.add_argument(
+        "--outdir",
+        default="data/full_history",
+        help="Root output directory (default: data/full_history).",
+    )
 
     # Item fetching
-    p.add_argument("--items", action="store_true",
-                   help="Fetch item-level detail for every list entry (slow).")
-    p.add_argument("--max-items", type=int, default=None, metavar="N",
-                   help="Cap item fetches per resource per chunk.")
-    p.add_argument("--max-pages", type=int, default=None, metavar="N",
-                   help="Cap list pages per resource per chunk (useful for smoke-tests).")
+    p.add_argument(
+        "--items",
+        action="store_true",
+        help="Fetch item-level detail for every list entry (slow).",
+    )
+    p.add_argument(
+        "--max-items",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Cap item fetches per resource per chunk.",
+    )
+    p.add_argument(
+        "--max-pages",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Cap list pages per resource per chunk (useful for smoke-tests).",
+    )
 
     # Resume
-    p.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True,
-                   help="Skip chunks whose output already exists (default: --resume).")
+    p.add_argument(
+        "--resume",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Skip chunks whose output already exists (default: --resume).",
+    )
 
     # Delay between chunks to avoid rate-limit bursts
-    p.add_argument("--chunk-delay", type=float, default=0.0, metavar="SECS",
-                   help="Seconds to wait between chunks (default: 0 — rate limiter handles pacing).")
+    p.add_argument(
+        "--chunk-delay",
+        type=float,
+        default=0.0,
+        metavar="SECS",
+        help="Seconds to wait between chunks (default: 0 — rate limiter handles pacing).",
+    )
 
     # Concurrency
-    p.add_argument("--concurrency", type=int, default=20, metavar="N",
-                   help="Parallel item-fetch workers per resource (default: 20).")
-    p.add_argument("--rate-limit", type=float, default=4800.0, metavar="N",
-                   help="Max API requests per hour across all workers (default: 4800).")
+    p.add_argument(
+        "--concurrency",
+        type=int,
+        default=20,
+        metavar="N",
+        help="Parallel item-fetch workers per resource (default: 20).",
+    )
+    p.add_argument(
+        "--rate-limit",
+        type=float,
+        default=4800.0,
+        metavar="N",
+        help="Max API requests per hour across all workers (default: 4800).",
+    )
 
     # Auth / misc
-    p.add_argument("--api-key", default=None, help="Congress.gov API key (overrides env).")
-    p.add_argument("--fail-fast", action="store_true",
-                   help="Stop on first resource error inside a chunk.")
-    p.add_argument("--log-level", default="INFO",
-                   choices=["DEBUG", "INFO", "WARNING", "ERROR"])
+    p.add_argument(
+        "--api-key", default=None, help="Congress.gov API key (overrides env)."
+    )
+    p.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Stop on first resource error inside a chunk.",
+    )
+    p.add_argument(
+        "--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"]
+    )
 
     return p.parse_args()
 
 
 # ── Resource selection ────────────────────────────────────────────────────────
+
 
 def _select_resources(args: argparse.Namespace) -> list[Resource]:
     if args.resources:
@@ -194,7 +267,9 @@ def _select_resources(args: argparse.Namespace) -> list[Resource]:
                 out.append(Resource(name))
             except ValueError:
                 valid = [r.value for r in Resource]
-                print(f"ERROR: unknown resource '{name}'. Valid: {valid}", file=sys.stderr)
+                print(
+                    f"ERROR: unknown resource '{name}'. Valid: {valid}", file=sys.stderr
+                )
                 sys.exit(1)
         return out
 
@@ -209,6 +284,7 @@ def _select_resources(args: argparse.Namespace) -> list[Resource]:
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     args = _parse_args()
 
@@ -217,24 +293,32 @@ def main() -> None:
         format="%(asctime)s  %(levelname)-8s  %(name)s  %(message)s",
         datefmt="%H:%M:%S",
     )
+    # Suppress "Unprocessed fields" noise from the SDK — these are harmless
+    # mapping gaps and would otherwise flood the log at INFO level.
+    logging.getLogger("congress_sdk.data_collection.client").setLevel(logging.ERROR)
 
     outdir = Path(args.outdir)
     all_resources = _select_resources(args)
 
-    dw_resources = [r for r in all_resources
-                    if RESOURCE_CONFIGS[r].scope == "date_window"]
-    cs_resources = [r for r in all_resources
-                    if RESOURCE_CONFIGS[r].scope == "congress_scoped"]
-    st_resources = [r for r in all_resources
-                    if RESOURCE_CONFIGS[r].scope == "static"]
+    dw_resources = [
+        r for r in all_resources if RESOURCE_CONFIGS[r].scope == "date_window"
+    ]
+    cs_resources = [
+        r for r in all_resources if RESOURCE_CONFIGS[r].scope == "congress_scoped"
+    ]
+    st_resources = [r for r in all_resources if RESOURCE_CONFIGS[r].scope == "static"]
 
     from_year = args.from_year
-    to_year   = args.to_year
+    to_year = args.to_year
 
     # Congress range (for congress-scoped resources)
     derived_congresses = _congresses_for_years(from_year, to_year)
-    from_congress = args.from_congress or (derived_congresses[0] if derived_congresses else 101)
-    to_congress   = args.to_congress   or (derived_congresses[-1] if derived_congresses else 119)
+    from_congress = args.from_congress or (
+        derived_congresses[0] if derived_congresses else 101
+    )
+    to_congress = args.to_congress or (
+        derived_congresses[-1] if derived_congresses else 119
+    )
     congress_range = list(range(from_congress, to_congress + 1))
 
     total_chunks = (
@@ -244,8 +328,10 @@ def main() -> None:
     )
     logger.info(
         "Plan: %d date-windowed × %d years + %d congress-scoped × %d congresses + %d static  =  ~%d chunks",
-        len(dw_resources), to_year - from_year + 1,
-        len(cs_resources), len(congress_range),
+        len(dw_resources),
+        to_year - from_year + 1,
+        len(cs_resources),
+        len(congress_range),
         len(st_resources),
         total_chunks,
     )
@@ -257,12 +343,13 @@ def main() -> None:
     rate_limiter = TokenBucket(rate_per_hour=args.rate_limit)
     logger.info(
         "Rate limiter: %.0f req/hr  |  Concurrency: %d workers",
-        args.rate_limit, args.concurrency,
+        args.rate_limit,
+        args.concurrency,
     )
 
-    chunk_num   = 0
-    skip_count  = 0
-    fail_count  = 0
+    chunk_num = 0
+    skip_count = 0
+    fail_count = 0
 
     def _make_cfg(from_date=None, to_date=None, congress=None, chunk_outdir=None):
         return PipelineConfig(
@@ -303,8 +390,12 @@ def main() -> None:
                 fail_count += 1
                 logger.error("  FAIL  %s  — %s", r.resource.value, r.error)
             else:
-                logger.info("  OK    %-30s  list=%d  items=%d",
-                            r.resource.value, r.list_count, r.item_count)
+                logger.info(
+                    "  OK    %-30s  list=%d  items=%d",
+                    r.resource.value,
+                    r.list_count,
+                    r.item_count,
+                )
 
         if args.chunk_delay > 0:
             time.sleep(args.chunk_delay)
