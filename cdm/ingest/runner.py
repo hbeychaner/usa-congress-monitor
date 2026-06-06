@@ -172,7 +172,7 @@ class IngestRunner:
     save_raw_items: bool = False
     # Date window for endpoints that support fromDateTime/toDateTime
     from_date: Optional[str] = None  # ISO-8601 e.g. "2025-01-01T00:00:00Z"
-    to_date: Optional[str] = None    # ISO-8601 e.g. "2025-01-31T23:59:59Z"
+    to_date: Optional[str] = None  # ISO-8601 e.g. "2025-01-31T23:59:59Z"
     # Arbitrary extra query params (e.g. {"sort": "updateDate"}) merged last
     extra_params: Optional[dict] = None
     # Concurrency: number of parallel item-fetch workers (1 = serial)
@@ -186,6 +186,7 @@ class IngestRunner:
         if not key:
             try:
                 from settings import CONGRESS_API_KEY  # root project settings
+
                 key = CONGRESS_API_KEY or None
             except ImportError:
                 pass
@@ -211,7 +212,9 @@ class IngestRunner:
         meta_mapping = (
             meta.model_dump(mode="json") if hasattr(meta, "model_dump") else dict(meta)
         )
-        runtime_params = client.resolve_runtime_params_from_record(item_spec, meta_mapping)
+        runtime_params = client.resolve_runtime_params_from_record(
+            item_spec, meta_mapping
+        )
 
         if self.save_raw_items:
             parsed_item = client.request_for_spec(item_spec, runtime_params)
@@ -225,10 +228,15 @@ class IngestRunner:
                     f"response_keys={list(parsed_item.keys())}"
                 )
             item = insts[0]
+            # Start from the raw API dict so no fields are silently dropped by
+            # the pydantic model (e.g. witnesses, meetingDocuments, videos).
+            # Then overlay the model-dumped output so computed fields like `id`
+            # and camelCase→snake_case aliases take precedence.
+            raw_dict = recs[0] if recs else {}
+            item_data = {**raw_dict, **item.model_dump(mode="json", exclude_none=True)}
         else:
             item = client.fetch_one(item_spec, runtime_params)
-
-        item_data = item.model_dump(mode="json", exclude_none=True)
+            item_data = item.model_dump(mode="json", exclude_none=True)
 
         if not item_data.get("id"):
             try:
@@ -239,6 +247,7 @@ class IngestRunner:
         if not item_data.get("referenceId"):
             try:
                 from congress_sdk.data_collection.id_utils import parse_url_to_id
+
                 if item_data.get("url"):
                     item_data["referenceId"] = parse_url_to_id(str(item_data["url"]))
             except Exception:
@@ -258,7 +267,9 @@ class IngestRunner:
         if self.resource == Resource.LAW:
             from congress_sdk.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 
-            logger.info("Resource=law: preferring bill item spec to avoid /law item 5xx")
+            logger.info(
+                "Resource=law: preferring bill item spec to avoid /law item 5xx"
+            )
             item_spec = BILL_ITEM_SPEC
         logger.info("Fetching %s list spec: %s", self.resource.value, list_spec.name)
 
@@ -337,8 +348,8 @@ class IngestRunner:
         to_fetch_list: List = (
             all_models if self.max_items is None else all_models[: self.max_items]
         )
-        successes = [0]   # wrapped in list for mutation in nested closure
-        failures  = [0]
+        successes = [0]  # wrapped in list for mutation in nested closure
+        failures = [0]
         aggregated_items: List[dict] = []
         seen_ids: set = set()
         write_lock = threading.Lock()
@@ -366,7 +377,8 @@ class IngestRunner:
             if already_fetched_urls:
                 logger.info(
                     "Resume: loaded %d already-fetched items from %s",
-                    len(already_fetched_urls), items_jsonl_path,
+                    len(already_fetched_urls),
+                    items_jsonl_path,
                 )
         items_jsonl_fh = items_jsonl_path.open("a", encoding="utf-8")
         # ─────────────────────────────────────────────────────────────────
@@ -375,9 +387,7 @@ class IngestRunner:
         pending = [
             (idx, meta)
             for idx, meta in enumerate(to_fetch_list, start=1)
-            if not (
-                str(getattr(meta, "url", None) or "") in already_fetched_urls
-            )
+            if not (str(getattr(meta, "url", None) or "") in already_fetched_urls)
         ]
         total = len(to_fetch_list)
         skipped = total - len(pending)
@@ -387,7 +397,8 @@ class IngestRunner:
         concurrency = max(1, self.concurrency)
         logger.info(
             "Fetching %d items with concurrency=%d rate=%.0f/hr",
-            len(pending), concurrency,
+            len(pending),
+            concurrency,
             self.rate_limiter.rate_per_hour if self.rate_limiter else float("inf"),
         )
 
@@ -413,7 +424,9 @@ class IngestRunner:
                 if successes[0] % 100 == 0:
                     logger.info(
                         "Progress: %d/%d items fetched (%d failures so far)",
-                        successes[0] + skipped, total, failures[0],
+                        successes[0] + skipped,
+                        total,
+                        failures[0],
                     )
             except (AttributeError, TypeError) as exc:
                 # These indicate a pycongress model bug — stop immediately so
@@ -422,7 +435,8 @@ class IngestRunner:
                 logger.critical(
                     "FATAL error on item %d/%d (url=%s): %s — aborting run; "
                     "fix the model and re-run with --resume",
-                    idx, total,
+                    idx,
+                    total,
                     getattr(meta, "url", "?"),
                     exc,
                 )
@@ -431,7 +445,8 @@ class IngestRunner:
                     failures[0] += 1
                 logger.error(
                     "Failed item %d/%d (url=%s): %s",
-                    idx, total,
+                    idx,
+                    total,
                     getattr(meta, "url", "?"),
                     exc,
                 )
