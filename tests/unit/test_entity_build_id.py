@@ -1,8 +1,8 @@
-import pytest
-from datetime import datetime
 
-from src.models.other_models import MemberListItem, BillListItem
-from src.models.shared import EntityBase
+import pytest
+
+from cdm.models.other_models import BillListItem, MemberListItem
+from cdm.models.shared import EntityBase
 
 
 def test_build_id_member_bioguide():

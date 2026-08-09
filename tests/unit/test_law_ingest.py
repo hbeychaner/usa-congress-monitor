@@ -4,7 +4,7 @@ from pathlib import Path
 
 def test_ingest_law_list_only(tmp_path, monkeypatch):
     repo = Path(__file__).resolve().parents[2]
-    fixtures = repo / "tmp_ingest" / "law"
+    fixtures = repo / "tests" / "fixtures" / "law"
     raw_list_p = fixtures / "raw_list.json"
     raw_items_p = fixtures / "raw_items.json"
     assert raw_list_p.exists()
@@ -13,12 +13,12 @@ def test_ingest_law_list_only(tmp_path, monkeypatch):
     raw_list = json.loads(raw_list_p.read_text(encoding="utf-8"))
     raw_items = json.loads(raw_items_p.read_text(encoding="utf-8"))
 
-    from congress_sdk.data_collection.client import get_client as real_get_client
+    from cdm.data_collection.client import get_client as real_get_client
 
     client = real_get_client(api_key="test")
 
     if isinstance(raw_list, list):
-        list_resp = {"data": raw_list}
+        list_resp = {"bills": raw_list}
     else:
         list_resp = raw_list
     responses = [list_resp, list_resp] + list(raw_items)
@@ -58,10 +58,8 @@ def test_ingest_law_list_only(tmp_path, monkeypatch):
         congress=119,
         max_pages=2,
         max_items=20,
-        save_raw_items=True,
     )
-    runner.run()
+    result = runner.run()
 
-    # For LAW the runner is configured as list-only; items.json should not be produced
-    assert (tmp_path / "list.json").exists()
-    assert not (tmp_path / "items.json").exists()
+    assert result["list_count"] == len(raw_list)
+    assert result["item_count"] == 0

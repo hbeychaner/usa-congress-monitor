@@ -1,0 +1,2858 @@
+[
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "2445 Rayburn House Office Building",
+        "phoneNumber": "(202) 225-2523",
+        "zipCode": 20515
+      },
+      "bioguideId": "K000401",
+      "birthYear": "1985",
+      "cosponsoredLegislation": {
+        "count": 267,
+        "url": "https://api.congress.gov/v3/member/k000401/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Image courtesy of the Member",
+        "imageUrl": "https://www.congress.gov/img/member/k000401_200.jpg"
+      },
+      "directOrderName": "Kevin Kiley",
+      "district": 3,
+      "firstName": "Kevin",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Kiley, Kevin",
+      "lastName": "Kiley",
+      "officialWebsiteUrl": "https://kiley.house.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "I",
+          "partyName": "Independent",
+          "startYear": 2026
+        },
+        {
+          "endYear": 2026,
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 2023
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Kevin Kiley",
+          "endDate": "2024-06-03T03:59:59Z",
+          "firstName": "Kevin",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Kiley, Kevin",
+          "lastName": "Kiley",
+          "startDate": "2023-01-03T17:00:00Z"
+        },
+        {
+          "directOrderName": "Kevin Kiley",
+          "endDate": "2025-01-17T04:59:59Z",
+          "firstName": "Kevin",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Kiley, Kevin",
+          "lastName": "Kiley",
+          "startDate": "2024-06-03T04:00:00Z"
+        },
+        {
+          "directOrderName": "Kevin Kiley",
+          "firstName": "Kevin",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Kiley, Kevin",
+          "lastName": "Kiley",
+          "startDate": "2025-01-17T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 41,
+        "url": "https://api.congress.gov/v3/member/k000401/sponsored-legislation"
+      },
+      "state": "California",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 118,
+          "district": 3,
+          "endYear": 2025,
+          "memberType": "Representative",
+          "startYear": 2023,
+          "stateCode": "CA",
+          "stateName": "California"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 119,
+          "district": 3,
+          "memberType": "Representative",
+          "startYear": 2025,
+          "stateCode": "CA",
+          "stateName": "California"
+        }
+      ],
+      "updateDate": "2026-03-20T07:30:24Z",
+      "fullName": "Kevin Kiley",
+      "party": "Independent"
+    },
+    "request": {
+      "bioguideId": "k000401",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "bioguideId": "C000722",
+      "birthYear": "1946",
+      "cosponsoredLegislation": {
+        "count": 603,
+        "url": "https://api.congress.gov/v3/member/c000722/cosponsored-legislation"
+      },
+      "currentMember": false,
+      "deathYear": "2026",
+      "depiction": {
+        "attribution": "Image, Congressional Pictorial Directory, 106th.",
+        "imageUrl": "https://www.congress.gov/img/member/c000722_200.jpg"
+      },
+      "directOrderName": "Merrill Cook",
+      "district": 2,
+      "firstName": "MERRILL",
+      "invertedOrderName": "Cook, Merrill",
+      "lastName": "COOK",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 1997
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Merrill Cook",
+          "firstName": "MERRILL",
+          "invertedOrderName": "Cook, Merrill",
+          "lastName": "COOK",
+          "startDate": "1997-01-03T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 25,
+        "url": "https://api.congress.gov/v3/member/c000722/sponsored-legislation"
+      },
+      "state": "Utah",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 105,
+          "district": 2,
+          "endYear": 1999,
+          "memberType": "Representative",
+          "startYear": 1997,
+          "stateCode": "UT",
+          "stateName": "Utah"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 106,
+          "district": 2,
+          "endYear": 2001,
+          "memberType": "Representative",
+          "startYear": 1999,
+          "stateCode": "UT",
+          "stateName": "Utah"
+        }
+      ],
+      "updateDate": "2026-03-13T16:51:48Z",
+      "fullName": "Merrill Cook",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "c000722",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "1502 Longworth House Office Building",
+        "phoneNumber": "(202) 225-6111",
+        "zipCode": 20515
+      },
+      "bioguideId": "B001296",
+      "birthYear": "1977",
+      "cosponsoredLegislation": {
+        "count": 2245,
+        "url": "https://api.congress.gov/v3/member/b001296/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Image courtesy of the Member",
+        "imageUrl": "https://www.congress.gov/img/member/69b30d648b7b84825b02d362_200.jpg"
+      },
+      "directOrderName": "Brendan F. Boyle",
+      "district": 2,
+      "firstName": "Brendan",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Boyle, Brendan F.",
+      "lastName": "Boyle",
+      "middleName": "F.",
+      "officialWebsiteUrl": "https://boyle.house.gov/",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2015
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Brendan F. Boyle",
+          "endDate": "2023-06-01T03:59:59Z",
+          "firstName": "Brendan",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Boyle, Brendan F.",
+          "lastName": "Boyle",
+          "middleName": "F.",
+          "startDate": "2015-01-06T05:00:00Z"
+        },
+        {
+          "directOrderName": "Brendan F. Boyle",
+          "endDate": "2024-06-03T03:59:59Z",
+          "firstName": "Brendan",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Boyle, Brendan F.",
+          "lastName": "Boyle",
+          "middleName": "F.",
+          "startDate": "2023-06-01T04:00:00Z"
+        },
+        {
+          "directOrderName": "Brendan F. Boyle",
+          "firstName": "Brendan",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Boyle, Brendan F.",
+          "lastName": "Boyle",
+          "middleName": "F.",
+          "startDate": "2024-06-03T04:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 128,
+        "url": "https://api.congress.gov/v3/member/b001296/sponsored-legislation"
+      },
+      "state": "Pennsylvania",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 114,
+          "district": 13,
+          "endYear": 2017,
+          "memberType": "Representative",
+          "startYear": 2015,
+          "stateCode": "PA",
+          "stateName": "Pennsylvania"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 115,
+          "district": 13,
+          "endYear": 2019,
+          "memberType": "Representative",
+          "startYear": 2017,
+          "stateCode": "PA",
+          "stateName": "Pennsylvania"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 116,
+          "district": 2,
+          "endYear": 2021,
+          "memberType": "Representative",
+          "startYear": 2019,
+          "stateCode": "PA",
+          "stateName": "Pennsylvania"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 117,
+          "district": 2,
+          "endYear": 2023,
+          "memberType": "Representative",
+          "startYear": 2021,
+          "stateCode": "PA",
+          "stateName": "Pennsylvania"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 118,
+          "district": 2,
+          "endYear": 2025,
+          "memberType": "Representative",
+          "startYear": 2023,
+          "stateCode": "PA",
+          "stateName": "Pennsylvania"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 119,
+          "district": 2,
+          "memberType": "Representative",
+          "startYear": 2025,
+          "stateCode": "PA",
+          "stateName": "Pennsylvania"
+        }
+      ],
+      "updateDate": "2026-03-13T13:26:36Z",
+      "fullName": "Brendan F. Boyle",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "b001296",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "bioguideId": "H001050",
+      "birthYear": "1951",
+      "cosponsoredLegislation": {
+        "count": 912,
+        "url": "https://api.congress.gov/v3/member/h001050/cosponsored-legislation"
+      },
+      "currentMember": false,
+      "deathYear": "2026",
+      "depiction": {
+        "attribution": "Collection of the U.S. House of Representatives",
+        "imageUrl": "https://www.congress.gov/img/member/h001050_200.jpg"
+      },
+      "directOrderName": "Colleen Hanabusa",
+      "district": 1,
+      "firstName": "Colleen",
+      "honorificName": "Ms.",
+      "invertedOrderName": "Hanabusa, Colleen",
+      "lastName": "Hanabusa",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2011
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Colleen Hanabusa",
+          "endDate": "2017-01-01T05:00:00Z",
+          "firstName": "Colleen",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Hanabusa, Colleen W.",
+          "lastName": "Hanabusa",
+          "middleName": "W.",
+          "startDate": "2011-01-03T05:00:00Z"
+        },
+        {
+          "directOrderName": "Colleen Hanabusa",
+          "firstName": "Colleen",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Hanabusa, Colleen",
+          "lastName": "Hanabusa",
+          "startDate": "2017-01-01T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 43,
+        "url": "https://api.congress.gov/v3/member/h001050/sponsored-legislation"
+      },
+      "state": "Hawaii",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 112,
+          "district": 1,
+          "endYear": 2013,
+          "memberType": "Representative",
+          "startYear": 2011,
+          "stateCode": "HI",
+          "stateName": "Hawaii"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 113,
+          "district": 1,
+          "endYear": 2015,
+          "memberType": "Representative",
+          "startYear": 2013,
+          "stateCode": "HI",
+          "stateName": "Hawaii"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 114,
+          "district": 1,
+          "endYear": 2017,
+          "memberType": "Representative",
+          "startYear": 2016,
+          "stateCode": "HI",
+          "stateName": "Hawaii"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 115,
+          "district": 1,
+          "endYear": 2019,
+          "memberType": "Representative",
+          "startYear": 2017,
+          "stateCode": "HI",
+          "stateName": "Hawaii"
+        }
+      ],
+      "updateDate": "2026-03-09T19:10:13Z",
+      "fullName": "Colleen Hanabusa",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "h001050",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "185 Dirksen Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-5623",
+        "zipCode": 20515
+      },
+      "bioguideId": "Y000064",
+      "birthYear": "1972",
+      "cosponsoredLegislation": {
+        "count": 2093,
+        "url": "https://api.congress.gov/v3/member/y000064/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Image courtesy of the Member",
+        "imageUrl": "https://www.congress.gov/img/member/y000064_200.jpg"
+      },
+      "directOrderName": "Todd Young",
+      "firstName": "Todd",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Young, Todd",
+      "lastName": "Young",
+      "officialWebsiteUrl": "https://www.young.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 2011
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Todd Young",
+          "endDate": "2023-01-04T07:34:59Z",
+          "firstName": "Todd",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Young, Todd",
+          "lastName": "Young",
+          "middleName": "C.",
+          "startDate": "2011-01-03T05:00:00Z"
+        },
+        {
+          "directOrderName": "Todd Young",
+          "firstName": "Todd",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Young, Todd",
+          "lastName": "Young",
+          "startDate": "2023-01-04T07:35:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 416,
+        "url": "https://api.congress.gov/v3/member/y000064/sponsored-legislation"
+      },
+      "state": "Indiana",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 112,
+          "district": 9,
+          "endYear": 2013,
+          "memberType": "Representative",
+          "startYear": 2011,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 113,
+          "district": 9,
+          "endYear": 2015,
+          "memberType": "Representative",
+          "startYear": 2013,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 114,
+          "district": 9,
+          "endYear": 2017,
+          "memberType": "Representative",
+          "startYear": 2015,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "IN",
+          "stateName": "Indiana"
+        }
+      ],
+      "updateDate": "2026-03-08T10:33:08Z",
+      "fullName": "Todd Young",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "y000064",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "221 Dirksen Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-5244",
+        "zipCode": 20515
+      },
+      "bioguideId": "W000779",
+      "birthYear": "1949",
+      "cosponsoredLegislation": {
+        "count": 8501,
+        "url": "https://api.congress.gov/v3/member/w000779/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/w000779_200.jpg"
+      },
+      "directOrderName": "Ron Wyden",
+      "firstName": "Ron",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Wyden, Ron",
+      "lastName": "Wyden",
+      "officialWebsiteUrl": "https://www.wyden.senate.gov/",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 1981
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Ron Wyden",
+          "firstName": "Ron",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Wyden, Ron",
+          "lastName": "Wyden",
+          "startDate": "1981-01-03T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 1978,
+        "url": "https://api.congress.gov/v3/member/w000779/sponsored-legislation"
+      },
+      "state": "Oregon",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 97,
+          "district": 3,
+          "endYear": 1983,
+          "memberType": "Representative",
+          "startYear": 1981,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 98,
+          "district": 3,
+          "endYear": 1985,
+          "memberType": "Representative",
+          "startYear": 1983,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 99,
+          "district": 3,
+          "endYear": 1987,
+          "memberType": "Representative",
+          "startYear": 1985,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 100,
+          "district": 3,
+          "endYear": 1989,
+          "memberType": "Representative",
+          "startYear": 1987,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 101,
+          "district": 3,
+          "endYear": 1991,
+          "memberType": "Representative",
+          "startYear": 1989,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 102,
+          "district": 3,
+          "endYear": 1993,
+          "memberType": "Representative",
+          "startYear": 1991,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 103,
+          "district": 3,
+          "endYear": 1995,
+          "memberType": "Representative",
+          "startYear": 1993,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 104,
+          "district": 3,
+          "endYear": 1996,
+          "memberType": "Representative",
+          "startYear": 1995,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 104,
+          "endYear": 1997,
+          "memberType": "Senator",
+          "startYear": 1996,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 105,
+          "endYear": 1999,
+          "memberType": "Senator",
+          "startYear": 1997,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 106,
+          "endYear": 2001,
+          "memberType": "Senator",
+          "startYear": 1999,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 107,
+          "endYear": 2003,
+          "memberType": "Senator",
+          "startYear": 2001,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 108,
+          "endYear": 2005,
+          "memberType": "Senator",
+          "startYear": 2003,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 109,
+          "endYear": 2007,
+          "memberType": "Senator",
+          "startYear": 2005,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 110,
+          "endYear": 2009,
+          "memberType": "Senator",
+          "startYear": 2007,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 111,
+          "endYear": 2011,
+          "memberType": "Senator",
+          "startYear": 2009,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 112,
+          "endYear": 2013,
+          "memberType": "Senator",
+          "startYear": 2011,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 113,
+          "endYear": 2015,
+          "memberType": "Senator",
+          "startYear": 2013,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "OR",
+          "stateName": "Oregon"
+        }
+      ],
+      "updateDate": "2026-03-08T10:33:07Z",
+      "fullName": "Ron Wyden",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "w000779",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "425 Russell Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-6253",
+        "zipCode": 20515
+      },
+      "bioguideId": "W000437",
+      "birthYear": "1951",
+      "cosponsoredLegislation": {
+        "count": 4471,
+        "url": "https://api.congress.gov/v3/member/w000437/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Image courtesy of the Member",
+        "imageUrl": "https://www.congress.gov/img/member/f49ac425119375e9fe6a075762734079_200.jpg"
+      },
+      "directOrderName": "Roger F. Wicker",
+      "firstName": "Roger",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Wicker, Roger F.",
+      "lastName": "Wicker",
+      "middleName": "F.",
+      "officialWebsiteUrl": "https://www.wicker.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 1995
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Roger F. Wicker",
+          "endDate": "2023-02-03T07:34:59Z",
+          "firstName": "Roger",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Wicker, Roger F.",
+          "lastName": "Wicker",
+          "middleName": "F.",
+          "startDate": "1995-01-03T05:00:00Z"
+        },
+        {
+          "directOrderName": "Roger F. Wicker",
+          "firstName": "Roger",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Wicker, Roger F.",
+          "lastName": "Wicker",
+          "middleName": "F.",
+          "startDate": "2023-02-03T07:35:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 749,
+        "url": "https://api.congress.gov/v3/member/w000437/sponsored-legislation"
+      },
+      "state": "Mississippi",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 104,
+          "district": 1,
+          "endYear": 1997,
+          "memberType": "Representative",
+          "startYear": 1995,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 105,
+          "district": 1,
+          "endYear": 1999,
+          "memberType": "Representative",
+          "startYear": 1997,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 106,
+          "district": 1,
+          "endYear": 2001,
+          "memberType": "Representative",
+          "startYear": 1999,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 107,
+          "district": 1,
+          "endYear": 2003,
+          "memberType": "Representative",
+          "startYear": 2001,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 108,
+          "district": 1,
+          "endYear": 2005,
+          "memberType": "Representative",
+          "startYear": 2003,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 109,
+          "district": 1,
+          "endYear": 2007,
+          "memberType": "Representative",
+          "startYear": 2005,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 110,
+          "district": 1,
+          "endYear": 2007,
+          "memberType": "Representative",
+          "startYear": 2007,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 110,
+          "endYear": 2009,
+          "memberType": "Senator",
+          "startYear": 2007,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 111,
+          "endYear": 2011,
+          "memberType": "Senator",
+          "startYear": 2009,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 112,
+          "endYear": 2013,
+          "memberType": "Senator",
+          "startYear": 2011,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 113,
+          "endYear": 2015,
+          "memberType": "Senator",
+          "startYear": 2013,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "MS",
+          "stateName": "Mississippi"
+        }
+      ],
+      "updateDate": "2026-03-08T10:33:05Z",
+      "fullName": "Roger F. Wicker",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "w000437",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "530 Hart Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-2921",
+        "zipCode": 20510
+      },
+      "bioguideId": "W000802",
+      "birthYear": "1955",
+      "cosponsoredLegislation": {
+        "count": 4808,
+        "url": "https://api.congress.gov/v3/member/w000802/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/w000802_200.jpg"
+      },
+      "directOrderName": "Sheldon Whitehouse",
+      "firstName": "Sheldon",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Whitehouse, Sheldon",
+      "lastName": "Whitehouse",
+      "officialWebsiteUrl": "https://www.whitehouse.senate.gov/",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2007
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Sheldon Whitehouse",
+          "firstName": "Sheldon",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Whitehouse, Sheldon",
+          "lastName": "Whitehouse",
+          "startDate": "2007-01-04T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 745,
+        "url": "https://api.congress.gov/v3/member/w000802/sponsored-legislation"
+      },
+      "state": "Rhode Island",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 110,
+          "endYear": 2009,
+          "memberType": "Senator",
+          "startYear": 2007,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 111,
+          "endYear": 2011,
+          "memberType": "Senator",
+          "startYear": 2009,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 112,
+          "endYear": 2013,
+          "memberType": "Senator",
+          "startYear": 2011,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 113,
+          "endYear": 2015,
+          "memberType": "Senator",
+          "startYear": 2013,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "RI",
+          "stateName": "Rhode Island"
+        }
+      ],
+      "updateDate": "2026-03-08T10:33:03Z",
+      "fullName": "Sheldon Whitehouse",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "w000802",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "115 Russell Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-4242",
+        "zipCode": 20515
+      },
+      "bioguideId": "W000800",
+      "birthYear": "1947",
+      "cosponsoredLegislation": {
+        "count": 5370,
+        "url": "https://api.congress.gov/v3/member/w000800/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Official U.S. Senate Photo",
+        "imageUrl": "https://www.congress.gov/img/member/fd3cb364b8bf93c25834cff750637802_200.jpg"
+      },
+      "directOrderName": "Peter Welch",
+      "firstName": "Peter",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Welch, Peter",
+      "lastName": "Welch",
+      "officialWebsiteUrl": "https://www.welch.senate.gov/",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2007
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Peter Welch",
+          "endDate": "2023-01-04T07:34:59Z",
+          "firstName": "Peter",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Welch, Peter",
+          "lastName": "Welch",
+          "startDate": "2007-01-03T05:00:00Z"
+        },
+        {
+          "directOrderName": "Peter Welch",
+          "endDate": "2025-05-24T08:44:59Z",
+          "firstName": "Peter",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Welch, Peter",
+          "lastName": "Welch",
+          "startDate": "2023-05-10T06:35:00Z"
+        },
+        {
+          "directOrderName": "Peter Welch",
+          "endDate": "2023-05-10T06:34:59Z",
+          "firstName": "Peter",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Welch, Peter",
+          "lastName": "Welch",
+          "startDate": "2023-01-04T07:35:00Z"
+        },
+        {
+          "directOrderName": "Peter Welch",
+          "firstName": "Peter",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Welch, Peter",
+          "lastName": "Welch",
+          "startDate": "2025-05-24T08:45:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 672,
+        "url": "https://api.congress.gov/v3/member/w000800/sponsored-legislation"
+      },
+      "state": "Vermont",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 110,
+          "endYear": 2009,
+          "memberType": "Representative",
+          "startYear": 2007,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 111,
+          "endYear": 2011,
+          "memberType": "Representative",
+          "startYear": 2009,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 112,
+          "endYear": 2013,
+          "memberType": "Representative",
+          "startYear": 2011,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 113,
+          "endYear": 2015,
+          "memberType": "Representative",
+          "startYear": 2013,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Representative",
+          "startYear": 2015,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Representative",
+          "startYear": 2017,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Representative",
+          "startYear": 2019,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Representative",
+          "startYear": 2021,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "VT",
+          "stateName": "Vermont"
+        }
+      ],
+      "updateDate": "2026-03-08T10:33:01Z",
+      "fullName": "Peter Welch",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "w000800",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "311 Hart Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-4543",
+        "zipCode": 20510
+      },
+      "bioguideId": "W000817",
+      "birthYear": "1949",
+      "cosponsoredLegislation": {
+        "count": 4297,
+        "url": "https://api.congress.gov/v3/member/w000817/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/w000817_200.jpg"
+      },
+      "directOrderName": "Elizabeth Warren",
+      "firstName": "Elizabeth",
+      "honorificName": "Ms.",
+      "invertedOrderName": "Warren, Elizabeth",
+      "lastName": "Warren",
+      "middleName": "A.",
+      "officialWebsiteUrl": "https://www.warren.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2013
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Elizabeth Warren",
+          "endDate": "2025-02-19T09:44:59Z",
+          "firstName": "Elizabeth",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Warren, Elizabeth",
+          "lastName": "Warren",
+          "middleName": "A.",
+          "startDate": "2013-01-03T05:00:00Z"
+        },
+        {
+          "directOrderName": "Elizabeth Warren",
+          "firstName": "Elizabeth",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Warren, Elizabeth",
+          "lastName": "Warren",
+          "middleName": "A.",
+          "startDate": "2025-02-19T09:45:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 858,
+        "url": "https://api.congress.gov/v3/member/w000817/sponsored-legislation"
+      },
+      "state": "Massachusetts",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 113,
+          "endYear": 2015,
+          "memberType": "Senator",
+          "startYear": 2013,
+          "stateCode": "MA",
+          "stateName": "Massachusetts"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "MA",
+          "stateName": "Massachusetts"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "MA",
+          "stateName": "Massachusetts"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "MA",
+          "stateName": "Massachusetts"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "MA",
+          "stateName": "Massachusetts"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "MA",
+          "stateName": "Massachusetts"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "MA",
+          "stateName": "Massachusetts"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:59Z",
+      "fullName": "Elizabeth Warren",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "w000817",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "717 Hart Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-3643",
+        "zipCode": 20510
+      },
+      "bioguideId": "W000790",
+      "birthYear": "1969",
+      "cosponsoredLegislation": {
+        "count": 1216,
+        "url": "https://api.congress.gov/v3/member/w000790/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/w000790_200.jpg"
+      },
+      "directOrderName": "Raphael G. Warnock",
+      "firstName": "Raphael",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Warnock, Raphael G.",
+      "lastName": "Warnock",
+      "officialWebsiteUrl": "https://www.warnock.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2021
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Raphael G. Warnock",
+          "endDate": "2023-01-04T07:34:59Z",
+          "firstName": "Raphael",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Warnock, Raphael G.",
+          "lastName": "Warnock",
+          "middleName": "G.",
+          "startDate": "2021-01-20T17:00:00Z"
+        },
+        {
+          "directOrderName": "Raphael G. Warnock",
+          "endDate": "2023-04-20T06:34:59Z",
+          "firstName": "Raphael",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Warnock, Raphael G.",
+          "lastName": "Warnock",
+          "startDate": "2023-01-04T07:35:00Z"
+        },
+        {
+          "directOrderName": "Raphael G. Warnock",
+          "endDate": "2025-02-26T09:44:59Z",
+          "firstName": "Raphael",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Warnock, Raphael G.",
+          "lastName": "Warnock",
+          "startDate": "2023-04-20T06:35:00Z"
+        },
+        {
+          "directOrderName": "Raphael G. Warnock",
+          "firstName": "Raphael",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Warnock, Raphael G.",
+          "lastName": "Warnock",
+          "startDate": "2025-02-26T09:45:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 233,
+        "url": "https://api.congress.gov/v3/member/w000790/sponsored-legislation"
+      },
+      "state": "Georgia",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "GA",
+          "stateName": "Georgia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "GA",
+          "stateName": "Georgia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "GA",
+          "stateName": "Georgia"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:58Z",
+      "fullName": "Raphael G. Warnock",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "w000790",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "703 Hart Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-2023",
+        "zipCode": 20510
+      },
+      "bioguideId": "W000805",
+      "birthYear": "1954",
+      "cosponsoredLegislation": {
+        "count": 2475,
+        "url": "https://api.congress.gov/v3/member/w000805/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/w000805_200.jpg"
+      },
+      "directOrderName": "Mark R. Warner",
+      "firstName": "Mark",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Warner, Mark R.",
+      "lastName": "Warner",
+      "middleName": "R.",
+      "officialWebsiteUrl": "https://www.warner.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2009
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Mark R. Warner",
+          "firstName": "Mark",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Warner, Mark R.",
+          "lastName": "Warner",
+          "middleName": "R.",
+          "startDate": "2009-01-06T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 722,
+        "url": "https://api.congress.gov/v3/member/w000805/sponsored-legislation"
+      },
+      "state": "Virginia",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 111,
+          "endYear": 2011,
+          "memberType": "Senator",
+          "startYear": 2009,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 112,
+          "endYear": 2013,
+          "memberType": "Senator",
+          "startYear": 2011,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 113,
+          "endYear": 2015,
+          "memberType": "Senator",
+          "startYear": 2013,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "VA",
+          "stateName": "Virginia"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:56Z",
+      "fullName": "Mark R. Warner",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "w000805",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "730 Hart Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-4654",
+        "zipCode": 20515
+      },
+      "bioguideId": "V000128",
+      "birthYear": "1959",
+      "cosponsoredLegislation": {
+        "count": 6746,
+        "url": "https://api.congress.gov/v3/member/v000128/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Courtesy U.S. Senate Historical Office",
+        "imageUrl": "https://www.congress.gov/img/member/v000128_200.jpg"
+      },
+      "directOrderName": "Chris Van Hollen",
+      "firstName": "Chris",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Van Hollen, Chris",
+      "lastName": "Van Hollen",
+      "officialWebsiteUrl": "https://www.vanhollen.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2003
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Chris Van Hollen",
+          "firstName": "Chris",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Van Hollen, Chris",
+          "lastName": "Van Hollen",
+          "startDate": "2023-04-01T06:35:00Z"
+        },
+        {
+          "directOrderName": "Chris Van Hollen",
+          "endDate": "2023-04-01T06:34:59Z",
+          "firstName": "Chris",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Van Hollen, Chris",
+          "lastName": "Van Hollen",
+          "startDate": "2003-01-03T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 568,
+        "url": "https://api.congress.gov/v3/member/v000128/sponsored-legislation"
+      },
+      "state": "Maryland",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 108,
+          "district": 8,
+          "endYear": 2005,
+          "memberType": "Representative",
+          "startYear": 2003,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 109,
+          "district": 8,
+          "endYear": 2007,
+          "memberType": "Representative",
+          "startYear": 2005,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 110,
+          "district": 8,
+          "endYear": 2009,
+          "memberType": "Representative",
+          "startYear": 2007,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 111,
+          "district": 8,
+          "endYear": 2011,
+          "memberType": "Representative",
+          "startYear": 2009,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 112,
+          "district": 8,
+          "endYear": 2013,
+          "memberType": "Representative",
+          "startYear": 2011,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 113,
+          "district": 8,
+          "endYear": 2015,
+          "memberType": "Representative",
+          "startYear": 2013,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 114,
+          "district": 8,
+          "endYear": 2017,
+          "memberType": "Representative",
+          "startYear": 2015,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "MD",
+          "stateName": "Maryland"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:54Z",
+      "fullName": "Chris Van Hollen",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "v000128",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "455 Russell Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-4124",
+        "zipCode": 20510
+      },
+      "bioguideId": "T000278",
+      "birthYear": "1954",
+      "cosponsoredLegislation": {
+        "count": 637,
+        "url": "https://api.congress.gov/v3/member/t000278/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/t000278_200.jpg"
+      },
+      "directOrderName": "Tommy Tuberville",
+      "firstName": "Tommy",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Tuberville, Tommy",
+      "lastName": "Tuberville",
+      "officialWebsiteUrl": "https://www.tuberville.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 2021
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Tommy Tuberville",
+          "firstName": "Tommy",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Tuberville, Tommy",
+          "lastName": "Tuberville",
+          "startDate": "2023-04-25T06:35:00Z"
+        },
+        {
+          "directOrderName": "Tommy Tuberville",
+          "endDate": "2023-04-25T06:34:59Z",
+          "firstName": "Tommy",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Tuberville, Tommy",
+          "lastName": "Tuberville",
+          "startDate": "2021-01-03T17:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 305,
+        "url": "https://api.congress.gov/v3/member/t000278/sponsored-legislation"
+      },
+      "state": "Alabama",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "AL",
+          "stateName": "Alabama"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "AL",
+          "stateName": "Alabama"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "AL",
+          "stateName": "Alabama"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:53Z",
+      "fullName": "Tommy Tuberville",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "t000278",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "113 Dirksen Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-6342",
+        "zipCode": 20510
+      },
+      "bioguideId": "T000476",
+      "birthYear": "1960",
+      "cosponsoredLegislation": {
+        "count": 2578,
+        "url": "https://api.congress.gov/v3/member/t000476/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/t000476_200.jpg"
+      },
+      "directOrderName": "Thom Tillis",
+      "firstName": "Thomas",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Tillis, Thomas",
+      "lastName": "Tillis",
+      "middleName": "Roland",
+      "officialWebsiteUrl": "https://www.tillis.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 2015
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Thom Tillis",
+          "firstName": "Thomas",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Tillis, Thomas",
+          "lastName": "Tillis",
+          "middleName": "Roland",
+          "startDate": "2015-01-06T05:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 672,
+        "url": "https://api.congress.gov/v3/member/t000476/sponsored-legislation"
+      },
+      "state": "North Carolina",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "NC",
+          "stateName": "North Carolina"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "NC",
+          "stateName": "North Carolina"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "NC",
+          "stateName": "North Carolina"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "NC",
+          "stateName": "North Carolina"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "NC",
+          "stateName": "North Carolina"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "NC",
+          "stateName": "North Carolina"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:51Z",
+      "fullName": "Thom Tillis",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "t000476",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "511 Dirksen Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-2321",
+        "zipCode": 20515
+      },
+      "bioguideId": "T000250",
+      "birthYear": "1961",
+      "cosponsoredLegislation": {
+        "count": 2796,
+        "url": "https://api.congress.gov/v3/member/t000250/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/t000250_200.jpg"
+      },
+      "directOrderName": "John Thune",
+      "firstName": "John",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Thune, John",
+      "lastName": "Thune",
+      "leadership": [
+        {
+          "congress": 116,
+          "type": "Majority Whip"
+        },
+        {
+          "congress": 117,
+          "type": "Whip"
+        },
+        {
+          "congress": 118,
+          "type": "Whip"
+        },
+        {
+          "congress": 119,
+          "current": true,
+          "type": "Majority Leader"
+        }
+      ],
+      "officialWebsiteUrl": "https://www.thune.senate.gov/",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 1997
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "John Thune",
+          "endDate": "2023-01-04T07:34:59Z",
+          "firstName": "John",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Thune, John",
+          "lastName": "Thune",
+          "middleName": "R.",
+          "startDate": "1997-01-03T05:00:00Z"
+        },
+        {
+          "directOrderName": "John Thune",
+          "firstName": "John",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Thune, John",
+          "lastName": "Thune",
+          "startDate": "2023-01-04T07:35:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 1037,
+        "url": "https://api.congress.gov/v3/member/t000250/sponsored-legislation"
+      },
+      "state": "South Dakota",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 105,
+          "endYear": 1999,
+          "memberType": "Representative",
+          "startYear": 1997,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 106,
+          "endYear": 2001,
+          "memberType": "Representative",
+          "startYear": 1999,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 107,
+          "endYear": 2003,
+          "memberType": "Representative",
+          "startYear": 2001,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 109,
+          "endYear": 2007,
+          "memberType": "Senator",
+          "startYear": 2005,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 110,
+          "endYear": 2009,
+          "memberType": "Senator",
+          "startYear": 2007,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 111,
+          "endYear": 2011,
+          "memberType": "Senator",
+          "startYear": 2009,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 112,
+          "endYear": 2013,
+          "memberType": "Senator",
+          "startYear": 2011,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 113,
+          "endYear": 2015,
+          "memberType": "Senator",
+          "startYear": 2013,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "SD",
+          "stateName": "South Dakota"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:49Z",
+      "fullName": "John Thune",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "t000250",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "706 Hart Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-3004",
+        "zipCode": 20510
+      },
+      "bioguideId": "S001198",
+      "birthYear": "1964",
+      "cosponsoredLegislation": {
+        "count": 1764,
+        "url": "https://api.congress.gov/v3/member/s001198/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/s001198_200.jpg"
+      },
+      "directOrderName": "Dan Sullivan",
+      "firstName": "Dan",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Sullivan, Dan",
+      "lastName": "Sullivan",
+      "officialWebsiteUrl": "https://www.sullivan.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 2015
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Dan Sullivan",
+          "endDate": "2025-02-15T09:44:59Z",
+          "firstName": "Dan",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Sullivan, Dan",
+          "lastName": "Sullivan",
+          "startDate": "2015-01-06T05:00:00Z"
+        },
+        {
+          "directOrderName": "Dan Sullivan",
+          "firstName": "Dan",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Sullivan, Dan",
+          "lastName": "Sullivan",
+          "startDate": "2025-02-15T09:45:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 529,
+        "url": "https://api.congress.gov/v3/member/s001198/sponsored-legislation"
+      },
+      "state": "Alaska",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 114,
+          "endYear": 2017,
+          "memberType": "Senator",
+          "startYear": 2015,
+          "stateCode": "AK",
+          "stateName": "Alaska"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2017,
+          "stateCode": "AK",
+          "stateName": "Alaska"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "AK",
+          "stateName": "Alaska"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "AK",
+          "stateName": "Alaska"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "AK",
+          "stateName": "Alaska"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "AK",
+          "stateName": "Alaska"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:48Z",
+      "fullName": "Dan Sullivan",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "s001198",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "720 Hart Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-5641",
+        "zipCode": 20510
+      },
+      "bioguideId": "S001203",
+      "birthYear": "1958",
+      "cosponsoredLegislation": {
+        "count": 2741,
+        "url": "https://api.congress.gov/v3/member/s001203/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "<a href=\"http://www.senate.gov/artandhistory/history/common/generic/Photo_Collection_of_the_Senate_Historical_Office.htm\">Courtesy U.S. Senate Historical Office</a>",
+        "imageUrl": "https://www.congress.gov/img/member/s001203_200.jpg"
+      },
+      "directOrderName": "Tina Smith",
+      "firstName": "Tina",
+      "honorificName": "Ms.",
+      "invertedOrderName": "Smith, Tina",
+      "lastName": "Smith",
+      "officialWebsiteUrl": "https://www.smith.senate.gov",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2018
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Tina Smith",
+          "firstName": "Tina",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Smith, Tina",
+          "lastName": "Smith",
+          "startDate": "2018-01-03T00:00:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 331,
+        "url": "https://api.congress.gov/v3/member/s001203/sponsored-legislation"
+      },
+      "state": "Minnesota",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 115,
+          "endYear": 2019,
+          "memberType": "Senator",
+          "startYear": 2018,
+          "stateCode": "MN",
+          "stateName": "Minnesota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 116,
+          "endYear": 2021,
+          "memberType": "Senator",
+          "startYear": 2019,
+          "stateCode": "MN",
+          "stateName": "Minnesota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 117,
+          "endYear": 2023,
+          "memberType": "Senator",
+          "startYear": 2021,
+          "stateCode": "MN",
+          "stateName": "Minnesota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 118,
+          "endYear": 2025,
+          "memberType": "Senator",
+          "startYear": 2023,
+          "stateCode": "MN",
+          "stateName": "Minnesota"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "MN",
+          "stateName": "Minnesota"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:46Z",
+      "fullName": "Tina Smith",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "s001203",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "291 Russell Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-4822",
+        "zipCode": 20515
+      },
+      "bioguideId": "S001208",
+      "birthYear": "1976",
+      "cosponsoredLegislation": {
+        "count": 1488,
+        "url": "https://api.congress.gov/v3/member/s001208/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Image courtesy of the Member",
+        "imageUrl": "https://www.congress.gov/img/member/s001208_200.jpg"
+      },
+      "directOrderName": "Elissa Slotkin",
+      "firstName": "Elissa",
+      "honorificName": "Ms.",
+      "invertedOrderName": "Slotkin, Elissa",
+      "lastName": "Slotkin",
+      "officialWebsiteUrl": "https://www.slotkin.senate.gov/",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "D",
+          "partyName": "Democratic",
+          "startYear": 2019
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Elissa Slotkin",
+          "endDate": "2023-06-01T03:59:59Z",
+          "firstName": "Elissa",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Slotkin, Elissa",
+          "lastName": "Slotkin",
+          "startDate": "2019-01-03T05:00:00Z"
+        },
+        {
+          "directOrderName": "Elissa Slotkin",
+          "endDate": "2024-06-03T03:59:59Z",
+          "firstName": "Elissa",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Slotkin, Elissa",
+          "lastName": "Slotkin",
+          "startDate": "2023-06-01T04:00:00Z"
+        },
+        {
+          "directOrderName": "Elissa Slotkin",
+          "endDate": "2025-02-15T09:44:59Z",
+          "firstName": "Elissa",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Slotkin, Elissa",
+          "lastName": "Slotkin",
+          "startDate": "2024-06-03T04:00:00Z"
+        },
+        {
+          "directOrderName": "Elissa Slotkin",
+          "endDate": "2025-03-14T08:44:59Z",
+          "firstName": "Elissa",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Slotkin, Elissa",
+          "lastName": "Slotkin",
+          "startDate": "2025-02-15T09:45:00Z"
+        },
+        {
+          "directOrderName": "Elissa Slotkin",
+          "endDate": "2025-03-27T08:44:59Z",
+          "firstName": "Elissa",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Slotkin, Elissa",
+          "lastName": "Slotkin",
+          "startDate": "2025-03-14T08:45:00Z"
+        },
+        {
+          "directOrderName": "Elissa Slotkin",
+          "firstName": "Elissa",
+          "honorificName": "Ms.",
+          "invertedOrderName": "Slotkin, Elissa",
+          "lastName": "Slotkin",
+          "startDate": "2025-03-27T08:45:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 203,
+        "url": "https://api.congress.gov/v3/member/s001208/sponsored-legislation"
+      },
+      "state": "Michigan",
+      "terms": [
+        {
+          "chamber": "House of Representatives",
+          "congress": 116,
+          "district": 8,
+          "endYear": 2021,
+          "memberType": "Representative",
+          "startYear": 2019,
+          "stateCode": "MI",
+          "stateName": "Michigan"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 117,
+          "district": 8,
+          "endYear": 2023,
+          "memberType": "Representative",
+          "startYear": 2021,
+          "stateCode": "MI",
+          "stateName": "Michigan"
+        },
+        {
+          "chamber": "House of Representatives",
+          "congress": 118,
+          "district": 7,
+          "endYear": 2025,
+          "memberType": "Representative",
+          "startYear": 2023,
+          "stateCode": "MI",
+          "stateName": "Michigan"
+        },
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "MI",
+          "stateName": "Michigan"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:45Z",
+      "fullName": "Elissa Slotkin",
+      "party": "Democratic"
+    },
+    "request": {
+      "bioguideId": "s001208",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "member": {
+      "addressInformation": {
+        "city": "Washington",
+        "district": "DC",
+        "officeAddress": "124 Russell Senate Office Building  Washington, DC 20510",
+        "phoneNumber": "(202) 224-2644",
+        "zipCode": 20510
+      },
+      "bioguideId": "S001232",
+      "birthYear": "1985",
+      "cosponsoredLegislation": {
+        "count": 269,
+        "url": "https://api.congress.gov/v3/member/s001232/cosponsored-legislation"
+      },
+      "currentMember": true,
+      "depiction": {
+        "attribution": "Official U.S. Senate Photo",
+        "imageUrl": "https://www.congress.gov/img/member/677d8231fdb6cf36bbb6498b_200.jpg"
+      },
+      "directOrderName": "Tim Sheehy",
+      "firstName": "Tim",
+      "honorificName": "Mr.",
+      "invertedOrderName": "Sheehy, Tim",
+      "lastName": "Sheehy",
+      "officialWebsiteUrl": "https://www.sheehy.senate.gov/",
+      "partyHistory": [
+        {
+          "partyAbbreviation": "R",
+          "partyName": "Republican",
+          "startYear": 2025
+        }
+      ],
+      "previousNames": [
+        {
+          "directOrderName": "Tim Sheehy",
+          "endDate": "2025-02-15T09:44:59Z",
+          "firstName": "Tim",
+          "invertedOrderName": "Sheehy, Tim",
+          "lastName": "Sheehy",
+          "startDate": "2025-01-03T17:00:00Z"
+        },
+        {
+          "directOrderName": "Tim Sheehy",
+          "endDate": "2025-06-07T08:44:59Z",
+          "firstName": "Tim",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Sheehy, Tim",
+          "lastName": "Sheehy",
+          "startDate": "2025-02-15T09:45:00Z"
+        },
+        {
+          "directOrderName": "Tim Sheehy",
+          "firstName": "Tim",
+          "honorificName": "Mr.",
+          "invertedOrderName": "Sheehy, Tim",
+          "lastName": "Sheehy",
+          "startDate": "2025-06-07T08:45:00Z"
+        }
+      ],
+      "sponsoredLegislation": {
+        "count": 63,
+        "url": "https://api.congress.gov/v3/member/s001232/sponsored-legislation"
+      },
+      "state": "Montana",
+      "terms": [
+        {
+          "chamber": "Senate",
+          "congress": 119,
+          "memberType": "Senator",
+          "startYear": 2025,
+          "stateCode": "MT",
+          "stateName": "Montana"
+        }
+      ],
+      "updateDate": "2026-03-08T10:32:44Z",
+      "fullName": "Tim Sheehy",
+      "party": "Republican"
+    },
+    "request": {
+      "bioguideId": "s001232",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  }
+]

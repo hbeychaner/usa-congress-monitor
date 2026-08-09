@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # Makefile for local development tasks (start OpenSearch, manage deps)
 
-.PHONY: local local-down deps uv-sync uv-test help
+.PHONY: local local-down deps uv-sync uv-test worker beat help
 
 # Detect docker compose command at make-parse time (prefer `docker compose`)
 DOCKER_COMPOSE_CMD_DETECTED := $(if $(shell docker compose version >/dev/null 2>&1 && echo ok),docker compose,$(if $(shell command -v docker-compose >/dev/null 2>&1 && echo ok),docker-compose,))
@@ -27,7 +27,7 @@ ensure-docker:
 	fi; \
 	# Quick check if Docker daemon is responsive; try to start Docker on macOS
 	@if ! docker info >/dev/null 2>&1; then \
-		if [ "$(uname)" = "Darwin" ]; then \
+		if [ "$$(uname)" = "Darwin" ]; then \
 			echo "Docker daemon not running. Attempting to start Docker Desktop..."; \
 			open -a Docker || true; \
 			SECS=0; until docker info >/dev/null 2>&1 || [ $$SECS -ge 120 ]; do sleep 2; SECS=$$((SECS+2)); echo "waiting for docker... ($$SECS)s"; done; \
@@ -58,6 +58,12 @@ uv-sync:
 uv-test:
 	uv run pytest -q
 
+worker:
+	uv run celery -A cdm.workers.celery_app:celery_app worker --pool=solo --loglevel=INFO
+
+beat:
+	uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO
+
 help:
 	@printf "Available targets:\n"
 	@printf "  local       - Start local OpenSearch stack via docker-compose\n"
@@ -65,3 +71,5 @@ help:
 	@printf "  deps        - Install dependencies via pip (legacy)\n"
 	@printf "  uv-sync     - Install deps via uv into .venv (reads pyproject.toml)\n"
 	@printf "  uv-test     - Run pytest via uv run\n"
+	@printf "  worker      - Start the RabbitMQ Celery worker\n"
+	@printf "  beat        - Start the daily Celery scheduler\n"

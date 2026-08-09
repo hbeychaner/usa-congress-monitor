@@ -1,0 +1,36 @@
+[
+  {
+    "committeePrint": {
+      "jacketNumber": 48144,
+      "citation": "117-62",
+      "congress": 117,
+      "chamber": "House",
+      "title": "Section-by-Section Analysis of H.R. 4521",
+      "updateDate": "2022-08-01T21:19:33Z",
+      "committees": [
+        {
+          "systemCode": "hssy00",
+          "name": "House Science, Space, and Technology Committee",
+          "url": "https://api.congress.gov/v3/committee/house/hssy00"
+        }
+      ]
+    }
+  },
+  {
+    "committeePrint": {
+      "jacketNumber": 48501,
+      "citation": "117-89",
+      "congress": 117,
+      "chamber": "Senate",
+      "title": "Budget Views and Estimates",
+      "updateDate": "2022-09-14T10:00:00Z",
+      "committees": [
+        {
+          "systemCode": "ssbu00",
+          "name": "Senate Budget Committee",
+          "url": "https://api.congress.gov/v3/committee/senate/ssbu00"
+        }
+      ]
+    }
+  }
+]

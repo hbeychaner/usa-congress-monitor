@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 
-from src.data_collection.client import resolve_runtime_params_from_record
-from src.models.endpoint_spec import ParamLocation, ParamSpec
+from cdm.data_collection.client import resolve_runtime_params_from_record
+from cdm.models.endpoint_spec import ParamLocation, ParamSpec
 
 
 def test_runtime_params_lowercases_path_strings():

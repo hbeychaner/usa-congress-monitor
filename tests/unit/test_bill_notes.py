@@ -1,6 +1,5 @@
-import datetime
 
-from src.models.bills import Bill
+from cdm.models.bills import Bill
 
 
 def test_bill_accepts_list_shaped_notes():

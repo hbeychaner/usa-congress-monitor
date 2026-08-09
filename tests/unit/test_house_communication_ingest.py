@@ -4,7 +4,7 @@ from pathlib import Path
 
 def test_ingest_house_communication(tmp_path, monkeypatch):
     repo = Path(__file__).resolve().parents[2]
-    fixtures = repo / "tmp_ingest" / "house_communication"
+    fixtures = repo / "tests" / "fixtures" / "house_communication"
     raw_list_p = fixtures / "raw_list.json"
     raw_items_p = fixtures / "raw_items.json"
     assert raw_list_p.exists()
@@ -13,7 +13,7 @@ def test_ingest_house_communication(tmp_path, monkeypatch):
     raw_list = json.loads(raw_list_p.read_text(encoding="utf-8"))
     raw_items = json.loads(raw_items_p.read_text(encoding="utf-8"))
 
-    from congress_sdk.data_collection.client import get_client as real_get_client
+    from cdm.data_collection.client import get_client as real_get_client
 
     client = real_get_client(api_key="test")
 
@@ -57,10 +57,8 @@ def test_ingest_house_communication(tmp_path, monkeypatch):
         fetch_items=True,
         max_pages=2,
         max_items=20,
-        save_raw_items=True,
     )
-    runner.run()
+    result = runner.run()
 
-    actual = json.loads((tmp_path / "items.json").read_text(encoding="utf-8"))
+    actual = result["records"]
     assert len(actual) <= len(raw_items)
-

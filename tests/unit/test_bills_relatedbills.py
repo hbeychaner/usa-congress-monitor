@@ -1,5 +1,4 @@
-from src.models.bills import Bill
-from src.models.shared import CountUrl
+from cdm.models.shared import CountUrl
 
 
 class FakeClient:

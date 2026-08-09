@@ -1,0 +1,5502 @@
+[
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3033,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3033?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3039,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3039?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3035,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3035?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3036,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3036?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3040,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3040?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3037,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3037?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3038,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3038?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3034,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3034?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3032,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3032?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3027,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3027?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3026,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3026?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3030,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3030?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3029,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3029?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3028,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3028?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3031,
+    "updateDate": "2026-03-20T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3031?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3024,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3024?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3019,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3019?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3020,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3020?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3023,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3023?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3025,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3025?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3018,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3018?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3022,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3022?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3021,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3021?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3003,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3003?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3014,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3014?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3006,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3006?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3013,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3013?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3002,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3002?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3005,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3005?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3012,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3012?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3009,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3009?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3004,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3004?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3008,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3008?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3016,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3016?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3011,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3011?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3010,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3010?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3007,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3007?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3015,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3015?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3017,
+    "updateDate": "2026-03-19T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3017?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2988,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2988?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2987,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2987?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2997,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2997?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2993,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2993?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2995,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2995?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2986,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2986?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2984,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2984?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2990,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2990?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2999,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2999?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3000,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3000?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2991,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2991?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2998,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2998?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2994,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2994?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2996,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2996?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 3001,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/3001?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2992,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2992?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2985,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2985?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2989,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2989?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2983,
+    "updateDate": "2026-03-18T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2983?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2982,
+    "updateDate": "2026-03-18T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2982?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2981,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2981?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2980,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2980?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2970,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2970?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2949,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2949?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2969,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2969?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2976,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2976?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2974,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2974?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2971,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2971?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2972,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2972?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2977,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2977?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2978,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2978?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2979,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2979?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2975,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2975?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2973,
+    "updateDate": "2026-03-13T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2973?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2968,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2968?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2967,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2967?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2951,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2951?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2952,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2952?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2963,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2963?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2955,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2955?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2966,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2966?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2953,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2953?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2958,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2958?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2960,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2960?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2954,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2954?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2965,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2965?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2964,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2964?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2957,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2957?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2959,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2959?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2962,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2962?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2961,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2961?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2956,
+    "updateDate": "2026-03-12T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2956?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2935,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2935?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2947,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2947?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2945,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2945?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2946,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2946?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2944,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2944?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2936,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2936?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2948,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2948?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2942,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2942?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2943,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2943?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2941,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2941?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2937,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2937?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2940,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2940?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2938,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2938?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2939,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2939?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2950,
+    "updateDate": "2026-03-12T10:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2950?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2927,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2927?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2925,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2925?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2928,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2928?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2924,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2924?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2933,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2933?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2932,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2932?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2926,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2926?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2931,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2931?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2930,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2930?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2934,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2934?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2929,
+    "updateDate": "2026-03-11T10:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2929?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2923,
+    "updateDate": "2026-03-10T10:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2923?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2920,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2920?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2921,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2921?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2922,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2922?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2919,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2919?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2904,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2904?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2905,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2905?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2918,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2918?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2915,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2915?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2917,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2917?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2912,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2912?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2909,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2909?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2913,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2913?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2910,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2910?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2911,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2911?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2914,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2914?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2906,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2906?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2907,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2907?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2908,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2908?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2916,
+    "updateDate": "2026-03-06T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2916?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2903,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2903?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2888,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2888?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2894,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2894?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2889,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2889?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2897,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2897?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2890,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2890?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2891,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2891?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2893,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2893?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2892,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2892?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2896,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2896?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2898,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2898?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2902,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2902?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2895,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2895?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2901,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2901?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2899,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2899?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2900,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2900?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2875,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2875?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2880,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2880?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2873,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2873?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2881,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2881?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2883,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2883?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2884,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2884?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2876,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2876?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2874,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2874?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2887,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2887?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2878,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2878?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2877,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2877?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2886,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2886?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2885,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2885?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2879,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2879?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2882,
+    "updateDate": "2026-03-05T11:00:22Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2882?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2872,
+    "updateDate": "2026-03-05T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2872?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "PM",
+      "name": "Presidential Message"
+    },
+    "congress": 119,
+    "number": 53,
+    "updateDate": "2026-03-04T11:01:54Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pm/53?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2871,
+    "updateDate": "2026-03-04T11:01:53Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2871?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2870,
+    "updateDate": "2026-03-04T11:01:51Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2870?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2869,
+    "updateDate": "2026-03-04T11:01:48Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2869?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2868,
+    "updateDate": "2026-03-04T11:01:46Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2868?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2867,
+    "updateDate": "2026-03-04T11:01:45Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2867?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2866,
+    "updateDate": "2026-03-04T11:01:40Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2866?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2865,
+    "updateDate": "2026-03-04T11:01:37Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2865?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2864,
+    "updateDate": "2026-03-04T11:01:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2864?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2863,
+    "updateDate": "2026-03-04T11:01:12Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2863?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2862,
+    "updateDate": "2026-03-04T11:01:05Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2862?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2861,
+    "updateDate": "2026-03-04T11:01:03Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2861?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2860,
+    "updateDate": "2026-03-04T11:01:01Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2860?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2859,
+    "updateDate": "2026-03-04T11:01:00Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2859?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2858,
+    "updateDate": "2026-03-04T11:00:59Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2858?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2850,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2850?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2857,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2857?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2855,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2855?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2852,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2852?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2848,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2848?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "POM",
+      "name": "Petition or Memorial"
+    },
+    "congress": 119,
+    "number": 32,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pom/32?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "POM",
+      "name": "Petition or Memorial"
+    },
+    "congress": 119,
+    "number": 33,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pom/33?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2856,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2856?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2851,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2851?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2854,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2854?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2849,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2849?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2853,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2853?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2847,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2847?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2845,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2845?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2846,
+    "updateDate": "2026-03-03T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2846?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2839,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2839?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2837,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2837?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2836,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2836?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2838,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2838?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2841,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2841?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2840,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2840?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2835,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2835?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2842,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2842?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2833,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2833?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2843,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2843?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2834,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2834?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2844,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2844?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2831,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2831?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2832,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2832?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2829,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2829?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2830,
+    "updateDate": "2026-02-27T11:00:24Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2830?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2823,
+    "updateDate": "2026-02-27T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2823?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2826,
+    "updateDate": "2026-02-27T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2826?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2827,
+    "updateDate": "2026-02-27T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2827?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2822,
+    "updateDate": "2026-02-27T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2822?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2828,
+    "updateDate": "2026-02-27T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2828?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2825,
+    "updateDate": "2026-02-27T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2825?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2824,
+    "updateDate": "2026-02-27T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2824?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2820,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2820?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2819,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2819?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2821,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2821?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2811,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2811?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2815,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2815?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2814,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2814?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2812,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2812?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2810,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2810?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2813,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2813?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2806,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2806?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2818,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2818?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2807,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2807?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2809,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2809?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2816,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2816?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2805,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2805?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2808,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2808?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2817,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2817?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2791,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2791?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2792,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2792?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2801,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2801?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2793,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2793?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2803,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2803?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2802,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2802?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2798,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2798?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2804,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2804?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2794,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2794?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2795,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2795?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2797,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2797?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2792,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2792?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2796,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2796?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2795,
+    "updateDate": "2026-02-26T11:00:27Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2795?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2790,
+    "updateDate": "2026-02-26T11:00:26Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2790?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2786,
+    "updateDate": "2026-02-26T11:00:26Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2786?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2789,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2789?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2778,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2778?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "PM",
+      "name": "Presidential Message"
+    },
+    "congress": 119,
+    "number": 52,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pm/52?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2781,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2781?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2788,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2788?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2783,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2783?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2785,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2785?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2779,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2779?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2787,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2787?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2784,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2784?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2780,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2780?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2782,
+    "updateDate": "2026-02-25T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2782?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2776,
+    "updateDate": "2026-02-24T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2776?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2777,
+    "updateDate": "2026-02-24T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2777?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2775,
+    "updateDate": "2026-02-24T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2775?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2774,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2774?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2772,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2772?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2769,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2769?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2773,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2773?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2771,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2771?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2770,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2770?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2767,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2767?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2766,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2766?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2768,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2768?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2765,
+    "updateDate": "2026-02-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2765?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2763,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2763?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "PM",
+      "name": "Presidential Message"
+    },
+    "congress": 119,
+    "number": 49,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pm/49?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2762,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2762?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "PM",
+      "name": "Presidential Message"
+    },
+    "congress": 119,
+    "number": 50,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pm/50?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "PM",
+      "name": "Presidential Message"
+    },
+    "congress": 119,
+    "number": 51,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pm/51?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2764,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2764?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2757,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2757?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2760,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2760?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2759,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2759?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2758,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2758?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2761,
+    "updateDate": "2026-02-12T11:00:23Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2761?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2756,
+    "updateDate": "2026-02-11T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2756?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2753,
+    "updateDate": "2026-02-11T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2753?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2754,
+    "updateDate": "2026-02-11T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2754?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2755,
+    "updateDate": "2026-02-11T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2755?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2751,
+    "updateDate": "2026-02-11T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2751?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2750,
+    "updateDate": "2026-02-11T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2750?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2752,
+    "updateDate": "2026-02-11T11:00:21Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2752?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2745,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2745?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2742,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2742?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2746,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2746?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2749,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2749?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2747,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2747?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2748,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2748?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2744,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2744?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2743,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2743?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2730,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2730?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2729,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2729?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2738,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2738?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2734,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2734?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2736,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2736?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2737,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2737?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2739,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2739?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2732,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2732?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2740,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2740?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2731,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2731?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2735,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2735?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2741,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2741?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2733,
+    "updateDate": "2026-02-11T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2733?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2728,
+    "updateDate": "2026-02-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2728?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2727,
+    "updateDate": "2026-02-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2727?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2725,
+    "updateDate": "2026-02-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2725?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2726,
+    "updateDate": "2026-02-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2726?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2718,
+    "updateDate": "2026-02-10T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2718?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2720,
+    "updateDate": "2026-02-10T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2720?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2719,
+    "updateDate": "2026-02-10T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2719?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2724,
+    "updateDate": "2026-02-10T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2724?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2722,
+    "updateDate": "2026-02-10T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2722?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2723,
+    "updateDate": "2026-02-10T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2723?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2721,
+    "updateDate": "2026-02-10T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2721?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2716,
+    "updateDate": "2026-02-06T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2716?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2714,
+    "updateDate": "2026-02-06T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2714?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2717,
+    "updateDate": "2026-02-06T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2717?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2713,
+    "updateDate": "2026-02-06T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2713?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2712,
+    "updateDate": "2026-02-06T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2712?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2715,
+    "updateDate": "2026-02-06T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2715?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2697,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2697?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2691,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2691?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2694,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2694?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2695,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2695?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2696,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2696?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2692,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2692?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2693,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2693?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2704,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2704?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2703,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2703?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2705,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2705?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2707,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2707?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2706,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2706?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2698,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2698?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2700,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2700?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2699,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2699?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2702,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2702?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2708,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2708?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2710,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2710?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2709,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2709?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2711,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2711?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2701,
+    "updateDate": "2026-02-06T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2701?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2683,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2683?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2687,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2687?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2685,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2685?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2686,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2686?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2689,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2689?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2688,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2688?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2684,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2684?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2690,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2690?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "PM",
+      "name": "Presidential Message"
+    },
+    "congress": 119,
+    "number": 48,
+    "updateDate": "2026-02-05T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/pm/48?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2682,
+    "updateDate": "2026-02-05T11:15:13Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2682?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2677,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2677?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2681,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2681?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2673,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2673?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2676,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2676?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2674,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2674?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2678,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2678?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2680,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2680?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2679,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2679?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2675,
+    "updateDate": "2026-02-04T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2675?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2672,
+    "updateDate": "2026-02-04T11:00:18Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2672?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2669,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2669?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2668,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2668?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2667,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2667?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2670,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2670?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2671,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2671?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2664,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2664?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2660,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2660?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2661,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2661?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2658,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2658?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2656,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2656?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2666,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2666?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2652,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2652?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2663,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2663?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2655,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2655?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2653,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2653?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2665,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2665?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2654,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2654?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2657,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2657?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2659,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2659?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2651,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2651?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2662,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2662?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2647,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2647?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2648,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2648?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2650,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2650?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2649,
+    "updateDate": "2026-02-03T11:00:19Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2649?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2643,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2643?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2639,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2639?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2642,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2642?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2640,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2640?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2641,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2641?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2634,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2634?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2645,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2645?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2637,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2637?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2633,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2633?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2636,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2636?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2635,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2635?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2644,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2644?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2646,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2646?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2638,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2638?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2632,
+    "updateDate": "2026-01-31T11:15:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2632?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2535,
+    "updateDate": "2026-01-31T11:15:13Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2535?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2631,
+    "updateDate": "2026-01-29T11:00:16Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2631?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2630,
+    "updateDate": "2026-01-29T11:00:16Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2630?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2618,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2618?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2624,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2624?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2596,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2596?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2589,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2589?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2590,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2590?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2595,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2595?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2594,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2594?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2617,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2617?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2626,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2626?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2597,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2597?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2593,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2593?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2600,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2600?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2616,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2616?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2629,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2629?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2625,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2625?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2601,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2601?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2588,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2588?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2623,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2623?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2622,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2622?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2591,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2591?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2620,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2620?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2621,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2621?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2627,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2627?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2628,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2628?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2598,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2598?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2592,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2592?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2599,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2599?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2615,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2615?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2619,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2619?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2586,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2586?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2583,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2583?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2581,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2581?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2582,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2582?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2584,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2584?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2577,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2577?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2574,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2574?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2585,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2585?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2576,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2576?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2587,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2587?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2578,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2578?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2575,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2575?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2579,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2579?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2580,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2580?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2570,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2570?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2613,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2613?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2609,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2609?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2602,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2602?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2603,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2603?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2612,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2612?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2611,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2611?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2604,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2604?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2605,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2605?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2569,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2569?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2606,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2606?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2572,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2572?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2614,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2614?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2573,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2573?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2571,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2571?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2607,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2607?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2608,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2608?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2610,
+    "updateDate": "2026-01-29T11:00:15Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2610?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2562,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2562?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2563,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2563?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2568,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2568?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2565,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2565?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2564,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2564?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2567,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2567?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2566,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2566?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2560,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2560?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2561,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2561?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2546,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2546?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2544,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2544?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2559,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2559?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2547,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2547?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2557,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2557?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2553,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2553?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2554,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2554?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2549,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2549?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2545,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2545?format=json"
+  },
+  {
+    "chamber": "Senate",
+    "communicationType": {
+      "code": "EC",
+      "name": "Executive Communication"
+    },
+    "congress": 119,
+    "number": 2555,
+    "updateDate": "2026-01-29T11:00:14Z",
+    "url": "https://api.congress.gov/v3/senate-communication/119/ec/2555?format=json"
+  }
+]

@@ -1,4 +1,6 @@
-from src.models.other_models import DailyCongressionalRecordIssue, FullIssue, EntireIssueEntry
+from cdm.models.other_models import (
+    DailyCongressionalRecordIssue,
+)
 
 
 def test_entire_issue_part_coercion_and_build_id():
@@ -6,7 +8,11 @@ def test_entire_issue_part_coercion_and_build_id():
     payload = {
         "volumeNumber": "172",
         "issueNumber": "50",
-        "fullIssue": {"entireIssue": [{"part": "1", "type": "PDF", "url": "https://example.com/1.pdf"}]},
+        "fullIssue": {
+            "entireIssue": [
+                {"part": "1", "type": "PDF", "url": "https://example.com/1.pdf"}
+            ]
+        },
     }
 
     inst = DailyCongressionalRecordIssue.model_validate(payload)

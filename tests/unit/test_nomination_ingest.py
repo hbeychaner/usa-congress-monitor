@@ -4,7 +4,7 @@ from pathlib import Path
 
 def test_ingest_nomination(tmp_path, monkeypatch):
     repo = Path(__file__).resolve().parents[2]
-    fixtures = repo / "tmp_ingest" / "nomination"
+    fixtures = repo / "tests" / "fixtures" / "nomination"
     raw_list_p = fixtures / "raw_list.json"
     raw_items_p = fixtures / "raw_items.json"
     assert raw_list_p.exists()
@@ -13,7 +13,7 @@ def test_ingest_nomination(tmp_path, monkeypatch):
     raw_list = json.loads(raw_list_p.read_text(encoding="utf-8"))
     raw_items = json.loads(raw_items_p.read_text(encoding="utf-8"))
 
-    from congress_sdk.data_collection.client import get_client as real_get_client
+    from cdm.data_collection.client import get_client as real_get_client
 
     client = real_get_client(api_key="test")
 
@@ -53,3 +53,11 @@ def test_ingest_nomination(tmp_path, monkeypatch):
     assert isinstance(raw_list, list)
     assert isinstance(raw_items, list)
     assert len(raw_list) > 0
+
+    from cdm.models.other_models import Nomination
+
+    payload = raw_items[0]["nomination"]
+    nomination = Nomination.model_validate(payload)
+    assert nomination.build_id().startswith(
+        f"nomination:{nomination.congress}:{nomination.number}:part"
+    )

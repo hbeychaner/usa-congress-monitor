@@ -1,26 +1,252 @@
+# Congress Tracker
+
+## Worker Service
+
+The production execution path separates durable state from message delivery:
+
+| Component | Responsibility | Durable state |
+|---|---|---|
+| Celery Beat | Enqueues the daily UTC ingest window at 02:00 | SQLite job record |
+| RabbitMQ | Delivers ingest and indexing messages | Persistent broker volume |
+| Celery worker | Runs ingest and indexing tasks | SQLite job lifecycle |
+| `JobStore` | Owns idempotency, status, attempts, and errors | `JOB_DB_PATH` SQLite database |
+| `IngestRunner` | Pulls Congress.gov lists and publishes details | Redis Stream entries |
+| `RedisIndexingRunner` | Consumes, transforms, and bulk-upserts records | Redis pending-entry state |
+| OpenSearch | Serves indexed documents and aliases | OpenSearch indices |
+
+[C4 worker architecture diagram](../worker-architecture.mmd)
+
+The C4 boundary separates four kinds of state: RabbitMQ transports Celery
+messages, SQLite records job identity and lifecycle, Redis Streams are the
+durable replayable ingest handoff, and OpenSearch is the searchable projection.
+The worker task is orchestration; `IngestRunner` and `RedisIndexingRunner` own
+the domain behavior and can be tested independently of Celery.
+
+### Job lifecycle
+
+Jobs use a deterministic idempotency key derived from their kind and payload.
+The lifecycle is `queued -> running -> succeeded` or `failed`. A worker marks
+the job running before work begins and marks it succeeded only after all work,
+including child indexing jobs, has been dispatched successfully.
+
+Celery is configured with late acknowledgements and worker-loss requeue. Task
+failures use bounded exponential retry/backoff. The task functions are thin
+wrappers; ingest, transformation, validation, and checkpoint semantics remain
+in ordinary Python services so they can be tested without a broker.
+
+### Retry and failure behavior
+
+- Congress.gov request retries remain inside the API client.
+- Celery retries task-level transient failures up to `CELERY_RETRY_MAX` times.
+- Backoff is capped by `CELERY_RETRY_BACKOFF_MAX` seconds.
+- Index checkpoints advance only after `bulk_upsert()` reports no errors.
+- A failed batch is retried from its prior offset; already committed batches
+  are skipped on restart.
+- A source fingerprint resets indexing to offset zero when the durable input
+  file changes.
+
+### Daily ingestion
+
+Celery Beat schedules `schedule_daily_ingest` at 02:00 UTC. The task submits a
+two-day overlapping window ending on the current UTC date. The overlap catches
+late API updates; canonical IDs and OpenSearch upserts make the overlap
+idempotent.
+
+### Historical backfills
+
+Use the submission CLI for backfills rather than invoking worker internals:
+
+```bash
+uv run python scripts/submit_ingest.py \
+  --outdir data/full_history \
+  --resources amendment,bill \
+  --from-date 2020-01-01T00:00:00Z \
+  --to-date 2020-12-31T23:59:59Z \
+  --fetch-items \
+  --index-batch-size 500
+```
+
+The same payload produces the same job ID. Existing ingest files and indexing
+checkpoints prevent completed work from being repeated unnecessarily.
+
+Local commands:
+
+```bash
+make worker  # macOS-safe solo pool
+make beat
+```
+
+For Linux production workers, omit `--pool=solo` and choose concurrency based
+on API rate limits and OpenSearch capacity.
+
+## Setup
+
+### Prerequisites
+- Python 3.13+
+- [uv](https://docs.astral.sh/uv/) package manager
+- Docker (for local OpenSearch)
+- A [Congress.gov API key](https://api.congress.gov/sign-up/)
+
+### Install dependencies
+
+```bash
+# Install uv if you don't have it
+brew install uv
+
+# Create .venv and install all dependencies (reads pyproject.toml)
+uv sync --all-extras
+
+# Activate the virtual environment (optional — prefix commands with 'uv run' instead)
+source .venv/bin/activate
+```
+
+### Environment variables
+
+Create a `.env` file in the project root:
+
+```
+CONGRESS_API_KEY=your_key_here
+ELASTIC_API_URL=http://localhost:9200
+ELASTIC_API_KEY=...          # preferred over user/password
+ES_LOCAL_PASSWORD=...        # local dev only
+RABBITMQ_URL=amqp://guest:guest@localhost:5672/
+JOB_DB_PATH=data/jobs.sqlite3
+OPENAI_API_KEY=...           # optional — generative features
+```
+
+### Start local OpenSearch
+
+```bash
+# Requires Docker Desktop running
+cd elastic-start-local && ./start.sh
+```
+
+### Run tests
+
+```bash
+PYTHONPATH=. uv run pytest -q
+```
+
+---
+
+## Architecture
+
+```
+cdm/                    — Congress Data Model (core library)
+  ingest/               — API collection pipeline
+    resource_config.py  — Per-resource metadata (scope, date params, etc.)
+    runner.py           — Single-resource ingest (list + items, concurrent)
+    pipeline.py         — Multi-resource orchestration
+    rate_limiter.py     — Thread-safe token bucket (default 4800 req/hr)
+    checkpoint.py       — Resume state tracking
+  jobs/store.py         — SQLite job ledger and idempotency store
+  workers/              — Celery app, beat schedule, and task wrappers
+  store/                — OpenSearch integration
+    index_manager.py    — Loads opensearch_mappings.yaml, manages indices
+    opensearch.py       — Bulk upsert helpers
+    indexer.py          — Transforms records into OpenSearch documents
+    redis_indexing.py    — Redis Stream consumer and bulk indexing runner
+  links/                — Cross-index relationship resolution
+  search/               — Query helpers
+
+scripts/
+  ingest_history.py     — Full-history bulk ingest CLI (year-by-year + congress-by-congress)
+  submit_ingest.py      — Idempotent RabbitMQ/Celery job submission CLI
+  create_indices.py     — OpenSearch index creation/update CLI
+  ingest.py             — Single-resource ingest CLI
+
+documentation/
+  opensearch_mappings.yaml  — Single source of truth for all 17 OpenSearch indices
+  README.md                 — This file
+```
+
+### Ingest pipeline
+
+Resources are classified into three scopes:
+
+| Scope | Strategy | Examples |
+|---|---|---|
+| `date_window` | Chunked by year (e.g. 2020–2026) using `fromDateTime`/`toDateTime` | amendment, bill, committee, member, … |
+| `congress_scoped` | Chunked by Congress number (116–119) | house_vote, law, nomination |
+| `static` | Run once, no date filter | congress_ref, bound_congressional_record, house_requirement |
+
+Item fetches use a `ThreadPoolExecutor` (default 20 workers) governed by a
+`TokenBucket` rate limiter so the pipeline stays within the 4 800 req/hr API
+limit. Each deduplicated item is published directly to the resource's Redis
+Stream; consumer-group pending state provides crash recovery.
+
+### Full-history ingest
+
+```bash
+uv run python scripts/ingest_history.py \
+  --from-year 2020 --to-year 2026 \
+  --items \
+  --outdir data/full_history \
+  --resume \
+  --concurrency 20 \
+  --rate-limit 4800
+```
+
+The history command creates Redis-backed ingest and indexing jobs for each
+chunk. SQLite checkpoints and job records track chunk progress; records are
+not staged in local JSON or JSONL files.
+
+### OpenSearch indices
+
+17 indices defined in `documentation/opensearch_mappings.yaml`:
+
+| Index | Description |
+|---|---|
+| `legislation` | Bills and resolutions |
+| `amendment` | Floor and committee amendments |
+| `communication` | House and Senate communications |
+| `committee` | Standing, select, and joint committees |
+| `committee_meeting` | Committee meeting records |
+| `committee_print` | Committee print publications |
+| `committee_report` | Committee reports |
+| `congressional_record` | Bound and daily Congressional Record |
+| `hearing` | Congressional hearings |
+| `house_vote` | House roll-call votes |
+| `member` | Members of Congress |
+| `nomination` | Presidential nominations |
+| `treaty` | Treaties |
+| `congress_ref` | Reference anchor per Congress (116–119) |
+| `house_requirement` | Statutory reporting requirements |
+| `sponsorship` | Bridge index: member ↔ legislation |
+| `vote_position` | Bridge index: member ↔ house_vote |
+
+Create or update all indices:
+
+```bash
+uv run python scripts/create_indices.py            # create all
+uv run python scripts/create_indices.py --status   # show index stats
+uv run python scripts/create_indices.py --update   # update mappings in place
+```
+
+---
+
 # Data Structures Overview
 
 This diagram summarizes the core data models, their relationships, and the field(s) used as unique identifiers where applicable. Composite IDs are noted when a single field is not sufficient.
 
 ## Using the Client
 
-The project wraps the Congress.gov API in `CDGClient` (see src/data_collection/client.py). The client reads the API key from `CONGRESS_API_KEY` or you can pass it directly.
+The project uses the [pycongress](https://github.com/hbeychaner/pycongress) SDK which wraps the Congress.gov API via `CDGClient`. The client reads the API key from `CONGRESS_API_KEY`.
 
 ```python
-from src.data_collection.client import CDGClient
+from cdm.data_collection.client import CDGClient
 
-client = CDGClient(api_key="YOUR_API_KEY")
-response = client.get("member", params={"limit": 5})
-print(response["members"][0])
+client = CDGClient()  # reads CONGRESS_API_KEY from environment
+members = client.get_members(limit=5)
 ```
 
 ## Using Endpoint Helpers
 
-Endpoint modules live under src/data_collection/endpoints and provide convenience helpers that return parsed response dictionaries or aggregated lists.
+Endpoint modules live under cdm/data_collection/specs and provide typed endpoint specifications for parsed API responses.
 
 ```python
-from src.data_collection.client import CDGClient
-from src.data_collection.endpoints.member import get_members_list, gather_members
+from cdm.data_collection.client import CDGClient
+from cdm.data_collection.endpoints.member import get_members_list, gather_members
 
 client = CDGClient(api_key="YOUR_API_KEY")
 
@@ -31,13 +257,13 @@ page = get_members_list(client, offset=0, pageSize=250)
 members = gather_members(client)
 ```
 
-For paginated endpoints that expose list-level results, use the shared pagination helpers in src/data_collection/utils.py. They accept a page-fetcher and the response list key from `CongressDataType` in src/models/data_types.py.
+For paginated endpoints that expose list-level results, use the shared pagination helpers in cdm/data_collection/utils.py. They accept a page-fetcher and the response list key from `CongressDataType` in cdm/models/data_types.py.
 
 ```python
-from src.data_collection.client import CDGClient
-from src.data_collection.utils import gather_paginated_metadata
-from src.data_collection.data_types import CongressDataType
-from src.data_collection.endpoints.bill import get_bills_metadata
+from cdm.data_collection.client import CDGClient
+from cdm.data_collection.utils import gather_paginated_metadata
+from cdm.data_collection.data_types import CongressDataType
+from cdm.data_collection.endpoints.bill import get_bills_metadata
 
 client = CDGClient(api_key="YOUR_API_KEY")
 
@@ -51,17 +277,17 @@ all_bills = gather_paginated_metadata(
 
 ## Data Collection Orchestration
 
-Use src/data_collection/collector.py to orchestrate two-step data collection:
+Use cdm/data_collection/collector.py to orchestrate two-step data collection:
 1) fetch list-level records from paginated endpoints, and
 2) enrich each record with detail data, while saving progress for resumable runs.
 
 ```python
 from pathlib import Path
 
-from src.data_collection.client import CDGClient
-from src.data_collection.collector import collect_with_details
-from src.data_collection.data_types import CongressDataType
-from src.data_collection.endpoints.bill import get_bills_metadata
+from cdm.data_collection.client import CDGClient
+from cdm.data_collection.collector import collect_with_details
+from cdm.data_collection.data_types import CongressDataType
+from cdm.data_collection.endpoints.bill import get_bills_metadata
 
 client = CDGClient(api_key="YOUR_API_KEY")
 
@@ -94,7 +320,7 @@ checkpoint files allow the job to resume without duplicating previously collecte
 
 ## Daily Window Collector
 
-Use src/data_collection/daily_collector.py to gather all top-level list endpoints in a
+Use cdm/data_collection/daily_collector.py to gather all top-level list endpoints in a
 24-hour window, fetch detail records for each item URL, and collect member metadata
 referenced by any details. Outputs are written as JSON files grouped by endpoint name.
 

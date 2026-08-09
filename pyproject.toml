@@ -8,6 +8,7 @@ dependencies = [
     "aio-pika==9.6.1",
     "aiohttp==3.13.3",
     "bs4==0.0.2",
+    "celery>=5.4,<6",
     "chromedriver-py==134.0.6998.88",
     "dataclasses-json==0.6.7",
     "elasticsearch==9.3.0",
@@ -21,6 +22,7 @@ dependencies = [
     "streamlit_agraph==0.0.45",
     "pydantic>=2.0",
     "requests",
+    "redis>=5.0,<6",
     # Congress.gov SDK — switch to git+https://github.com/hbeychaner/pycongress.git after push
     "pycongress",
 ]
@@ -49,4 +51,4 @@ packages = ["cdm"]
 testpaths = ["tests"]
 
 [tool.uv.sources]
-pycongress = { git = "https://github.com/hbeychaner/pycongress.git" }
+pycongress = { path = "../pycongress" }

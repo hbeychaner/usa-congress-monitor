@@ -1,0 +1,1136 @@
+[
+  {
+    "amendment": {
+      "actions": {
+        "count": 6,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/2/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "54",
+        "originChamber": "House",
+        "originChamberCode": "H",
+        "title": "Congressional Gold Medal Enhancement Act of 2005",
+        "type": "HR",
+        "updateDateIncludingText": "2025-04-07",
+        "url": "https://api.congress.gov/v3/bill/109/hr/54?format=json"
+      },
+      "chamber": "House of Representatives",
+      "congress": 109,
+      "description": "Amendment changes the effective date of the bill to the date of enactment.",
+      "latestAction": {
+        "actionDate": "2005-01-26",
+        "actionTime": "11:28:22",
+        "text": "On agreeing to the Oxley amendment (A001) Agreed to by voice vote. "
+      },
+      "links": [
+        {
+          "name": "House Report 109-1",
+          "url": "https://www.congress.gov/committee-report/109th-congress/house-report/1"
+        }
+      ],
+      "number": "2",
+      "purpose": "An amendment numbered 1 printed in House Report 109-1 to change the effective date of the bill from \"after December 31, 2005\" to instead make the new limitation on the number of congressional gold medals effective on enactment of the bill.",
+      "sponsors": [
+        {
+          "bioguideId": "O000163",
+          "district": 4,
+          "firstName": "MICHAEL",
+          "fullName": "Rep. Oxley, Michael G. [R-OH-4]",
+          "lastName": "OXLEY",
+          "middleName": "G.",
+          "party": "R",
+          "state": "OH",
+          "url": "https://api.congress.gov/v3/member/O000163?format=json"
+        }
+      ],
+      "submittedDate": "2005-01-26T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/2/text?format=json"
+      },
+      "type": "HAMDT",
+      "updateDate": "2022-02-03T05:36:29Z"
+    },
+    "request": {
+      "amendmentNumber": "2",
+      "amendmentType": "hamdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/9/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "9",
+      "sponsors": [
+        {
+          "bioguideId": "C001056",
+          "firstName": "John",
+          "fullName": "Sen. Cornyn, John [R-TX]",
+          "lastName": "Cornyn",
+          "party": "R",
+          "state": "TX",
+          "url": "https://api.congress.gov/v3/member/C001056?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-09T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/9/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-08T17:29:43Z"
+    },
+    "request": {
+      "amendmentNumber": "9",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 6,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/2/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "cosponsors": {
+        "count": 8,
+        "countIncludingWithdrawnCosponsors": 8,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/2/cosponsors?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2005-02-09",
+        "links": [
+          {
+            "name": "Record Vote Number: 6",
+            "url": "https://www.senate.gov/legislative/LIS/roll_call_votes/vote1091/vote_109_1_00006.htm"
+          },
+          {
+            "name": "SA 2",
+            "url": "https://www.congress.gov/amendment/109th-congress/senate-amendment/2"
+          }
+        ],
+        "text": "Amendment SA 2 not agreed to in Senate by Yea-Nay Vote. 40 - 59. Record Vote Number: 6. "
+      },
+      "number": "2",
+      "proposedDate": "2005-02-09T05:00:00Z",
+      "purpose": "To amend the definition of class action in title 28, United States Code, to exclude class actions relating to civil rights or the payment of wages.",
+      "sponsors": [
+        {
+          "bioguideId": "K000105",
+          "firstName": "EDWARD",
+          "fullName": "Sen. Kennedy, Edward M. [D-MA]",
+          "lastName": "KENNEDY",
+          "middleName": "MOORE",
+          "party": "D",
+          "state": "MA",
+          "url": "https://api.congress.gov/v3/member/K000105?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-08T05:00:00Z",
+      "textVersions": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/2/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2025-07-02T21:34:25Z"
+    },
+    "request": {
+      "amendmentNumber": "2",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/8/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "8",
+      "sponsors": [
+        {
+          "bioguideId": "C001056",
+          "firstName": "John",
+          "fullName": "Sen. Cornyn, John [R-TX]",
+          "lastName": "Cornyn",
+          "party": "R",
+          "state": "TX",
+          "url": "https://api.congress.gov/v3/member/C001056?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-09T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/8/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-08T17:29:43Z"
+    },
+    "request": {
+      "amendmentNumber": "8",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 5,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/5/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "cosponsors": {
+        "count": 3,
+        "countIncludingWithdrawnCosponsors": 3,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/5/cosponsors?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2005-02-09",
+        "links": [
+          {
+            "name": "Record Vote Number: 5",
+            "url": "https://www.senate.gov/legislative/LIS/roll_call_votes/vote1091/vote_109_1_00005.htm"
+          },
+          {
+            "name": "SA 5",
+            "url": "https://www.congress.gov/amendment/109th-congress/senate-amendment/5"
+          }
+        ],
+        "text": "Motion to table amendment SA 5 agreed to in Senate by Yea-Nay Vote. 60 - 39. Record Vote Number: 5. "
+      },
+      "number": "5",
+      "proposedDate": "2005-02-09T05:00:00Z",
+      "purpose": "To exempt class action lawsuits brought by the attorney general of any State from the modified civil procedures required by this Act.",
+      "sponsors": [
+        {
+          "bioguideId": "P000590",
+          "firstName": "Mark",
+          "fullName": "Sen. Pryor, Mark L. [D-AR]",
+          "lastName": "Pryor",
+          "middleName": "Lunsford",
+          "party": "D",
+          "state": "AR",
+          "url": "https://api.congress.gov/v3/member/P000590?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-09T05:00:00Z",
+      "textVersions": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/5/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2025-07-02T21:34:18Z"
+    },
+    "request": {
+      "amendmentNumber": "5",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/9/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "418",
+        "originChamber": "House",
+        "originChamberCode": "H",
+        "title": "REAL ID Act of 2005",
+        "type": "HR",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/hr/418?format=json"
+      },
+      "chamber": "House of Representatives",
+      "congress": 109,
+      "description": "Amendment sought to strike section 102 entitled \"Waiver of Law Necessary for Improvement of Barriers at Border\" from the bill.",
+      "latestAction": {
+        "actionDate": "2005-02-10",
+        "actionTime": "14:02:32",
+        "links": [
+          {
+            "name": "H553",
+            "url": "https://www.congress.gov/congressional-record/volume-151/house-section/page/H553"
+          },
+          {
+            "name": "Roll no. 29",
+            "url": "https://clerk.house.gov/Votes/200529"
+          }
+        ],
+        "text": "On agreeing to the Farr amendment (A005) Failed by recorded vote: 179 - 243 (Roll no. 29). (text: CR H553)"
+      },
+      "links": [
+        {
+          "name": "House Report 109-4",
+          "url": "https://www.congress.gov/committee-report/109th-congress/house-report/4"
+        }
+      ],
+      "number": "9",
+      "purpose": "An amendment numbered 5 printed in House Report 109-4 to strike section 102 of the bill.",
+      "sponsors": [
+        {
+          "bioguideId": "F000030",
+          "district": 17,
+          "firstName": "SAM",
+          "fullName": "Rep. Farr, Sam [D-CA-17]",
+          "lastName": "FARR",
+          "party": "D",
+          "state": "CA",
+          "url": "https://api.congress.gov/v3/member/F000030?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-10T05:00:00Z",
+      "type": "HAMDT",
+      "updateDate": "2022-02-03T05:35:46Z"
+    },
+    "request": {
+      "amendmentNumber": "9",
+      "amendmentType": "hamdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/12/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "latestAction": {
+        "actionDate": "2005-02-10",
+        "links": [
+          {
+            "name": "Record Vote Number: 8",
+            "url": "https://www.senate.gov/legislative/LIS/roll_call_votes/vote1091/vote_109_1_00008.htm"
+          },
+          {
+            "name": "SA 12",
+            "url": "https://www.congress.gov/amendment/109th-congress/senate-amendment/12"
+          }
+        ],
+        "text": "Amendment SA 12 not agreed to in Senate by Yea-Nay Vote. 37 - 61. Record Vote Number: 8. "
+      },
+      "number": "12",
+      "proposedDate": "2005-02-09T05:00:00Z",
+      "purpose": "To establish time limits for action by Federal district courts on motions to remand cases that have been removed to Federal court.",
+      "sponsors": [
+        {
+          "bioguideId": "F000061",
+          "firstName": "RUSSELL",
+          "fullName": "Sen. Feingold, Russell D. [D-WI]",
+          "lastName": "FEINGOLD",
+          "middleName": "D.",
+          "party": "D",
+          "state": "WI",
+          "url": "https://api.congress.gov/v3/member/F000061?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-09T05:00:00Z",
+      "textVersions": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/12/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2025-07-02T21:34:26Z"
+    },
+    "request": {
+      "amendmentNumber": "12",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/8/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "418",
+        "originChamber": "House",
+        "originChamberCode": "H",
+        "title": "REAL ID Act of 2005",
+        "type": "HR",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/hr/418?format=json"
+      },
+      "chamber": "House of Representatives",
+      "congress": 109,
+      "description": "Amendment sought to strike section 101 entitled \"Preventing Terrorists from Obtaining Relief from Removal\" from the bill.",
+      "latestAction": {
+        "actionDate": "2005-02-10",
+        "actionTime": "13:52:07",
+        "links": [
+          {
+            "name": "H548",
+            "url": "https://www.congress.gov/congressional-record/volume-151/house-section/page/H548"
+          },
+          {
+            "name": "Roll no. 28",
+            "url": "https://clerk.house.gov/Votes/200528"
+          }
+        ],
+        "text": "On agreeing to the Nadler amendment (A004) Failed by recorded vote: 185 - 236 (Roll no. 28). (text: CR H548)"
+      },
+      "links": [
+        {
+          "name": "House Report 109-4",
+          "url": "https://www.congress.gov/committee-report/109th-congress/house-report/4"
+        }
+      ],
+      "number": "8",
+      "purpose": "An amendment numbered 4 printed in House Report 109-4 to strike section 101 and redesignate the succeeding sections of title I accordingly.",
+      "sponsors": [
+        {
+          "bioguideId": "N000002",
+          "district": 8,
+          "firstName": "JERROLD",
+          "fullName": "Rep. Nadler, Jerrold [D-NY-8]",
+          "lastName": "NADLER",
+          "party": "D",
+          "state": "NY",
+          "url": "https://api.congress.gov/v3/member/N000002?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-10T05:00:00Z",
+      "type": "HAMDT",
+      "updateDate": "2022-02-03T05:35:46Z"
+    },
+    "request": {
+      "amendmentNumber": "8",
+      "amendmentType": "hamdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 6,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/5/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "418",
+        "originChamber": "House",
+        "originChamberCode": "H",
+        "title": "REAL ID Act of 2005",
+        "type": "HR",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/hr/418?format=json"
+      },
+      "chamber": "House of Representatives",
+      "congress": 109,
+      "description": "Amendment adds language to clarify the use of delivery bonds by the Department of Homeland Security.",
+      "latestAction": {
+        "actionDate": "2005-02-10",
+        "actionTime": "12:08:49",
+        "links": [
+          {
+            "name": "H540-541",
+            "url": "https://www.congress.gov/congressional-record/volume-151/house-section/page/H540-541"
+          }
+        ],
+        "text": "On agreeing to the Sessions amendment (A001) Agreed to by voice vote. (text: CR H540-541)"
+      },
+      "links": [
+        {
+          "name": "House Report 109-4",
+          "url": "https://www.congress.gov/committee-report/109th-congress/house-report/4"
+        }
+      ],
+      "number": "5",
+      "purpose": "An amendment numbered 1 printed in House Report 109-4 to promote the goal of 100% repatriation of all aliens ordered deported by clarifying obligations under the Department of Homeland Security's existing delivery bond authority.",
+      "sponsors": [
+        {
+          "bioguideId": "S000250",
+          "district": 32,
+          "firstName": "PETE",
+          "fullName": "Rep. Sessions, Pete [R-TX-32]",
+          "lastName": "SESSIONS",
+          "party": "R",
+          "state": "TX",
+          "url": "https://api.congress.gov/v3/member/S000250?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-10T05:00:00Z",
+      "type": "HAMDT",
+      "updateDate": "2022-02-03T05:35:46Z"
+    },
+    "request": {
+      "amendmentNumber": "5",
+      "amendmentType": "hamdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/7/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "7",
+      "sponsors": [
+        {
+          "bioguideId": "C001056",
+          "firstName": "John",
+          "fullName": "Sen. Cornyn, John [R-TX]",
+          "lastName": "Cornyn",
+          "party": "R",
+          "state": "TX",
+          "url": "https://api.congress.gov/v3/member/C001056?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-09T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/7/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-08T17:29:43Z"
+    },
+    "request": {
+      "amendmentNumber": "7",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 6,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/29/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "256",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Bankruptcy Abuse Prevention and Consumer Protection Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/256?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "latestAction": {
+        "actionDate": "2005-03-02",
+        "links": [
+          {
+            "name": "Record Vote Number: 17",
+            "url": "https://www.senate.gov/legislative/LIS/roll_call_votes/vote1091/vote_109_1_00017.htm"
+          },
+          {
+            "name": "SA 29",
+            "url": "https://www.congress.gov/amendment/109th-congress/senate-amendment/29"
+          }
+        ],
+        "text": "Amendment SA 29 not agreed to in Senate by Yea-Nay Vote. 39 - 58. Record Vote Number: 17. "
+      },
+      "number": "29",
+      "proposedDate": "2005-03-02T05:00:00Z",
+      "purpose": "To provide protection for medical debt homeowners.",
+      "sponsors": [
+        {
+          "bioguideId": "K000105",
+          "firstName": "EDWARD",
+          "fullName": "Sen. Kennedy, Edward M. [D-MA]",
+          "lastName": "KENNEDY",
+          "middleName": "MOORE",
+          "party": "D",
+          "state": "MA",
+          "url": "https://api.congress.gov/v3/member/K000105?format=json"
+        }
+      ],
+      "submittedDate": "2005-03-02T05:00:00Z",
+      "textVersions": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/29/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2025-07-02T21:34:20Z"
+    },
+    "request": {
+      "amendmentNumber": "29",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/10/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "10",
+      "sponsors": [
+        {
+          "bioguideId": "C001056",
+          "firstName": "John",
+          "fullName": "Sen. Cornyn, John [R-TX]",
+          "lastName": "Cornyn",
+          "party": "R",
+          "state": "TX",
+          "url": "https://api.congress.gov/v3/member/C001056?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-09T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/10/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-08T17:29:43Z"
+    },
+    "request": {
+      "amendmentNumber": "10",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/18/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "256",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Bankruptcy Abuse Prevention and Consumer Protection Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/256?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "18",
+      "sponsors": [
+        {
+          "bioguideId": "F000062",
+          "firstName": "Dianne",
+          "fullName": "Sen. Feinstein, Dianne [D-CA]",
+          "lastName": "Feinstein",
+          "party": "D",
+          "state": "CA",
+          "url": "https://api.congress.gov/v3/member/F000062?format=json"
+        }
+      ],
+      "submittedDate": "2005-03-01T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/18/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-03T05:34:37Z"
+    },
+    "request": {
+      "amendmentNumber": "18",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/22/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "256",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Bankruptcy Abuse Prevention and Consumer Protection Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/256?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "22",
+      "sponsors": [
+        {
+          "bioguideId": "S000148",
+          "firstName": "Charles",
+          "fullName": "Sen. Schumer, Charles E. [D-NY]",
+          "lastName": "Schumer",
+          "middleName": "E.",
+          "party": "D",
+          "state": "NY",
+          "url": "https://api.congress.gov/v3/member/S000148?format=json"
+        }
+      ],
+      "submittedDate": "2005-03-01T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/22/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-03T05:34:37Z"
+    },
+    "request": {
+      "amendmentNumber": "22",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 5,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/1/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "167",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Family Entertainment and Copyright Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/167?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "cosponsors": {
+        "count": 1,
+        "countIncludingWithdrawnCosponsors": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/1/cosponsors?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2005-02-01",
+        "links": [
+          {
+            "name": "SA 1",
+            "url": "https://www.congress.gov/amendment/109th-congress/senate-amendment/1"
+          }
+        ],
+        "text": "Amendment SA 1 agreed to in Senate by Unanimous Consent. "
+      },
+      "number": "1",
+      "proposedDate": "2005-02-01T05:00:00Z",
+      "purpose": "Of a technical nature.",
+      "sponsors": [
+        {
+          "bioguideId": "L000174",
+          "firstName": "Patrick",
+          "fullName": "Sen. Leahy, Patrick J. [D-VT]",
+          "lastName": "Leahy",
+          "party": "D",
+          "state": "VT",
+          "url": "https://api.congress.gov/v3/member/L000174?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-01T05:00:00Z",
+      "textVersions": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/1/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2025-07-02T21:33:58Z"
+    },
+    "request": {
+      "amendmentNumber": "1",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/4/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "54",
+        "originChamber": "House",
+        "originChamberCode": "H",
+        "title": "Congressional Gold Medal Enhancement Act of 2005",
+        "type": "HR",
+        "updateDateIncludingText": "2025-04-07",
+        "url": "https://api.congress.gov/v3/bill/109/hr/54?format=json"
+      },
+      "chamber": "House of Representatives",
+      "congress": 109,
+      "description": "Amendment sought to provide for the equitable distribution of congressional gold medals under the bill between the majority and minority parties.",
+      "latestAction": {
+        "actionDate": "2005-01-26",
+        "actionTime": "12:26:15",
+        "links": [
+          {
+            "name": "Roll no. 11",
+            "url": "https://clerk.house.gov/Votes/200511"
+          }
+        ],
+        "text": "On agreeing to the Crowley amendment (A003) Failed by recorded vote: 182 - 211 (Roll no. 11). "
+      },
+      "links": [
+        {
+          "name": "House Report 109-1",
+          "url": "https://www.congress.gov/committee-report/109th-congress/house-report/1"
+        }
+      ],
+      "number": "4",
+      "purpose": "An amendment numbered 3 printed in House Report 109-1 to provide for an equitable distribution of gold medals under the bill between the majority party and the minority party.",
+      "sponsors": [
+        {
+          "bioguideId": "C001038",
+          "district": 7,
+          "firstName": "JOSEPH",
+          "fullName": "Rep. Crowley, Joseph [D-NY-7]",
+          "lastName": "CROWLEY",
+          "party": "D",
+          "state": "NY",
+          "url": "https://api.congress.gov/v3/member/C001038?format=json"
+        }
+      ],
+      "submittedDate": "2005-01-26T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/4/text?format=json"
+      },
+      "type": "HAMDT",
+      "updateDate": "2022-02-03T05:36:29Z"
+    },
+    "request": {
+      "amendmentNumber": "4",
+      "amendmentType": "hamdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/6/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "5",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Class Action Fairness Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/5?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "6",
+      "sponsors": [
+        {
+          "bioguideId": "C001056",
+          "firstName": "John",
+          "fullName": "Sen. Cornyn, John [R-TX]",
+          "lastName": "Cornyn",
+          "party": "R",
+          "state": "TX",
+          "url": "https://api.congress.gov/v3/member/C001056?format=json"
+        }
+      ],
+      "submittedDate": "2005-02-09T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/6/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-08T17:29:43Z"
+    },
+    "request": {
+      "amendmentNumber": "6",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/3/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "54",
+        "originChamber": "House",
+        "originChamberCode": "H",
+        "title": "Congressional Gold Medal Enhancement Act of 2005",
+        "type": "HR",
+        "updateDateIncludingText": "2025-04-07",
+        "url": "https://api.congress.gov/v3/bill/109/hr/54?format=json"
+      },
+      "chamber": "House of Representatives",
+      "congress": 109,
+      "description": "Amendment sought to increase the maximum number of congressional gold medals that Congress could award from two per calendar year to six per Congress.",
+      "latestAction": {
+        "actionDate": "2005-01-26",
+        "actionTime": "12:19:13",
+        "links": [
+          {
+            "name": "Roll no. 10",
+            "url": "https://clerk.house.gov/Votes/200510"
+          }
+        ],
+        "text": "On agreeing to the Crowley amendment (A002) Failed by recorded vote: 189 - 212 (Roll no. 10). "
+      },
+      "links": [
+        {
+          "name": "House Report 109-1",
+          "url": "https://www.congress.gov/committee-report/109th-congress/house-report/1"
+        }
+      ],
+      "number": "3",
+      "purpose": "An amendment numbered 2 printed in House Report 109-1 to increase the limit of gold medals provided for under the bill from 2 per calendar year to 6 per Congress.",
+      "sponsors": [
+        {
+          "bioguideId": "C001038",
+          "district": 7,
+          "firstName": "JOSEPH",
+          "fullName": "Rep. Crowley, Joseph [D-NY-7]",
+          "lastName": "CROWLEY",
+          "party": "D",
+          "state": "NY",
+          "url": "https://api.congress.gov/v3/member/C001038?format=json"
+        }
+      ],
+      "submittedDate": "2005-01-26T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/hamdt/3/text?format=json"
+      },
+      "type": "HAMDT",
+      "updateDate": "2022-02-03T05:36:29Z"
+    },
+    "request": {
+      "amendmentNumber": "3",
+      "amendmentType": "hamdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/27/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "256",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Bankruptcy Abuse Prevention and Consumer Protection Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/256?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "cosponsors": {
+        "count": 1,
+        "countIncludingWithdrawnCosponsors": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/27/cosponsors?format=json"
+      },
+      "number": "27",
+      "sponsors": [
+        {
+          "bioguideId": "C001040",
+          "firstName": "LINCOLN",
+          "fullName": "Sen. Chafee, Lincoln [R-RI]",
+          "lastName": "CHAFEE",
+          "middleName": "D.",
+          "party": "R",
+          "state": "RI",
+          "url": "https://api.congress.gov/v3/member/C001040?format=json"
+        }
+      ],
+      "submittedDate": "2005-03-01T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/27/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-03T05:34:38Z"
+    },
+    "request": {
+      "amendmentNumber": "27",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  },
+  {
+    "amendment": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/39/actions?format=json"
+      },
+      "amendedBill": {
+        "congress": 109,
+        "number": "256",
+        "originChamber": "Senate",
+        "originChamberCode": "S",
+        "title": "Bankruptcy Abuse Prevention and Consumer Protection Act of 2005",
+        "type": "S",
+        "updateDateIncludingText": "2025-07-21",
+        "url": "https://api.congress.gov/v3/bill/109/s/256?format=json"
+      },
+      "chamber": "Senate",
+      "congress": 109,
+      "number": "39",
+      "sponsors": [
+        {
+          "bioguideId": "K000148",
+          "firstName": "JOHN",
+          "fullName": "Sen. Kerry, John F. [D-MA]",
+          "lastName": "KERRY",
+          "middleName": "FORBES",
+          "party": "D",
+          "state": "MA",
+          "url": "https://api.congress.gov/v3/member/K000148?format=json"
+        }
+      ],
+      "submittedDate": "2005-03-02T05:00:00Z",
+      "textVersions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/amendment/109/samdt/39/text?format=json"
+      },
+      "type": "SAMDT",
+      "updateDate": "2022-02-03T05:34:37Z"
+    },
+    "request": {
+      "amendmentNumber": "39",
+      "amendmentType": "samdt",
+      "congress": "109",
+      "contentType": "application/json",
+      "format": "json"
+    }
+  }
+]

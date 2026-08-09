@@ -1,11 +1,19 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
-from src.models.bills import Amendment
-from src.models.people import Chamber
+from cdm.models.bills import Amendment
+from cdm.models.people import Chamber
 
 
 def mk(base_chamber):
-    return Amendment(congress=118, number="1", type="HAMDT", updateDate=datetime.now(), chamber=base_chamber)
+    return Amendment.model_validate(
+        {
+            "congress": 118,
+            "number": 1,
+            "type": "HAMDT",
+            "updateDate": datetime.now(UTC).isoformat(),
+            "chamber": base_chamber,
+        }
+    )
 
 
 def test_chamber_variants():

@@ -21,7 +21,8 @@ for root, dirs, files in os.walk(ROOT):
         if any(path.startswith(p) for p in skip_prefixes):
             continue
         try:
-            src = open(path, encoding="utf-8").read()
+            with open(path, encoding="utf-8") as source_file:
+                src = source_file.read()
             tree = ast.parse(src)
         except (OSError, SyntaxError, UnicodeDecodeError) as exc:
             # Skip files we cannot read or parse and report the reason.
@@ -34,7 +35,7 @@ for root, dirs, files in os.walk(ROOT):
                 if not doc:
                     results.append(
                         (
-                            path[2:] if path.startswith("./") else path,
+                            path.removeprefix("./"),
                             node.lineno,
                             type(node).__name__,
                             name,

@@ -1,10 +1,12 @@
 import json
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any, cast
 
 
 def test_ingest_amendment_produces_expected_items(tmp_path, monkeypatch):
     repo = Path(__file__).resolve().parents[2]
-    fixtures = repo / "tmp_ingest" / "amendment"
+    fixtures = repo / "tests" / "fixtures" / "amendment"
     raw_list_p = fixtures / "raw_list.json"
     raw_items_p = fixtures / "raw_items.json"
     expect_p = fixtures / "items.json"
@@ -14,10 +16,10 @@ def test_ingest_amendment_produces_expected_items(tmp_path, monkeypatch):
 
     raw_list = json.loads(raw_list_p.read_text(encoding="utf-8"))
     raw_items = json.loads(raw_items_p.read_text(encoding="utf-8"))
-    expected = json.loads(expect_p.read_text(encoding="utf-8"))
+    json.loads(expect_p.read_text(encoding="utf-8"))
 
     # Prepare a real client but replay saved responses via _request_with_backoff
-    from congress_sdk.data_collection.client import get_client as real_get_client
+    from cdm.data_collection.client import get_client as real_get_client
 
     client = real_get_client(api_key="test")
 
@@ -49,7 +51,7 @@ def test_ingest_amendment_produces_expected_items(tmp_path, monkeypatch):
             raise RuntimeError("No more canned responses available for test")
         return ResponseStub(obj)
 
-    client._request_with_backoff = _request_with_backoff
+    cast(Any, client)._request_with_backoff = _request_with_backoff
 
     # Monkeypatch the module-level get_client so IngestRunner uses our client
     monkeypatch.setattr(
@@ -65,12 +67,11 @@ def test_ingest_amendment_produces_expected_items(tmp_path, monkeypatch):
         fetch_items=True,
         max_pages=2,
         max_items=20,
-        save_raw_items=True,
     )
-    runner.run()
+    result = runner.run()
 
-    actual = json.loads((tmp_path / "items.json").read_text(encoding="utf-8"))
-    # The saved fixture `items.json` may be empty in tmp_ingest; verify
+    actual = result.get("records", [])
+    # The saved fixture `items.json` may be empty; verify
     # the ingest produced the expected number of items.
     # produced count may be <= raw_items due to deduplication
     assert len(actual) <= len(raw_items)
@@ -80,36 +81,42 @@ def test_ingest_amendment_produces_expected_items(tmp_path, monkeypatch):
         produced = actual[idx]
         raw_entry = raw_items[idx]
         # raw items may be wrapped in an 'amendment' key
-        raw_payload = (
-            raw_entry.get("amendment")
-            if isinstance(raw_entry, dict) and "amendment" in raw_entry
-            else raw_entry
+        raw_payload = cast(
+            Mapping[str, Any],
+            (
+                raw_entry.get("amendment")
+                if isinstance(raw_entry, dict) and "amendment" in raw_entry
+                else raw_entry
+            )
+            or {},
         )
 
         # congress should match and be an int
-        assert int(raw_payload.get("congress")) == int(produced.get("congress"))
+        raw_congress = raw_payload.get("congress")
+        produced_congress = produced.get("congress")
+        assert raw_congress is not None and produced_congress is not None
+        assert int(raw_congress) == int(produced_congress)
 
         # number coerced to int by model
         try:
-            raw_num = (
-                int(raw_payload.get("number"))
-                if raw_payload.get("number") is not None
-                else None
-            )
-        except Exception:
+            raw_number = raw_payload.get("number")
+            raw_num = int(raw_number) if raw_number is not None else None
+        except (KeyError, TypeError, ValueError):
             raw_num = None
         if raw_num is not None:
-            assert int(produced.get("number")) == raw_num
+            produced_number = produced.get("number")
+            assert produced_number is not None
+            assert int(produced_number) == raw_num
 
         # type should be present and normalized to lowercase in id
         raw_type = (raw_payload.get("type") or "").lower()
-        assert "id" in produced and produced["id"].startswith(
-            f"amendment:{raw_payload.get('congress')}:"
-        )
+        produced_id = produced.get("id")
+        assert isinstance(produced_id, str)
+        assert produced_id.startswith(f"amendment:{raw_congress}:")
         if raw_type:
             assert (
-                raw_type in produced.get("id")
-                or produced.get("type", "").lower() == raw_type
+                raw_type in produced_id
+                or str(produced.get("type", "")).lower() == raw_type
             )
 
         # sponsors -> produced sponsors should be a list when source has sponsors

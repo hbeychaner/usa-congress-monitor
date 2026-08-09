@@ -1,8 +1,6 @@
 from datetime import datetime
 
-import pytest
-
-from src.models.bills import BillTextResponse, BillActionsResponse
+from cdm.models.bills import BillActionsResponse, BillTextResponse
 
 
 def test_bill_text_response_parse():

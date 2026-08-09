@@ -1,0 +1,811 @@
+[
+  {
+    "committee": {
+      "history": [
+        {
+          "committeeTypeCode": "Joint",
+          "libraryOfCongressName": "Joint Economic Committee",
+          "officialName": "Joint Economic Committee",
+          "startDate": "2023-01-03T17:00:00Z",
+          "updateDate": "2026-02-24T17:47:40Z"
+        }
+      ],
+      "isCurrent": true,
+      "systemCode": "jjec00",
+      "type": "Joint",
+      "updateDate": "2026-02-24T17:51:09Z"
+    },
+    "request": {
+      "chamber": "joint",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "jjec00"
+    }
+  },
+  {
+    "committee": {
+      "history": [
+        {
+          "committeeTypeCode": "Commission or Caucus",
+          "endDate": "2023-07-01T03:59:00Z",
+          "establishingAuthority": "116 PL 136",
+          "libraryOfCongressName": "Congressional Oversight Commission",
+          "locLinkedDataId": "no2021068631",
+          "officialName": "Congressional Oversight Commission",
+          "startDate": "2020-03-27T04:00:00Z",
+          "updateDate": "2026-02-02T14:59:16Z"
+        }
+      ],
+      "isCurrent": false,
+      "systemCode": "jcov00",
+      "type": "Commission or Caucus",
+      "updateDate": "2026-02-18T18:41:09Z"
+    },
+    "request": {
+      "chamber": "joint",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "jcov00"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://oversight.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hzgo34/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Task Force",
+          "establishingAuthority": "Rules of the Committee on Oversight and Government Reform",
+          "libraryOfCongressName": "Task Force on the Declassification of Federal Secrets",
+          "officialName": "Task Force on the Declassification of Federal Secrets",
+          "startDate": "2025-01-03T17:00:00Z",
+          "updateDate": "2026-03-13T17:20:22Z"
+        }
+      ],
+      "isCurrent": true,
+      "parent": {
+        "name": "Oversight and Government Reform Committee",
+        "systemCode": "hsgo00",
+        "url": "https://api.congress.gov/v3/committee/house/hsgo00?format=json"
+      },
+      "systemCode": "hzgo34",
+      "type": "Task Force",
+      "updateDate": "2026-01-22T19:34:38Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hzgo34"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://judiciary.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hlqj00/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Select",
+          "establishingAuthority": "119 HRES 605",
+          "libraryOfCongressName": "Select Subcommittee to Investigate the Remaining Questions Surrounding January 6, 2021",
+          "officialName": "House Select Subcommittee to Investigate the Remaining Questions Surrounding January 6, 2021",
+          "startDate": "2025-09-03T16:00:00Z",
+          "updateDate": "2025-09-10T13:54:55Z"
+        }
+      ],
+      "isCurrent": true,
+      "parent": {
+        "name": "Judiciary Committee",
+        "systemCode": "hsju00",
+        "url": "https://api.congress.gov/v3/committee/house/hsju00?format=json"
+      },
+      "systemCode": "hlqj00",
+      "type": "Select",
+      "updateDate": "2025-09-10T15:55:39Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hlqj00"
+    }
+  },
+  {
+    "committee": {
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/senate/n79043125/senate-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Standing",
+          "endDate": "1946-08-02T15:59:00Z",
+          "establishingAuthority": "16 S. J. Res. 65",
+          "libraryOfCongressName": "Indian Affairs",
+          "locLinkedDataId": "n79043125",
+          "naraId": "10458433",
+          "officialName": "Committee on Indian Affairs",
+          "startDate": "1820-01-03T16:56:02Z",
+          "updateDate": "2025-07-21T17:57:30Z"
+        }
+      ],
+      "isCurrent": false,
+      "systemCode": "n79043125",
+      "type": "Standing",
+      "updateDate": "2025-06-20T19:17:19Z"
+    },
+    "request": {
+      "chamber": "senate",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "n79043125"
+    }
+  },
+  {
+    "committee": {
+      "history": [
+        {
+          "libraryOfCongressName": "Joint Economic Committee",
+          "officialName": "Joint Economic Committee",
+          "startDate": "2023-01-03T17:00:00Z",
+          "updateDate": "2025-05-19T15:22:53Z"
+        }
+      ],
+      "isCurrent": true,
+      "systemCode": "jhje00",
+      "type": "Joint",
+      "updateDate": "2025-05-16T20:39:59Z"
+    },
+    "request": {
+      "chamber": "joint",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "jhje00"
+    }
+  },
+  {
+    "committee": {
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/senate/n79043126/senate-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Standing",
+          "endDate": "1946-08-03T03:59:00Z",
+          "establishingAuthority": "71 SRES 55",
+          "libraryOfCongressName": "Territories and Insular Affairs",
+          "locLinkedDataId": "n79043126",
+          "naraId": "10513930",
+          "officialName": "Committee on Territories and Insular Affairs",
+          "startDate": "1929-06-17T04:00:00Z",
+          "superintendentDocumentNumber": "Y 4.T 27/2",
+          "updateDate": "2025-04-23T11:18:18Z"
+        },
+        {
+          "committeeTypeCode": "Standing",
+          "endDate": "1929-06-17T03:59:00Z",
+          "establishingAuthority": "67 SRES 43",
+          "libraryOfCongressName": "Territories and Insular Possessions",
+          "locLinkedDataId": "n2005035372",
+          "naraId": "10564058",
+          "officialName": "Committee on Territories and Insular Possessions",
+          "startDate": "1921-04-18T05:00:00Z",
+          "superintendentDocumentNumber": "Y 4.T 27/2",
+          "updateDate": "2025-04-23T11:25:37Z"
+        },
+        {
+          "committeeTypeCode": "Standing",
+          "endDate": "1921-04-18T04:59:00Z",
+          "establishingAuthority": "28 Senate Journal 189",
+          "libraryOfCongressName": "Territories",
+          "locLinkedDataId": "n50083199",
+          "naraId": "10564058",
+          "officialName": "Committee on Territories",
+          "startDate": "1844-03-25T04:57:00Z",
+          "superintendentDocumentNumber": "Y 4.T 27/2",
+          "updateDate": "2025-04-23T11:31:26Z"
+        }
+      ],
+      "isCurrent": false,
+      "systemCode": "n79043126",
+      "type": "Standing",
+      "updateDate": "2025-04-23T11:10:37Z"
+    },
+    "request": {
+      "chamber": "senate",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "n79043126"
+    }
+  },
+  {
+    "committee": {
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hlmh00/house-communication?format=json"
+      },
+      "history": [
+        {
+          "endDate": "2023-01-03T16:59:00Z",
+          "libraryOfCongressName": "Select Committee on the Modernization of Congress",
+          "officialName": "Select Committee on the Modernization of Congress",
+          "startDate": "2019-01-03T06:50:25Z",
+          "updateDate": "2023-01-31T20:48:16Z"
+        }
+      ],
+      "isCurrent": false,
+      "reports": {
+        "count": 11,
+        "url": "https://api.congress.gov/v3/committee/house/hlmh00/reports?format=json"
+      },
+      "systemCode": "hlmh00",
+      "type": "Select",
+      "updateDate": "2025-04-03T19:10:56Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hlmh00"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://www.banking.senate.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/senate/ssbk13/senate-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Subcommittee",
+          "libraryOfCongressName": "Digital Assets",
+          "officialName": "Subcommittee on Digital Assets",
+          "startDate": "2025-01-03T17:00:00Z",
+          "updateDate": "2025-02-19T13:11:21Z"
+        }
+      ],
+      "isCurrent": true,
+      "parent": {
+        "name": "Banking, Housing, and Urban Affairs Committee",
+        "systemCode": "ssbk00",
+        "url": "https://api.congress.gov/v3/committee/senate/ssbk00?format=json"
+      },
+      "systemCode": "ssbk13",
+      "type": "Subcommittee",
+      "updateDate": "2025-02-25T15:27:44Z"
+    },
+    "request": {
+      "chamber": "senate",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "ssbk13"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://www.cecc.gov/",
+      "history": [
+        {
+          "committeeTypeCode": "Commission or Caucus",
+          "establishingAuthority": "106 PL 286",
+          "libraryOfCongressName": "Congressional-Executive Commission on China",
+          "locLinkedDataId": "no2002054400",
+          "officialName": "Congressional-Executive Commission on China",
+          "startDate": "2000-10-10T04:00:00Z",
+          "updateDate": "2024-08-13T16:34:38Z"
+        }
+      ],
+      "isCurrent": true,
+      "systemCode": "jcpk00",
+      "type": "Commission or Caucus",
+      "updateDate": "2025-02-24T16:33:20Z"
+    },
+    "request": {
+      "chamber": "joint",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "jcpk00"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://intelligence.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hlig11/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Subcommittee",
+          "establishingAuthority": "Rules of the Permanent Select Committee on Intelligence United States House of Representatives 119th Congress",
+          "libraryOfCongressName": "Open Source",
+          "officialName": "House Intelligence (Permanent) Subcommittee on Open Source",
+          "startDate": "2025-01-03T17:00:00Z",
+          "updateDate": "2025-02-07T20:06:30Z"
+        }
+      ],
+      "isCurrent": true,
+      "parent": {
+        "name": "Intelligence (Permanent Select) Committee",
+        "systemCode": "hlig00",
+        "url": "https://api.congress.gov/v3/committee/house/hlig00?format=json"
+      },
+      "systemCode": "hlig11",
+      "type": "Subcommittee",
+      "updateDate": "2025-02-07T19:37:59Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hlig11"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://foreignaffairs.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hsfa19/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Subcommittee",
+          "establishingAuthority": "Rules of the Committee on Foreign Affairs, 119th Congress",
+          "libraryOfCongressName": "South and Central Asia",
+          "officialName": "House South and Central Asia Subcommittee",
+          "startDate": "2025-01-03T17:00:00Z",
+          "updateDate": "2025-01-23T13:43:43Z"
+        }
+      ],
+      "isCurrent": true,
+      "parent": {
+        "name": "Foreign Affairs Committee",
+        "systemCode": "hsfa00",
+        "url": "https://api.congress.gov/v3/committee/house/hsfa00?format=json"
+      },
+      "systemCode": "hsfa19",
+      "type": "Subcommittee",
+      "updateDate": "2025-01-23T13:41:12Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hsfa19"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://oversight.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hsgo33/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Subcommittee",
+          "establishingAuthority": "Rules Committee on Oversight and Government Reform, 119th Congress",
+          "libraryOfCongressName": "Federal Law Enforcement",
+          "officialName": "House Subcommittee on Federal Law Enforcement",
+          "startDate": "2025-01-03T17:00:00Z",
+          "updateDate": "2026-03-13T17:18:51Z"
+        }
+      ],
+      "isCurrent": true,
+      "parent": {
+        "name": "Oversight and Government Reform Committee",
+        "systemCode": "hsgo00",
+        "url": "https://api.congress.gov/v3/committee/house/hsgo00?format=json"
+      },
+      "systemCode": "hsgo33",
+      "type": "Subcommittee",
+      "updateDate": "2025-01-16T13:13:07Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hsgo33"
+    }
+  },
+  {
+    "committee": {
+      "bills": {
+        "count": 44,
+        "url": "https://api.congress.gov/v3/committee/house/hsgo16/bills?format=json"
+      },
+      "committeeWebsiteUrl": "https://oversight.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hsgo16/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Subcommittee",
+          "establishingAuthority": "Rules Committee on Oversight and Government Reform, 119th Congress",
+          "libraryOfCongressName": "Delivering on Government Efficiency",
+          "officialName": "House Subcommittee on Delivering on Government Efficiency",
+          "startDate": "2025-01-03T17:00:00Z",
+          "updateDate": "2026-03-13T17:22:22Z"
+        },
+        {
+          "endDate": "2002-12-31T05:00:00Z",
+          "libraryOfCongressName": "Government Efficiency, Financial Management and Intergovernmental Relations",
+          "startDate": "2001-01-01T05:00:00Z",
+          "updateDate": "2019-11-15T20:43:46Z"
+        }
+      ],
+      "isCurrent": true,
+      "parent": {
+        "name": "Oversight and Government Reform Committee",
+        "systemCode": "hsgo00",
+        "url": "https://api.congress.gov/v3/committee/house/hsgo00?format=json"
+      },
+      "systemCode": "hsgo16",
+      "type": "Standing",
+      "updateDate": "2025-01-16T12:41:04Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hsgo16"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://judiciary.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hlfd00/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Subcommittee",
+          "endDate": "2025-01-03T16:59:00Z",
+          "libraryOfCongressName": "Select Subcommittee on the Weaponization of the Federal Government",
+          "locLinkedDataId": "no2023035804",
+          "officialName": "House Select Subcommittee on the Weaponization of the Federal Government",
+          "startDate": "2023-01-03T17:00:00Z",
+          "updateDate": "2025-12-05T21:16:16Z"
+        }
+      ],
+      "isCurrent": false,
+      "parent": {
+        "name": "Judiciary Committee",
+        "systemCode": "hsju00",
+        "url": "https://api.congress.gov/v3/committee/house/hsju00?format=json"
+      },
+      "systemCode": "hlfd00",
+      "type": "Select",
+      "updateDate": "2025-01-04T11:54:09Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hlfd00"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://oversight.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/hlvc00/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Subcommittee",
+          "endDate": "2025-01-03T16:59:00Z",
+          "libraryOfCongressName": "Select Subcommittee on the Coronavirus Pandemic",
+          "locLinkedDataId": "no2023061036",
+          "officialName": "House Select Subcommittee on the Coronavirus Pandemic",
+          "startDate": "2023-01-03T17:01:00Z",
+          "updateDate": "2025-12-05T21:16:16Z"
+        },
+        {
+          "endDate": "2023-01-03T16:59:00Z",
+          "libraryOfCongressName": "Select Subcommittee on the Coronavirus Crisis",
+          "officialName": "Select Subcommittee on the Coronavirus Crisis",
+          "startDate": "2020-04-23T04:00:00Z",
+          "updateDate": "2025-02-10T21:33:36Z"
+        }
+      ],
+      "isCurrent": false,
+      "parent": {
+        "name": "Oversight and Government Reform Committee",
+        "systemCode": "hsgo00",
+        "url": "https://api.congress.gov/v3/committee/house/hsgo00?format=json"
+      },
+      "systemCode": "hlvc00",
+      "type": "Subcommittee",
+      "updateDate": "2025-01-04T11:53:18Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "hlvc00"
+    }
+  },
+  {
+    "committee": {
+      "committeeWebsiteUrl": "https://taskforce.house.gov/",
+      "communications": {
+        "count": 0,
+        "url": "https://api.congress.gov/v3/committee/house/htzt00/house-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Task Force",
+          "endDate": "2025-01-03T16:59:00Z",
+          "establishingAuthority": "118 H. Res. 1367",
+          "libraryOfCongressName": "Task Force on the Attempted Assassination of Donald J. Trump",
+          "officialName": "Task Force on the Attempted Assassination of Donald J. Trump",
+          "startDate": "2024-07-24T04:01:00Z",
+          "updateDate": "2025-12-05T21:16:16Z"
+        }
+      ],
+      "isCurrent": false,
+      "reports": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/committee/house/htzt00/reports?format=json"
+      },
+      "systemCode": "htzt00",
+      "type": "Task Force",
+      "updateDate": "2025-01-04T11:38:24Z"
+    },
+    "request": {
+      "chamber": "house",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "htzt00"
+    }
+  },
+  {
+    "committee": {
+      "bills": {
+        "count": 7578,
+        "url": "https://api.congress.gov/v3/committee/senate/ssva00/bills?format=json"
+      },
+      "committeeWebsiteUrl": "https://www.veterans.senate.gov/",
+      "communications": {
+        "count": 2006,
+        "url": "https://api.congress.gov/v3/committee/senate/ssva00/senate-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Standing",
+          "establishingAuthority": "91 HR 17654",
+          "libraryOfCongressName": "Veterans' Affairs",
+          "locLinkedDataId": "n79033063",
+          "naraId": "10532071",
+          "officialName": "Committee on Veterans' Affairs",
+          "startDate": "1970-10-26T05:00:00Z",
+          "superintendentDocumentNumber": "Y 4.V 64/4:",
+          "updateDate": "2025-01-14T17:02:09Z"
+        }
+      ],
+      "isCurrent": true,
+      "nominations": {
+        "count": 216,
+        "url": "https://api.congress.gov/v3/committee/senate/ssva00/nominations?format=json"
+      },
+      "reports": {
+        "count": 115,
+        "url": "https://api.congress.gov/v3/committee/senate/ssva00/reports?format=json"
+      },
+      "systemCode": "ssva00",
+      "type": "Standing",
+      "updateDate": "2025-01-03T20:48:25Z"
+    },
+    "request": {
+      "chamber": "senate",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "ssva00"
+    }
+  },
+  {
+    "committee": {
+      "bills": {
+        "count": 2074,
+        "url": "https://api.congress.gov/v3/committee/senate/sssb00/bills?format=json"
+      },
+      "committeeWebsiteUrl": "https://www.sbc.senate.gov/public/",
+      "communications": {
+        "count": 662,
+        "url": "https://api.congress.gov/v3/committee/senate/sssb00/senate-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Standing",
+          "establishingAuthority": "107 S Res 123",
+          "libraryOfCongressName": "Small Business and Entrepreneurship",
+          "locLinkedDataId": "no2001081659",
+          "naraId": "74579027",
+          "officialName": "Committee on Small Business and Entrepreneurship",
+          "startDate": "2001-06-29T04:00:00Z",
+          "superintendentDocumentNumber": "Y 4.SM 1/2:",
+          "updateDate": "2025-01-14T17:16:55Z"
+        },
+        {
+          "committeeTypeCode": "Standing",
+          "endDate": "2001-06-29T03:59:00Z",
+          "establishingAuthority": "97 S Res 101",
+          "libraryOfCongressName": "Small Business",
+          "locLinkedDataId": "n78084903",
+          "naraId": "10676867",
+          "officialName": "Committee on Small Business",
+          "startDate": "1981-03-25T05:00:00Z",
+          "superintendentDocumentNumber": "Y 4.SM 1/2:",
+          "updateDate": "2024-08-14T10:15:03Z"
+        },
+        {
+          "committeeTypeCode": "Select",
+          "endDate": "1981-03-24T05:00:00Z",
+          "establishingAuthority": "80 S Res 58",
+          "libraryOfCongressName": "Small Business (Select)",
+          "locLinkedDataId": "n78084904",
+          "officialName": "Select Committee on Small Business",
+          "startDate": "1950-02-20T05:00:00Z",
+          "updateDate": "2024-08-14T10:12:48Z"
+        }
+      ],
+      "isCurrent": true,
+      "nominations": {
+        "count": 60,
+        "url": "https://api.congress.gov/v3/committee/senate/sssb00/nominations?format=json"
+      },
+      "reports": {
+        "count": 101,
+        "url": "https://api.congress.gov/v3/committee/senate/sssb00/reports?format=json"
+      },
+      "subcommittees": [
+        {
+          "name": "Government Contracting and Paperwork Reduction Subcommittee",
+          "systemCode": "sssb02",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb02?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb02"
+        },
+        {
+          "name": "Innovation, Manufacturing, and Technology Subcommittee",
+          "systemCode": "sssb04",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb04?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb04"
+        },
+        {
+          "name": "Urban and Minority-Owned Business Development Subcommittee",
+          "systemCode": "sssb06",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb06?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb06"
+        },
+        {
+          "name": "Competitiveness, Capital Formation and Economic Opportunity Subcommittee",
+          "systemCode": "sssb07",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb07?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb07"
+        },
+        {
+          "name": "Advocacy and The Future of Small Business Subcommittee",
+          "systemCode": "sssb08",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb08?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb08"
+        },
+        {
+          "name": "Rural Economy and Family Farming Subcommittee",
+          "systemCode": "sssb03",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb03?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb03"
+        },
+        {
+          "name": "Small Business: Family Farm Subcommittee",
+          "systemCode": "sssb11",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb11?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb11"
+        },
+        {
+          "name": "Export Expansion and Agricultural Development Subcommittee",
+          "systemCode": "sssb01",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb01?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb01"
+        },
+        {
+          "name": "Competition and Antitrust Enforcement Subcommittee",
+          "systemCode": "sssb05",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb05?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb05"
+        },
+        {
+          "name": "Entrepreneurship and Special Problems Facing Small Business Subcommittee",
+          "systemCode": "sssb12",
+          "url": "https://api.congress.gov/v3/committee/senate/sssb12?format=json",
+          "chamber": "Standing",
+          "type": "Standing",
+          "system_code": "sssb12"
+        }
+      ],
+      "systemCode": "sssb00",
+      "type": "Standing",
+      "updateDate": "2025-01-03T20:48:25Z"
+    },
+    "request": {
+      "chamber": "senate",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "sssb00"
+    }
+  },
+  {
+    "committee": {
+      "bills": {
+        "count": 7212,
+        "url": "https://api.congress.gov/v3/committee/senate/ssra00/bills?format=json"
+      },
+      "committeeWebsiteUrl": "https://www.rules.senate.gov/",
+      "communications": {
+        "count": 782,
+        "url": "https://api.congress.gov/v3/committee/senate/ssra00/senate-communication?format=json"
+      },
+      "history": [
+        {
+          "committeeTypeCode": "Standing",
+          "establishingAuthority": "60 S 2177",
+          "libraryOfCongressName": "Rules and Administration",
+          "locLinkedDataId": "n79125216",
+          "naraId": "10678649",
+          "officialName": "Committee on Rules and Administration",
+          "startDate": "1946-08-02T04:00:00Z",
+          "superintendentDocumentNumber": "Y 4.R 86/2:",
+          "updateDate": "2025-01-14T17:21:40Z"
+        }
+      ],
+      "isCurrent": true,
+      "nominations": {
+        "count": 108,
+        "url": "https://api.congress.gov/v3/committee/senate/ssra00/nominations?format=json"
+      },
+      "reports": {
+        "count": 27,
+        "url": "https://api.congress.gov/v3/committee/senate/ssra00/reports?format=json"
+      },
+      "systemCode": "ssra00",
+      "type": "Standing",
+      "updateDate": "2025-01-03T20:48:25Z"
+    },
+    "request": {
+      "chamber": "senate",
+      "contentType": "application/json",
+      "format": "json",
+      "systemCode": "ssra00"
+    }
+  }
+]

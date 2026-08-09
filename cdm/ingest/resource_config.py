@@ -12,11 +12,11 @@ IngestRunner without the caller needing to know per-resource quirks.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Literal, Optional
+from dataclasses import dataclass
+from typing import Literal
 
 from cdm.ingest.runner import Resource
-
+from cdm.models.endpoint_spec import ParamLocation
 
 Scope = Literal["date_window", "congress_scoped", "static"]
 
@@ -27,10 +27,8 @@ class ResourceConfig:
     # How the list endpoint is scoped/filtered
     scope: Scope
     # Query param names for date filtering (None if not supported)
-    from_date_param: Optional[str] = None
-    to_date_param: Optional[str] = None
-    # Whether the list URL path requires a {congress} segment
-    requires_congress: bool = False
+    from_date_param: str | None = None
+    to_date_param: str | None = None
     # Whether this resource has no item endpoint (list phase only)
     list_only: bool = False
     # Whether to fetch items by default (False for very large resources)
@@ -38,12 +36,19 @@ class ResourceConfig:
     # Human-readable note for the CLI --help output
     notes: str = ""
 
+    @property
+    def requires_congress(self) -> bool:
+        """Whether the registered list spec requires a congress path value."""
+        if self.scope != "congress_scoped":
+            return False
+        return list_spec_requires_congress(self.resource)
+
 
 # ---------------------------------------------------------------------------
 # Catalog — one entry per Resource enum value
 # ---------------------------------------------------------------------------
 
-RESOURCE_CONFIGS: Dict[Resource, ResourceConfig] = {
+RESOURCE_CONFIGS: dict[Resource, ResourceConfig] = {
     r: c
     for r, c in [
         (
@@ -112,10 +117,9 @@ RESOURCE_CONFIGS: Dict[Resource, ResourceConfig] = {
             Resource.COMMITTEE_REPORT,
             ResourceConfig(
                 resource=Resource.COMMITTEE_REPORT,
-                scope="date_window",
-                from_date_param="fromDateTime",
-                to_date_param="toDateTime",
+                scope="static",
                 fetch_items_default=True,
+                notes="API ignores all date filter params (fromDateTime and fromDate both return full 20k count); fetch once as static",
             ),
         ),
         (
@@ -131,41 +135,36 @@ RESOURCE_CONFIGS: Dict[Resource, ResourceConfig] = {
             Resource.CRSREPORT,
             ResourceConfig(
                 resource=Resource.CRSREPORT,
-                scope="date_window",
-                from_date_param="fromDateTime",
-                to_date_param="toDateTime",
+                scope="static",
                 fetch_items_default=True,
+                notes="API ignores all date filter params (fromDateTime and fromDate both return full 13.8k count); fetch once as static",
             ),
         ),
         (
             Resource.DAILY_CONGRESSIONAL_RECORD,
             ResourceConfig(
                 resource=Resource.DAILY_CONGRESSIONAL_RECORD,
-                scope="date_window",
-                from_date_param="fromDateTime",
-                to_date_param="toDateTime",
-                # ~200 issues/year; each item is a full CR document (large payload)
+                scope="static",
                 fetch_items_default=False,
-                notes="List-only by default; use --resources daily_congressional_record --items to fetch full text",
+                notes="API ignores fromDateTime/toDateTime — always returns all 5.8k issues; fetch once as static. List-only by default (large PDF payloads per item)",
             ),
         ),
         (
             Resource.HEARING,
             ResourceConfig(
                 resource=Resource.HEARING,
-                scope="congress_scoped",
-                requires_congress=False,  # congress optional on list URL
+                scope="static",
                 fetch_items_default=True,
+                notes="API ignores fromDateTime/toDateTime — always returns full collection (35k records); fetch once as static",
             ),
         ),
         (
             Resource.HOUSE_COMMUNICATION,
             ResourceConfig(
                 resource=Resource.HOUSE_COMMUNICATION,
-                scope="date_window",
-                from_date_param="fromDateTime",
-                to_date_param="toDateTime",
+                scope="static",
                 fetch_items_default=True,
+                notes="API ignores fromDateTime/toDateTime — always returns full collection; fetch once as static",
             ),
         ),
         (
@@ -182,9 +181,8 @@ RESOURCE_CONFIGS: Dict[Resource, ResourceConfig] = {
             ResourceConfig(
                 resource=Resource.HOUSE_VOTE,
                 scope="congress_scoped",
-                requires_congress=True,
                 fetch_items_default=True,
-                notes="Requires congress number; optionally scoped by session",
+                notes="Global list; item URLs may include session details",
             ),
         ),
         (
@@ -192,7 +190,6 @@ RESOURCE_CONFIGS: Dict[Resource, ResourceConfig] = {
             ResourceConfig(
                 resource=Resource.LAW,
                 scope="congress_scoped",
-                requires_congress=True,
                 list_only=True,
                 fetch_items_default=False,
                 notes="Item endpoint returns 5xx; use bill ingest for full records",
@@ -224,10 +221,9 @@ RESOURCE_CONFIGS: Dict[Resource, ResourceConfig] = {
             Resource.SENATE_COMMUNICATION,
             ResourceConfig(
                 resource=Resource.SENATE_COMMUNICATION,
-                scope="date_window",
-                from_date_param="fromDateTime",
-                to_date_param="toDateTime",
+                scope="static",
                 fetch_items_default=True,
+                notes="API ignores fromDateTime/toDateTime — always returns full collection; fetch once as static",
             ),
         ),
         (
@@ -261,13 +257,54 @@ def get_config(resource: Resource) -> ResourceConfig:
     return RESOURCE_CONFIGS[resource]
 
 
-def date_windowed() -> List[ResourceConfig]:
-    return [c for c in RESOURCE_CONFIGS.values() if c.scope == "date_window"]
+def list_spec_requires_congress(resource: Resource) -> bool:
+    """Return whether the registered list endpoint requires a congress path value."""
+    # Importing the specs package registers every list/item spec. Keep this lazy
+    # so importing the configuration catalog does not trigger model registration.
+    import cdm.data_collection.specs  # noqa: F401
+    from cdm.data_collection.endpoint_registry import get_spec
+
+    list_spec = get_spec(f"{resource.value}_list")
+    return any(
+        param.location == ParamLocation.PATH
+        and param.name == "congress"
+        and param.required
+        for param in list_spec.param_specs
+    )
 
 
-def congress_scoped() -> List[ResourceConfig]:
-    return [c for c in RESOURCE_CONFIGS.values() if c.scope == "congress_scoped"]
+def effective_scope(config: ResourceConfig) -> Scope:
+    """Return the planning scope, correcting stale congress-scope metadata."""
+    if config.scope == "congress_scoped" and not config.requires_congress:
+        return "static"
+    return config.scope
 
 
-def static_resources() -> List[ResourceConfig]:
-    return [c for c in RESOURCE_CONFIGS.values() if c.scope == "static"]
+def validate_scope_catalog() -> None:
+    """Raise when scope metadata contradicts the configured query fields."""
+    for config in RESOURCE_CONFIGS.values():
+        has_date_params = bool(config.from_date_param or config.to_date_param)
+        if config.scope == "static" and has_date_params:
+            raise ValueError(
+                f"Static resource {config.resource.value} cannot define date parameters"
+            )
+        if config.scope == "date_window" and not (
+            config.from_date_param and config.to_date_param
+        ):
+            raise ValueError(
+                f"Date-windowed resource {config.resource.value} requires both date parameters"
+            )
+
+
+def date_windowed() -> list[ResourceConfig]:
+    return [c for c in RESOURCE_CONFIGS.values() if effective_scope(c) == "date_window"]
+
+
+def congress_scoped() -> list[ResourceConfig]:
+    return [
+        c for c in RESOURCE_CONFIGS.values() if effective_scope(c) == "congress_scoped"
+    ]
+
+
+def static_resources() -> list[ResourceConfig]:
+    return [c for c in RESOURCE_CONFIGS.values() if effective_scope(c) == "static"]

@@ -1,4 +1,4 @@
-from src.models.other_models import BoundCongressionalRecordListItem
+from cdm.models.other_models import BoundCongressionalRecordListItem
 
 
 def test_bound_record_build_id_from_date_and_url_synthesis():

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Generic ingest script (renamed from ingest_congress.py).
 
 Defaults to the Congress specs and behavior from the original script.
@@ -7,21 +6,22 @@ Defaults to the Congress specs and behavior from the original script.
 from __future__ import annotations
 
 import argparse
-import json
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from pathlib import Path
-from enum import Enum
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Iterable, Optional, List
+from enum import Enum
+from pathlib import Path
+from typing import NotRequired, TypedDict
 
 # Ensure known specs are registered (importing the package imports submodules)
-import congress_sdk.data_collection.specs  # noqa: F401
-from congress_sdk.data_collection.client import get_client
-from congress_sdk.data_collection.endpoint_registry import get_spec
-from congress_sdk.data_collection.id_utils import canonical_id
-from congress_sdk.data_collection.utils import resolve_pagination
-from congress_sdk.utils.logger import get_logger
+import cdm.data_collection.specs  # noqa: F401
+from cdm.data_collection.client import get_client
+from cdm.data_collection.endpoint_registry import get_spec
+from cdm.data_collection.id_utils import canonical_id
+from cdm.data_collection.utils import resolve_pagination
+from cdm.ingest.rate_limiter import TokenBucket
+from cdm.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -35,6 +35,14 @@ class FatalIngestError(RuntimeError):
     """
 
 
+class IngestCounts(TypedDict):
+    """Counts and records returned by an ingest run."""
+
+    list_count: int
+    item_count: int
+    records: NotRequired[list[dict]]
+
+
 def _attempt_law_fallback(
     client, meta_mapping: dict, meta, aggregated_items: list, seen_ids: set
 ) -> bool:
@@ -43,7 +51,7 @@ def _attempt_law_fallback(
     Returns True when a fallback item was successfully appended to
     `aggregated_items` (or deduplicated), otherwise False.
     """
-    from congress_sdk.data_collection.specs.bill_specs import BILL_ITEM_SPEC
+    from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 
     bill_params = client.resolve_runtime_params_from_record(
         BILL_ITEM_SPEC, meta_mapping
@@ -72,23 +80,6 @@ def _attempt_law_fallback(
     return True
 
 
-def dump_json(path: Path, obj) -> None:
-    """Serialize ``obj`` to JSON and write it to ``path``.
-
-    Non-JSON-serializable values (for example, Pydantic HttpUrl objects)
-    are coerced to strings using ``default=str`` so output remains stable
-    and human-readable.
-
-    Args:
-        path: Destination file path to write the JSON.
-        obj: The Python object to serialize (commonly a list or mapping).
-    """
-    # Use `default=str` to coerce non-JSON-serializable types (e.g., HttpUrl) to strings
-    path.write_text(
-        json.dumps(obj, indent=2, ensure_ascii=False, default=str), encoding="utf-8"
-    )
-
-
 def fetch_and_save_all(
     outdir: Path,
     resource: Resource | str = "congress",
@@ -98,7 +89,8 @@ def fetch_and_save_all(
     max_pages: int | None = None,
     congress: int | None = None,
     pause_on_error: bool = False,
-    save_raw_items: bool = False,
+    from_date: str | None = None,
+    to_date: str | None = None,
 ) -> None:
     """Compatibility wrapper that delegates work to :class:`IngestRunner`.
 
@@ -115,7 +107,8 @@ def fetch_and_save_all(
         max_pages=max_pages,
         congress=congress,
         pause_on_error=pause_on_error,
-        save_raw_items=save_raw_items,
+        from_date=from_date,
+        to_date=to_date,
     )
     runner.run()
 
@@ -163,22 +156,25 @@ _thread_local = threading.local()
 class IngestRunner:
     outdir: Path
     resource: Resource = Resource.CONGRESS
-    api_key: Optional[str] = None
+    api_key: str | None = None
     fetch_items: bool = False
-    max_items: Optional[int] = None
-    max_pages: Optional[int] = None
-    congress: Optional[int] = None
+    force_item_fetch: bool = False
+    max_items: int | None = None
+    max_pages: int | None = None
+    congress: int | None = None
     pause_on_error: bool = False
-    save_raw_items: bool = False
     # Date window for endpoints that support fromDateTime/toDateTime
-    from_date: Optional[str] = None  # ISO-8601 e.g. "2025-01-01T00:00:00Z"
-    to_date: Optional[str] = None  # ISO-8601 e.g. "2025-01-31T23:59:59Z"
+    from_date: str | None = None  # ISO-8601 e.g. "2025-01-01T00:00:00Z"
+    to_date: str | None = None  # ISO-8601 e.g. "2025-01-31T23:59:59Z"
+    from_date_param: str = "fromDateTime"
+    to_date_param: str = "toDateTime"
     # Arbitrary extra query params (e.g. {"sort": "updateDate"}) merged last
-    extra_params: Optional[dict] = None
+    extra_params: dict | None = None
     # Concurrency: number of parallel item-fetch workers (1 = serial)
     concurrency: int = 1
     # Rate limiter: if provided, each worker calls limiter.acquire() before each request
-    rate_limiter: Optional[object] = field(default=None, repr=False)
+    rate_limiter: TokenBucket | None = field(default=None, repr=False)
+    record_sink: Callable[[str, dict], None] | None = field(default=None, repr=False)
 
     def _client(self):
         """Return (or create) a per-thread SDK client."""
@@ -193,9 +189,11 @@ class IngestRunner:
         # Reuse the client stored on the current thread to avoid sharing Sessions
         cached = getattr(_thread_local, "client", None)
         cached_key = getattr(_thread_local, "client_key", None)
-        if cached is None or cached_key != key:
+        cached_factory = getattr(_thread_local, "client_factory", None)
+        if cached is None or cached_key != key or cached_factory is not get_client:
             _thread_local.client = get_client(api_key=key)
             _thread_local.client_key = key
+            _thread_local.client_factory = get_client
         return _thread_local.client
 
     def _fetch_single_item(
@@ -216,56 +214,39 @@ class IngestRunner:
             item_spec, meta_mapping
         )
 
-        if self.save_raw_items:
-            parsed_item = client.request_for_spec(item_spec, runtime_params)
-            recs = client._extract_records_from_response(item_spec, parsed_item)
-            insts = client.coerce_records(
-                client._resolve_response_model(item_spec), recs, spec=item_spec
-            )
-            if not insts:
-                raise ValueError(
-                    f"no item found for params={runtime_params}; "
-                    f"response_keys={list(parsed_item.keys())}"
-                )
-            item = insts[0]
-            # Start from the raw API dict so no fields are silently dropped by
-            # the pydantic model (e.g. witnesses, meetingDocuments, videos).
-            # Then overlay the model-dumped output so computed fields like `id`
-            # and camelCase→snake_case aliases take precedence.
-            raw_dict = recs[0] if recs else {}
-            item_data = {**raw_dict, **item.model_dump(mode="json", exclude_none=True)}
-        else:
-            item = client.fetch_one(item_spec, runtime_params)
-            item_data = item.model_dump(mode="json", exclude_none=True)
+        item = client.fetch_one(item_spec, runtime_params)
+        item_data = item.model_dump(mode="json", exclude_none=True)
 
         if not item_data.get("id"):
             try:
                 item_data["id"] = canonical_id(item)
-            except Exception:
+            except Exception:  # noqa: BLE001, S110 - ID enrichment is best effort.
                 pass
 
         if not item_data.get("referenceId"):
             try:
-                from congress_sdk.data_collection.id_utils import parse_url_to_id
+                from cdm.data_collection.id_utils import parse_url_to_id
 
                 if item_data.get("url"):
                     item_data["referenceId"] = parse_url_to_id(str(item_data["url"]))
-            except Exception:
+            except Exception:  # noqa: BLE001, S110 - reference ID enrichment is best effort.
                 pass
 
         return item_data
 
-    def run(self) -> None:
+    def run(self) -> IngestCounts:
         outdir = self.outdir
         outdir.mkdir(parents=True, exist_ok=True)
         client = self._client()
 
         list_spec = get_spec(self.resource.list_spec_name())
-        item_spec = get_spec(self.resource.item_spec_name())
+        item_spec = None
+        if self.resource != Resource.SUMMARIES:
+            item_spec = get_spec(self.resource.item_spec_name())
         # Prefer bill item endpoints for law resources to avoid known server-side
         # errors on the `/law/{congress}/{lawType}/{lawNumber}` item handler.
-        if self.resource == Resource.LAW:
-            from congress_sdk.data_collection.specs.bill_specs import BILL_ITEM_SPEC
+        if self.resource == Resource.LAW and not self.force_item_fetch:
+            from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 
             logger.info(
                 "Resource=law: preferring bill item spec to avoid /law item 5xx"
@@ -275,10 +256,8 @@ class IngestRunner:
 
         offset = 0
         limit = 250
-        all_models: List = []
-        raw_records: List[dict] = []
+        all_models: list = []
         list_model_cls = client._resolve_response_model(list_spec)
-
         base_path_params = {}
         if getattr(list_spec, "_param_map", {}) and "congress" in list_spec._param_map:
             if self.congress is None:
@@ -291,9 +270,9 @@ class IngestRunner:
         while True:
             params: dict = {"offset": offset, "limit": limit}
             if self.from_date:
-                params["fromDateTime"] = self.from_date
+                params[self.from_date_param] = self.from_date
             if self.to_date:
-                params["toDateTime"] = self.to_date
+                params[self.to_date_param] = self.to_date
             if self.extra_params:
                 params.update(self.extra_params)
             logger.info("Requesting list page: %s params=%s", list_url, params)
@@ -303,96 +282,57 @@ class IngestRunner:
             parsed = resp_obj.json()
             records = client._extract_records_from_response(list_spec, parsed)
             logger.info("Parsed response; extracted %d records", len(records))
-            raw_records.extend(records)
             if not records:
                 break
-            coerced = client.coerce_records(list_model_cls, records, spec=list_spec)
-            all_models.extend(coerced)
+            all_models.extend(
+                client.coerce_records(list_model_cls, records, spec=list_spec)
+            )
             meta = resolve_pagination(
                 parsed, records_len=len(records), offset=offset, page_size=limit
             )
-            logger.info(
-                "Pagination meta: next_offset=%s total=%s page_size=%s",
-                meta.next_offset,
-                meta.total,
-                meta.page_size,
-            )
             page_count += 1
             if self.max_pages is not None and page_count >= self.max_pages:
-                logger.info("Reached max_pages=%s; stopping pagination", self.max_pages)
                 break
             if meta.next_offset == -1 or meta.next_offset == offset:
                 break
             offset = meta.next_offset
 
-        list_data = [m.model_dump(mode="json", exclude_none=True) for m in all_models]
-        dump_json(outdir / "list.json", list_data)
-        dump_json(outdir / "raw_list.json", raw_records)
-        logger.info(
-            "Saved list (%d entries) to %s", len(list_data), outdir / "list.json"
-        )
-
         # List-only resources: LAW (item endpoint returns 5xx) and SUMMARIES
         # (no individual item endpoint exists in the API).
-        _LIST_ONLY = {Resource.LAW, Resource.SUMMARIES}
+        _LIST_ONLY = (
+            {Resource.SUMMARIES}
+            if self.force_item_fetch
+            else {
+                Resource.LAW,
+                Resource.SUMMARIES,
+            }
+        )
         if self.resource in _LIST_ONLY:
             logger.info(
                 "Resource=%s: list-only ingest; skipping item fetch",
                 self.resource.value,
             )
-            return
+            return IngestCounts(list_count=len(all_models), item_count=0, records=[])
 
         if not self.fetch_items:
-            return
+            return IngestCounts(list_count=len(all_models), item_count=0)
 
-        to_fetch_list: List = (
+        if item_spec is None:
+            raise ValueError(f"No item spec available for {self.resource.value}")
+
+        to_fetch_list: list = (
             all_models if self.max_items is None else all_models[: self.max_items]
         )
         successes = [0]  # wrapped in list for mutation in nested closure
         failures = [0]
-        aggregated_items: List[dict] = []
+        records: list[dict] = []
         seen_ids: set = set()
         write_lock = threading.Lock()
         counters_lock = threading.Lock()
         abort_event = threading.Event()  # set when a fatal error is detected
 
-        # ── incremental resume ────────────────────────────────────────────
-        items_jsonl_path = outdir / "items.jsonl"
-        already_fetched_urls: set = set()
-        if items_jsonl_path.exists():
-            for raw_line in items_jsonl_path.read_text(encoding="utf-8").splitlines():
-                raw_line = raw_line.strip()
-                if not raw_line:
-                    continue
-                try:
-                    existing = json.loads(raw_line)
-                    aggregated_items.append(existing)
-                    if existing.get("id"):
-                        seen_ids.add(existing["id"])
-                    if existing.get("url"):
-                        already_fetched_urls.add(str(existing["url"]))
-                    successes[0] += 1
-                except json.JSONDecodeError:
-                    pass
-            if already_fetched_urls:
-                logger.info(
-                    "Resume: loaded %d already-fetched items from %s",
-                    len(already_fetched_urls),
-                    items_jsonl_path,
-                )
-        items_jsonl_fh = items_jsonl_path.open("a", encoding="utf-8")
-        # ─────────────────────────────────────────────────────────────────
-
-        # Filter out already-fetched items before submitting to pool
-        pending = [
-            (idx, meta)
-            for idx, meta in enumerate(to_fetch_list, start=1)
-            if not (str(getattr(meta, "url", None) or "") in already_fetched_urls)
-        ]
+        pending = [(idx, meta) for idx, meta in enumerate(to_fetch_list, start=1)]
         total = len(to_fetch_list)
-        skipped = total - len(pending)
-        if skipped:
-            logger.info("Resume: skipping %d already-fetched items", skipped)
 
         concurrency = max(1, self.concurrency)
         logger.info(
@@ -414,17 +354,15 @@ class IngestRunner:
                         logger.debug("Skipping duplicate item id=%s", item_id)
                         return
                     seen_ids.add(item_id or "")
-                    aggregated_items.append(item_data)
-                    items_jsonl_fh.write(
-                        json.dumps(item_data, ensure_ascii=False, default=str) + "\n"
-                    )
-                    items_jsonl_fh.flush()
+                    records.append(item_data)
+                    if self.record_sink is not None:
+                        self.record_sink(self.resource.value, item_data)
                 with counters_lock:
                     successes[0] += 1
                 if successes[0] % 100 == 0:
                     logger.info(
                         "Progress: %d/%d items fetched (%d failures so far)",
-                        successes[0] + skipped,
+                        successes[0],
                         total,
                         failures[0],
                     )
@@ -440,7 +378,7 @@ class IngestRunner:
                     getattr(meta, "url", "?"),
                     exc,
                 )
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 - continue after ordinary item failures.
                 with counters_lock:
                     failures[0] += 1
                 logger.error(
@@ -454,14 +392,10 @@ class IngestRunner:
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             list(pool.map(_do_fetch, pending))
 
-        items_jsonl_fh.close()
-        dump_json(outdir / "items.json", aggregated_items)
-
         logger.info(
-            "Finished fetching items: %d succeeded, %d failed; saved to %s",
+            "Finished fetching items: %d succeeded, %d failed",
             successes[0],
             failures[0],
-            outdir / "items.json",
         )
 
         if abort_event.is_set():
@@ -469,6 +403,9 @@ class IngestRunner:
                 f"Aborted after fatal model error during {self.resource.value} item fetch. "
                 "Fix the pycongress model and re-run with --resume."
             )
+        return IngestCounts(
+            list_count=len(all_models), item_count=successes[0], records=records
+        )
 
 
 def parse_args() -> argparse.Namespace:
@@ -477,9 +414,9 @@ def parse_args() -> argparse.Namespace:
     Returns an ``argparse.Namespace`` with the standard flags used by
     ``fetch_and_save_all`` (output dir, resource, max limits, API key, etc.).
     """
-    p = argparse.ArgumentParser(description="Ingest Congress list and items to disk")
+    p = argparse.ArgumentParser(description="Ingest Congress lists and publish items")
     p.add_argument(
-        "--outdir", default="data/congress", help="Output directory to write JSON files"
+        "--outdir", default="data/congress", help="Output directory for run metadata"
     )
     p.add_argument(
         "--resource",
@@ -515,11 +452,6 @@ def parse_args() -> argparse.Namespace:
         help="Pause and dump partial items when an item fetch raises an exception",
     )
     p.add_argument(
-        "--save-raw",
-        action="store_true",
-        help="Also save raw per-item API JSON to raw_items.json",
-    )
-    p.add_argument(
         "--from-date",
         default=None,
         help="fromDateTime filter (ISO-8601, e.g. 2025-01-01 or 2025-01-01T00:00:00Z)",
@@ -549,7 +481,6 @@ def main() -> None:
         max_pages=args.max_pages,
         congress=args.congress,
         pause_on_error=args.pause_on_error,
-        save_raw_items=args.save_raw,
         from_date=args.from_date,
         to_date=args.to_date,
     )

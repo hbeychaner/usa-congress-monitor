@@ -1,4 +1,4 @@
-from src.models.other_models import BoundCongressionalRecordListItem
+from cdm.models.other_models import BoundCongressionalRecordListItem
 
 
 def test_sections_dailyDigest_and_url_and_build_id():
@@ -19,7 +19,9 @@ def test_sections_dailyDigest_and_url_and_build_id():
     expected_daily = sample["dailyDigest"].copy()
     # also shallow-copy inner text entries to avoid in-place mutation
     if isinstance(expected_daily.get("text"), list):
-        expected_daily["text"] = [t.copy() if isinstance(t, dict) else t for t in expected_daily["text"]]
+        expected_daily["text"] = [
+            t.copy() if isinstance(t, dict) else t for t in expected_daily["text"]
+        ]
 
     m = BoundCongressionalRecordListItem.model_validate(sample)
 

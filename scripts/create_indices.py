@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """CLI: create or update OpenSearch indices from opensearch_mappings.yaml.
 
 Usage

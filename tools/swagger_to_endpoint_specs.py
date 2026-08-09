@@ -10,22 +10,21 @@ heuristics (looks for 'offset'/'limit' or 'page'/'pageSize' params).
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-from src.models.endpoint_spec import (
+from cdm.models.endpoint_spec import (
     EndpointSpec,
-    ParamSpec,
-    SchemaSpec,
     PaginationSpec,
     PaginationType,
+    ParamSpec,
+    SchemaSpec,
 )
-
 
 SWAGGER_PATH = Path("documentation/original/swagger.json")
 OUT_PATH = Path("documentation/generated_endpoint_specs.json")
 
 
-def schema_from_param(p: Dict[str, Any]) -> Dict[str, Any]:
+def schema_from_param(p: dict[str, Any]) -> dict[str, Any]:
     """Extract a minimal schema dict from an OpenAPI parameter object.
 
     Returns a mapping compatible with :class:`SchemaSpec` constructor.
@@ -57,7 +56,7 @@ def convert():
         raise SystemExit(f"Swagger file not found at {SWAGGER_PATH}")
     root = json.loads(SWAGGER_PATH.read_text())
     paths = root.get("paths", {})
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for path, methods in paths.items():
         for method, op in methods.items():
             m = method.upper()

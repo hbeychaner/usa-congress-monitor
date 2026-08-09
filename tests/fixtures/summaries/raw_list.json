@@ -1,0 +1,42 @@
+[
+  {
+    "bill": {
+      "congress": 117,
+      "type": "HR",
+      "originChamber": "House",
+      "originChamberCode": "H",
+      "number": "8432",
+      "url": "https://api.congress.gov/v3/bill/117/hr/8432",
+      "title": "Beagle Brigade Act of 2022",
+      "updateDateIncludingText": "2022-09-29T07:15:39Z"
+    },
+    "text": "<p><strong>Beagle Brigade Act of 2022</strong></p>",
+    "actionDate": "2022-05-16",
+    "updateDate": "2022-08-18T17:00:44Z",
+    "currentChamber": "House",
+    "currentChamberCode": "H",
+    "actionDesc": "Introduced in House",
+    "versionCode": "00",
+    "lastSummaryUpdateDate": "2022-08-18T16:46:01Z"
+  },
+  {
+    "bill": {
+      "congress": 117,
+      "type": "S",
+      "originChamber": "Senate",
+      "originChamberCode": "S",
+      "number": "4073",
+      "url": "https://api.congress.gov/v3/bill/117/s/4073",
+      "title": "Inflation Reduction Act of 2022",
+      "updateDateIncludingText": "2022-09-15T12:00:00Z"
+    },
+    "text": "<p><strong>Inflation Reduction Act of 2022</strong></p>",
+    "actionDate": "2022-07-27",
+    "updateDate": "2022-08-16T20:00:00Z",
+    "currentChamber": "Senate",
+    "currentChamberCode": "S",
+    "actionDesc": "Passed Senate",
+    "versionCode": "55",
+    "lastSummaryUpdateDate": "2022-08-16T20:00:00Z"
+  }
+]

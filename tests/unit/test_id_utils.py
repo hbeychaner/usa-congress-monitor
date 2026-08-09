@@ -1,5 +1,6 @@
 import json
-from src.data_collection.id_utils import canonical_id, parse_url_to_id
+
+from cdm.data_collection.id_utils import canonical_id, parse_url_to_id
 
 
 def test_parse_url_to_id():
@@ -8,7 +9,7 @@ def test_parse_url_to_id():
 
 
 def test_canonical_id_from_bill_item():
-    with open("data/bills_ingest2/items.json") as f:
+    with open("tests/fixtures/bills_ingest2/items.json") as f:
         items = json.load(f)
     assert len(items) > 0
     first = items[0]
@@ -25,7 +26,7 @@ def test_canonical_id_amendment_like():
     # amendment fallback path should produce amendment:... id
     cid = canonical_id(rec)
     # allow either amendment: or bill: (some records normalize to bill composite)
-    assert cid.startswith("amendment:110:") or cid.startswith("bill:110:")
+    assert cid.startswith(("amendment:110:", "bill:110:"))
 
 
 def test_canonical_id_fallback_record():

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import pytest
-from pydantic import BaseModel
 import json
 from pathlib import Path
 
-from src.data_collection.client import CDGClient
-from src.models.endpoint_spec import EndpointSpec
+import pytest
+from pydantic import BaseModel
+
+from cdm.data_collection.client import CDGClient
+from cdm.models.endpoint_spec import EndpointSpec
 
 
 class DummyModel(BaseModel):
@@ -47,7 +48,9 @@ def test_resolve_response_model_string():
     c = CDGClient(api_key="")
     spec = EndpointSpec(name="x", path_template="/v3/x", param_specs=[])
     # assign a dotted-path string form to exercise string resolution path
-    setattr(spec, "response_model", f"{DummyModel.__module__}.{DummyModel.__name__}")
+    object.__setattr__(
+        spec, "response_model", f"{DummyModel.__module__}.{DummyModel.__name__}"
+    )
     cls = c._resolve_response_model(spec)
     assert cls is DummyModel
 
@@ -93,8 +96,7 @@ def test_iterate_pages_single_shot(monkeypatch):
 
     # call the client's request_for_spec path through iterate_pages single-shot
     itr = c.iterate_pages(spec, base_params={})
-    items, resp_json, meta = next(itr)
+    items, resp_json, _meta = next(itr)
     assert isinstance(resp_json, dict)
     assert isinstance(items, list)
     assert len(items) == len(sample.get("congresses", []))
-    

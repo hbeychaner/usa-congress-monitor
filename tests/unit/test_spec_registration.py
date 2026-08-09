@@ -1,15 +1,13 @@
-import pytest
 
-import src.data_collection.specs  # registers specs
-from src.data_collection.endpoint_registry import all_specs
-from src.data_collection.client import get_client
+from cdm.data_collection.client import get_client
+from cdm.data_collection.endpoint_registry import all_specs
 
 
 def test_registered_specs_resolve_models():
     client = get_client()
     specs = all_specs()
     assert specs, "no specs registered"
-    for name, spec in specs.items():
+    for spec in specs.values():
         # some specs intentionally omit response_model; skip those
         if getattr(spec, "response_model", None) is None:
             continue

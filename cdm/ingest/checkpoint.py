@@ -10,19 +10,17 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Optional
-
 
 _DEFAULT_DIR = Path.home() / ".congress_tracker" / "checkpoints"
 
 
-def _checkpoint_path(resource: str, checkpoint_dir: Optional[Path] = None) -> Path:
+def _checkpoint_path(resource: str, checkpoint_dir: Path | None = None) -> Path:
     d = checkpoint_dir or _DEFAULT_DIR
     d.mkdir(parents=True, exist_ok=True)
     return d / f"{resource}.json"
 
 
-def load(resource: str, checkpoint_dir: Optional[Path] = None) -> dict:
+def load(resource: str, checkpoint_dir: Path | None = None) -> dict:
     """Load checkpoint for *resource*. Returns empty dict if not found."""
     p = _checkpoint_path(resource, checkpoint_dir)
     if p.exists():
@@ -30,7 +28,7 @@ def load(resource: str, checkpoint_dir: Optional[Path] = None) -> dict:
     return {}
 
 
-def save(resource: str, state: dict, checkpoint_dir: Optional[Path] = None) -> None:
+def save(resource: str, state: dict, checkpoint_dir: Path | None = None) -> None:
     """Atomically write *state* as the checkpoint for *resource*."""
     p = _checkpoint_path(resource, checkpoint_dir)
     tmp = p.with_suffix(".tmp")
@@ -38,7 +36,7 @@ def save(resource: str, state: dict, checkpoint_dir: Optional[Path] = None) -> N
     os.replace(tmp, p)
 
 
-def clear(resource: str, checkpoint_dir: Optional[Path] = None) -> None:
+def clear(resource: str, checkpoint_dir: Path | None = None) -> None:
     """Remove the checkpoint file for *resource*."""
     p = _checkpoint_path(resource, checkpoint_dir)
     p.unlink(missing_ok=True)

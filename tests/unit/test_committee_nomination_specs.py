@@ -1,16 +1,13 @@
-import src.data_collection.specs.committee_specs  # registers committee specs
-import src.data_collection.specs.nomination_specs  # registers nomination specs
-from src.models.other_models import BillListItem as _BillListItem
-from src.models.other_models import NominationListItem as _NominationListItem
-
-from src.data_collection.endpoint_registry import get_spec
-from src.models.other_models import (
+from cdm.data_collection.endpoint_registry import get_spec
+from cdm.models.other_models import BillListItem as _BillListItem
+from cdm.models.other_models import (
     CommitteeListItem,
-    CommitteeReportListItem,
     CommitteeMeetingListItem,
     CommitteePrintListItem,
+    CommitteeReportListItem,
     NominationListItem,
 )
+from cdm.models.other_models import NominationListItem as _NominationListItem
 
 
 def test_committee_specs_registered():

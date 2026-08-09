@@ -8,8 +8,9 @@
 #                  (handles "2025-01-01T00:00:00Z" and bare "2025-01-02")
 #   dynamic      : false  — unmapped fields silently dropped;
 #                  flip to "strict" once schema stabilises
-#   text+keyword : searchable text fields carry a .keyword sub-field
-#                  for aggregations and exact-match sorting
+#   text+keyword : searchable text fields carry .keyword and .lemma sub-fields;
+#                  .lemma is text analyzed with the built-in whitespace analyzer
+#                  and stores future spaCy-generated lemma arrays for search
 #
 # Index consolidations (20 raw resources → 15 primary + 2 bridge indices)
 # ─────────────────────────────────────────────────────────────────────────
@@ -69,6 +70,7 @@ legislation:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 512 }
+          lemma:     { type: text, analyzer: whitespace }
       origin_chamber:      { type: keyword }       # House | Senate
       origin_chamber_code: { type: keyword }       # H | S
 
@@ -88,6 +90,7 @@ legislation:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 512 }
+          lemma:     { type: text, analyzer: whitespace }
 
       # ── law-specific (null for non-law source_type) ──
       is_enacted:    { type: boolean }             # true when laws[] is non-empty
@@ -108,7 +111,10 @@ legislation:
           last_summary_update_date:
             type: date
             format: "strict_date_optional_time||yyyy-MM-dd"
-          text:                      { type: text }
+          text:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
 
 
 # ── 2. amendment ──────────────────────────────────────────────────────────────
@@ -142,8 +148,12 @@ amendment:
         type: text
         fields:
           keyword:    { type: keyword, ignore_above: 256 }
+          lemma:      { type: text, analyzer: whitespace }
 
-      description:    { type: text }
+      description:
+        type: text
+        fields:
+          lemma:      { type: text, analyzer: whitespace }
 
       update_date:
         type: date
@@ -174,6 +184,7 @@ communication:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 256 }
+          lemma:     { type: text, analyzer: whitespace }
 
       update_date:
         type: date
@@ -198,6 +209,7 @@ committee:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 512 }
+          lemma:     { type: text, analyzer: whitespace }
       chamber:             { type: keyword }       # House | Senate | Joint
       committee_type_code: { type: keyword }       # "Committee" | "Subcommittee" | "Joint"
 
@@ -206,6 +218,7 @@ committee:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 512 }
+          lemma:     { type: text, analyzer: whitespace }
       parent_system_code:  { type: keyword }
       parent_url:          { type: keyword }
 
@@ -395,6 +408,7 @@ member:
         type: text
         fields:
           keyword:  { type: keyword, ignore_above: 256 }
+          lemma:    { type: text, analyzer: whitespace }
       state:        { type: keyword }
       party_name:   { type: keyword }
       district:     { type: integer }              # null for senators
@@ -432,11 +446,15 @@ nomination:
       part_number: { type: keyword }
       citation:    { type: keyword }               # "PN11-23"
 
-      description: { type: text }
+      description:
+        type: text
+        fields:
+          lemma: { type: text, analyzer: whitespace }
       organization:
         type: text
         fields:
           keyword: { type: keyword, ignore_above: 512 }
+          lemma:   { type: text, analyzer: whitespace }
 
       # ── nomination_type flattened ──
       is_civilian_nomination: { type: boolean }    # from nomination_type.is_civilian
@@ -453,6 +471,7 @@ nomination:
         type: text
         fields:
           keyword: { type: keyword, ignore_above: 512 }
+          lemma:   { type: text, analyzer: whitespace }
 
       update_date:
         type: date
@@ -480,6 +499,7 @@ treaty:
         type: text
         fields:
           keyword:      { type: keyword, ignore_above: 512 }
+          lemma:        { type: text, analyzer: whitespace }
 
       transmitted_date:
         type: date
@@ -489,7 +509,42 @@ treaty:
         format: "strict_date_optional_time||yyyy-MM-dd"
 
 
-# ── 14. congress_ref ──────────────────────────────────────────────────────────
+# ── 14. crsreport ─────────────────────────────────────────────────────────────
+crsreport:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+
+      id:           { type: keyword }
+      record_type:  { type: keyword }
+      url:          { type: keyword }
+      title:
+        type: text
+        fields:
+          keyword:  { type: keyword, ignore_above: 512 }
+          lemma:    { type: text, analyzer: whitespace }
+      status:       { type: keyword }
+      summary:
+        type: text
+        fields:
+          lemma:    { type: text, analyzer: whitespace }
+      authors:      { type: keyword }
+      topics:
+        type: nested
+        properties:
+          topic:       { type: keyword }
+          update_date:
+            type: date
+            format: "strict_date_optional_time||yyyy-MM-dd"
+      publish_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 15. congress_ref ──────────────────────────────────────────────────────────
 # Reference table; one document per congress (1–119+).
 # id = "congress:{number}" — derived at index-time from URL path segment
 # (the congress list API does not return a number field directly).
@@ -528,7 +583,7 @@ congress_ref:
         format: "strict_date_optional_time||yyyy-MM-dd"
 
 
-# ── 15. house_requirement ─────────────────────────────────────────────────────
+# ── 16. house_requirement ─────────────────────────────────────────────────────
 # Sparse reference data; reporting requirements for executive agencies.
 house_requirement:
   settings:
@@ -549,7 +604,7 @@ house_requirement:
         format: "strict_date_optional_time||yyyy-MM-dd"
 
 
-# ── 16. sponsorship  (bridge: member ↔ legislation) ─────────────────────────
+# ── 17. sponsorship  (bridge: member ↔ legislation) ─────────────────────────
 # One row per member-bill relationship.
 # Populated from legislation item fetch (sponsors[] + cosponsors[] arrays).
 # Enables:
@@ -577,6 +632,7 @@ sponsorship:
         type: text
         fields:
           keyword:      { type: keyword, ignore_above: 256 }
+          lemma:        { type: text, analyzer: whitespace }
       member_state:     { type: keyword }
       member_party:     { type: keyword }
 
@@ -588,7 +644,7 @@ sponsorship:
         format: "strict_date_optional_time||yyyy-MM-dd"
 
 
-# ── 17. vote_position  (bridge: member ↔ house_vote) ────────────────────────
+# ── 18. vote_position  (bridge: member ↔ house_vote) ────────────────────────
 # One row per member-vote cast.
 # Populated by parsing clerk.house.gov XML linked via house_vote.source_data_url.
 # Enables:
@@ -622,6 +678,7 @@ vote_position:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 256 }
+          lemma:     { type: text, analyzer: whitespace }
 
       vote_date:
         type: date

@@ -1,0 +1,1302 @@
+[
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 80,
+        "date": "1947-03-17",
+        "sections": [
+          {
+            "name": "Daily Digest",
+            "start_page": 3,
+            "end_page": 29
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2025-04-18",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/17?format=json",
+        "daily_digest": {
+          "text": [
+            {
+              "type": "PDF",
+              "url": "https://congress.gov/crecb/1947/GPO-CRECB-1947-pt15-Pages3-29.pdf"
+            }
+          ],
+          "start_page": 3,
+          "end_page": 29
+        }
+      },
+      {
+        "congress": 80,
+        "date": "1947-03-17",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 2137,
+            "end_page": 2166
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/17?format=json"
+      },
+      {
+        "congress": 80,
+        "date": "1947-03-17",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 2102,
+            "end_page": 2137
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/17?format=json"
+      },
+      {
+        "congress": 80,
+        "date": "1947-03-17",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 2102,
+            "end_page": 2166
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/17?format=json"
+      },
+      {
+        "congress": 80,
+        "date": "1947-03-17",
+        "sections": [
+          {
+            "name": "Full volume of Congressional Record (Digest)",
+            "start_page": 3,
+            "end_page": 538
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2022-11-04",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/17?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 5
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "17",
+      "format": "json",
+      "month": "3",
+      "year": "1947"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 9153,
+            "end_page": 9186
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      },
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 9135,
+            "end_page": 9153
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      },
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 9135,
+            "end_page": 9186
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "27",
+      "format": "json",
+      "month": "11",
+      "year": "1942"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 9153,
+            "end_page": 9186
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      },
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 9135,
+            "end_page": 9153
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      },
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 9135,
+            "end_page": 9186
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "27",
+      "format": "json",
+      "month": "11",
+      "year": "1942"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 9153,
+            "end_page": 9186
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      },
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 9135,
+            "end_page": 9153
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      },
+      {
+        "congress": 77,
+        "date": "1942-11-27",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 9135,
+            "end_page": 9186
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/27?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "27",
+      "format": "json",
+      "month": "11",
+      "year": "1942"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 77,
+        "date": "1942-11-25",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 9123,
+            "end_page": 9135
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/25?format=json"
+      },
+      {
+        "congress": 77,
+        "date": "1942-11-25",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 9123,
+            "end_page": 9135
+          }
+        ],
+        "sessionNumber": 2,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 88,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1942/11/25?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 2
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "25",
+      "format": "json",
+      "month": "11",
+      "year": "1942"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 80,
+        "date": "1947-03-18",
+        "sections": [
+          {
+            "name": "Daily Digest",
+            "start_page": 29,
+            "end_page": 33
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2025-04-18",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/18?format=json",
+        "daily_digest": {
+          "text": [
+            {
+              "type": "PDF",
+              "url": "https://congress.gov/crecb/1947/GPO-CRECB-1947-pt15-Pages29-33.pdf"
+            }
+          ],
+          "start_page": 29,
+          "end_page": 33
+        }
+      },
+      {
+        "congress": 80,
+        "date": "1947-03-18",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 2201,
+            "end_page": 2219
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/18?format=json"
+      },
+      {
+        "congress": 80,
+        "date": "1947-03-18",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 2166,
+            "end_page": 2219
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/18?format=json"
+      },
+      {
+        "congress": 80,
+        "date": "1947-03-18",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 2166,
+            "end_page": 2201
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 93,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1947/3/18?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 4
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "18",
+      "format": "json",
+      "month": "3",
+      "year": "1947"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 78,
+        "date": "1943-01-06",
+        "sections": [
+          {
+            "name": "Appendix",
+            "start_page": 3,
+            "end_page": 1456
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-03-28",
+        "volumeNumber": 89,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1943/1/6?format=json"
+      },
+      {
+        "congress": 78,
+        "date": "1943-01-06",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 3,
+            "end_page": 4
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 89,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1943/1/6?format=json"
+      },
+      {
+        "congress": 78,
+        "date": "1943-01-06",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 3,
+            "end_page": 31
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 89,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1943/1/6?format=json"
+      },
+      {
+        "congress": 78,
+        "date": "1943-01-06",
+        "sections": [
+          {
+            "name": "History of Bills",
+            "start_page": 633,
+            "end_page": 794
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 89,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1943/1/6?format=json"
+      },
+      {
+        "congress": 78,
+        "date": "1943-01-06",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 4,
+            "end_page": 31
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 89,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1943/1/6?format=json"
+      },
+      {
+        "congress": 78,
+        "date": "1943-01-06",
+        "sections": [
+          {
+            "name": "Congressional Record Index",
+            "start_page": 9,
+            "end_page": 632
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 89,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1943/1/6?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 6
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "6",
+      "format": "json",
+      "month": "1",
+      "year": "1943"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 91,
+        "date": "1969-10-01",
+        "sections": [
+          {
+            "name": "Extensions of Remarks",
+            "start_page": 28040,
+            "end_page": 28097
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-03-28",
+        "volumeNumber": 115,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1969/10/1?format=json"
+      },
+      {
+        "congress": 91,
+        "date": "1969-10-01",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 27859,
+            "end_page": 28097
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-03-28",
+        "volumeNumber": 115,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1969/10/1?format=json"
+      },
+      {
+        "congress": 91,
+        "date": "1969-10-01",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 27859,
+            "end_page": 27951
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-03-28",
+        "volumeNumber": 115,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1969/10/1?format=json"
+      },
+      {
+        "congress": 91,
+        "date": "1969-10-01",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 27951,
+            "end_page": 28039
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-03-28",
+        "volumeNumber": 115,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1969/10/1?format=json"
+      },
+      {
+        "congress": 91,
+        "date": "1969-10-01",
+        "sections": [
+          {
+            "name": "Daily Digest",
+            "start_page": 459,
+            "end_page": 465
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2022-11-04",
+        "volumeNumber": 115,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1969/10/1?format=json",
+        "daily_digest": {
+          "text": [
+            {
+              "type": "PDF",
+              "url": "https://congress.gov/crecb/1969/GPO-CRECB-1969-pt32-Pages459-465.pdf"
+            }
+          ],
+          "start_page": 459,
+          "end_page": 465
+        }
+      }
+    ],
+    "pagination": {
+      "count": 5
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "1",
+      "format": "json",
+      "month": "10",
+      "year": "1969"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1568,
+            "end_page": 1612
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1546,
+            "end_page": 1568
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1546,
+            "end_page": 1612
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "26",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1568,
+            "end_page": 1612
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1546,
+            "end_page": 1568
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1546,
+            "end_page": 1612
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "26",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1568,
+            "end_page": 1612
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1546,
+            "end_page": 1568
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-26",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1546,
+            "end_page": 1612
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/26?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "26",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-25",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1510,
+            "end_page": 1546
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/25?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-25",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1483,
+            "end_page": 1510
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/25?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-25",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1483,
+            "end_page": 1546
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/25?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "25",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-21",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1343,
+            "end_page": 1373
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/21?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-21",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1343,
+            "end_page": 1373
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/21?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 2
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "21",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1312,
+            "end_page": 1343
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1291,
+            "end_page": 1312
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1291,
+            "end_page": 1343
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "20",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1312,
+            "end_page": 1343
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1291,
+            "end_page": 1312
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1291,
+            "end_page": 1343
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "20",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1312,
+            "end_page": 1343
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1291,
+            "end_page": 1312
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-20",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1291,
+            "end_page": 1343
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/20?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "20",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1262,
+            "end_page": 1291
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1238,
+            "end_page": 1262
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1238,
+            "end_page": 1291
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "19",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1262,
+            "end_page": 1291
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1238,
+            "end_page": 1262
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1238,
+            "end_page": 1291
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "19",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1262,
+            "end_page": 1291
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1238,
+            "end_page": 1262
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-19",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1238,
+            "end_page": 1291
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/19?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "19",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  },
+  {
+    "boundCongressionalRecord": [
+      {
+        "congress": 64,
+        "date": "1916-01-18",
+        "sections": [
+          {
+            "name": "House of Representatives",
+            "start_page": 1208,
+            "end_page": 1237
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/18?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-18",
+        "sections": [
+          {
+            "name": "Senate",
+            "start_page": 1183,
+            "end_page": 1208
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/18?format=json"
+      },
+      {
+        "congress": 64,
+        "date": "1916-01-18",
+        "sections": [
+          {
+            "name": "Entire Issue",
+            "start_page": 1183,
+            "end_page": 1237
+          }
+        ],
+        "sessionNumber": 1,
+        "updateDate": "2024-04-17",
+        "volumeNumber": 53,
+        "url": "https://api.congress.gov/v3/bound-congressional-record/1916/1/18?format=json"
+      }
+    ],
+    "pagination": {
+      "count": 3
+    },
+    "request": {
+      "contentType": "application/json",
+      "day": "18",
+      "format": "json",
+      "month": "1",
+      "year": "1916"
+    }
+  }
+]

@@ -1,7 +1,6 @@
-from src.models.bills import CommitteeReport
-from src.data_collection.client import get_client
-from src.data_collection.endpoint_registry import get_spec
-import src.data_collection.specs.committee_report_specs
+from cdm.data_collection.client import get_client
+from cdm.data_collection.endpoint_registry import get_spec
+from cdm.models.bills import CommitteeReport
 
 
 def test_committee_report_model_accepts_missing_url():

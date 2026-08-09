@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from src.models.other_models import AmendmentListItem
-from src.models.bills import Amendment
+from cdm.models.bills import Amendment
+from cdm.models.other_models import AmendmentListItem
 
 
 def test_amendment_list_item_parse():

@@ -1,0 +1,360 @@
+[
+  {
+    "actions": {
+      "count": 4,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/10/actions?format=json"
+    },
+    "amendments": null,
+    "committees": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/10/committees?format=json"
+    },
+    "cosponsors": {
+      "count": 7,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/10/cosponsors?format=json"
+    },
+    "related_bills": null,
+    "subjects": {
+      "count": 7,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/10/subjects?format=json"
+    },
+    "summaries": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/10/summaries?format=json"
+    },
+    "text_versions": null,
+    "titles": {
+      "count": 2,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/10/titles?format=json"
+    },
+    "full_text": "",
+    "congress": 110,
+    "constitutional_authority_statement_text": "",
+    "introduced_date": "2007-01-04T00:00:00",
+    "latest_action": {
+      "action_date": "2007-04-26T00:00:00",
+      "text": "Sponsor introductory remarks on measure. (CR H4200)"
+    },
+    "laws": [],
+    "number": "10",
+    "origin_chamber": "House",
+    "origin_chamber_code": "H",
+    "policy_area": {
+      "name": "Taxation",
+      "update_date": null
+    },
+    "sponsors": [
+      {
+        "bioguide_id": "L000551",
+        "first_name": "BARBARA",
+        "full_name": "Rep. Lee, Barbara [D-CA-9]",
+        "last_name": "LEE",
+        "party": "D",
+        "state": "CA",
+        "url": "https://api.congress.gov/v3/member/L000551?format=json",
+        "middle_name": "",
+        "district": 9,
+        "is_original_cosponsor": false,
+        "is_by_request": "N",
+        "depiction": {
+          "attribution": "",
+          "image_url": null
+        },
+        "sponsorship_date": null,
+        "sponsorship_withrawn_date": null
+      }
+    ],
+    "title": "Expressing the sense of the Congress that the tax give away since 2001 to the wealthiest 5 percent of Americans should be repealed and those monies instead invested in vital programs to relieve the growing burden on the working poor and to alleviate poverty in America.",
+    "type": "HCONRES",
+    "update_date": "2024-02-07T16:32:33Z",
+    "update_date_including_text": "2024-02-07T16:38:03Z",
+    "notes": null
+  },
+  {
+    "actions": {
+      "count": 10,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/2/actions?format=json"
+    },
+    "amendments": null,
+    "committees": {
+      "count": 2,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/2/committees?format=json"
+    },
+    "cosponsors": {
+      "count": 46,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/2/cosponsors?format=json"
+    },
+    "related_bills": null,
+    "subjects": {
+      "count": 15,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/2/subjects?format=json"
+    },
+    "summaries": {
+      "count": 2,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/2/summaries?format=json"
+    },
+    "text_versions": null,
+    "titles": {
+      "count": 3,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/2/titles?format=json"
+    },
+    "full_text": "",
+    "congress": 110,
+    "constitutional_authority_statement_text": "",
+    "introduced_date": "2007-01-04T00:00:00",
+    "latest_action": {
+      "action_date": "2008-06-24T00:00:00",
+      "text": "Received in the Senate and referred to the Committee on Energy and Natural Resources."
+    },
+    "laws": [],
+    "number": "2",
+    "origin_chamber": "House",
+    "origin_chamber_code": "H",
+    "policy_area": {
+      "name": "Education",
+      "update_date": null
+    },
+    "sponsors": [
+      {
+        "bioguide_id": "C000380",
+        "first_name": "DONNA",
+        "full_name": "Del. Christensen, Donna M. [D-VI-At Large]",
+        "last_name": "CHRISTENSEN",
+        "party": "D",
+        "state": "VI",
+        "url": "https://api.congress.gov/v3/member/C000380?format=json",
+        "middle_name": "M.",
+        "district": null,
+        "is_original_cosponsor": false,
+        "is_by_request": "N",
+        "depiction": {
+          "attribution": "",
+          "image_url": null
+        },
+        "sponsorship_date": null,
+        "sponsorship_withrawn_date": null
+      }
+    ],
+    "title": "Expressing the sense of the Congress that children in the United States should understand and appreciate the contributions of individuals from the territories of the United States and the contributions of such individuals in United States history.",
+    "type": "HCONRES",
+    "update_date": "2025-07-21T19:44:15Z",
+    "update_date_including_text": "2025-07-21T19:44:15Z",
+    "notes": null
+  },
+  {
+    "actions": {
+      "count": 24,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/20/actions?format=json"
+    },
+    "amendments": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/20/amendments?format=json"
+    },
+    "committees": {
+      "count": 2,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/20/committees?format=json"
+    },
+    "cosponsors": {
+      "count": 27,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/20/cosponsors?format=json"
+    },
+    "related_bills": null,
+    "subjects": {
+      "count": 27,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/20/subjects?format=json"
+    },
+    "summaries": {
+      "count": 3,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/20/summaries?format=json"
+    },
+    "text_versions": null,
+    "titles": {
+      "count": 2,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/20/titles?format=json"
+    },
+    "full_text": "",
+    "congress": 110,
+    "constitutional_authority_statement_text": "",
+    "introduced_date": "2007-01-09T00:00:00",
+    "latest_action": {
+      "action_date": "2007-03-19T00:00:00",
+      "text": "Message on Senate action sent to the House."
+    },
+    "laws": [],
+    "number": "20",
+    "origin_chamber": "House",
+    "origin_chamber_code": "H",
+    "policy_area": {
+      "name": "International Affairs",
+      "update_date": null
+    },
+    "sponsors": [
+      {
+        "bioguide_id": "S000522",
+        "first_name": "CHRISTOPHER",
+        "full_name": "Rep. Smith, Christopher H. [R-NJ-4]",
+        "last_name": "SMITH",
+        "party": "R",
+        "state": "NJ",
+        "url": "https://api.congress.gov/v3/member/S000522?format=json",
+        "middle_name": "H.",
+        "district": 4,
+        "is_original_cosponsor": false,
+        "is_by_request": "N",
+        "depiction": {
+          "attribution": "",
+          "image_url": null
+        },
+        "sponsorship_date": null,
+        "sponsorship_withrawn_date": null
+      }
+    ],
+    "title": "Calling on the Government of the United Kingdom to immediately establish a full, independent, and public judicial inquiry into the murder of Northern Ireland defense attorney Patrick Finucane, as recommended by Judge Peter Cory as part of the Weston Park Agreement, in order to move forward on the Northern Ireland peace process.",
+    "type": "HCONRES",
+    "update_date": "2025-04-07T15:25:10Z",
+    "update_date_including_text": "2025-04-07T15:25:10Z",
+    "notes": null
+  },
+  {
+    "actions": {
+      "count": 4,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/12/actions?format=json"
+    },
+    "amendments": null,
+    "committees": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/12/committees?format=json"
+    },
+    "cosponsors": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/12/cosponsors?format=json"
+    },
+    "related_bills": null,
+    "subjects": {
+      "count": 10,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/12/subjects?format=json"
+    },
+    "summaries": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/12/summaries?format=json"
+    },
+    "text_versions": null,
+    "titles": {
+      "count": 2,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/12/titles?format=json"
+    },
+    "full_text": "",
+    "congress": 110,
+    "constitutional_authority_statement_text": "",
+    "introduced_date": "2007-01-04T00:00:00",
+    "latest_action": {
+      "action_date": "2007-01-05T00:00:00",
+      "text": "Sponsor introductory remarks on measure. (CR E22-23)"
+    },
+    "laws": [],
+    "number": "12",
+    "origin_chamber": "House",
+    "origin_chamber_code": "H",
+    "policy_area": {
+      "name": "Congress",
+      "update_date": null
+    },
+    "sponsors": [
+      {
+        "bioguide_id": "S000822",
+        "first_name": "CLIFF",
+        "full_name": "Rep. Stearns, Cliff [R-FL-6]",
+        "last_name": "STEARNS",
+        "party": "R",
+        "state": "FL",
+        "url": "https://api.congress.gov/v3/member/S000822?format=json",
+        "middle_name": "",
+        "district": 6,
+        "is_original_cosponsor": false,
+        "is_by_request": "N",
+        "depiction": {
+          "attribution": "",
+          "image_url": null
+        },
+        "sponsorship_date": null,
+        "sponsorship_withrawn_date": null
+      }
+    ],
+    "title": "Requiring the display of the Ten Commandments in the United States Capitol.",
+    "type": "HCONRES",
+    "update_date": "2024-02-07T11:39:48Z",
+    "update_date_including_text": "2024-02-07T11:40:23Z",
+    "notes": null
+  },
+  {
+    "actions": {
+      "count": 4,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/22/actions?format=json"
+    },
+    "amendments": null,
+    "committees": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/22/committees?format=json"
+    },
+    "cosponsors": {
+      "count": 6,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/22/cosponsors?format=json"
+    },
+    "related_bills": null,
+    "subjects": {
+      "count": 9,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/22/subjects?format=json"
+    },
+    "summaries": {
+      "count": 1,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/22/summaries?format=json"
+    },
+    "text_versions": null,
+    "titles": {
+      "count": 2,
+      "url": "https://api.congress.gov/v3/bill/110/hconres/22/titles?format=json"
+    },
+    "full_text": "",
+    "congress": 110,
+    "constitutional_authority_statement_text": "",
+    "introduced_date": "2007-01-10T00:00:00",
+    "latest_action": {
+      "action_date": "2007-01-11T00:00:00",
+      "text": "Referred to the Subcommittee on Trade."
+    },
+    "laws": [],
+    "number": "22",
+    "origin_chamber": "House",
+    "origin_chamber_code": "H",
+    "policy_area": {
+      "name": "Foreign Trade and International Finance",
+      "update_date": null
+    },
+    "sponsors": [
+      {
+        "bioguide_id": "G000280",
+        "first_name": "VIRGIL",
+        "full_name": "Rep. Goode, Virgil H., Jr. [R-VA-5]",
+        "last_name": "GOODE",
+        "party": "R",
+        "state": "VA",
+        "url": "https://api.congress.gov/v3/member/G000280?format=json",
+        "middle_name": "H.",
+        "district": 5,
+        "is_original_cosponsor": false,
+        "is_by_request": "N",
+        "depiction": {
+          "attribution": "",
+          "image_url": null
+        },
+        "sponsorship_date": null,
+        "sponsorship_withrawn_date": null
+      }
+    ],
+    "title": "Expressing the sense of Congress that the President should provide notice of withdrawal of the United States from the North American Free Trade Agreement (NAFTA).",
+    "type": "HCONRES",
+    "update_date": "2024-02-07T16:32:33Z",
+    "update_date_including_text": "2024-02-07T16:38:06Z",
+    "notes": null
+  }
+]

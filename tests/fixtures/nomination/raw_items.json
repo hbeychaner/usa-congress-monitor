@@ -1,0 +1,3604 @@
+[
+  {
+    "nomination": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/nomination/115/346/actions?format=json"
+      },
+      "authorityDate": "2026-03-20",
+      "citation": "PN346",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/115/346/committees?format=json"
+      },
+      "congress": 115,
+      "description": "Robert Daigle, of Virginia, to be Director of Cost Assessment and Program Evaluation, Department of Defense, vice Jamie Michael Morin.",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/115/346/hearings?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2017-08-01",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Defense",
+          "positionTitle": "Director of Cost Assessment and Program Evaluation, Department of Defense",
+          "url": "https://api.congress.gov/v3/nomination/115/346/1?format=json"
+        }
+      ],
+      "number": 346,
+      "partNumber": "00",
+      "receivedDate": "2017-04-25",
+      "updateDate": "2026-03-21T11:00:29Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2017-08-01",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "115",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "346"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/nomination/115/247/actions?format=json"
+      },
+      "authorityDate": "2026-03-20",
+      "citation": "PN247",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/115/247/committees?format=json"
+      },
+      "congress": 115,
+      "description": "David L. Norquist, of Virginia, to be Under Secretary of Defense (Comptroller), vice Michael J. McCord.",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/115/247/hearings?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2017-05-25",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Defense",
+          "positionTitle": "Under Secretary of Defense (Comptroller)",
+          "url": "https://api.congress.gov/v3/nomination/115/247/1?format=json"
+        }
+      ],
+      "number": 247,
+      "partNumber": "00",
+      "receivedDate": "2017-04-06",
+      "updateDate": "2026-03-21T11:00:29Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2017-05-25",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "115",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "247"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/nomination/115/294/actions?format=json"
+      },
+      "authorityDate": "2026-03-20",
+      "citation": "PN294",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/115/294/committees?format=json"
+      },
+      "congress": 115,
+      "description": "Elaine McCusker, of Virginia, to be a Principal Deputy Under Secretary of Defense, vice John Conger.",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/115/294/hearings?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2017-08-01",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Defense",
+          "positionTitle": "Principal Deputy Under Secretary of Defense",
+          "url": "https://api.congress.gov/v3/nomination/115/294/1?format=json"
+        }
+      ],
+      "number": 294,
+      "partNumber": "00",
+      "receivedDate": "2017-04-24",
+      "updateDate": "2026-03-21T11:00:29Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2017-08-01",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "115",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "294"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-01-20",
+      "citation": "PN12",
+      "congress": 119,
+      "description": "Keith Bass, of Texas, to be an Assistant Secretary of Defense, vice Lester Martinez-Lopez.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 12,
+      "partNumber": "00",
+      "receivedDate": "2025-01-20",
+      "updateDate": "2025-01-21T15:27:24Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "12"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 14,
+        "url": "https://api.congress.gov/v3/nomination/118/1980/actions?format=json"
+      },
+      "authorityDate": "2026-03-20",
+      "citation": "PN1980",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/1980/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Matthew James Marzano, of Illinois, to be a Member of the Nuclear Regulatory Commission for the term of five years expiring June 30, 2028, vice Jeffrey Martin Baran, term expired.",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/1980/hearings?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2024-12-12",
+        "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 45. Record Vote Number: 323."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Nuclear Regulatory Commission",
+          "positionTitle": "Member of the Nuclear Regulatory Commission",
+          "url": "https://api.congress.gov/v3/nomination/118/1980/1?format=json"
+        }
+      ],
+      "number": 1980,
+      "partNumber": "00",
+      "receivedDate": "2024-07-23",
+      "updateDate": "2026-03-21T11:00:29Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2024-12-12",
+        "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 45. Record Vote Number: 323."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "1980"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-01-20",
+      "citation": "PN12",
+      "congress": 119,
+      "description": "Keith Bass, of Texas, to be an Assistant Secretary of Defense, vice Lester Martinez-Lopez.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 12,
+      "partNumber": "00",
+      "receivedDate": "2025-01-20",
+      "updateDate": "2025-01-21T15:27:24Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "12"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-01-20",
+      "citation": "PN12",
+      "congress": 119,
+      "description": "Keith Bass, of Texas, to be an Assistant Secretary of Defense, vice Lester Martinez-Lopez.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 12,
+      "partNumber": "00",
+      "receivedDate": "2025-01-20",
+      "updateDate": "2025-01-21T15:27:24Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "12"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-01-20",
+      "citation": "PN12",
+      "congress": 119,
+      "description": "Keith Bass, of Texas, to be an Assistant Secretary of Defense, vice Lester Martinez-Lopez.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 12,
+      "partNumber": "00",
+      "receivedDate": "2025-01-20",
+      "updateDate": "2025-01-21T15:27:24Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "12"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-11",
+      "citation": "PN24",
+      "congress": 119,
+      "description": "Olivia Trusty, of Maryland, to be Assistant Secretary for Elementary and Secondary Education",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 24,
+      "partNumber": "00",
+      "receivedDate": "2025-02-11",
+      "updateDate": "2025-02-12T12:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "24"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-01-20",
+      "citation": "PN12",
+      "congress": 119,
+      "description": "Keith Bass, of Texas, to be an Assistant Secretary of Defense, vice Lester Martinez-Lopez.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 12,
+      "partNumber": "00",
+      "receivedDate": "2025-01-20",
+      "updateDate": "2025-01-21T15:27:24Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "12"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-11",
+      "citation": "PN25",
+      "congress": 119,
+      "description": "Matthew Whitaker, of Iowa, to be Assistant Secretary of Health and Human Services",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 25,
+      "partNumber": "00",
+      "receivedDate": "2025-02-11",
+      "updateDate": "2025-02-12T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "25"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-11",
+      "citation": "PN24",
+      "congress": 119,
+      "description": "Olivia Trusty, of Maryland, to be Assistant Secretary for Elementary and Secondary Education",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 24,
+      "partNumber": "00",
+      "receivedDate": "2025-02-11",
+      "updateDate": "2025-02-12T12:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "24"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-01-22",
+      "citation": "PN13",
+      "congress": 119,
+      "description": "Michael Boren, of Idaho, to be Under Secretary of Agriculture for Natural Resources and Environment and Environment, vice Homer L. Wilkes, resigned.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 13,
+      "partNumber": "00",
+      "receivedDate": "2025-01-22",
+      "updateDate": "2025-01-23T12:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "13"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-01-22",
+      "citation": "PN13",
+      "congress": 119,
+      "description": "Michael Boren, of Idaho, to be Under Secretary of Agriculture for Natural Resources and Environment and Environment, vice Homer L. Wilkes, resigned.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 13,
+      "partNumber": "00",
+      "receivedDate": "2025-01-22",
+      "updateDate": "2025-01-23T12:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "13"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-03",
+      "citation": "PN22",
+      "congress": 119,
+      "description": "Devon Westhill, of Florida, to be Administrator of the Energy Information Administration",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2025-02-03",
+      "updateDate": "2025-02-04T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 7,
+        "url": "https://api.congress.gov/v3/nomination/119/858/actions?format=json"
+      },
+      "authorityDate": "2026-03-20",
+      "citation": "PN858",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/858/committees?format=json"
+      },
+      "congress": 119,
+      "description": "Markwayne Mullin, of Oklahoma, to be Secretary of Homeland Security, vice Kristi Noem.",
+      "latestAction": {
+        "actionDate": "2026-03-20",
+        "text": "Cloture motion presented in Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Homeland Security",
+          "positionTitle": "Secretary of Homeland Security",
+          "url": "https://api.congress.gov/v3/nomination/119/858/1?format=json"
+        }
+      ],
+      "number": 858,
+      "partNumber": "00",
+      "receivedDate": "2026-03-09",
+      "updateDate": "2026-03-21T11:00:27Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-20",
+        "text": "Cloture motion presented in Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "858"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-03-10",
+      "citation": "PN26",
+      "congress": 119,
+      "description": "Daniel Zimmerman, of North Carolina, to be Assistant Secretary of the Air Force",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 26,
+      "partNumber": "00",
+      "receivedDate": "2025-03-10",
+      "updateDate": "2025-03-11T11:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "26"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-02-11",
+      "citation": "PN25",
+      "congress": 119,
+      "description": "Matthew Whitaker, of Iowa, to be Assistant Secretary of Health and Human Services",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 25,
+      "partNumber": "00",
+      "receivedDate": "2025-02-11",
+      "updateDate": "2025-02-12T12:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "25"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-10-27",
+      "citation": "PN624",
+      "congress": 119,
+      "description": "Michael Selig, of Florida, to be Chairman of the Commodity Futures Trading Commission",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 624,
+      "partNumber": "00",
+      "receivedDate": "2025-10-27",
+      "updateDate": "2025-10-28T11:00:13Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "624"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-03-10",
+      "citation": "PN26",
+      "congress": 119,
+      "description": "Daniel Zimmerman, of North Carolina, to be Assistant Secretary of the Air Force",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 26,
+      "partNumber": "00",
+      "receivedDate": "2025-03-10",
+      "updateDate": "2025-03-11T11:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "26"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-03-10",
+      "citation": "PN26",
+      "congress": 119,
+      "description": "Daniel Zimmerman, of North Carolina, to be Assistant Secretary of the Air Force",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 26,
+      "partNumber": "00",
+      "receivedDate": "2025-03-10",
+      "updateDate": "2025-03-11T11:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "26"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-10-27",
+      "citation": "PN624",
+      "congress": 119,
+      "description": "Michael Selig, of Florida, to be Chairman of the Commodity Futures Trading Commission",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 624,
+      "partNumber": "00",
+      "receivedDate": "2025-10-27",
+      "updateDate": "2025-10-28T11:00:13Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "624"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 6,
+        "url": "https://api.congress.gov/v3/nomination/116/1234/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN1234",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/116/1234/committees?format=json"
+      },
+      "congress": 116,
+      "description": "Amanda Wood Laihow, of Maine, to be a Member of the Occupational Safety and Health Review Commission for the remainder of a term expiring April 27, 2023, vice Heather L. MacDougall, resigned.",
+      "latestAction": {
+        "actionDate": "2020-01-09",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Occupational Safety and Health Review Commission",
+          "positionTitle": "Member of Occupational Safety and Health Review Commission",
+          "url": "https://api.congress.gov/v3/nomination/116/1234/1?format=json"
+        }
+      ],
+      "number": 1234,
+      "partNumber": "00",
+      "receivedDate": "2019-10-17",
+      "updateDate": "2026-03-20T11:00:22Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2020-01-09",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "116",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "1234"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-02-11",
+      "citation": "PN806",
+      "congress": 119,
+      "description": "Catherine Dillon, of Maryland, to be an Assistant Secretary of State (Educational and Cultural Affairs), vice Lee Satterfield, resigned.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 806,
+      "partNumber": "00",
+      "receivedDate": "2026-02-11",
+      "updateDate": "2026-02-12T12:00:28Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "806"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-29",
+      "citation": "PN786",
+      "congress": 119,
+      "description": "Brett Doyle, of Connecticut, to be Member of the United States International Trade Commission",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 786,
+      "partNumber": "00",
+      "receivedDate": "2026-01-29",
+      "updateDate": "2026-01-30T12:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "786"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/882/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN882",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/882/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Army under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Army",
+          "positionTitle": "Major",
+          "url": "https://api.congress.gov/v3/nomination/119/882/1?format=json"
+        }
+      ],
+      "number": 882,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "882"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/885/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN885",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/885/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Navy under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Navy",
+          "positionTitle": "Lieutenant Commander",
+          "url": "https://api.congress.gov/v3/nomination/119/885/1?format=json"
+        }
+      ],
+      "number": 885,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "885"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/881/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN881",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/881/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Army under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Army",
+          "positionTitle": "Lieutenant Colonel",
+          "url": "https://api.congress.gov/v3/nomination/119/881/1?format=json"
+        }
+      ],
+      "number": 881,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "881"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/884/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN884",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/884/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the Reserve of the Army under title 10, U.S.C., section 12203:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Army",
+          "positionTitle": "Colonel",
+          "url": "https://api.congress.gov/v3/nomination/119/884/1?format=json"
+        }
+      ],
+      "number": 884,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "884"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/876/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN876",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/876/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officers for appointment in the United States Coast Guard to the grade indicated under title 14, U.S.C., section 2121(e):",
+          "nomineeCount": 6,
+          "ordinal": 1,
+          "organization": "Coast Guard",
+          "positionTitle": "Rear Admiral (Lower Half)",
+          "url": "https://api.congress.gov/v3/nomination/119/876/1?format=json"
+        }
+      ],
+      "number": 876,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "876"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/883/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN883",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/883/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Army Medical Specialist Corps under title 10, U.S.C., sections 624 and 7064:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Army",
+          "positionTitle": "Colonel",
+          "url": "https://api.congress.gov/v3/nomination/119/883/1?format=json"
+        }
+      ],
+      "number": 883,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "883"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/877/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN877",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/877/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Air Force under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Air Force",
+          "positionTitle": "Lieutenant Colonel",
+          "url": "https://api.congress.gov/v3/nomination/119/877/1?format=json"
+        }
+      ],
+      "number": 877,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "877"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/886/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN886",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/886/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Navy under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Navy",
+          "positionTitle": "Lieutenant Commander",
+          "url": "https://api.congress.gov/v3/nomination/119/886/1?format=json"
+        }
+      ],
+      "number": 886,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "886"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/879/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN879",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/879/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named individual for appointment to the grade indicated in the Regular Air Force under title 10, U.S.C., section 531:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Air Force",
+          "positionTitle": "Major",
+          "url": "https://api.congress.gov/v3/nomination/119/879/1?format=json"
+        }
+      ],
+      "number": 879,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "879"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/888/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN888",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/888/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Navy under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Navy",
+          "positionTitle": "Captain",
+          "url": "https://api.congress.gov/v3/nomination/119/888/1?format=json"
+        }
+      ],
+      "number": 888,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "888"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/878/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN878",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/878/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment in the grade indicated in the Regular Air Force under title 10, U.S.C., sections 531 and 716:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Air Force",
+          "positionTitle": "Major",
+          "url": "https://api.congress.gov/v3/nomination/119/878/1?format=json"
+        }
+      ],
+      "number": 878,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "878"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/880/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN880",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/880/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named individual for appointment to the grade indicated in the Reserve of the Air Force under title 10, U.S.C., section 12203:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Air Force",
+          "positionTitle": "Colonel",
+          "url": "https://api.congress.gov/v3/nomination/119/880/1?format=json"
+        }
+      ],
+      "number": 880,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "880"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/887/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN887",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/887/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Navy under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Navy",
+          "positionTitle": "Lieutenant Commander",
+          "url": "https://api.congress.gov/v3/nomination/119/887/1?format=json"
+        }
+      ],
+      "number": 887,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "887"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/889/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN889",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/889/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Navy under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Navy",
+          "positionTitle": "Captain",
+          "url": "https://api.congress.gov/v3/nomination/119/889/1?format=json"
+        }
+      ],
+      "number": 889,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:20Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "889"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/890/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN890",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/890/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Navy under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Navy",
+          "positionTitle": "Commander",
+          "url": "https://api.congress.gov/v3/nomination/119/890/1?format=json"
+        }
+      ],
+      "number": 890,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:20Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "890"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/891/actions?format=json"
+      },
+      "authorityDate": "2026-03-19",
+      "citation": "PN891",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/891/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment in the grade indicated in the Regular Navy under title 10, U.S.C., sections 531 and 8132:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Navy",
+          "positionTitle": "Lieutenant Commander",
+          "url": "https://api.congress.gov/v3/nomination/119/891/1?format=json"
+        }
+      ],
+      "number": 891,
+      "partNumber": "00",
+      "receivedDate": "2026-03-19",
+      "updateDate": "2026-03-20T11:00:20Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-19",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "891"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-05-12",
+      "citation": "PN150",
+      "congress": 119,
+      "description": "Zachary M. Bluestone, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice John Andrew Ross, retired.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 150,
+      "partNumber": "00",
+      "receivedDate": "2025-05-12",
+      "updateDate": "2025-05-13T11:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "150"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-05-12",
+      "citation": "PN150",
+      "congress": 119,
+      "description": "Zachary M. Bluestone, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice John Andrew Ross, retired.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 150,
+      "partNumber": "00",
+      "receivedDate": "2025-05-12",
+      "updateDate": "2025-05-13T11:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "150"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/nomination/113/821/actions?format=json"
+      },
+      "authorityDate": "2026-03-18",
+      "citation": "PN821",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/113/821/committees?format=json"
+      },
+      "congress": 113,
+      "description": "John P. Carlin, of New York, to be an Assistant Attorney General, vice Lisa O. Monaco, resigned.",
+      "latestAction": {
+        "actionDate": "2014-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Justice",
+          "positionTitle": "Assistant Attorney General",
+          "url": "https://api.congress.gov/v3/nomination/113/821/1?format=json"
+        }
+      ],
+      "number": 821,
+      "partNumber": "00",
+      "receivedDate": "2013-09-11",
+      "updateDate": "2026-03-19T11:00:23Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2014-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "113",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "821"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 10,
+        "url": "https://api.congress.gov/v3/nomination/117/2225/actions?format=json"
+      },
+      "authorityDate": "2026-03-18",
+      "citation": "PN2225",
+      "committees": {
+        "count": 3,
+        "url": "https://api.congress.gov/v3/nomination/117/2225/committees?format=json"
+      },
+      "congress": 117,
+      "description": "Terrence Edwards, of Maryland, to be Inspector General of the National Reconnaissance Office, vice Susan S. Gibson.",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/117/2225/hearings?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2022-12-22",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Defense",
+          "positionTitle": "Inspector General of the National Reconnaissance Office",
+          "url": "https://api.congress.gov/v3/nomination/117/2225/1?format=json"
+        }
+      ],
+      "number": 2225,
+      "partNumber": "00",
+      "receivedDate": "2022-06-07",
+      "updateDate": "2026-03-19T11:00:23Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2022-12-22",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "117",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "2225"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 13,
+        "url": "https://api.congress.gov/v3/nomination/112/358/actions?format=json"
+      },
+      "authorityDate": "2026-03-18",
+      "citation": "PN358",
+      "committees": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/nomination/112/358/committees?format=json"
+      },
+      "congress": 112,
+      "description": "Lisa O. Monaco, of the District of Columbia, to be an Assistant Attorney General, vice David S. Kris, resigned.",
+      "hearings": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/nomination/112/358/hearings?format=json"
+      },
+      "latestAction": {
+        "actionDate": "2011-06-28",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Justice",
+          "positionTitle": "Assistant Attorney General",
+          "url": "https://api.congress.gov/v3/nomination/112/358/1?format=json"
+        }
+      ],
+      "number": 358,
+      "partNumber": "00",
+      "receivedDate": "2011-03-17",
+      "updateDate": "2026-03-19T11:00:23Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2011-06-28",
+        "text": "Confirmed by the Senate by Voice Vote."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "112",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "358"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/nomination/118/2014/actions?format=json"
+      },
+      "authorityDate": "2026-03-18",
+      "citation": "PN2014",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/2014/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Kristi Zuleika Lane Scott, of Virginia, to be Inspector General of the National Security Agency, vice Robert P. Storch, resigned.",
+      "latestAction": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of Defense",
+          "positionTitle": "Inspector General of the National Security Agency",
+          "url": "https://api.congress.gov/v3/nomination/118/2014/1?format=json"
+        }
+      ],
+      "number": 2014,
+      "partNumber": "00",
+      "receivedDate": "2024-07-31",
+      "updateDate": "2026-03-19T11:00:23Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "2014"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-03-10",
+      "citation": "PN26",
+      "congress": 119,
+      "description": "Daniel Zimmerman, of North Carolina, to be Assistant Secretary of the Air Force",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 26,
+      "partNumber": "00",
+      "receivedDate": "2025-03-10",
+      "updateDate": "2025-03-11T11:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "26"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-05-06",
+      "citation": "PN141",
+      "congress": 119,
+      "description": "Charlton Allen, of North Carolina, to be Special Counsel, Office of Special Counsel, for the term of five years, vice Hampton Y. Dellinger.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 141,
+      "partNumber": "00",
+      "receivedDate": "2025-05-06",
+      "updateDate": "2025-05-07T11:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "141"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-05-12",
+      "citation": "PN150",
+      "congress": 119,
+      "description": "Zachary M. Bluestone, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice John Andrew Ross, retired.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 150,
+      "partNumber": "00",
+      "receivedDate": "2025-05-12",
+      "updateDate": "2025-05-13T11:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "150"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-05-12",
+      "citation": "PN150",
+      "congress": 119,
+      "description": "Zachary M. Bluestone, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice John Andrew Ross, retired.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 150,
+      "partNumber": "00",
+      "receivedDate": "2025-05-12",
+      "updateDate": "2025-05-13T11:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "150"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-05-12",
+      "citation": "PN150",
+      "congress": 119,
+      "description": "Zachary M. Bluestone, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice John Andrew Ross, retired.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 150,
+      "partNumber": "00",
+      "receivedDate": "2025-05-12",
+      "updateDate": "2025-05-13T11:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "150"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2025-06-16",
+      "citation": "PN345",
+      "congress": 119,
+      "description": "David Wright, of South Carolina, to be Assistant Secretary of State for Democracy, Human Rights, and Labor",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 345,
+      "partNumber": "00",
+      "receivedDate": "2025-06-16",
+      "updateDate": "2025-06-17T11:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "345"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 5,
+        "url": "https://api.congress.gov/v3/nomination/118/121/actions?format=json"
+      },
+      "authorityDate": "2026-03-17",
+      "citation": "PN121",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/121/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Kathryn Rose Lang, of Maryland, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2026, vice Henry J. Aaron, term expired.",
+      "executiveCalendarNumber": "HELD",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/121/hearings?format=json"
+      },
+      "isPrivileged": true,
+      "latestAction": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Social Security Advisory Board",
+          "positionTitle": "Member of the Social Security Advisory Board",
+          "url": "https://api.congress.gov/v3/nomination/118/121/1?format=json"
+        }
+      ],
+      "number": 121,
+      "partNumber": "00",
+      "receivedDate": "2023-01-23",
+      "updateDate": "2026-03-18T11:00:22Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "121"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 5,
+        "url": "https://api.congress.gov/v3/nomination/118/22/actions?format=json"
+      },
+      "authorityDate": "2026-03-17",
+      "citation": "PN22",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/22/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Andrew G. Biggs, of Oregon, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2024, vice Lanhee J. Chen, term expired.",
+      "executiveCalendarNumber": "HELD",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/22/hearings?format=json"
+      },
+      "isPrivileged": true,
+      "latestAction": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Social Security Advisory Board",
+          "positionTitle": "Member of the Social Security Advisory Board",
+          "url": "https://api.congress.gov/v3/nomination/118/22/1?format=json"
+        }
+      ],
+      "number": 22,
+      "partNumber": "00",
+      "receivedDate": "2023-01-03",
+      "updateDate": "2026-03-18T11:00:22Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "22"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 5,
+        "url": "https://api.congress.gov/v3/nomination/118/23/actions?format=json"
+      },
+      "authorityDate": "2026-03-17",
+      "citation": "PN23",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/23/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Sharon Beth Lewis, of Oregon, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2028, vice Alan L. Cohan, term expired.",
+      "executiveCalendarNumber": "HELD",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/23/hearings?format=json"
+      },
+      "isPrivileged": true,
+      "latestAction": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Social Security Advisory Board",
+          "positionTitle": "Member of the Social Security Advisory Board",
+          "url": "https://api.congress.gov/v3/nomination/118/23/1?format=json"
+        }
+      ],
+      "number": 23,
+      "partNumber": "00",
+      "receivedDate": "2023-01-03",
+      "updateDate": "2026-03-18T11:00:22Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "23"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 5,
+        "url": "https://api.congress.gov/v3/nomination/118/120/actions?format=json"
+      },
+      "authorityDate": "2026-03-17",
+      "citation": "PN120",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/120/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Andrew G. Biggs, of Oregon, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2030. (Reappointment)",
+      "executiveCalendarNumber": "HELD",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/120/hearings?format=json"
+      },
+      "isPrivileged": true,
+      "latestAction": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Social Security Advisory Board",
+          "positionTitle": "Member of the Social Security Advisory Board",
+          "url": "https://api.congress.gov/v3/nomination/118/120/1?format=json"
+        }
+      ],
+      "number": 120,
+      "partNumber": "00",
+      "receivedDate": "2023-01-23",
+      "updateDate": "2026-03-18T11:00:22Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "120"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 13,
+        "url": "https://api.congress.gov/v3/nomination/118/1355/actions?format=json"
+      },
+      "authorityDate": "2026-03-17",
+      "citation": "PN1355",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/1355/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Charles J. Willoughby, Jr., of the District of Columbia, to be an Associate Judge of the Superior Court of the District of Columbia for the term of fifteen years, vice William M. Jackson, retired.",
+      "latestAction": {
+        "actionDate": "2024-07-10",
+        "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 43. Record Vote Number: 208."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "The Judiciary",
+          "positionTitle": "Associate Judge of the Superior Court of the District of Columbia",
+          "url": "https://api.congress.gov/v3/nomination/118/1355/1?format=json"
+        }
+      ],
+      "number": 1355,
+      "partNumber": "00",
+      "receivedDate": "2024-01-11",
+      "updateDate": "2026-03-18T11:00:22Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2024-07-10",
+        "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 43. Record Vote Number: 208."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "1355"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 8,
+        "url": "https://api.congress.gov/v3/nomination/118/1149/actions?format=json"
+      },
+      "authorityDate": "2026-03-17",
+      "citation": "PN1149",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/1149/committees?format=json"
+      },
+      "congress": 118,
+      "description": "Corey Anne Tellez, of Illinois, to be a Deputy Under Secretary of the Treasury, vice Jonathan Davidson.",
+      "hearings": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/118/1149/hearings?format=json"
+      },
+      "isPrivileged": true,
+      "latestAction": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Department of the Treasury",
+          "positionTitle": "Deputy Under Secretary of the Treasury",
+          "url": "https://api.congress.gov/v3/nomination/118/1149/1?format=json"
+        }
+      ],
+      "number": 1149,
+      "partNumber": "00",
+      "receivedDate": "2023-11-13",
+      "updateDate": "2026-03-18T11:00:22Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2025-01-03",
+        "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "118",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "1149"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-29",
+      "citation": "PN787",
+      "congress": 119,
+      "description": "Andrew B. Davis, of Texas, to be United States District Judge for the Western District of Texas, vice Earl Leroy Yeakel III, retired.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 787,
+      "partNumber": "00",
+      "receivedDate": "2026-01-29",
+      "updateDate": "2026-01-30T12:00:20Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "787"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 4,
+        "url": "https://api.congress.gov/v3/nomination/119/716/actions?format=json"
+      },
+      "authorityDate": "2026-03-12",
+      "citation": "PN716",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/716/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-12",
+        "text": "Placed on Senate Executive Calendar. Calendar No. 693. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment in the United States Coast Guard to the grade indicated under title 14, U.S.C., section 2121(d):",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Coast Guard",
+          "positionTitle": "Rear Admiral",
+          "url": "https://api.congress.gov/v3/nomination/119/716/1?format=json"
+        }
+      ],
+      "number": 716,
+      "partNumber": "00",
+      "receivedDate": "2025-12-15",
+      "updateDate": "2026-03-13T11:00:22Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-12",
+        "text": "Placed on Senate Executive Calendar. Calendar No. 693. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "716"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-29",
+      "citation": "PN786",
+      "congress": 119,
+      "description": "Brett Doyle, of Connecticut, to be Member of the United States International Trade Commission",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 786,
+      "partNumber": "00",
+      "receivedDate": "2026-01-29",
+      "updateDate": "2026-01-30T12:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "786"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/769/actions?format=json"
+      },
+      "authorityDate": "2026-03-12",
+      "citation": "PN769",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/769/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-01-13",
+        "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "THE FOLLOWING NAMED OFFICERS FOR APPOINTMENT IN THE UNITED STATES COAST GUARD TO THE GRADE INDICATED UNDER TITLE 14 U.S.C., SECTION 2121(E):",
+          "nomineeCount": 253,
+          "ordinal": 1,
+          "organization": "Coast Guard",
+          "positionTitle": "Commander",
+          "url": "https://api.congress.gov/v3/nomination/119/769/1?format=json"
+        }
+      ],
+      "number": 769,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-03-13T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-01-13",
+        "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "769"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 4,
+        "url": "https://api.congress.gov/v3/nomination/119/846/actions?format=json"
+      },
+      "authorityDate": "2026-03-12",
+      "citation": "PN846",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/846/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-12",
+        "text": "Placed on Senate Executive Calendar. Calendar No. DESK. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment in the United States Coast Guard to the grade indicated under title 14, U.S.C., section 2121(e):",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Coast Guard",
+          "positionTitle": "Captain",
+          "url": "https://api.congress.gov/v3/nomination/119/846/1?format=json"
+        }
+      ],
+      "number": 846,
+      "partNumber": "00",
+      "receivedDate": "2026-02-11",
+      "updateDate": "2026-03-13T11:00:19Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-12",
+        "text": "Placed on Senate Executive Calendar. Calendar No. DESK. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "846"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/874/actions?format=json"
+      },
+      "authorityDate": "2026-03-12",
+      "citation": "PN874",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/874/committees?format=json"
+      },
+      "congress": 119,
+      "description": "Sarah B. Rogers, of New York, to be Chief Executive Officer of the United States Agency for Global Media, vice Amanda Bennett, resigned.",
+      "latestAction": {
+        "actionDate": "2026-03-12",
+        "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+      },
+      "nominationType": {
+        "isCivilian": true
+      },
+      "nominees": [
+        {
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "United States Agency for Global Media",
+          "positionTitle": "Chief Executive Officer of the United States Agency for Global Media",
+          "url": "https://api.congress.gov/v3/nomination/119/874/1?format=json"
+        }
+      ],
+      "number": 874,
+      "partNumber": "00",
+      "receivedDate": "2026-03-12",
+      "updateDate": "2026-03-13T11:00:19Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-12",
+        "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "874"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/769/actions?format=json"
+      },
+      "authorityDate": "2026-03-12",
+      "citation": "PN769",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/769/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-01-13",
+        "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "THE FOLLOWING NAMED OFFICERS FOR APPOINTMENT IN THE UNITED STATES COAST GUARD TO THE GRADE INDICATED UNDER TITLE 14 U.S.C., SECTION 2121(E):",
+          "nomineeCount": 253,
+          "ordinal": 1,
+          "organization": "Coast Guard",
+          "positionTitle": "Commander",
+          "url": "https://api.congress.gov/v3/nomination/119/769/1?format=json"
+        }
+      ],
+      "number": 769,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-03-13T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-01-13",
+        "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "769"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/875/actions?format=json"
+      },
+      "authorityDate": "2026-03-12",
+      "citation": "PN875",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/875/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-12",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment in the Reserve of the Army to the grade indicated under title 10, U.S.C., section 12203:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Army",
+          "positionTitle": "Major General",
+          "url": "https://api.congress.gov/v3/nomination/119/875/1?format=json"
+        }
+      ],
+      "number": 875,
+      "partNumber": "00",
+      "receivedDate": "2026-03-12",
+      "updateDate": "2026-03-13T11:00:18Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-12",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "875"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-29",
+      "citation": "PN786",
+      "congress": 119,
+      "description": "Brett Doyle, of Connecticut, to be Member of the United States International Trade Commission",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 786,
+      "partNumber": "00",
+      "receivedDate": "2026-01-29",
+      "updateDate": "2026-01-30T12:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "786"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-29",
+      "citation": "PN786",
+      "congress": 119,
+      "description": "Brett Doyle, of Connecticut, to be Member of the United States International Trade Commission",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 786,
+      "partNumber": "00",
+      "receivedDate": "2026-01-29",
+      "updateDate": "2026-01-30T12:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "786"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-29",
+      "citation": "PN786",
+      "congress": 119,
+      "description": "Brett Doyle, of Connecticut, to be Member of the United States International Trade Commission",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 786,
+      "partNumber": "00",
+      "receivedDate": "2026-01-29",
+      "updateDate": "2026-01-30T12:00:21Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "786"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-02-11",
+      "citation": "PN806",
+      "congress": 119,
+      "description": "Catherine Dillon, of Maryland, to be an Assistant Secretary of State (Educational and Cultural Affairs), vice Lee Satterfield, resigned.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 806,
+      "partNumber": "00",
+      "receivedDate": "2026-02-11",
+      "updateDate": "2026-02-12T12:00:28Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "806"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 17,
+        "url": "https://api.congress.gov/v3/nomination/119/711/actions?format=json"
+      },
+      "authorityDate": "2026-03-10",
+      "citation": "PN711",
+      "committees": {
+        "count": 2,
+        "url": "https://api.congress.gov/v3/nomination/119/711/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-10",
+        "text": "Confirmed by the Senate by Yea-Nay Vote. 71 - 29. Record Vote Number: 49."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment in the United States Army to the grade indicated while assigned to a position of importance and responsibility under title 10, U.S.C., section 601:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Army",
+          "positionTitle": "General",
+          "url": "https://api.congress.gov/v3/nomination/119/711/1?format=json"
+        }
+      ],
+      "number": 711,
+      "partNumber": "00",
+      "receivedDate": "2025-12-15",
+      "updateDate": "2026-03-11T11:00:19Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-10",
+        "text": "Confirmed by the Senate by Yea-Nay Vote. 71 - 29. Record Vote Number: 49."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "711"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/864/actions?format=json"
+      },
+      "authorityDate": "2026-03-10",
+      "citation": "PN864",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/864/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-09",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Air Force under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Air Force",
+          "positionTitle": "Major",
+          "url": "https://api.congress.gov/v3/nomination/119/864/1?format=json"
+        }
+      ],
+      "number": 864,
+      "partNumber": "00",
+      "receivedDate": "2026-03-09",
+      "updateDate": "2026-03-11T11:00:18Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-09",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "864"
+    }
+  },
+  {
+    "nomination": {
+      "authorityDate": "2026-01-13",
+      "citation": "PN730",
+      "congress": 119,
+      "description": "Ademola Adewale-Sadik, of New York, to be United States Director of the African Development Bank for a term of five years, vice Oren E. Whyche-Shaw.",
+      "nominationType": {
+        "isCivilian": true
+      },
+      "number": 730,
+      "partNumber": "00",
+      "receivedDate": "2026-01-13",
+      "updateDate": "2026-01-14T12:00:38Z",
+      "nomination_type": {
+        "isCivilian": true
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "730"
+    }
+  },
+  {
+    "nomination": {
+      "actions": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/863/actions?format=json"
+      },
+      "authorityDate": "2026-03-09",
+      "citation": "PN863",
+      "committees": {
+        "count": 1,
+        "url": "https://api.congress.gov/v3/nomination/119/863/committees?format=json"
+      },
+      "congress": 119,
+      "isList": true,
+      "latestAction": {
+        "actionDate": "2026-03-09",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "nominationType": {
+        "isMilitary": true
+      },
+      "nominees": [
+        {
+          "introText": "The following named officer for appointment to the grade indicated in the United States Air Force under title 10, U.S.C., section 624:",
+          "nomineeCount": 1,
+          "ordinal": 1,
+          "organization": "Air Force",
+          "positionTitle": "Lieutenant Colonel",
+          "url": "https://api.congress.gov/v3/nomination/119/863/1?format=json"
+        }
+      ],
+      "number": 863,
+      "partNumber": "00",
+      "receivedDate": "2026-03-09",
+      "updateDate": "2026-03-10T11:00:21Z",
+      "nomination_type": {
+        "isMilitary": true
+      },
+      "latest_action": {
+        "actionDate": "2026-03-09",
+        "text": "Received in the Senate and referred to the Committee on Armed Services."
+      },
+      "part_number": "00"
+    },
+    "request": {
+      "congress": "119",
+      "contentType": "application/json",
+      "format": "json",
+      "number": "863"
+    }
+  }
+]

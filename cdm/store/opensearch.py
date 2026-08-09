@@ -2,14 +2,43 @@
 
 from __future__ import annotations
 
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 INDEX_PREFIX = "congress"
+
+# Source resources that share a physical index must carry a discriminator in
+# the document so queries can distinguish their source shapes.
+_RESOURCE_TARGETS: dict[str, tuple[str, dict[str, str]]] = {
+    "bill": ("legislation", {"source_type": "bill"}),
+    "law": ("legislation", {"source_type": "law"}),
+    "house_communication": ("communication", {"chamber": "House"}),
+    "senate_communication": ("communication", {"chamber": "Senate"}),
+    "bound_congressional_record": (
+        "congressional_record",
+        {"record_subtype": "bound"},
+    ),
+    "daily_congressional_record": (
+        "congressional_record",
+        {"record_subtype": "daily"},
+    ),
+    "congress": ("congress_ref", {}),
+}
+
+
+def resource_target(resource: str) -> tuple[str, dict[str, str]]:
+    """Return the logical index and discriminator fields for a resource."""
+    if resource == "summaries":
+        raise ValueError(
+            "summaries are denormalized into legislation and cannot be indexed directly"
+        )
+    return _RESOURCE_TARGETS.get(resource, (resource, {}))
 
 
 def index_name(resource: str) -> str:
     """Return the canonical OpenSearch index name for *resource*."""
-    return f"{INDEX_PREFIX}-{resource.replace('_', '-')}"
+    target, _ = resource_target(resource)
+    return f"{INDEX_PREFIX}-{target.replace('_', '-')}"
 
 
 def write_alias(resource: str) -> str:
@@ -43,6 +72,7 @@ def bulk_upsert(client: Any, resource: str, docs: Iterable[dict]) -> dict:
     """
     from elasticsearch.helpers import bulk
 
+    documents = list(docs)
     index = write_alias(resource)
     actions = [
         {
@@ -52,11 +82,19 @@ def bulk_upsert(client: Any, resource: str, docs: Iterable[dict]) -> dict:
             "doc": doc,
             "doc_as_upsert": True,
         }
-        for doc in docs
+        for doc in documents
         if doc.get("id")
     ]
     if not actions:
-        return {"updated": 0, "errors": False}
+        return {
+            "updated": 0,
+            "errors": False,
+            "skipped_missing_ids": len(documents),
+        }
 
     success, errors = bulk(client, actions, raise_on_error=False)
-    return {"updated": success, "errors": bool(errors)}
+    return {
+        "updated": success,
+        "errors": bool(errors),
+        "skipped_missing_ids": sum(1 for doc in documents if not doc.get("id")),
+    }

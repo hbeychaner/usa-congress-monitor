@@ -1,0 +1,4385 @@
+[
+  {
+    "citation": "PN346",
+    "congress": 115,
+    "description": "Robert Daigle, of Virginia, to be Director of Cost Assessment and Program Evaluation, Department of Defense, vice Jamie Michael Morin.",
+    "latestAction": {
+      "actionDate": "2017-08-01",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 346,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2017-04-25",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/115/346?format=json"
+  },
+  {
+    "citation": "PN247",
+    "congress": 115,
+    "description": "David L. Norquist, of Virginia, to be Under Secretary of Defense (Comptroller), vice Michael J. McCord.",
+    "latestAction": {
+      "actionDate": "2017-05-25",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 247,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2017-04-06",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/115/247?format=json"
+  },
+  {
+    "citation": "PN294",
+    "congress": 115,
+    "description": "Elaine McCusker, of Virginia, to be a Principal Deputy Under Secretary of Defense, vice John Conger.",
+    "latestAction": {
+      "actionDate": "2017-08-01",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 294,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2017-04-24",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/115/294?format=json"
+  },
+  {
+    "citation": "PN12-19",
+    "congress": 119,
+    "description": "Dario Gil, of New York, to be Under Secretary for Science, Department of Energy, vice Geraldine Richmond, resigned.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 12,
+    "organization": "Department of Energy",
+    "partNumber": "19",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/119/12-19?format=json"
+  },
+  {
+    "citation": "PN1980",
+    "congress": 118,
+    "description": "Matthew James Marzano, of Illinois, to be a Member of the Nuclear Regulatory Commission for the term of five years expiring June 30, 2028, vice Jeffrey Martin Baran, term expired.",
+    "latestAction": {
+      "actionDate": "2024-12-12",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 45. Record Vote Number: 323."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 1980,
+    "organization": "Nuclear Regulatory Commission",
+    "partNumber": "00",
+    "receivedDate": "2024-07-23",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/118/1980?format=json"
+  },
+  {
+    "citation": "PN12-20",
+    "congress": 119,
+    "description": "Preston Griffith, of Virginia, to be Under Secretary of Energy, vice David Crane, resigned.",
+    "latestAction": {
+      "actionDate": "2025-07-09",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 54 - 43. Record Vote Number: 375."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 12,
+    "organization": "Department of Energy",
+    "partNumber": "20",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/119/12-20?format=json"
+  },
+  {
+    "citation": "PN12-23",
+    "congress": 119,
+    "description": "Jared Isaacman, of Pennsylvania, to be Administrator of the National Aeronautics and Space Administration, vice Bill Nelson, resigned.",
+    "latestAction": {
+      "actionDate": "2025-06-02",
+      "text": "Received message of withdrawal of nomination from the President."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 12,
+    "organization": "National Aeronautics and Space Administration",
+    "partNumber": "23",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/119/12-23?format=json"
+  },
+  {
+    "citation": "PN12-17",
+    "congress": 119,
+    "description": "David Fink, of New Hampshire, to be Administrator of the Federal Railroad Administration, vice Amitabha Bose, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-07",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 547."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 12,
+    "organization": "Department of Transportation",
+    "partNumber": "17",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-03-21T11:00:29Z",
+    "url": "https://api.congress.gov/v3/nomination/119/12-17?format=json"
+  },
+  {
+    "citation": "PN24-7",
+    "congress": 119,
+    "description": "Olivia Trusty, of Maryland, to be a Member of the Federal Communications Commission for a term of five years from July 1, 2025.  (Reappointment)",
+    "latestAction": {
+      "actionDate": "2025-06-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 53 - 45. Record Vote Number: 320."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 24,
+    "organization": "Federal Communications Commission",
+    "partNumber": "07",
+    "receivedDate": "2025-02-11",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/24-7?format=json"
+  },
+  {
+    "citation": "PN22-9",
+    "congress": 119,
+    "description": "Neil Jacobs, of North Carolina, to be Under Secretary of Commerce for Oceans and Atmosphere, vice Richard W. Spinrad, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-07",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 547."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of Commerce",
+    "partNumber": "09",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-9?format=json"
+  },
+  {
+    "citation": "PN22-8",
+    "congress": 119,
+    "description": "Kyle Haustveit, of Oklahoma, to be an Assistant Secretary of Energy (Fossil Energy), vice Brad John Crabtree, resigned.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of Energy",
+    "partNumber": "08",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-8?format=json"
+  },
+  {
+    "citation": "PN22-5",
+    "congress": 119,
+    "description": "Theodore J. Garrish, of Maryland, to be an Assistant Secretary of Energy (Nuclear Energy), vice Kathryn Huff.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of Energy",
+    "partNumber": "05",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-5?format=json"
+  },
+  {
+    "citation": "PN22-27",
+    "congress": 119,
+    "description": "Andrea Travnicek, of North Dakota, to be an Assistant Secretary of the Interior, vice Tanya Marie Trujillo, resigned.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of the Interior",
+    "partNumber": "27",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-27?format=json"
+  },
+  {
+    "citation": "PN12-36",
+    "congress": 119,
+    "description": "John Phelan, of Florida, to be Secretary of the Navy, vice Carlos Del Toro, resigned.",
+    "latestAction": {
+      "actionDate": "2025-03-24",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 62 - 30. Record Vote Number: 136."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 12,
+    "organization": "Department of Defense",
+    "partNumber": "36",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/12-36?format=json"
+  },
+  {
+    "citation": "PN25-13",
+    "congress": 119,
+    "description": "David Fogel, of Connecticut, to be Assistant Secretary of Commerce and Director General of the United States and Foreign Commercial Service, vice Arun Venkataraman, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-07",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 547."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 25,
+    "organization": "Department of Commerce",
+    "partNumber": "13",
+    "receivedDate": "2025-02-11",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/25-13?format=json"
+  },
+  {
+    "citation": "PN24-6",
+    "congress": 119,
+    "description": "Olivia Trusty, of Maryland, to be a Member of the Federal Communications Commission for the remainder of the term expiring June 30, 2025, vice Jessica Rosenworcel.",
+    "latestAction": {
+      "actionDate": "2025-06-17",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 53 - 45. Record Vote Number: 317."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 24,
+    "organization": "Federal Communications Commission",
+    "partNumber": "06",
+    "receivedDate": "2025-02-11",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/24-6?format=json"
+  },
+  {
+    "citation": "PN13-4",
+    "congress": 119,
+    "description": "James Danly, of Tennessee, to be Deputy Secretary of Energy, vice David Turk, resigned.",
+    "latestAction": {
+      "actionDate": "2025-05-13",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 52 - 44. Record Vote Number: 248."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 13,
+    "organization": "Department of Energy",
+    "partNumber": "04",
+    "receivedDate": "2025-01-22",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/13-4?format=json"
+  },
+  {
+    "citation": "PN22-2",
+    "congress": 119,
+    "description": "Leslie Beyer, of Texas, to be an Assistant Secretary of the Interior, vice Joseph Balash, resigned.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of the Interior",
+    "partNumber": "02",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-2?format=json"
+  },
+  {
+    "citation": "PN22-6",
+    "congress": 119,
+    "description": "Pierre Gentin, of New York, to be General Counsel of the Department of Commerce, vice Leslie B. Kiernan, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-07",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 547."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of Commerce",
+    "partNumber": "06",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-6?format=json"
+  },
+  {
+    "citation": "PN22-4",
+    "congress": 119,
+    "description": "William L. Doffermyre, of Texas, to be Solicitor of the Department of the Interior, vice Robert T. Anderson, resigned.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of the Interior",
+    "partNumber": "04",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-4?format=json"
+  },
+  {
+    "citation": "PN13-10",
+    "congress": 119,
+    "description": "Katharine MacGregor, of Florida, to be Deputy Secretary of the Interior, vice Tommy P. Beaudreau, resigned.",
+    "latestAction": {
+      "actionDate": "2025-05-14",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 54 - 40. Record Vote Number: 250."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 13,
+    "organization": "Department of the Interior",
+    "partNumber": "10",
+    "receivedDate": "2025-01-22",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/13-10?format=json"
+  },
+  {
+    "citation": "PN22-1",
+    "congress": 119,
+    "description": "Tristan Abbey, of Florida, to be Administrator of the Energy Information Administration, vice Joseph F. DeCarolis, resigned.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Department of Energy",
+    "partNumber": "01",
+    "receivedDate": "2025-02-03",
+    "updateDate": "2026-03-21T11:00:28Z",
+    "url": "https://api.congress.gov/v3/nomination/119/22-1?format=json"
+  },
+  {
+    "citation": "PN858",
+    "congress": 119,
+    "description": "Markwayne Mullin, of Oklahoma, to be Secretary of Homeland Security, vice Kristi Noem.",
+    "latestAction": {
+      "actionDate": "2026-03-20",
+      "text": "Cloture motion presented in Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 858,
+    "organization": "Department of Homeland Security",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-21T11:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/858?format=json"
+  },
+  {
+    "citation": "PN26-26",
+    "congress": 119,
+    "description": "Harry Kumar, of New York, to be an Assistant Secretary of Commerce, vice Susie Feliz, resigned.",
+    "latestAction": {
+      "actionDate": "2025-12-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 53 - 43. Record Vote Number: 655."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 26,
+    "organization": "Department of Commerce",
+    "partNumber": "26",
+    "receivedDate": "2025-03-10",
+    "updateDate": "2026-03-21T11:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/26-26?format=json"
+  },
+  {
+    "citation": "PN25-23",
+    "congress": 119,
+    "description": "Taylor Jordan, of the District of Columbia, to be an Assistant Secretary of Commerce, vice Michael Cottman Morgan, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-07",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 547."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 25,
+    "organization": "Department of Commerce",
+    "partNumber": "23",
+    "receivedDate": "2025-02-11",
+    "updateDate": "2026-03-21T11:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/25-23?format=json"
+  },
+  {
+    "citation": "PN624-1",
+    "congress": 119,
+    "description": "Michael Selig, of Florida, to be Chairman of the Commodity Futures Trading Commission, vice Rostin Behnam.",
+    "latestAction": {
+      "actionDate": "2025-12-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 53 - 43. Record Vote Number: 655."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 624,
+    "organization": "Commodity Futures Trading Commission",
+    "partNumber": "01",
+    "receivedDate": "2025-10-27",
+    "updateDate": "2026-03-21T11:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/624-1?format=json"
+  },
+  {
+    "citation": "PN26-19",
+    "congress": 119,
+    "description": "Robert Gleason, of Pennsylvania, to be Director of the Amtrak Board of Directors for a term of five years, vice Albert DiClemente, term expired.",
+    "latestAction": {
+      "actionDate": "2025-09-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 526."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 26,
+    "organization": "Amtrak Board of Directors",
+    "partNumber": "19",
+    "receivedDate": "2025-03-10",
+    "updateDate": "2026-03-21T11:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/26-19?format=json"
+  },
+  {
+    "citation": "PN26-21",
+    "congress": 119,
+    "description": "Catherine Jereza, of Maryland, to be an Assistant Secretary of Energy (Electricity), vice Gene Rodrigues, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-07",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 547."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 26,
+    "organization": "Department of Energy",
+    "partNumber": "21",
+    "receivedDate": "2025-03-10",
+    "updateDate": "2026-03-21T11:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/26-21?format=json"
+  },
+  {
+    "citation": "PN624-2",
+    "congress": 119,
+    "description": "Michael Selig, of Florida, to be a Commissioner of the Commodity Futures Trading Commission for a term expiring April 13, 2029, vice Christy Goldsmith Romero, term expired.",
+    "latestAction": {
+      "actionDate": "2025-12-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 53 - 43. Record Vote Number: 655."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 624,
+    "organization": "Commodity Futures Trading Commission",
+    "partNumber": "02",
+    "receivedDate": "2025-10-27",
+    "updateDate": "2026-03-21T11:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/624-2?format=json"
+  },
+  {
+    "citation": "PN730-5",
+    "congress": 119,
+    "description": "Brian Barber, of Louisiana, to be United States Marshal for the Western District of Louisiana for the term of four years, vice Henry Lee Whitehorn, Sr., term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 699."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "05",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-20T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-5?format=json"
+  },
+  {
+    "citation": "PN1234",
+    "congress": 116,
+    "description": "Amanda Wood Laihow, of Maine, to be a Member of the Occupational Safety and Health Review Commission for the remainder of a term expiring April 27, 2023, vice Heather L. MacDougall, resigned.",
+    "latestAction": {
+      "actionDate": "2020-01-09",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 1234,
+    "organization": "Occupational Safety and Health Review Commission",
+    "partNumber": "00",
+    "receivedDate": "2019-10-17",
+    "updateDate": "2026-03-20T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/116/1234?format=json"
+  },
+  {
+    "citation": "PN730-44",
+    "congress": 119,
+    "description": "Priscilla Lopez, of Florida, to be United States Marshal for the Southern District of Florida for the term of four years, vice Gadyaces S. Serralta, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 701."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "44",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-20T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-44?format=json"
+  },
+  {
+    "citation": "PN730-9",
+    "congress": 119,
+    "description": "James Bishop, of North Carolina, to be United States Attorney for the Middle District of North Carolina for the term of four years, vice Sandra J. Hairston.",
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 698."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "09",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-20T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-9?format=json"
+  },
+  {
+    "citation": "PN806-4",
+    "congress": 119,
+    "description": "Steven Lewis, of Missouri, to be United States Marshal for the Eastern District of Missouri, for the term of four years, vice John D. Jordan, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 700."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 806,
+    "organization": "Department of Justice",
+    "partNumber": "04",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-20T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/806-4?format=json"
+  },
+  {
+    "citation": "PN786-9",
+    "congress": 119,
+    "description": "Colin McDonald, of California, to be an Assistant Attorney General, vice Todd Sunhwae Kim.",
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 697."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 786,
+    "organization": "Department of Justice",
+    "partNumber": "09",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-20T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/786-9?format=json"
+  },
+  {
+    "citation": "PN882",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 882,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/882?format=json"
+  },
+  {
+    "citation": "PN885",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 885,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/885?format=json"
+  },
+  {
+    "citation": "PN881",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 881,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/881?format=json"
+  },
+  {
+    "citation": "PN884",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 884,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/884?format=json"
+  },
+  {
+    "citation": "PN876",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 876,
+    "organization": "Coast Guard",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/876?format=json"
+  },
+  {
+    "citation": "PN883",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 883,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/883?format=json"
+  },
+  {
+    "citation": "PN877",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 877,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/877?format=json"
+  },
+  {
+    "citation": "PN886",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 886,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/886?format=json"
+  },
+  {
+    "citation": "PN879",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 879,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/879?format=json"
+  },
+  {
+    "citation": "PN888",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 888,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/888?format=json"
+  },
+  {
+    "citation": "PN878",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 878,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/878?format=json"
+  },
+  {
+    "citation": "PN880",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 880,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/880?format=json"
+  },
+  {
+    "citation": "PN887",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 887,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/887?format=json"
+  },
+  {
+    "citation": "PN889",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 889,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/889?format=json"
+  },
+  {
+    "citation": "PN890",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 890,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/890?format=json"
+  },
+  {
+    "citation": "PN891",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-19",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 891,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-19",
+    "updateDate": "2026-03-20T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/891?format=json"
+  },
+  {
+    "citation": "PN150-1",
+    "congress": 119,
+    "description": "Zachary M. Bluestone, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice John Andrew Ross, retired.",
+    "latestAction": {
+      "actionDate": "2025-07-23",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 49 - 47. Record Vote Number: 430."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 150,
+    "organization": "The Judiciary",
+    "partNumber": "01",
+    "receivedDate": "2025-05-12",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/150-1?format=json"
+  },
+  {
+    "citation": "PN150-2",
+    "congress": 119,
+    "description": "Joshua M. Divine, of Missouri, to be United States District Judge for the Eastern and Western Districts of Missouri, vice Rodney W. Sippel, retired.",
+    "latestAction": {
+      "actionDate": "2025-07-22",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 46. Record Vote Number: 420."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 150,
+    "organization": "The Judiciary",
+    "partNumber": "02",
+    "receivedDate": "2025-05-12",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/150-2?format=json"
+  },
+  {
+    "citation": "PN821",
+    "congress": 113,
+    "description": "John P. Carlin, of New York, to be an Assistant Attorney General, vice Lisa O. Monaco, resigned.",
+    "latestAction": {
+      "actionDate": "2014-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 821,
+    "organization": "Department of Justice",
+    "partNumber": "00",
+    "receivedDate": "2013-09-11",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/113/821?format=json"
+  },
+  {
+    "citation": "PN2225",
+    "congress": 117,
+    "description": "Terrence Edwards, of Maryland, to be Inspector General of the National Reconnaissance Office, vice Susan S. Gibson.",
+    "latestAction": {
+      "actionDate": "2022-12-22",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 2225,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2022-06-07",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/117/2225?format=json"
+  },
+  {
+    "citation": "PN358",
+    "congress": 112,
+    "description": "Lisa O. Monaco, of the District of Columbia, to be an Assistant Attorney General, vice David S. Kris, resigned.",
+    "latestAction": {
+      "actionDate": "2011-06-28",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 358,
+    "organization": "Department of Justice",
+    "partNumber": "00",
+    "receivedDate": "2011-03-17",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/112/358?format=json"
+  },
+  {
+    "citation": "PN2014",
+    "congress": 118,
+    "description": "Kristi Zuleika Lane Scott, of Virginia, to be Inspector General of the National Security Agency, vice Robert P. Storch, resigned.",
+    "latestAction": {
+      "actionDate": "2025-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 2014,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2024-07-31",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/118/2014?format=json"
+  },
+  {
+    "citation": "PN26-16",
+    "congress": 119,
+    "description": "John Andrew Eisenberg, of Virginia, to be an Assistant Attorney General, vice Matthew G. Olsen, resigned.",
+    "latestAction": {
+      "actionDate": "2025-06-05",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 52 - 43. Record Vote Number: 295."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 26,
+    "organization": "Department of Justice",
+    "partNumber": "16",
+    "receivedDate": "2025-03-10",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/26-16?format=json"
+  },
+  {
+    "citation": "PN141-19",
+    "congress": 119,
+    "description": "Christopher Fox, of Virginia, to be Inspector General of the Intelligence Community, Office of the Director of National Intelligence, vice Thomas Andrew Monheim, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-07",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 47. Record Vote Number: 547."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 141,
+    "organization": "Office of the Director of National Intelligence",
+    "partNumber": "19",
+    "receivedDate": "2025-05-06",
+    "updateDate": "2026-03-19T11:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/141-19?format=json"
+  },
+  {
+    "citation": "PN150-3",
+    "congress": 119,
+    "description": "Whitney D. Hermandorfer, of Tennessee, to be United States Circuit Judge for the Sixth Circuit, vice Jane Branstetter Stranch, retiring.",
+    "latestAction": {
+      "actionDate": "2025-07-14",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 46 - 42. Record Vote Number: 384."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 150,
+    "organization": "The Judiciary",
+    "partNumber": "03",
+    "receivedDate": "2025-05-12",
+    "updateDate": "2026-03-19T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/150-3?format=json"
+  },
+  {
+    "citation": "PN150-6",
+    "congress": 119,
+    "description": "Cristian M. Stevens, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice Audrey Goldstein Fleissig, retired.",
+    "latestAction": {
+      "actionDate": "2025-07-22",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 47. Record Vote Number: 421."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 150,
+    "organization": "The Judiciary",
+    "partNumber": "06",
+    "receivedDate": "2025-05-12",
+    "updateDate": "2026-03-19T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/150-6?format=json"
+  },
+  {
+    "citation": "PN150-4",
+    "congress": 119,
+    "description": "Maria A. Lanahan, of Missouri, to be United States District Judge for the Eastern District of Missouri, vice Ronnie L. White, retired.",
+    "latestAction": {
+      "actionDate": "2025-09-09",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 52 - 45. Record Vote Number: 505."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 150,
+    "organization": "The Judiciary",
+    "partNumber": "04",
+    "receivedDate": "2025-05-12",
+    "updateDate": "2026-03-19T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/150-4?format=json"
+  },
+  {
+    "citation": "PN345-3",
+    "congress": 119,
+    "description": "Karen Brazell, of Maryland, to be Under Secretary for Benefits of the Department of Veterans Affairs, vice Joshua David Jacobs, resigned.",
+    "latestAction": {
+      "actionDate": "2025-10-08",
+      "text": "Received message of withdrawal of nomination from the President."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 345,
+    "organization": "Department of Veterans Affairs",
+    "partNumber": "03",
+    "receivedDate": "2025-06-16",
+    "updateDate": "2026-03-19T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/345-3?format=json"
+  },
+  {
+    "citation": "PN121",
+    "congress": 118,
+    "description": "Kathryn Rose Lang, of Maryland, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2026, vice Henry J. Aaron, term expired.",
+    "latestAction": {
+      "actionDate": "2025-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 121,
+    "organization": "Social Security Advisory Board",
+    "partNumber": "00",
+    "receivedDate": "2023-01-23",
+    "updateDate": "2026-03-18T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/118/121?format=json"
+  },
+  {
+    "citation": "PN22",
+    "congress": 118,
+    "description": "Andrew G. Biggs, of Oregon, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2024, vice Lanhee J. Chen, term expired.",
+    "latestAction": {
+      "actionDate": "2025-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 22,
+    "organization": "Social Security Advisory Board",
+    "partNumber": "00",
+    "receivedDate": "2023-01-03",
+    "updateDate": "2026-03-18T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/118/22?format=json"
+  },
+  {
+    "citation": "PN23",
+    "congress": 118,
+    "description": "Sharon Beth Lewis, of Oregon, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2028, vice Alan L. Cohan, term expired.",
+    "latestAction": {
+      "actionDate": "2025-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 23,
+    "organization": "Social Security Advisory Board",
+    "partNumber": "00",
+    "receivedDate": "2023-01-03",
+    "updateDate": "2026-03-18T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/118/23?format=json"
+  },
+  {
+    "citation": "PN120",
+    "congress": 118,
+    "description": "Andrew G. Biggs, of Oregon, to be a Member of the Social Security Advisory Board for a term expiring September 30, 2030. (Reappointment)",
+    "latestAction": {
+      "actionDate": "2025-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 120,
+    "organization": "Social Security Advisory Board",
+    "partNumber": "00",
+    "receivedDate": "2023-01-23",
+    "updateDate": "2026-03-18T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/118/120?format=json"
+  },
+  {
+    "citation": "PN1355",
+    "congress": 118,
+    "description": "Charles J. Willoughby, Jr., of the District of Columbia, to be an Associate Judge of the Superior Court of the District of Columbia for the term of fifteen years, vice William M. Jackson, retired.",
+    "latestAction": {
+      "actionDate": "2024-07-10",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 43. Record Vote Number: 208."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 1355,
+    "organization": "The Judiciary",
+    "partNumber": "00",
+    "receivedDate": "2024-01-11",
+    "updateDate": "2026-03-18T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/118/1355?format=json"
+  },
+  {
+    "citation": "PN1149",
+    "congress": 118,
+    "description": "Corey Anne Tellez, of Illinois, to be a Deputy Under Secretary of the Treasury, vice Jonathan Davidson.",
+    "latestAction": {
+      "actionDate": "2025-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 1149,
+    "organization": "Department of the Treasury",
+    "partNumber": "00",
+    "receivedDate": "2023-11-13",
+    "updateDate": "2026-03-18T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/118/1149?format=json"
+  },
+  {
+    "citation": "PN787-4",
+    "congress": 119,
+    "description": "Anna St. John, of Louisiana, to be United States District Judge for the Eastern District of Louisiana, vice Sarah S. Vance, retired.",
+    "latestAction": {
+      "actionDate": "2026-03-17",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 45. Record Vote Number: 56."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 787,
+    "organization": "The Judiciary",
+    "partNumber": "04",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-18T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/787-4?format=json"
+  },
+  {
+    "citation": "PN730-3",
+    "congress": 119,
+    "description": "Matthew Anderson, of Colorado, to be Deputy Administrator of the National Aeronautics and Space Administration, vice Pamela A. Melroy, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 688. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "National Aeronautics and Space Administration",
+    "partNumber": "03",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-3?format=json"
+  },
+  {
+    "citation": "PN716",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 693. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 716,
+    "organization": "Coast Guard",
+    "partNumber": "00",
+    "receivedDate": "2025-12-15",
+    "updateDate": "2026-03-13T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/716?format=json"
+  },
+  {
+    "citation": "PN730-13",
+    "congress": 119,
+    "description": "Jeremy Carl, of Montana, to be an Assistant Secretary of State (International Organizations), vice Michele Jeanne Sison.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Received message of withdrawal of nomination from the President."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of State",
+    "partNumber": "13",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-13?format=json"
+  },
+  {
+    "citation": "PN730-32",
+    "congress": 119,
+    "description": "William Hewes III, of Mississippi, to be a Commissioner of the Consumer Product Safety Commission for a term of seven years from October 27, 2024, vice Douglas Dziak, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Received message of withdrawal of nomination from the President."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Consumer Product Safety Commission",
+    "partNumber": "32",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-32?format=json"
+  },
+  {
+    "citation": "PN730-37",
+    "congress": 119,
+    "description": "Richard Kloster, of West Virginia, to be a Member of the Surface Transportation Board for a term expiring December 31, 2028, vice Martin J. Oberman, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 690. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Surface Transportation Board",
+    "partNumber": "37",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-37?format=json"
+  },
+  {
+    "citation": "PN730-28",
+    "congress": 119,
+    "description": "Michael Graham, of Virginia, to be a Member of the National Transportation Safety Board for a term expiring December 31, 2030.  (Reappointment)",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 689. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "National Transportation Safety Board",
+    "partNumber": "28",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-28?format=json"
+  },
+  {
+    "citation": "PN730-20",
+    "congress": 119,
+    "description": "Irving Dennis, of Ohio, to be Chief Financial Officer, Department of Housing and Urban Development, vice Vinay Vijay Singh, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Referred to the Committee on Banking, Housing, and Urban Affairs as requested by Senator Smith."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Housing and Urban Development",
+    "partNumber": "20",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-20?format=json"
+  },
+  {
+    "citation": "PN730-68",
+    "congress": 119,
+    "description": "Phillip Williams, Jr., of Alabama, to be United States Attorney for the Northern District of Alabama for the term of four years, vice John E. Town, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 695."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "68",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-68?format=json"
+  },
+  {
+    "citation": "PN730-51",
+    "congress": 119,
+    "description": "Seval Oz, of California, to be an Assistant Secretary of Transportation.  (New Position)",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 691. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Transportation",
+    "partNumber": "51",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-51?format=json"
+  },
+  {
+    "citation": "PN730-54",
+    "congress": 119,
+    "description": "Arvind Raman, of Indiana, to be Under Secretary of Commerce for Standards and Technology, vice Laurie E. Locascio, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 692. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Commerce",
+    "partNumber": "54",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-54?format=json"
+  },
+  {
+    "citation": "PN786-7",
+    "congress": 119,
+    "description": "Melissa Holyoak, of Utah, to be United States Attorney for the District of Utah for the term of four years, vice Trina A. Higgins.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 694."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 786,
+    "organization": "Department of Justice",
+    "partNumber": "07",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/786-7?format=json"
+  },
+  {
+    "citation": "PN769-2",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-01-13",
+      "text": "Received in the Senate and referred to the Committee on Commerce, Science, and Transportation."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 769,
+    "organization": "Coast Guard",
+    "partNumber": "02",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/769-2?format=json"
+  },
+  {
+    "citation": "PN846",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. DESK. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 846,
+    "organization": "Coast Guard",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/846?format=json"
+  },
+  {
+    "citation": "PN874",
+    "congress": 119,
+    "description": "Sarah B. Rogers, of New York, to be Chief Executive Officer of the United States Agency for Global Media, vice Amanda Bennett, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 874,
+    "organization": "United States Agency for Global Media",
+    "partNumber": "00",
+    "receivedDate": "2026-03-12",
+    "updateDate": "2026-03-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/874?format=json"
+  },
+  {
+    "citation": "PN769-1",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Placed on Senate Executive Calendar. Calendar No. DESK."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 769,
+    "organization": "Coast Guard",
+    "partNumber": "01",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-13T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/769-1?format=json"
+  },
+  {
+    "citation": "PN875",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-12",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 875,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-12",
+    "updateDate": "2026-03-13T11:00:18Z",
+    "url": "https://api.congress.gov/v3/nomination/119/875?format=json"
+  },
+  {
+    "citation": "PN730-12",
+    "congress": 119,
+    "description": "Wesley Brooks, of Florida, to be Assistant Secretary of State for Oceans and International Environmental and Scientific Affairs, vice Monica P. Medina, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 686. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of State",
+    "partNumber": "12",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-12T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-12?format=json"
+  },
+  {
+    "citation": "PN730-50",
+    "congress": 119,
+    "description": "Jared Novelly, of Missouri, to be Ambassador Extraordinary and Plenipotentiary of the United States of America to New Zealand, and to serve concurrently and without additional compensation as Ambassador Extraordinary and Plenipotentiary of the United States of America to the Independent State of Samoa, the Cook Islands, and Niue.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 682. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of State",
+    "partNumber": "50",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-12T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-50?format=json"
+  },
+  {
+    "citation": "PN730-40",
+    "congress": 119,
+    "description": "Lee Lipton, of Florida, to be Ambassador Extraordinary and Plenipotentiary of the United States of America to the Republic of the Philippines.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 680. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of State",
+    "partNumber": "40",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-12T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-40?format=json"
+  },
+  {
+    "citation": "PN730-43",
+    "congress": 119,
+    "description": "William Long, of Missouri, to be Ambassador Extraordinary and Plenipotentiary of the United States of America to the Republic of Iceland.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 681. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of State",
+    "partNumber": "43",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-12T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-43?format=json"
+  },
+  {
+    "citation": "PN786-2",
+    "congress": 119,
+    "description": "Troy Edgar, of California, to be Ambassador Extraordinary and Plenipotentiary of the United States of America to the Republic of El Salvador.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 684. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 786,
+    "organization": "Department of State",
+    "partNumber": "02",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-12T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/786-2?format=json"
+  },
+  {
+    "citation": "PN786-5",
+    "congress": 119,
+    "description": "Frank Garcia, of Virginia, to be a Member of the Board of Directors of the African Development Foundation for a term expiring September 22, 2031, vice Morgan W. Davis, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Committee on Foreign Relations. Ordered to be reported favorably."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 786,
+    "organization": "African Development Foundation",
+    "partNumber": "05",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-12T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/786-5?format=json"
+  },
+  {
+    "citation": "PN730-62",
+    "congress": 119,
+    "description": "Robert Sweeney, of Texas, to be United States Director of the Asian Development Bank, with the rank of Ambassador, vice Chantale Yokmin Wong, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 683. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Asian Development Bank",
+    "partNumber": "62",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-12T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-62?format=json"
+  },
+  {
+    "citation": "PN786-4",
+    "congress": 119,
+    "description": "Frank Garcia, of Virginia, to be an Assistant Secretary of State (African Affairs), vice Mary Catherine Phee.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 687. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 786,
+    "organization": "Department of State",
+    "partNumber": "04",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-12T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/786-4?format=json"
+  },
+  {
+    "citation": "PN806-6",
+    "congress": 119,
+    "description": "Asel Roberts, of Virginia, to be Ambassador Extraordinary and Plenipotentiary of the United States of America to the Republic of Slovenia.",
+    "latestAction": {
+      "actionDate": "2026-03-11",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 685. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 806,
+    "organization": "Department of State",
+    "partNumber": "06",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-12T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/806-6?format=json"
+  },
+  {
+    "citation": "PN730-8",
+    "congress": 119,
+    "description": "Brian Birdwell, of Texas, to be an Assistant Secretary of Defense, vice Christopher Joseph Lowman.",
+    "latestAction": {
+      "actionDate": "2026-03-10",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 678. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Defense",
+    "partNumber": "08",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-11T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-8?format=json"
+  },
+  {
+    "citation": "PN711",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-10",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 71 - 29. Record Vote Number: 49."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 711,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2025-12-15",
+    "updateDate": "2026-03-11T11:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/711?format=json"
+  },
+  {
+    "citation": "PN864",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 864,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-11T11:00:18Z",
+    "url": "https://api.congress.gov/v3/nomination/119/864?format=json"
+  },
+  {
+    "citation": "PN730-21",
+    "congress": 119,
+    "description": "Mark Ditlevson, of Minnesota, to be an Assistant Secretary of Defense, vice Melissa Griffin Dalton, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-10",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 679. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Defense",
+    "partNumber": "21",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-11T11:00:18Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-21?format=json"
+  },
+  {
+    "citation": "PN863",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 863,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/863?format=json"
+  },
+  {
+    "citation": "PN859-3",
+    "congress": 119,
+    "description": "Darrell Owens, of Pennsylvania, to be U.S. Representative to the Organization for Security and Cooperation in Europe, with the rank of Ambassador.",
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 859,
+    "organization": "Department of State",
+    "partNumber": "03",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/859-3?format=json"
+  },
+  {
+    "citation": "PN859-1",
+    "congress": 119,
+    "description": "James Arnott, of Missouri, to be United States Marshal for the Western District of Missouri for the term of four years, vice Mark S. James, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 859,
+    "organization": "Department of Justice",
+    "partNumber": "01",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/859-1?format=json"
+  },
+  {
+    "citation": "PN859-2",
+    "congress": 119,
+    "description": "Jack Chambers, of West Virginia, to be United States Marshal for the Southern District of West Virginia for the term of four years, vice Michael T. Baylous, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 859,
+    "organization": "Department of Justice",
+    "partNumber": "02",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/859-2?format=json"
+  },
+  {
+    "citation": "PN859-5",
+    "congress": 119,
+    "description": "William Trachman, of Colorado, to be Ambassador Extraordinary and Plenipotentiary of the United States of America to the United Republic of Tanzania.",
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 859,
+    "organization": "Department of State",
+    "partNumber": "05",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/859-5?format=json"
+  },
+  {
+    "citation": "PN859-4",
+    "congress": 119,
+    "description": "Juan Rodriguez, of Florida, to be Ambassador Extraordinary and Plenipotentiary of the United States of America to the Republic of Guatemala.",
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 859,
+    "organization": "Department of State",
+    "partNumber": "04",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/859-4?format=json"
+  },
+  {
+    "citation": "PN859-6",
+    "congress": 119,
+    "description": "Fleet White, of Virginia, to be an Assistant Secretary of State (Political-Military Affairs), vice Jessica Lewis, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 859,
+    "organization": "Department of State",
+    "partNumber": "06",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/859-6?format=json"
+  },
+  {
+    "citation": "PN860",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 860,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/860?format=json"
+  },
+  {
+    "citation": "PN862",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 862,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/862?format=json"
+  },
+  {
+    "citation": "PN861",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 861,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/861?format=json"
+  },
+  {
+    "citation": "PN871",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 871,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/871?format=json"
+  },
+  {
+    "citation": "PN866",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 866,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/866?format=json"
+  },
+  {
+    "citation": "PN870",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 870,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/870?format=json"
+  },
+  {
+    "citation": "PN869",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 869,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/869?format=json"
+  },
+  {
+    "citation": "PN867",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 867,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/867?format=json"
+  },
+  {
+    "citation": "PN868",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 868,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/868?format=json"
+  },
+  {
+    "citation": "PN865",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 865,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/865?format=json"
+  },
+  {
+    "citation": "PN872",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-09",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 872,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-03-09",
+    "updateDate": "2026-03-10T11:00:20Z",
+    "url": "https://api.congress.gov/v3/nomination/119/872?format=json"
+  },
+  {
+    "citation": "PN730-57",
+    "congress": 119,
+    "description": "Robert Rotter, of Iowa, to be United States Marshal for the Northern District of Iowa for the term of four years, vice Douglas J. Strike, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-05",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 675."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "57",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-06T12:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-57?format=json"
+  },
+  {
+    "citation": "PN730-60",
+    "congress": 119,
+    "description": "David St. Pierre, of Maine, to be United States Marshal for the District of Maine for the term of four years, vice Theodor G. Short, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-05",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 677."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "60",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-06T12:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-60?format=json"
+  },
+  {
+    "citation": "PN730-14",
+    "congress": 119,
+    "description": "Robert Cekada, of Florida, to be Director, Bureau of Alcohol, Tobacco, Firearms, and Explosives, vice Steven M. Dettelbach, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-05",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 670."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "14",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-06T12:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-14?format=json"
+  },
+  {
+    "citation": "PN730-58",
+    "congress": 119,
+    "description": "Daniel Satterlee, of South Dakota, to be United States Marshal for the District of South Dakota for the term of four years, vice Daniel C. Mosteller, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-05",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 676."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "58",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-06T12:00:19Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-58?format=json"
+  },
+  {
+    "citation": "PN787-5",
+    "congress": 119,
+    "description": "Christopher R. Wolfe, of Texas, to be United States District Judge for the Western District of Texas, vice David Campos Guaderrama, retired.",
+    "latestAction": {
+      "actionDate": "2026-03-05",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 674."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 787,
+    "organization": "The Judiciary",
+    "partNumber": "05",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-06T12:00:18Z",
+    "url": "https://api.congress.gov/v3/nomination/119/787-5?format=json"
+  },
+  {
+    "citation": "PN787-1",
+    "congress": 119,
+    "description": "Andrew B. Davis, of Texas, to be United States District Judge for the Western District of Texas, vice Earl Leroy Yeakel III, retired.",
+    "latestAction": {
+      "actionDate": "2026-03-05",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 671."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 787,
+    "organization": "The Judiciary",
+    "partNumber": "01",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-06T12:00:18Z",
+    "url": "https://api.congress.gov/v3/nomination/119/787-1?format=json"
+  },
+  {
+    "citation": "PN787-3",
+    "congress": 119,
+    "description": "John Thomas Shepherd, of Arkansas, to be United States District Judge for the Western District of Arkansas, vice Susan Owens Hickey, retiring.",
+    "latestAction": {
+      "actionDate": "2026-03-05",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 672."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 787,
+    "organization": "The Judiciary",
+    "partNumber": "03",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-06T12:00:18Z",
+    "url": "https://api.congress.gov/v3/nomination/119/787-3?format=json"
+  },
+  {
+    "citation": "PN753",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 753,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/753?format=json"
+  },
+  {
+    "citation": "PN712-4",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 712,
+    "organization": "Army",
+    "partNumber": "04",
+    "receivedDate": "2025-12-15",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/712-4?format=json"
+  },
+  {
+    "citation": "PN730-52",
+    "congress": 119,
+    "description": "Stevan Pearce, of New Mexico, to be Director of the Bureau of Land Management, vice Tracy Stone-Manning, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 666. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of the Interior",
+    "partNumber": "52",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-52?format=json"
+  },
+  {
+    "citation": "PN681-2",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Placed on Senate Executive Calendar. Calendar No. DESK."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 681,
+    "organization": "Marine Corps",
+    "partNumber": "02",
+    "receivedDate": "2025-12-02",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/681-2?format=json"
+  },
+  {
+    "citation": "PN712-7",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 712,
+    "organization": "Air Force",
+    "partNumber": "07",
+    "receivedDate": "2025-12-15",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/712-7?format=json"
+  },
+  {
+    "citation": "PN752",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 752,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/752?format=json"
+  },
+  {
+    "citation": "PN751",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 751,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/751?format=json"
+  },
+  {
+    "citation": "PN681-1",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 681,
+    "organization": "Marine Corps",
+    "partNumber": "01",
+    "receivedDate": "2025-12-02",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/681-1?format=json"
+  },
+  {
+    "citation": "PN680",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 680,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2025-12-02",
+    "updateDate": "2026-03-05T12:00:27Z",
+    "url": "https://api.congress.gov/v3/nomination/119/680?format=json"
+  },
+  {
+    "citation": "PN786-8",
+    "congress": 119,
+    "description": "David LaCerte, of Louisiana, to be a Member of the Federal Energy Regulatory Commission for a term expiring June 30, 2031.  (Reappointment)",
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 667. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 786,
+    "organization": "Federal Energy Regulatory Commission",
+    "partNumber": "08",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-05T12:00:26Z",
+    "url": "https://api.congress.gov/v3/nomination/119/786-8?format=json"
+  },
+  {
+    "citation": "PN786-11",
+    "congress": 119,
+    "description": "Douglas Weaver, of Maryland, to be a Member of the Nuclear Regulatory Commission for the term of five years expiring June 30, 2031.  (Reappointment)",
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 665. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 786,
+    "organization": "Nuclear Regulatory Commission",
+    "partNumber": "11",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-05T12:00:26Z",
+    "url": "https://api.congress.gov/v3/nomination/119/786-11?format=json"
+  },
+  {
+    "citation": "PN770-8",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 770,
+    "organization": "Marine Corps",
+    "partNumber": "08",
+    "receivedDate": "2026-01-15",
+    "updateDate": "2026-03-05T12:00:26Z",
+    "url": "https://api.congress.gov/v3/nomination/119/770-8?format=json"
+  },
+  {
+    "citation": "PN759",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 759,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-03-05T12:00:26Z",
+    "url": "https://api.congress.gov/v3/nomination/119/759?format=json"
+  },
+  {
+    "citation": "PN780",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 780,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-01-15",
+    "updateDate": "2026-03-05T12:00:26Z",
+    "url": "https://api.congress.gov/v3/nomination/119/780?format=json"
+  },
+  {
+    "citation": "PN781",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 781,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-01-15",
+    "updateDate": "2026-03-05T12:00:26Z",
+    "url": "https://api.congress.gov/v3/nomination/119/781?format=json"
+  },
+  {
+    "citation": "PN788",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 788,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-05T12:00:26Z",
+    "url": "https://api.congress.gov/v3/nomination/119/788?format=json"
+  },
+  {
+    "citation": "PN800",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 800,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/800?format=json"
+  },
+  {
+    "citation": "PN793-1",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 793,
+    "organization": "Marine Corps",
+    "partNumber": "01",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/793-1?format=json"
+  },
+  {
+    "citation": "PN789",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 789,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/789?format=json"
+  },
+  {
+    "citation": "PN797",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 797,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/797?format=json"
+  },
+  {
+    "citation": "PN798",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 798,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/798?format=json"
+  },
+  {
+    "citation": "PN796",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 796,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/796?format=json"
+  },
+  {
+    "citation": "PN790",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 790,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-01-29",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/790?format=json"
+  },
+  {
+    "citation": "PN795",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 795,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/795?format=json"
+  },
+  {
+    "citation": "PN802",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 802,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/802?format=json"
+  },
+  {
+    "citation": "PN799",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 799,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/799?format=json"
+  },
+  {
+    "citation": "PN793-2",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 669."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 793,
+    "organization": "Marine Corps",
+    "partNumber": "02",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/793-2?format=json"
+  },
+  {
+    "citation": "PN794",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 794,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-02-04",
+    "updateDate": "2026-03-05T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/119/794?format=json"
+  },
+  {
+    "citation": "PN817",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 817,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/817?format=json"
+  },
+  {
+    "citation": "PN809",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 809,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/809?format=json"
+  },
+  {
+    "citation": "PN808",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 808,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/808?format=json"
+  },
+  {
+    "citation": "PN816",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 816,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/816?format=json"
+  },
+  {
+    "citation": "PN806-3",
+    "congress": 119,
+    "description": "Kyle Haustveit, of North Dakota, to be Under Secretary of Energy, vice Preston Griffith, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 668. Subject to nominee's commitment to respond to requests to appear and testify before any duly constituted committee of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 806,
+    "organization": "Department of Energy",
+    "partNumber": "03",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/806-3?format=json"
+  },
+  {
+    "citation": "PN807",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 807,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/807?format=json"
+  },
+  {
+    "citation": "PN811",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 811,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/811?format=json"
+  },
+  {
+    "citation": "PN810",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 810,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/810?format=json"
+  },
+  {
+    "citation": "PN813",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 813,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/813?format=json"
+  },
+  {
+    "citation": "PN815",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 815,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/815?format=json"
+  },
+  {
+    "citation": "PN814",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 814,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/814?format=json"
+  },
+  {
+    "citation": "PN812",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 812,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/812?format=json"
+  },
+  {
+    "citation": "PN825",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 825,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/825?format=json"
+  },
+  {
+    "citation": "PN819",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 819,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/819?format=json"
+  },
+  {
+    "citation": "PN829",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 829,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/829?format=json"
+  },
+  {
+    "citation": "PN822",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 822,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/822?format=json"
+  },
+  {
+    "citation": "PN828",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 828,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/828?format=json"
+  },
+  {
+    "citation": "PN827",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 827,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/827?format=json"
+  },
+  {
+    "citation": "PN820",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 820,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/820?format=json"
+  },
+  {
+    "citation": "PN823",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 823,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/823?format=json"
+  },
+  {
+    "citation": "PN821",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 821,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/821?format=json"
+  },
+  {
+    "citation": "PN826",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 826,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/826?format=json"
+  },
+  {
+    "citation": "PN824",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 824,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/824?format=json"
+  },
+  {
+    "citation": "PN818",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 818,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/818?format=json"
+  },
+  {
+    "citation": "PN831",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 831,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/831?format=json"
+  },
+  {
+    "citation": "PN830",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 830,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/830?format=json"
+  },
+  {
+    "citation": "PN837",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 837,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/837?format=json"
+  },
+  {
+    "citation": "PN835-2",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Placed on Senate Executive Calendar. Calendar No. DESK."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 835,
+    "organization": "Navy",
+    "partNumber": "02",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/835-2?format=json"
+  },
+  {
+    "citation": "PN838",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 838,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/838?format=json"
+  },
+  {
+    "citation": "PN832",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 832,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/832?format=json"
+  },
+  {
+    "citation": "PN839",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 839,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/839?format=json"
+  },
+  {
+    "citation": "PN840",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 840,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/840?format=json"
+  },
+  {
+    "citation": "PN835-1",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 835,
+    "organization": "Navy",
+    "partNumber": "01",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/835-1?format=json"
+  },
+  {
+    "citation": "PN834",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 834,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/834?format=json"
+  },
+  {
+    "citation": "PN836",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 836,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/836?format=json"
+  },
+  {
+    "citation": "PN841",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 841,
+    "organization": "Navy",
+    "partNumber": "00",
+    "receivedDate": "2026-02-11",
+    "updateDate": "2026-03-05T12:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/841?format=json"
+  },
+  {
+    "citation": "PN855-1",
+    "congress": 119,
+    "description": "Kevin Warsh, of Florida, to be Chairman of the Board of Governors of the Federal Reserve System for a term of four years, vice Jerome H. Powell, term expiring.",
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Received in the Senate and referred to the Committee on Banking, Housing, and Urban Affairs."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 855,
+    "organization": "Federal Reserve System",
+    "partNumber": "01",
+    "receivedDate": "2026-03-04",
+    "updateDate": "2026-03-05T12:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/855-1?format=json"
+  },
+  {
+    "citation": "PN856",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 856,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-04",
+    "updateDate": "2026-03-05T12:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/856?format=json"
+  },
+  {
+    "citation": "PN855-2",
+    "congress": 119,
+    "description": "Kevin Warsh, of Florida, to be a Member of the Board of Governors of the Federal Reserve System for a term of fourteen years from February 1, 2026, vice Stephen Miran, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Received in the Senate and referred to the Committee on Banking, Housing, and Urban Affairs."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 855,
+    "organization": "Federal Reserve System",
+    "partNumber": "02",
+    "receivedDate": "2026-03-04",
+    "updateDate": "2026-03-05T12:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/855-2?format=json"
+  },
+  {
+    "citation": "PN857",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-04",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 857,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-04",
+    "updateDate": "2026-03-05T12:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/857?format=json"
+  },
+  {
+    "citation": "PN853",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-03",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 853,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2026-03-03",
+    "updateDate": "2026-03-04T12:37:07Z",
+    "url": "https://api.congress.gov/v3/nomination/119/853?format=json"
+  },
+  {
+    "citation": "PN854",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-03-03",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 854,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2026-03-03",
+    "updateDate": "2026-03-04T12:37:02Z",
+    "url": "https://api.congress.gov/v3/nomination/119/854?format=json"
+  },
+  {
+    "citation": "PN851-8",
+    "congress": 119,
+    "description": "Kara Marie Westercamp, of Virginia, to be a Judge of the United States Court of International Trade, vice Stephen A. Vaden, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "08",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-8?format=json"
+  },
+  {
+    "citation": "PN851-4",
+    "congress": 119,
+    "description": "Anthony W. Mattivi, of Kansas, to be United States District Judge for the District of Kansas, vice Daniel D. Crabtree, retired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "04",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-4?format=json"
+  },
+  {
+    "citation": "PN852-1",
+    "congress": 119,
+    "description": "Jeffrey Brodsky, of Florida, to be a Governor of the United States Postal Service for a term expiring December 8, 2029, vice William Zollars, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Homeland Security and Governmental Affairs."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "United States Postal Service",
+    "partNumber": "01",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-1?format=json"
+  },
+  {
+    "citation": "PN851-6",
+    "congress": 119,
+    "description": "Evan Rikhye, of the Virgin Islands, to be Judge for the District Court of the Virgin Islands for a term of ten years, vice Wilma Antoinette Lewis, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "06",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-6?format=json"
+  },
+  {
+    "citation": "PN851-1",
+    "congress": 119,
+    "description": "Sheria Akins Clarke, of South Carolina, to be United States District Judge for the District of South Carolina, vice Robert Bryan Harwell, retired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "01",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-1?format=json"
+  },
+  {
+    "citation": "PN851-2",
+    "congress": 119,
+    "description": "Jeffrey M. Kuhlman, of Kansas, to be United States District Judge for the District of Kansas, vice Eric F. Melgren, retired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "02",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-2?format=json"
+  },
+  {
+    "citation": "PN852-3",
+    "congress": 119,
+    "description": "Kaveh Farzad, of Maryland, to be an Assistant Secretary of Energy (International Affairs), vice Andrew Eilperin Light, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Energy and Natural Resources."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "Department of Energy",
+    "partNumber": "03",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-3?format=json"
+  },
+  {
+    "citation": "PN851-7",
+    "congress": 119,
+    "description": "Justin D. Smith, of Missouri, to be United States Circuit Judge for the Eighth Circuit, vice William Duane Benton, retiring.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "07",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-7?format=json"
+  },
+  {
+    "citation": "PN851-5",
+    "congress": 119,
+    "description": "Anthony J. Powell, of Kansas, to be United States District Judge for the District of Kansas, vice Julie A. Robinson, retired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "05",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-5?format=json"
+  },
+  {
+    "citation": "PN850",
+    "congress": 119,
+    "description": "Bradford Pentony Wilson, of New Jersey, to be Archivist of the United States, vice Colleen Joy Shogan.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Homeland Security and Governmental Affairs."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 850,
+    "organization": "National Archives and Records Administration",
+    "partNumber": "00",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/850?format=json"
+  },
+  {
+    "citation": "PN851-3",
+    "congress": 119,
+    "description": "Kathleen S. Lane, of Montana, to be United States District Judge for the District of Montana, vice Susan P. Watters, retiring.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 851,
+    "organization": "The Judiciary",
+    "partNumber": "03",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/851-3?format=json"
+  },
+  {
+    "citation": "PN852-2",
+    "congress": 119,
+    "description": "Adam Cassady, of Virginia, to be Ambassador at Large for Cyberspace and Digital Policy, vice Nathaniel Fick, resigned.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "Department of State",
+    "partNumber": "02",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-2?format=json"
+  },
+  {
+    "citation": "PN852-8",
+    "congress": 119,
+    "description": "James O'Neill, of Texas, to be Director of the National Science Foundation for a term of six years, vice Sethuraman Panchanathan.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Health, Education, Labor, and Pensions."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "National Science Foundation",
+    "partNumber": "08",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-8?format=json"
+  },
+  {
+    "citation": "PN852-5",
+    "congress": 119,
+    "description": "Preston Wells Griffith III, of Virginia, to be Representative of the United States of America to the Vienna Office of the United Nations, with the rank of Ambassador.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "Department of State",
+    "partNumber": "05",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-5?format=json"
+  },
+  {
+    "citation": "PN852-11",
+    "congress": 119,
+    "description": "Johnson TeeHee II, of Oklahoma, to be United States Marshal for the Eastern District of Oklahoma for the term of four years, vice Kerry Lee Pettingill, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "Department of Justice",
+    "partNumber": "11",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-11?format=json"
+  },
+  {
+    "citation": "PN852-9",
+    "congress": 119,
+    "description": "Kenneth Sorenson, of Hawaii, to be United States Attorney for the District of Hawaii for the term of four years, vice Clare E. Connors, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on the Judiciary."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "Department of Justice",
+    "partNumber": "09",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-9?format=json"
+  },
+  {
+    "citation": "PN852-7",
+    "congress": 119,
+    "description": "Yeouk Kim, of Texas, to be Representative of the United States of America to the Association of Southeast Asian Nations, with the rank and status of Ambassador Extraordinary and Plenipotentiary.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "Department of State",
+    "partNumber": "07",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-7?format=json"
+  },
+  {
+    "citation": "PN852-10",
+    "congress": 119,
+    "description": "Robert Steffens, of Texas, to be a Governor of the United States Postal Service for a term expiring December 8, 2032, vice Robert M. Duncan, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Homeland Security and Governmental Affairs."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "United States Postal Service",
+    "partNumber": "10",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-10?format=json"
+  },
+  {
+    "citation": "PN852-6",
+    "congress": 119,
+    "description": "Preston Wells Griffith III, of Virginia, to be Representative of the United States of America to the International Atomic Energy Agency, with the rank of Ambassador.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Foreign Relations."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "Department of State",
+    "partNumber": "06",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-6?format=json"
+  },
+  {
+    "citation": "PN852-4",
+    "congress": 119,
+    "description": "William Gallo, of Florida, to be a Governor of the United States Postal Service for a term expiring December 8, 2030, vice Anton George Hajjar, term expired.",
+    "latestAction": {
+      "actionDate": "2026-03-02",
+      "text": "Received in the Senate and referred to the Committee on Homeland Security and Governmental Affairs."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 852,
+    "organization": "United States Postal Service",
+    "partNumber": "04",
+    "receivedDate": "2026-03-02",
+    "updateDate": "2026-03-03T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/852-4?format=json"
+  },
+  {
+    "citation": "PN730-46",
+    "congress": 119,
+    "description": "Ryan McCormack, of Virginia, to be Under Secretary of Transportation for Policy, vice Carlos Alberto Monje, Jr.",
+    "latestAction": {
+      "actionDate": "2026-02-26",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 57 - 33. Record Vote Number: 43."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Transportation",
+    "partNumber": "46",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-02-27T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-46?format=json"
+  },
+  {
+    "citation": "PN712-6",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2025-12-15",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 712,
+    "organization": "Air Force",
+    "partNumber": "06",
+    "receivedDate": "2025-12-15",
+    "updateDate": "2026-02-27T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/712-6?format=json"
+  },
+  {
+    "citation": "PN770-7",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-01-15",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 770,
+    "partNumber": "07",
+    "receivedDate": "2026-01-15",
+    "updateDate": "2026-02-27T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/770-7?format=json"
+  },
+  {
+    "citation": "PN730-25",
+    "congress": 119,
+    "description": "Gregory Gilmore, of Illinois, to be United States Attorney for the Central District of Illinois for the term of four years, vice Gregory K. Harris.",
+    "latestAction": {
+      "actionDate": "2026-02-26",
+      "text": "Placed on Senate Executive Calendar. Calendar No. 664."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Department of Justice",
+    "partNumber": "25",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-02-27T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-25?format=json"
+  },
+  {
+    "citation": "PN770-6",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-01-15",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 770,
+    "partNumber": "06",
+    "receivedDate": "2026-01-15",
+    "updateDate": "2026-02-27T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/770-6?format=json"
+  },
+  {
+    "citation": "PN770-5",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-01-15",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 770,
+    "organization": "Marine Corps",
+    "partNumber": "05",
+    "receivedDate": "2026-01-15",
+    "updateDate": "2026-02-27T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/770-5?format=json"
+  },
+  {
+    "citation": "PN712-8",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2025-12-15",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 712,
+    "organization": "Air Force",
+    "partNumber": "08",
+    "receivedDate": "2025-12-15",
+    "updateDate": "2026-02-27T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/119/712-8?format=json"
+  },
+  {
+    "citation": "PN770-9",
+    "congress": 119,
+    "latestAction": {
+      "actionDate": "2026-01-15",
+      "text": "Received in the Senate and referred to the Committee on Armed Services."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 770,
+    "organization": "Marine Corps",
+    "partNumber": "09",
+    "receivedDate": "2026-01-15",
+    "updateDate": "2026-02-27T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/770-9?format=json"
+  },
+  {
+    "citation": "PN730-47",
+    "congress": 119,
+    "description": "Casey Means, of California, to be Medical Director in the Regular Corps of the Public Health Service, subject to qualifications therefor as provided by law and regulations, and to be Surgeon General of the Public Health Service for a term of four years, vice Vivek Hallegere Murthy, resigned.",
+    "latestAction": {
+      "actionDate": "2026-02-25",
+      "text": "Committee on Health, Education, Labor, and Pensions. Hearings held."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "Public Health Service",
+    "partNumber": "47",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-02-26T12:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-47?format=json"
+  },
+  {
+    "citation": "PN730-19",
+    "congress": 119,
+    "description": "John DeLeeuw, of Texas, to be a Member of the National Transportation Safety Board for the remainder of the term expiring December 31, 2026, vice Alvin Brown.",
+    "latestAction": {
+      "actionDate": "2026-02-25",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 45. Record Vote Number: 41."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 730,
+    "organization": "National Transportation Safety Board",
+    "partNumber": "19",
+    "receivedDate": "2026-01-13",
+    "updateDate": "2026-02-26T12:00:21Z",
+    "url": "https://api.congress.gov/v3/nomination/119/730-19?format=json"
+  },
+  {
+    "citation": "PN627",
+    "congress": 114,
+    "description": "Brad R. Carson, of Oklahoma, to be Under Secretary of Defense for Personnel and Readiness, vice Jessica Garfola Wright, resigned.",
+    "latestAction": {
+      "actionDate": "2016-03-17",
+      "text": "Received message of withdrawal of nomination from the President."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 627,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2015-07-08",
+    "updateDate": "2026-02-25T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/114/627?format=json"
+  },
+  {
+    "citation": "PN875",
+    "congress": 114,
+    "description": "Eric K. Fanning, of the District of Columbia, to be Secretary of the Army, vice John M. McHugh.",
+    "latestAction": {
+      "actionDate": "2016-05-17",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 875,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2015-09-21",
+    "updateDate": "2026-02-25T12:00:25Z",
+    "url": "https://api.congress.gov/v3/nomination/114/875?format=json"
+  },
+  {
+    "citation": "PN1158",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-03-17",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1158,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2016-02-22",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1158?format=json"
+  },
+  {
+    "citation": "PN1052",
+    "congress": 114,
+    "description": "Todd A. Weiler, of Virginia, to be an Assistant Secretary of Defense, vice Jessica Lynn Wright, resigned.",
+    "latestAction": {
+      "actionDate": "2016-03-17",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 1052,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2016-01-11",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1052?format=json"
+  },
+  {
+    "citation": "PN1159",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-03-17",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1159,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2016-02-22",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1159?format=json"
+  },
+  {
+    "citation": "PN1290",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-06-29",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1290,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2016-04-04",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1290?format=json"
+  },
+  {
+    "citation": "PN876",
+    "congress": 114,
+    "description": "Jennifer M. O'Connor, of Maryland, to be General Counsel of the Department of Defense, vice Stephen Woolman Preston, resigned.",
+    "latestAction": {
+      "actionDate": "2016-06-13",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 876,
+    "organization": "Department of Defense",
+    "partNumber": "00",
+    "receivedDate": "2015-09-21",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/876?format=json"
+  },
+  {
+    "citation": "PN1326",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-04-28",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1326,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2016-04-14",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1326?format=json"
+  },
+  {
+    "citation": "PN1214",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-04-28",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1214,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2016-03-14",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1214?format=json"
+  },
+  {
+    "citation": "PN1090",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-02-04",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1090,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2016-01-27",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1090?format=json"
+  },
+  {
+    "citation": "PN1289",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-04-28",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1289,
+    "organization": "Army",
+    "partNumber": "00",
+    "receivedDate": "2016-04-04",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1289?format=json"
+  },
+  {
+    "citation": "PN1388",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-06-29",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1388,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2016-04-25",
+    "updateDate": "2026-02-25T12:00:24Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1388?format=json"
+  },
+  {
+    "citation": "PN459",
+    "congress": 117,
+    "description": "Helaine Ann Greenfeld, of Maryland, to be an Assistant Attorney General, vice Stephen Elliott Boyd.",
+    "latestAction": {
+      "actionDate": "2022-01-03",
+      "text": "Returned to the President under the provisions of Senate Rule XXXI, paragraph 6 of the Standing Rules of the Senate."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 459,
+    "organization": "Department of Justice",
+    "partNumber": "00",
+    "receivedDate": "2021-04-27",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/117/459?format=json"
+  },
+  {
+    "citation": "PN561",
+    "congress": 117,
+    "description": "Christine P. O'Hearn, of New Jersey, to be United States District Judge for the District of New Jersey, vice Robert B. Kugler, retired.",
+    "latestAction": {
+      "actionDate": "2021-10-19",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 53 - 44. Record Vote Number: 416."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 561,
+    "organization": "The Judiciary",
+    "partNumber": "00",
+    "receivedDate": "2021-04-29",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/117/561?format=json"
+  },
+  {
+    "citation": "PN370",
+    "congress": 117,
+    "description": "Christopher H. Schroeder, of North Carolina, to be an Assistant Attorney General, vice Steven Andrew Engel.",
+    "latestAction": {
+      "actionDate": "2021-10-28",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 56 - 41. Record Vote Number: 444."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 370,
+    "organization": "Department of Justice",
+    "partNumber": "00",
+    "receivedDate": "2021-04-15",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/117/370?format=json"
+  },
+  {
+    "citation": "PN11-3",
+    "congress": 119,
+    "description": "Douglas Burgum, of North Dakota, to be Secretary of the Interior.",
+    "latestAction": {
+      "actionDate": "2025-01-30",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 80 - 17. Record Vote Number: 26."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 11,
+    "organization": "Department of the Interior",
+    "partNumber": "03",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/119/11-3?format=json"
+  },
+  {
+    "citation": "PN567",
+    "congress": 117,
+    "description": "Angel Kelley, of Massachusetts, to be United States District Judge for the District of Massachusetts, vice Douglas P. Woodlock, retired.",
+    "latestAction": {
+      "actionDate": "2021-09-14",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 52 - 44. Record Vote Number: 364."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 567,
+    "organization": "The Judiciary",
+    "partNumber": "00",
+    "receivedDate": "2021-05-12",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/117/567?format=json"
+  },
+  {
+    "citation": "PN1706",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-09-28",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1706,
+    "organization": "Air Force",
+    "partNumber": "00",
+    "receivedDate": "2016-09-08",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1706?format=json"
+  },
+  {
+    "citation": "PN566",
+    "congress": 117,
+    "description": "Gustavo A. Gelpi, of Puerto Rico, to be United States Circuit Judge for the First Circuit, vice Juan R. del Valle Torruella, deceased.",
+    "latestAction": {
+      "actionDate": "2021-10-18",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 52 - 41. Record Vote Number: 414."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 566,
+    "organization": "The Judiciary",
+    "partNumber": "00",
+    "receivedDate": "2021-05-12",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/117/566?format=json"
+  },
+  {
+    "citation": "PN1392",
+    "congress": 114,
+    "latestAction": {
+      "actionDate": "2016-06-29",
+      "text": "Confirmed by the Senate by Voice Vote."
+    },
+    "nominationType": {
+      "isMilitary": true
+    },
+    "number": 1392,
+    "organization": "Marine Corps",
+    "partNumber": "00",
+    "receivedDate": "2016-04-26",
+    "updateDate": "2026-02-25T12:00:23Z",
+    "url": "https://api.congress.gov/v3/nomination/114/1392?format=json"
+  },
+  {
+    "citation": "PN26-12",
+    "congress": 119,
+    "description": "Paul Dabbar, of New York, to be Deputy Secretary of Commerce, vice Donet Dominic Graves, Jr., resigned.",
+    "latestAction": {
+      "actionDate": "2025-06-25",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 56 - 40. Record Vote Number: 325."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 26,
+    "organization": "Department of Commerce",
+    "partNumber": "12",
+    "receivedDate": "2025-03-10",
+    "updateDate": "2026-02-25T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/26-12?format=json"
+  },
+  {
+    "citation": "PN55-6",
+    "congress": 119,
+    "description": "Bryan Bedford, of Indiana, to be Administrator of the Federal Aviation Administration for the term of five years, vice Michael G. Whitaker, resigned.",
+    "latestAction": {
+      "actionDate": "2025-07-09",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 53 - 43. Record Vote Number: 377."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 55,
+    "organization": "Department of Transportation",
+    "partNumber": "06",
+    "receivedDate": "2025-03-24",
+    "updateDate": "2026-02-25T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/55-6?format=json"
+  },
+  {
+    "citation": "PN11-15",
+    "congress": 119,
+    "description": "Christopher Wright, of Colorado, to be Secretary of Energy.",
+    "latestAction": {
+      "actionDate": "2025-02-03",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 59 - 38. Record Vote Number: 30."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 11,
+    "organization": "Department of Energy",
+    "partNumber": "15",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-02-25T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/11-15?format=json"
+  },
+  {
+    "citation": "PN13-2",
+    "congress": 119,
+    "description": "Steven Bradbury, of Virginia, to be Deputy Secretary of Transportation, vice Polly Ellen Trottenberg, resigned.",
+    "latestAction": {
+      "actionDate": "2025-03-11",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 51 - 46. Record Vote Number: 113."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 13,
+    "organization": "Department of Transportation",
+    "partNumber": "02",
+    "receivedDate": "2025-01-22",
+    "updateDate": "2026-02-25T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/13-2?format=json"
+  },
+  {
+    "citation": "PN12-29",
+    "congress": 119,
+    "description": "Mark Meador, of Virginia, to be a Federal Trade Commissioner for the term of seven years from September 26, 2024, vice Lina M. Khan, term expired.",
+    "latestAction": {
+      "actionDate": "2025-04-10",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 50 - 46. Record Vote Number: 209."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 12,
+    "organization": "Federal Trade Commission",
+    "partNumber": "29",
+    "receivedDate": "2025-01-20",
+    "updateDate": "2026-02-25T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/12-29?format=json"
+  },
+  {
+    "citation": "PN13-8",
+    "congress": 119,
+    "description": "Michael Kratsios, of South Carolina, to be Director of the Office of Science and Technology Policy, vice Arati Prabhakar.",
+    "latestAction": {
+      "actionDate": "2025-03-25",
+      "text": "Confirmed by the Senate by Yea-Nay Vote. 74 - 25. Record Vote Number: 139."
+    },
+    "nominationType": {
+      "isCivilian": true
+    },
+    "number": 13,
+    "organization": "Executive Office of the President",
+    "partNumber": "08",
+    "receivedDate": "2025-01-22",
+    "updateDate": "2026-02-25T12:00:22Z",
+    "url": "https://api.congress.gov/v3/nomination/119/13-8?format=json"
+  }
+]

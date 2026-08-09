@@ -109,7 +109,17 @@ services:
     volumes:
       - dev-rabbitmq:/var/lib/rabbitmq
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis-local
+    ports:
+      - 127.0.0.1:6379:6379
+    command: redis-server --appendonly yes
+    volumes:
+      - dev-redis:/data
+
 volumes:
   dev-elasticsearch:
   dev-kibana:
   dev-rabbitmq:
+  dev-redis:

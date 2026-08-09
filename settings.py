@@ -30,6 +30,13 @@ RABBITMQ_PREFETCH = int(os.getenv("RABBITMQ_PREFETCH", "200"))
 RABBITMQ_RATE_LIMIT_PER_HOUR = int(os.getenv("RABBITMQ_RATE_LIMIT_PER_HOUR", "5000"))
 RABBITMQ_PAGE_SIZE = int(os.getenv("RABBITMQ_PAGE_SIZE", "250"))
 RABBITMQ_API_WORKERS = int(os.getenv("RABBITMQ_API_WORKERS", "4"))
+JOB_DB_PATH = os.getenv("JOB_DB_PATH", "data/jobs.sqlite3")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+REDIS_STREAM_MAXLEN = int(os.getenv("REDIS_STREAM_MAXLEN", "1000000"))
+REDIS_CONSUMER_GROUP = os.getenv("REDIS_CONSUMER_GROUP", "congress-indexers")
+CELERY_TASK_QUEUE = os.getenv("CELERY_TASK_QUEUE", "congress-sync")
+CELERY_RETRY_MAX = int(os.getenv("CELERY_RETRY_MAX", "8"))
+CELERY_RETRY_BACKOFF_MAX = int(os.getenv("CELERY_RETRY_BACKOFF_MAX", "3600"))
 # When true, the client will raise an error if response fields are
 # present in the API payload but not represented in our Pydantic models.
 # Set via environment variable to one of: 1,true,yes

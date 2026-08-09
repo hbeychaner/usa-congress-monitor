@@ -1,0 +1,40 @@
+[
+  {
+    "committeeMeeting": {
+      "eventId": 115538,
+      "updateDate": "2023-03-27T18:11:19Z",
+      "congress": 118,
+      "type": "Hearing",
+      "title": "Legislative hearing on H.R. 1246",
+      "meetingStatus": "Scheduled",
+      "date": "2023-03-24T13:00:00Z",
+      "chamber": "House",
+      "committees": [
+        {
+          "systemCode": "hsii24",
+          "name": "House Natural Resources Subcommittee on Indian and Insular Affairs",
+          "url": "https://api.congress.gov/v3/committee/house/hsii24"
+        }
+      ]
+    }
+  },
+  {
+    "committeeMeeting": {
+      "eventId": 116040,
+      "updateDate": "2023-04-12T14:00:00Z",
+      "congress": 118,
+      "type": "Meeting",
+      "title": "Business meeting",
+      "meetingStatus": "Scheduled",
+      "date": "2023-04-18T10:00:00Z",
+      "chamber": "Senate",
+      "committees": [
+        {
+          "systemCode": "ssju00",
+          "name": "Senate Judiciary Committee",
+          "url": "https://api.congress.gov/v3/committee/senate/ssju00"
+        }
+      ]
+    }
+  }
+]

@@ -5,13 +5,13 @@ from pathlib import Path
 def test_ingest_summaries(tmp_path, monkeypatch):
     """Summaries is a list-only resource — verify list is ingested, no items fetched."""
     repo = Path(__file__).resolve().parents[2]
-    fixtures = repo / "tmp_ingest" / "summaries"
+    fixtures = repo / "tests" / "fixtures" / "summaries"
     raw_list_p = fixtures / "raw_list.json"
     assert raw_list_p.exists()
 
     raw_list = json.loads(raw_list_p.read_text(encoding="utf-8"))
 
-    from congress_sdk.data_collection.client import get_client as real_get_client
+    from cdm.data_collection.client import get_client as real_get_client
 
     client = real_get_client(api_key="test")
 
@@ -54,12 +54,11 @@ def test_ingest_summaries(tmp_path, monkeypatch):
     runner = IngestRunner(
         outdir=tmp_path,
         resource=Resource.SUMMARIES,
+        api_key="test-summaries",
         fetch_items=False,  # SUMMARIES is list-only
         max_pages=2,
     )
-    runner.run()
+    result = runner.run()
 
-    list_data = json.loads((tmp_path / "list.json").read_text(encoding="utf-8"))
-    assert len(list_data) > 0
-    # Items file must not exist — summaries runner stops after list phase
-    assert not (tmp_path / "items.json").exists()
+    assert result["list_count"] > 0
+    assert result["item_count"] == 0

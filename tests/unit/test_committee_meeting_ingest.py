@@ -4,7 +4,7 @@ from pathlib import Path
 
 def test_ingest_committee_meeting(tmp_path, monkeypatch):
     repo = Path(__file__).resolve().parents[2]
-    fixtures = repo / "tmp_ingest" / "committee_meeting"
+    fixtures = repo / "tests" / "fixtures" / "committee_meeting"
     raw_list_p = fixtures / "raw_list.json"
     raw_items_p = fixtures / "raw_items.json"
     assert raw_list_p.exists()
@@ -13,15 +13,18 @@ def test_ingest_committee_meeting(tmp_path, monkeypatch):
     raw_list = json.loads(raw_list_p.read_text(encoding="utf-8"))
     raw_items = json.loads(raw_items_p.read_text(encoding="utf-8"))
 
-    from congress_sdk.data_collection.client import get_client as real_get_client
+    from cdm.data_collection.client import get_client as real_get_client
 
     client = real_get_client(api_key="test")
 
     if isinstance(raw_list, list):
         list_resp = {"data": raw_list}
-    else:
+    elif isinstance(raw_list, dict):
         list_resp = raw_list
-    pagination = list_resp.get("pagination", {}) if isinstance(list_resp, dict) else {}
+    else:
+        list_resp = {}
+    pagination_value = list_resp.get("pagination", {})
+    pagination = pagination_value if isinstance(pagination_value, dict) else {}
     n_list_pages = 2 if (pagination.get("total", 0) or 0) > 0 else 1
     responses = ([list_resp] * n_list_pages) + list(raw_items)
 
@@ -46,7 +49,7 @@ def test_ingest_committee_meeting(tmp_path, monkeypatch):
             raise RuntimeError("No more canned responses available for test")
         return ResponseStub(obj)
 
-    client._request_with_backoff = _request_with_backoff
+    monkeypatch.setattr(client, "_request_with_backoff", _request_with_backoff)
     monkeypatch.setattr(
         "cdm.ingest.runner.get_client", lambda api_key=None, **k: client
     )
@@ -56,12 +59,12 @@ def test_ingest_committee_meeting(tmp_path, monkeypatch):
     runner = IngestRunner(
         outdir=tmp_path,
         resource=Resource.COMMITTEE_MEETING,
+        api_key="test-committee-meeting",
         fetch_items=True,
         max_pages=2,
         max_items=20,
-        save_raw_items=True,
     )
-    runner.run()
+    result = runner.run()
 
-    actual = json.loads((tmp_path / "items.json").read_text(encoding="utf-8"))
+    actual = result["records"]
     assert len(actual) <= len(raw_items)

@@ -1,0 +1,31 @@
+C4Container
+    title Congress Tracker worker and indexing containers
+
+    Person(operator, "Operator", "Submits historical backfills and inspects job status.")
+    System_Ext(congress, "Congress.gov API", "Provides paginated lists and item detail.")
+
+    System_Boundary(cdm, "Congress Tracker") {
+        Container(cli, "Submission CLI", "Python", "Builds deterministic job payloads and submits them.")
+        Container(beat, "Daily Scheduler", "Celery Beat", "Submits an overlapping UTC ingest window every 24 hours.")
+        Container(worker, "Worker Tasks", "Celery", "Runs ingest, dispatches indexing, and applies retry/backoff middleware.")
+        Container(ingest, "Ingest Pipeline", "Python", "Fetches typed records and publishes them to Redis Streams.")
+        Container(indexing, "Redis Indexing Runner", "Python", "Consumes, transforms, validates, and bulk-upserts stream records.")
+        ContainerQueue(rabbit, "Task Queue", "RabbitMQ", "Delivers ingest and indexing messages.")
+        ContainerDb(jobs, "Job Ledger", "SQLite", "Stores idempotency keys, status, attempts, and errors.")
+        ContainerDb(streams, "Record Handoff", "Redis Streams", "Durable replayable records with consumer groups and pending-entry recovery.")
+        ContainerDb(search, "Search Store", "OpenSearch", "Stores mapped documents behind write/read aliases.")
+    }
+
+    Rel(operator, cli, "Submits backfills")
+    Rel(beat, jobs, "Creates daily job record")
+    Rel(beat, rabbit, "Publishes scheduled task")
+    Rel(cli, jobs, "Creates idempotent job record")
+    Rel(cli, rabbit, "Publishes task")
+    Rel(rabbit, worker, "Delivers task")
+    Rel(worker, jobs, "Tracks lifecycle and retries")
+    Rel(worker, ingest, "Runs")
+    Rel(ingest, congress, "Fetches lists and details")
+    Rel(ingest, streams, "Publishes records")
+    Rel(worker, indexing, "Dispatches after ingest")
+    Rel(indexing, streams, "Consumes and acknowledges after bulk success")
+    Rel(indexing, search, "Bulk upserts validated documents")

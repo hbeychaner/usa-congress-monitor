@@ -16,12 +16,12 @@ Typical usage
 
 from __future__ import annotations
 
-import json
-import re
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+from cdm.store.opensearch import index_name, write_alias
 
 # Path relative to repo root; walks up from this file's location.
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -32,7 +32,7 @@ INDEX_PREFIX = "congress"
 
 def _prefixed(name: str) -> str:
     """Return the full OpenSearch index name: ``congress-{name}``."""
-    return f"{INDEX_PREFIX}-{name.replace('_', '-')}"
+    return index_name(name)
 
 
 def load_definitions() -> dict[str, dict]:
@@ -96,6 +96,7 @@ class IndexManager:
 
         if self.client.indices.exists(index=idx):
             if exists_ok:
+                self.ensure_write_alias(name)
                 return
             raise RuntimeError(f"Index {idx!r} already exists.")
 
@@ -106,7 +107,16 @@ class IndexManager:
             body["mappings"] = defn["mappings"]
 
         self.client.indices.create(index=idx, body=body)
+        self.ensure_write_alias(name)
         print(f"  created {idx}")
+
+    def ensure_write_alias(self, name: str) -> None:
+        """Ensure the bulk-write alias points at the logical index."""
+        idx = _prefixed(name)
+        if self.dry_run:
+            print(f"[dry-run] would point {write_alias(name)!r} to {idx!r}")
+            return
+        self.client.indices.put_alias(index=idx, name=write_alias(name))
 
     def update(self, name: str) -> None:
         """Push an updated mapping onto an existing index *name*.
@@ -173,6 +183,11 @@ class IndexManager:
                     .get("count", 0)
                 )
             rows.append(
-                {"name": name, "full_name": idx, "exists": exists, "doc_count": doc_count}
+                {
+                    "name": name,
+                    "full_name": idx,
+                    "exists": exists,
+                    "doc_count": doc_count,
+                }
             )
         return rows

@@ -1,4 +1,4 @@
-from src.models.other_models import LawListItem
+from cdm.models.other_models import LawListItem
 
 
 def test_law_list_item_parse():

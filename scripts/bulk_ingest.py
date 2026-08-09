@@ -1,13 +1,13 @@
-#!/usr/bin/env python3
 """Run ingest.fetch_and_save_all for all registered list resources.
 
 Saves per-resource outputs to tmp_ingest/<resource>/ with the same
 behavior as the CLI ingest script. Limits are configurable below.
 """
-from pathlib import Path
-import time
 
-from congress_sdk.data_collection.endpoint_registry import all_specs
+import time
+from pathlib import Path
+
+from cdm.data_collection.endpoint_registry import all_specs
 from scripts.ingest import fetch_and_save_all
 
 
@@ -15,7 +15,7 @@ def main():
     out_base = Path("tmp_ingest")
     specs = all_specs()
     # collect unique resource names from specs named '<resource>_list'
-    resources = sorted({name[:-5] for name in specs.keys() if name.endswith("_list")})
+    resources = sorted({name[:-5] for name in specs if name.endswith("_list")})
     print(f"Found resources: {resources}")
 
     # limits requested by user
@@ -27,8 +27,14 @@ def main():
         print(f"Starting ingest for {r} -> {outdir}")
         start = time.time()
         try:
-            fetch_and_save_all(outdir, resource=r, fetch_items=True, max_items=max_items, max_pages=max_pages)
-        except Exception as exc:
+            fetch_and_save_all(
+                outdir,
+                resource=r,
+                fetch_items=True,
+                max_items=max_items,
+                max_pages=max_pages,
+            )
+        except (OSError, RuntimeError, ValueError) as exc:
             print(f"Ingest failed for {r}: {exc}")
         finally:
             elapsed = time.time() - start

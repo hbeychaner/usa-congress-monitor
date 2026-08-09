@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Full-history ingest CLI — pull Congress.gov data for a multi-year / multi-congress span.
 
 Strategy
@@ -17,9 +16,8 @@ Resources have three scope types that each need a different iteration strategy:
 
 Resume behaviour
 ────────────────
-With --resume (default: on), a year/congress chunk is skipped when its output
-directory already contains a non-empty list.json.  Re-run with --no-resume to
-force a full re-fetch.
+With --resume (default: on), a year/congress chunk is skipped when its resource
+metadata exists. Re-run with --no-resume to force a full re-fetch.
 
 Examples
 ────────
@@ -39,22 +37,25 @@ Examples
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cdm.ingest import checkpoint
 from cdm.ingest.pipeline import Pipeline, PipelineConfig
-from cdm.ingest.runner import FatalIngestError
 from cdm.ingest.rate_limiter import TokenBucket
 from cdm.ingest.resource_config import (
     RESOURCE_CONFIGS,
-    date_windowed,
     congress_scoped,
+    date_windowed,
+    effective_scope,
     static_resources,
+    validate_scope_catalog,
 )
 from cdm.ingest.runner import Resource
 
@@ -88,28 +89,11 @@ def _congresses_for_years(from_year: int, to_year: int) -> list[int]:
 def _is_done(outdir: Path, resource: Resource, fetch_items: bool) -> bool:
     """Return True if this resource chunk is fully complete.
 
-    - List is always required: list.json must exist and be non-empty.
-    - Items: when fetch_items=True and the resource supports items,
-      items.json must also exist and be non-empty.  We also accept
-      items.jsonl (incremental file) as evidence of at-least-partial
-      completion; the caller decides whether partial counts as done.
+    - A successful resource metadata file is required.
     """
-    list_path = outdir / resource.value / "list.json"
-    if not list_path.exists() or list_path.stat().st_size < 10:
+    meta_path = outdir / resource.value / "meta.json"
+    if not meta_path.exists() or meta_path.stat().st_size < 10:
         return False
-    if not fetch_items:
-        return True
-    # Resources that are list-only (no item endpoint)
-    from cdm.ingest.resource_config import RESOURCE_CONFIGS
-
-    cfg = RESOURCE_CONFIGS.get(resource)
-    if cfg and (cfg.list_only or not cfg.fetch_items_default):
-        return True  # items not expected for this resource
-    items_json = outdir / resource.value / "items.json"
-    if items_json.exists() and items_json.stat().st_size > 10:
-        return True
-    # Partial JSONL present → not fully done; resume will continue
-    return False
 
 
 # ── Normalise date strings for the API ───────────────────────────────────────
@@ -122,11 +106,50 @@ def _iso(date_str: str, end_of_day: bool = False) -> str:
     return f"{date_str}{suffix}"
 
 
+def _year_window(year: int, overlap_days: int = 0) -> tuple[str, str]:
+    """Return an inclusive ISO window for a year with optional boundary overlap."""
+    if overlap_days < 0:
+        raise ValueError("overlap_days must be non-negative")
+    start = date(year, 1, 1) - timedelta(days=overlap_days)
+    end = date(year, 12, 31) + timedelta(days=overlap_days)
+    return _iso(start.isoformat()), _iso(end.isoformat(), end_of_day=True)
+
+
+def _write_coverage_report(outdir: Path, report: dict) -> Path:
+    report_path = outdir / "coverage_report.json"
+    outdir.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    return report_path
+
+
+def _checkpoint_name(label: str) -> str:
+    return f"history_{label.replace('=', '_')}"
+
+
+def _checkpoint_parameters(cfg: PipelineConfig) -> dict:
+    return {
+        "from_date": cfg.from_date,
+        "to_date": cfg.to_date,
+        "congress": cfg.congress,
+    }
+
+
+def _checkpoint_matches(
+    state: dict, label: str, resources: list[Resource], cfg: PipelineConfig
+) -> bool:
+    return (
+        state.get("status") == "completed"
+        and state.get("label") == label
+        and state.get("resources") == [resource.value for resource in resources]
+        and state.get("parameters") == _checkpoint_parameters(cfg)
+    )
+
+
 # ── Argument parsing ─────────────────────────────────────────────────────────
 
 
 def _parse_args() -> argparse.Namespace:
-    this_year = datetime.now(timezone.utc).year
+    this_year = datetime.now(UTC).year
 
     p = argparse.ArgumentParser(
         description="Full-history bulk ingest across all Congress.gov resources.",
@@ -150,6 +173,13 @@ def _parse_args() -> argparse.Namespace:
         help=f"Latest year to ingest (default: {this_year}).",
     )
     p.add_argument(
+        "--date-overlap-days",
+        type=int,
+        default=0,
+        metavar="N",
+        help="Days to overlap adjacent yearly date windows (default: 0).",
+    )
+    p.add_argument(
         "--from-congress",
         type=int,
         default=None,
@@ -169,7 +199,13 @@ def _parse_args() -> argparse.Namespace:
         "--resources",
         default=None,
         metavar="r1,r2,...",
-        help="Comma-separated resource names (default: all).",
+        help="Comma-separated resource names to include (default: all).",
+    )
+    p.add_argument(
+        "--skip-resources",
+        default=None,
+        metavar="r1,r2,...",
+        help="Comma-separated resource names to skip (e.g. 'bill' when using bulk download).",
     )
     p.add_argument(
         "--scope",
@@ -274,12 +310,31 @@ def _select_resources(args: argparse.Namespace) -> list[Resource]:
         return out
 
     if args.scope == "date_window":
-        return [c.resource for c in date_windowed()]
-    if args.scope == "congress_scoped":
-        return [c.resource for c in congress_scoped()]
-    if args.scope == "static":
-        return [c.resource for c in static_resources()]
-    return list(Resource)
+        resources = [c.resource for c in date_windowed()]
+    elif args.scope == "congress_scoped":
+        resources = [c.resource for c in congress_scoped()]
+    elif args.scope == "static":
+        resources = [c.resource for c in static_resources()]
+    else:
+        resources = list(Resource)
+
+    if args.skip_resources:
+        skip_names = {n.strip() for n in args.skip_resources.split(",") if n.strip()}
+        skip_set: set[Resource] = set()
+        for name in skip_names:
+            try:
+                skip_set.add(Resource(name))
+            except ValueError:
+                valid = [r.value for r in Resource]
+                print(
+                    f"ERROR: unknown resource '{name}' in --skip-resources. Valid: {valid}",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+        resources = [r for r in resources if r not in skip_set]
+        logger.info("Skipping resources: %s", ", ".join(sorted(skip_names)))
+
+    return resources
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -295,21 +350,31 @@ def main() -> None:
     )
     # Suppress "Unprocessed fields" noise from the SDK — these are harmless
     # mapping gaps and would otherwise flood the log at INFO level.
-    logging.getLogger("congress_sdk.data_collection.client").setLevel(logging.ERROR)
+    logging.getLogger("cdm.data_collection.client").setLevel(logging.ERROR)
 
     outdir = Path(args.outdir)
+    validate_scope_catalog()
     all_resources = _select_resources(args)
 
     dw_resources = [
-        r for r in all_resources if RESOURCE_CONFIGS[r].scope == "date_window"
+        r
+        for r in all_resources
+        if effective_scope(RESOURCE_CONFIGS[r]) == "date_window"
     ]
     cs_resources = [
-        r for r in all_resources if RESOURCE_CONFIGS[r].scope == "congress_scoped"
+        r
+        for r in all_resources
+        if effective_scope(RESOURCE_CONFIGS[r]) == "congress_scoped"
     ]
-    st_resources = [r for r in all_resources if RESOURCE_CONFIGS[r].scope == "static"]
+    st_resources = [
+        r for r in all_resources if effective_scope(RESOURCE_CONFIGS[r]) == "static"
+    ]
 
     from_year = args.from_year
     to_year = args.to_year
+    if args.date_overlap_days < 0:
+        logger.error("--date-overlap-days must be non-negative")
+        sys.exit(2)
 
     # Congress range (for congress-scoped resources)
     derived_congresses = _congresses_for_years(from_year, to_year)
@@ -350,6 +415,18 @@ def main() -> None:
     chunk_num = 0
     skip_count = 0
     fail_count = 0
+    coverage = {
+        "requested": {
+            "from_year": from_year,
+            "to_year": to_year,
+            "from_congress": from_congress,
+            "to_congress": to_congress,
+            "date_overlap_days": args.date_overlap_days,
+            "resources": [resource.value for resource in all_resources],
+        },
+        "planned_chunks": total_chunks,
+        "chunks": [],
+    }
 
     def _make_cfg(from_date=None, to_date=None, congress=None, chunk_outdir=None):
         return PipelineConfig(
@@ -358,7 +435,6 @@ def main() -> None:
             to_date=to_date,
             congress=congress,
             fetch_items=args.items,
-            save_raw_items=True,
             max_pages=args.max_pages,
             max_items=args.max_items,
             concurrency=args.concurrency,
@@ -370,20 +446,74 @@ def main() -> None:
     def _run_chunk(resources, cfg, label):
         nonlocal chunk_num, skip_count, fail_count
         chunk_num += 1
+        planned_resources = list(resources)
+
+        checkpoint_path_key = _checkpoint_name(label)
+        checkpoint_state = checkpoint.load(checkpoint_path_key, outdir / ".checkpoints")
 
         # Resume check: skip if ALL resources in this chunk already have output
         if args.resume:
             pending = [r for r in resources if not _is_done(cfg.outdir, r, args.items)]
-            if not pending:
+            checkpoint_matches = _checkpoint_matches(
+                checkpoint_state, label, resources, cfg
+            )
+            if not pending and (not checkpoint_state or checkpoint_matches):
                 logger.debug("[%s] all resources already done — skipping", label)
                 skip_count += len(resources)
+                coverage["chunks"].append(
+                    {
+                        "label": label,
+                        "status": "skipped",
+                        "resources": [r.value for r in resources],
+                    }
+                )
                 return
+            if not pending and checkpoint_state and not checkpoint_matches:
+                logger.warning(
+                    "[%s] existing output has a mismatched checkpoint; rerunning chunk",
+                    label,
+                )
             resources = pending
 
         logger.info("[chunk %d] %s  (%d resources)", chunk_num, label, len(resources))
         pipeline = Pipeline(cfg)
         # FatalIngestError propagates unconditionally — it stops the whole script.
         results = pipeline.run(resources)
+
+        chunk_success = all(result.success for result in results)
+        checkpoint.save(
+            checkpoint_path_key,
+            {
+                "label": label,
+                "status": "completed" if chunk_success else "failed",
+                "resources": [resource.value for resource in planned_resources],
+                "parameters": _checkpoint_parameters(cfg),
+                "list_counts": {
+                    result.resource.value: result.list_count for result in results
+                },
+                "item_counts": {
+                    result.resource.value: result.item_count for result in results
+                },
+            },
+            outdir / ".checkpoints",
+        )
+
+        coverage["chunks"].append(
+            {
+                "label": label,
+                "status": "completed",
+                "resources": [
+                    {
+                        "resource": result.resource.value,
+                        "success": result.success,
+                        "list_count": result.list_count,
+                        "item_count": result.item_count,
+                        "error": result.error,
+                    }
+                    for result in results
+                ],
+            }
+        )
 
         for r in results:
             if not r.success:
@@ -409,9 +539,10 @@ def main() -> None:
     if dw_resources:
         for year in range(from_year, to_year + 1):
             year_outdir = outdir / str(year)
+            from_date, to_date = _year_window(year, args.date_overlap_days)
             cfg = _make_cfg(
-                from_date=_iso(f"{year}-01-01"),
-                to_date=_iso(f"{year}-12-31", end_of_day=True),
+                from_date=from_date,
+                to_date=to_date,
                 chunk_outdir=year_outdir,
             )
             _run_chunk(dw_resources, cfg, f"year={year}")
@@ -430,6 +561,16 @@ def main() -> None:
     print(f"Resource failures      : {fail_count}")
     print(f"Output root            : {outdir.resolve()}")
     print("=" * 60)
+
+    coverage.update(
+        {
+            "attempted_chunks": chunk_num,
+            "skipped_resources": skip_count,
+            "resource_failures": fail_count,
+        }
+    )
+    report_path = _write_coverage_report(outdir, coverage)
+    logger.info("Coverage report: %s", report_path)
 
     sys.exit(1 if fail_count > 0 else 0)
 

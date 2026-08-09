@@ -1,0 +1,4892 @@
+[
+  {
+    "congress": 109,
+    "description": "Amendment changes the effective date of the bill to the date of enactment.",
+    "latestAction": {
+      "actionDate": "2005-01-26",
+      "actionTime": "11:28:22",
+      "text": "On agreeing to the Oxley amendment (A001) Agreed to by voice vote. "
+    },
+    "number": "2",
+    "purpose": "An amendment numbered 1 printed in House Report 109-1 to change the effective date of the bill from \"after December 31, 2005\" to instead make the new limitation on the number of congressional gold medals effective on enactment of the bill.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:23Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/2?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "9",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/9?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-02-09",
+      "text": "Amendment SA 2 not agreed to in Senate by Yea-Nay Vote. 40 - 59. Record Vote Number: 6. "
+    },
+    "number": "2",
+    "purpose": "To amend the definition of class action in title 28, United States Code, to exclude class actions relating to civil rights or the payment of wages.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/2?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "8",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/8?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-02-09",
+      "text": "Motion to table amendment SA 5 agreed to in Senate by Yea-Nay Vote. 60 - 39. Record Vote Number: 5. "
+    },
+    "number": "5",
+    "purpose": "To exempt class action lawsuits brought by the attorney general of any State from the modified civil procedures required by this Act.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/5?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to strike section 102 entitled \"Waiver of Law Necessary for Improvement of Barriers at Border\" from the bill.",
+    "latestAction": {
+      "actionDate": "2005-02-10",
+      "actionTime": "14:02:32",
+      "text": "On agreeing to the Farr amendment (A005) Failed by recorded vote: 179 - 243 (Roll no. 29). (text: CR H553)"
+    },
+    "number": "9",
+    "purpose": "An amendment numbered 5 printed in House Report 109-4 to strike section 102 of the bill.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:06Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/9?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-02-10",
+      "text": "Amendment SA 12 not agreed to in Senate by Yea-Nay Vote. 37 - 61. Record Vote Number: 8. "
+    },
+    "number": "12",
+    "purpose": "To establish time limits for action by Federal district courts on motions to remand cases that have been removed to Federal court.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/12?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to strike section 101 entitled \"Preventing Terrorists from Obtaining Relief from Removal\" from the bill.",
+    "latestAction": {
+      "actionDate": "2005-02-10",
+      "actionTime": "13:52:07",
+      "text": "On agreeing to the Nadler amendment (A004) Failed by recorded vote: 185 - 236 (Roll no. 28). (text: CR H548)"
+    },
+    "number": "8",
+    "purpose": "An amendment numbered 4 printed in House Report 109-4 to strike section 101 and redesignate the succeeding sections of title I accordingly.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:06Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/8?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment adds language to clarify the use of delivery bonds by the Department of Homeland Security.",
+    "latestAction": {
+      "actionDate": "2005-02-10",
+      "actionTime": "12:08:49",
+      "text": "On agreeing to the Sessions amendment (A001) Agreed to by voice vote. (text: CR H540-541)"
+    },
+    "number": "5",
+    "purpose": "An amendment numbered 1 printed in House Report 109-4 to promote the goal of 100% repatriation of all aliens ordered deported by clarifying obligations under the Department of Homeland Security's existing delivery bond authority.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:06Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/5?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "7",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/7?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-02",
+      "text": "Amendment SA 29 not agreed to in Senate by Yea-Nay Vote. 39 - 58. Record Vote Number: 17. "
+    },
+    "number": "29",
+    "purpose": "To provide protection for medical debt homeowners.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/29?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "10",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/10?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "18",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/18?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "22",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/22?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-02-01",
+      "text": "Amendment SA 1 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "1",
+    "purpose": "Of a technical nature.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/1?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to provide for the equitable distribution of congressional gold medals under the bill between the majority and minority parties.",
+    "latestAction": {
+      "actionDate": "2005-01-26",
+      "actionTime": "12:26:15",
+      "text": "On agreeing to the Crowley amendment (A003) Failed by recorded vote: 182 - 211 (Roll no. 11). "
+    },
+    "number": "4",
+    "purpose": "An amendment numbered 3 printed in House Report 109-1 to provide for an equitable distribution of gold medals under the bill between the majority party and the minority party.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:23Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/4?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "6",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/6?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to increase the maximum number of congressional gold medals that Congress could award from two per calendar year to six per Congress.",
+    "latestAction": {
+      "actionDate": "2005-01-26",
+      "actionTime": "12:19:13",
+      "text": "On agreeing to the Crowley amendment (A002) Failed by recorded vote: 189 - 212 (Roll no. 10). "
+    },
+    "number": "3",
+    "purpose": "An amendment numbered 2 printed in House Report 109-1 to increase the limit of gold medals provided for under the bill from 2 per calendar year to 6 per Congress.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:23Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/3?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "27",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/27?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "39",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/39?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "15",
+    "purpose": "Amendment in the nature of a substitute.",
+    "type": "HAMDT",
+    "updateDate": "2021-07-10T16:11:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/15?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-02-09",
+      "text": "Amendment SA 4 not agreed to in Senate by Yea-Nay Vote. 38 - 61. Record Vote Number: 7. "
+    },
+    "number": "4",
+    "purpose": "To clarify the application of State law in certain class actions, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/4?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-02",
+      "text": "Amendment SA 28 not agreed to in Senate by Yea-Nay Vote. 39 - 58. Record Vote Number: 16. "
+    },
+    "number": "28",
+    "purpose": "To exempt debtors whose financial problems were caused by serious medical problems from means testing.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/28?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment clarifies that the liability standard for non-licensees is willful and intentional; clarifies that for non-licensees to be found liable, their indecent statement must have been made knowing or having a reason to know that the statement would be broadcast; changes the reference in the bill to the \"General Accounting Office\" to its new name of \"Government Accountability Office\"; requires the FCC to look at the impact of a forfeiture penalty on an individual; requires the FCC's annual indecency enforcement report to include data going back to 2000; requires the GAO's indecency enforcement report to include data going back to 2000; and requires the FCC to update its broadcast indecency enforcement guidelines at least every 3 years.",
+    "latestAction": {
+      "actionDate": "2005-02-16",
+      "actionTime": "13:28:55",
+      "text": "On agreeing to the Upton amendment (A001) Agreed to by voice vote. (text: CR H662)"
+    },
+    "number": "10",
+    "purpose": "Amendment printed in House Report 109-6 to clarify that the liability standard for non-licensees (performers, networks) is \"willful and intentional\"; clarify that for non- licensees to be found liable, the indecent statement must have been made \"knowing or having a reason to know\" that the statement would be broadcast; change the reference to the \"General Accounting Office\" to its new name of \"Government Accountability Office\"; provide that if a violator of the provisions of the Act is an individual, the financial impact of a penalty can be taken into account; require the FCC's annual indecency enforcement report to include data going back to 2000; require the GAO's indecency enforcement report to include data going back to 2000; and to require the FCC to promptly, and regularly thereafter, update its Policy Statement that provides guidance on the Indecency Standard.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T14:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/10?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "11",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/11?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-02-10",
+      "text": "Proposed amendment SA 3 withdrawn in Senate. "
+    },
+    "number": "3",
+    "purpose": "To preserve State court procedures for handling mass actions.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/3?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-02",
+      "text": "Amendment SA 32 not agreed to in Senate by Yea-Nay Vote. 37 - 60. Record Vote Number: 18. "
+    },
+    "number": "32",
+    "purpose": "To preserve existing bankruptcy protections for individuals experiencing economic distress as caregivers to ill or disabled family members.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/32?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment requires the Department of Homeland Security to enter into the appropriate aviation security screening database any person convicted of using a false driver's license in attempting to board an airplane.",
+    "latestAction": {
+      "actionDate": "2005-02-10",
+      "actionTime": "12:23:06",
+      "text": "On agreeing to the Castle amendment (A002) Agreed to by voice vote. (text: CR H544)"
+    },
+    "number": "6",
+    "purpose": "An amendment numbered 2 printed in House Report 109-4 to require the Secretary of Homeland Security to enter into the appropriate aviation security screening database the appropriate background information of any person convicted of using a false drivers' license for the purpose of boarding an airplane. In addition to the federally mandated punishment for using a false drivers' license, collecting this information would enhance the ability to track and detect potential security threats.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:06Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/6?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-02",
+      "text": "Amendment SA 17 not agreed to in Senate by Yea-Nay Vote. 40 - 59. Record Vote Number: 14. "
+    },
+    "number": "17",
+    "purpose": "To provide a homestead floor for the elderly.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/17?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "35",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/35?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "text": "Amendment SA 49 not agreed to in Senate by Yea-Nay Vote. 40 - 54. Record Vote Number: 25. "
+    },
+    "number": "49",
+    "purpose": "To protect employees and retirees from corporate practices that deprive them of their earnings and retirement savings when a business files for bankruptcy.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:22Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/49?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "14",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/14?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "text": "Amendment SA 38 not agreed to in Senate by Yea-Nay Vote. 40 - 58. Record Vote Number: 22. "
+    },
+    "number": "38",
+    "purpose": "To discourage predatory lending practices.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/38?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "20",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/20?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "text": "Amendment SA 42 not agreed to in Senate by Yea-Nay Vote. 39 - 56. Record Vote Number: 23. "
+    },
+    "number": "42",
+    "purpose": "To limit the exemption for asset protection trusts.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/42?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-01",
+      "text": "Amendment SA 16 not agreed to in Senate by Yea-Nay Vote. 38 - 58. Record Vote Number: 13. "
+    },
+    "number": "16",
+    "purpose": "To protect servicemembers and veterans from means testing in bankruptcy, to disallow certain claims by lenders charging usurious interest rates to servicemembers, and to allow servicemembers to exempt property based on the law of the State of their premilitary residence.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/16?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment in the nature of a substitute sought to replace the provisions of the bill with the text of the \"Class Action Fairness Act of 2005\".",
+    "latestAction": {
+      "actionDate": "2005-02-17",
+      "actionTime": "13:05:07",
+      "text": "On agreeing to the Conyers amendment (A001) Failed by the Yeas and Nays: 178 - 247 (Roll no. 36). "
+    },
+    "number": "11",
+    "purpose": "An amendment in the nature of a substitute to clarify that cases brought by state attorneys general are excluded from the provisions of the class action bill and are not forced into federal court; to limit the court's ability to seal or make subject to a protective order, records unless it is necessary to protect trade confidentiality and is consistent with the protection of public health and safety or the disclosure of the information is clearly outweighed by a specific and substantial interest in maintaining the confidentiality of the information; to carve out State civil rights claims in order to make sure that civil rights plaintiffs, especially those seeking immediate injunctive relief, can have their grievances addressed in a timely manner; to carve out State civil rights claims to allow wage and hour class action members to have their grievances addressed in a timely manner; to prohibit domestic corporations that reincorporate abroad in order to avoid U.S. taxes and legal liability from benefitting from the new class action rules. Such corporations will retain the citizenship they had prior to their reincorporation; to remove the mass torts language; and to prohibit a federal judge from denying certification on the basis that more than one state law applies.",
+    "type": "HAMDT",
+    "updateDate": "2021-07-11T00:00:10Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/11?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-02-16",
+      "text": "Amendment SA 13 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "13",
+    "purpose": "To provide a complete substitute.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:01Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/13?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "text": "Amendment SA 37 not agreed to in Senate by Yea-Nay Vote. 37 - 61. Record Vote Number: 21. "
+    },
+    "number": "37",
+    "purpose": "To exempt debtors from means testing if their financial problems were caused by identity theft.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/37?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-02",
+      "text": "Amendment SA 15 not agreed to in Senate by Yea-Nay Vote. 40 - 59. Record Vote Number: 15. "
+    },
+    "number": "15",
+    "purpose": "To require enhanced disclosure to consumers regarding the consequences of making only minimum required payments in the repayment of credit card debt, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/15?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "79",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/79?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to strike all provisions related to youth.",
+    "latestAction": {
+      "actionDate": "2005-03-02",
+      "actionTime": "18:42:06",
+      "text": "On agreeing to the Kildee amendment (A001) Failed by recorded vote: 200 - 222 (Roll no. 44). "
+    },
+    "number": "12",
+    "purpose": "An amendment numbered one printed in House Report 109-11 to strike all provisions related to youth.",
+    "type": "HAMDT",
+    "updateDate": "2021-07-10T16:11:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/12?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "30",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/30?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "34",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/34?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "text": "Amendment SA 48 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "48",
+    "purpose": "To increase bankruptcy filing fees to pay for the additional duties of United States trustees and the new bankruptcy judges added by this Act.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/48?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "36",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/36?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "57",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/57?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "59",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/59?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-01",
+      "text": "Amendment SA 23 agreed to in Senate by Yea-Nay Vote. 63 - 32. Record Vote Number: 12. "
+    },
+    "number": "23",
+    "purpose": "To clarify the safe harbor with respect to debtors who have serious medical conditions or who have been called or ordered to active duty in the Armed Forces and low income veterans.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:01Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/23?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "25",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/25?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "21",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/21?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "82",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/82?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "60",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/60?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "46",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/46?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "78",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/78?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "text": "Amendment SA 24 not agreed to in Senate by Yea-Nay Vote. 40 - 54. Record Vote Number: 24. "
+    },
+    "number": "24",
+    "purpose": "To amend the wage priority provision and to amend the payment of insurance benefits to retirees.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/24?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "55",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/55?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "109",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/109?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "77",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/77?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "33",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/33?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "41",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/41?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "122",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/122?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "58",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/58?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "80",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/80?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "54",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/54?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "75",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/75?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "56",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/56?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-07",
+      "text": "Proposed amendment SA 19 withdrawn in Senate. "
+    },
+    "number": "19",
+    "purpose": "To enhance disclosures under an open end credit plan.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/19?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "43",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/43?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "127",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/127?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "text": "Amendment SA 31 not agreed to in Senate by Yea-Nay Vote. 24 - 74. Record Vote Number: 20. "
+    },
+    "number": "31",
+    "purpose": "To limit the amount of interest that can be charged on any extension of credit to 30 percent.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/31?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "102",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/102?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "108",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/108?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "76",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/76?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "74",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/74?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "120",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/120?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "115",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/115?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to allow unemployed workers to use their Personal Reemployment Account funds to cover the borrower guarantee costs of Small Business Administration's 7(a) loans.",
+    "latestAction": {
+      "actionDate": "2005-03-02",
+      "actionTime": "18:50:36",
+      "text": "On agreeing to the Velazquez amendment (A002) Failed by recorded vote: 202 - 221 (Roll no. 45). "
+    },
+    "number": "13",
+    "purpose": "An amendment numbered two printed in House Report 109-11 to allow unemployed workers to use their Personal Reemployment Account funds to cover the borrower guarantee costs of 7(a) loans.",
+    "type": "HAMDT",
+    "updateDate": "2021-07-10T16:11:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/13?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to expand the ability of an aggrieved party to file suit for either declaratory or injunctive relief from 2 days to 5 days; provide for an expedited appeals process to the United States District Court for matters rising out of the special election process; and provide for an expansion of the right to sue for declaratory judgment to others beyond a state Governor.",
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "actionTime": "13:21:53",
+      "text": "On agreeing to the Jackson-Lee (TX) amendment (A003) Failed by recorded vote: 183 - 239 (Roll no. 50). "
+    },
+    "number": "19",
+    "purpose": "An amendment numbered 2 printed in House Report 109-10.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T06:16:12Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/19?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "117",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/117?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "61",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/61?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "132",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/132?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-07",
+      "text": "Amendment SA 26 as modified agreed to in Senate by Unanimous Consent. (consideration: CR S2139-2143; text as modified: CR S2139)"
+    },
+    "number": "26",
+    "purpose": "To restrict access to certain personal information in bankruptcy documents.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/26?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "84",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/84?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-07",
+      "text": "Proposed amendment SA 128 withdrawn in Senate. "
+    },
+    "number": "128",
+    "purpose": "To promote job creation, family time, and small business preservation in the adjustment of the Federal minimum wage.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/128?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-08",
+      "text": "Proposed amendment SA 40 withdrawn in Senate. "
+    },
+    "number": "40",
+    "purpose": "To amend the Fair Credit Reporting Act to prohibit the use of any information in any consumer report by any credit card issuer that is unrelated to the transactions and experience of the card issuer with the consumer to increase the annual percentage rate applicable to credit extended to the consumer, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/40?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "65",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/65?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "73",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/73?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-08",
+      "text": "Amendment SA 89 not agreed to in Senate by Yea-Nay Vote. 41 - 59. Record Vote Number: 30. "
+    },
+    "number": "89",
+    "purpose": "To strike certain small business related bankruptcy provisions in the bill.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/89?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "81",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/81?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "107",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/107?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "14:01:55",
+      "text": "By unanimous consent, the Kuhl (NY) amendment was withdrawn. "
+    },
+    "number": "22",
+    "purpose": "Am amendment numbered three printed in Part B of House Report 109-14 to amend the exemption for maximum driving and on duty time for drivers of motor carriers transporting agricultural commodities or farm supplies at the time of planting or harvest for a 100 air mile radius to the distribution point of the source of the commodities, by increasing the air mile radius to 150.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/22?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "118",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/118?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "64",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/64?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "116",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/116?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "85",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/85?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 99 withdrawn in Senate. "
+    },
+    "number": "99",
+    "purpose": "To provide no bankruptcy protection for insolvent political committees.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/99?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-08",
+      "text": "Proposed amendment SA 111 withdrawn in Senate. "
+    },
+    "number": "111",
+    "purpose": "To protect veterans and member of the armed forces on active duty or performing homeland security activities from means testing in bankruptcy.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/111?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "113",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/113?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Amendment SA 62 not agreed to in Senate by Yea-Nay. 40 - 60. Record Vote Number: 33. "
+    },
+    "number": "62",
+    "purpose": "To provide for the potential disallowance of certain claims.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/62?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment extends the time frame for holding expedited special elections from 45 days to 49 days.",
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "actionTime": "12:10:37",
+      "text": "On agreeing to the Ney amendment (A001) Agreed to by voice vote. "
+    },
+    "number": "17",
+    "purpose": "An amendment made in order by H. Res. 125 to extend the time-frame for holding expedited special elections from 45 days to 49 days.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T06:16:12Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/17?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "13:46:51",
+      "text": "By unanimous consent, the Boozman amendment was withdrawn. "
+    },
+    "number": "20",
+    "purpose": "An amendment numbered one printed in Part B of House Report 109-14 to allow operators of a property carry motor vehicle to take up to 2hours of off-duty times, as defined by FMSCA, during their 14 hours on-duty, so as not to exceed 16 hours.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/20?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to change the overall deadline for holding expedited special elections from 49 days to 60 days.",
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "actionTime": "13:10:45",
+      "text": "On agreeing to the Millender-McDonald amendment (A002) Failed by recorded vote: 192 - 229 (Roll no. 49). "
+    },
+    "number": "18",
+    "purpose": "An amendment made in order by H. Res. 125 and in lieu of the amendment numbered 1 printed in House Report 109-10. The amendment inserts text providing that expedited special elections shall take place not later than 60 days after the Speaker of the House of Representatives announces that such vacancies exist.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T06:16:12Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/18?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "124",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/124?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "106",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/106?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 119 withdrawn in Senate. "
+    },
+    "number": "119",
+    "purpose": "To amend section 502(b) of title 11, United States code, to limit usurious claims in bankruptcy.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/119?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "125",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/125?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "123",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/123?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 52 withdrawn in Senate. "
+    },
+    "number": "52",
+    "purpose": "To prohibit extensions of credit to underage consumers.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/52?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "137",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/137?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Amendment SA 110 not agreed to in Senate by Yea-Nay Vote. 42 - 58. Record Vote Number: 31. "
+    },
+    "number": "110",
+    "purpose": "To clarify that the means test does not apply to debtors below median income.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/110?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "138",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/138?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "126",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/126?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 51 withdrawn in Senate. "
+    },
+    "number": "51",
+    "purpose": "To amend certain provisions regarding attorney actions on behalf of debtors, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/51?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "114",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/114?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "135",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/135?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 139 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "139",
+    "purpose": "To strike the request for a presidential proclamation.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T02:47:06Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/139?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "103",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/103?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 72 withdrawn in Senate. "
+    },
+    "number": "72",
+    "purpose": "To ensure that families below median income are not subjected to means test requirements.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/72?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 98 withdrawn in Senate. "
+    },
+    "number": "98",
+    "purpose": "To modify the disclosure requirements for debt relief agencies providing bankruptcy assistance.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/98?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-08",
+      "text": "Amendment SA 47 not agreed to in Senate by Yea-Nay Vote. 46 - 53. Record Vote Number: 28. "
+    },
+    "number": "47",
+    "purpose": "To prohibit the discharge, in bankruptcy, of a debt resulting from the debtor's unlawful interference with the provision of lawful goods or services or damage to property used to provide lawful goods or services.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:23Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/47?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 50 withdrawn in Senate. "
+    },
+    "number": "50",
+    "purpose": "To amend section 524(g)(1) of title 11, United States Code, to predicate the discharge of debts in bankruptcy by any vermiculite mining company meeting certain criteria on the establishment of a health care trust fund for certain individuals suffering from an asbestos related disease.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/50?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "86",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/86?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 45 withdrawn in Senate. "
+    },
+    "number": "45",
+    "purpose": "To establish a special committee of the Senate to investigate the awarding and carrying out of contracts to conduct activities in Afghanistan and Iraq and to fight the war on terrorism.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/45?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-07",
+      "text": "Proposed amendment SA 44 withdrawn in Senate. "
+    },
+    "number": "44",
+    "purpose": "To amend the Fair Labor Standards Act of 1938 to provide for an increase in the Federal minimum wage.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:59Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/44?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "63",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/63?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 101 withdrawn in Senate. "
+    },
+    "number": "101",
+    "purpose": "To amend the definition of small business debtor.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/101?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 92 as modified agreed to in Senate by Unanimous Consent. (text as modified: CR S2463)"
+    },
+    "number": "92",
+    "purpose": "To amend the credit counseling provision.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:42Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/92?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 88 withdrawn in Senate. "
+    },
+    "number": "88",
+    "purpose": "to amend the plan filing and confirmation deadlines.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/88?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 100 withdrawn in Senate. "
+    },
+    "number": "100",
+    "purpose": "To provide authority for a court to order disgorgement or other remedies relating to an agreement that is not enforceable.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/100?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Amendment SA 67 not agreed to in Senate by Yea-Nay. 42 - 58. Record Vote Number: 34. "
+    },
+    "number": "67",
+    "purpose": "To modify the bill to protect families, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/67?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Proposed amendment SA 95 withdrawn in Senate. "
+    },
+    "number": "95",
+    "purpose": "To amend the provisions relating to the discharge of taxes under chapter 13.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/95?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment provided for the consideration of two amendments to H.R. 841.",
+    "latestAction": {
+      "actionDate": "2005-03-03",
+      "actionTime": "11:13:35",
+      "text": "On agreeing to the Cole (OK) amendment (A001) Agreed to by voice vote. "
+    },
+    "number": "16",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T05:26:34Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/16?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "104",
+    "type": "SAMDT",
+    "updateDate": "2019-11-15T21:55:52Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/104?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 69 not agreed to in Senate by Yea-Nay Vote. 41 - 58. Record Vote Number: 37. "
+    },
+    "number": "69",
+    "purpose": "To amend the definition of current monthly income.",
+    "type": "SAMDT",
+    "updateDate": "2019-11-15T21:55:52Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/69?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "133",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/133?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Amendment SA 91 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "91",
+    "purpose": "To amend section 303 of title 11, United States Code, with respect to the sealing and expungement of court records relating to fraudulent involuntary bankruptcy petitions.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/91?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 112 agreed to in Senate by Yea-Nay. 99 - 0. Record Vote Number: 40. "
+    },
+    "number": "112",
+    "purpose": "To protect disabled veterans from means testing in bankruptcy under certain circumstances.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/112?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Amendment SA 68 not agreed to in Senate by Yea-Nay. 47 - 53. Record Vote Number: 35. "
+    },
+    "number": "68",
+    "purpose": "To provide a maximum amount for a homestead exemption under State law.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:22Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/68?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Proposed amendment SA 90 withdrawn in Senate. "
+    },
+    "number": "90",
+    "purpose": "To amend the provision relating to fair notice given to creditors.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/90?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 105 not agreed to in Senate by Yea-Nay. 38 - 61. Record Vote Number: 38. "
+    },
+    "number": "105",
+    "purpose": "To limit claims in bankruptcy by certain unsecured creditors.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:02Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/105?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 97 withdrawn in Senate. "
+    },
+    "number": "97",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/97?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "136",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/136?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "13:07:18",
+      "text": "By unanimous consent, the Shadegg amendment was withdrawn. "
+    },
+    "number": "39",
+    "purpose": "An amendment numbered 11 printed in House Report 109-15 to revise the formula by which funds are allocated under the Congestion Mitigation and Air Quality Improvement Program to include areas in non- attainment or maintenance for fine and coarse particulate matter (PM-2.5 and PM-10). The amendment ensures that funds will be available to assist areas which are not in attainment for particulate matter air quality.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/39?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 71 withdrawn in Senate. "
+    },
+    "number": "71",
+    "purpose": "To strike the provision relating to the presumption of luxury goods.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/71?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "12:14:16",
+      "text": "By unanimous consent, the Burgess amendment was withdrawn. "
+    },
+    "number": "32",
+    "purpose": "An amendment numbered 4 printed in House Report 109-15 to remove federal restrictions on state procurement procedures for Design Building (D/B) contracts; authorize the acceptance of multiple, unsolicited proposals when permitted by state and local law; permit a single consultant to do environmental work, as well as design and construction work in a single contract, subject to State review and review by the Secretary of Transportation; authorize a State to award a DIB contract prior to a final NEPA judgment; (a project's approval would be contingent on a NEPA compliance decision by the Secretary); reopen the rule making process to correct inequities to States and so they are not precluded from: allowing proposers to include alternative technical concepts in base proposals; issuing a proposal request or a notice to proceed with design work prior to EPA compliance; proceeding with the award of a DIB contract.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/32?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "134",
+    "type": "SAMDT",
+    "updateDate": "2019-11-15T21:55:52Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/134?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 53 withdrawn in Senate. "
+    },
+    "number": "53",
+    "purpose": "To require prior notice of rate increases.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/53?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Referred to the Committee on Foreign Relations. "
+    },
+    "number": "140",
+    "type": "SAMDT",
+    "updateDate": "2020-12-05T13:04:16Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/140?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment preempts state laws regarding vicarious liability for rental car and truck owners.",
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "16:54:50",
+      "text": "On agreeing to the Graves amendment Agreed to by recorded vote: 218 - 201 (Roll no. 60). "
+    },
+    "number": "28",
+    "purpose": "An amendment numbered ten printed in Part B of House Report 109-14 to eliminate liability under state law for an owner of a motor vehicle or their affiliate who is engaged in the business of renting and leasing motor vehicles provided there is no negligence or criminal wrongdoing on the part of the motor vehicle owner or affiliate. The owner or affiliate must maintain the required state limits of financial responsibility for each vehicle in accordance to the states where the vehicle is registered.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/28?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment to exempt the State of Nebraska from the ISTEA 1991 truck length freeze, subject to a change in state statute, to allow the operation of commercial vehicle combinations not exceeding 81 feet, six inches for custom harvesters operating in the State of Nebraska.",
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "16:36:10",
+      "text": "On agreeing to the Osborne amendment Agreed to by recorded vote: 236 - 184 (Roll no. 58). "
+    },
+    "number": "25",
+    "purpose": "An amendment numbered six printed in Part B of House Report 109-14 to exempt the State of Nebraska from the ISTEA 1991 truck length freeze, subject to change in states statute, to allow the operation of commercial vehicle combinations not exceeding 81 feet, 6 inches for custom harvesters operating in the State of Nebraska.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/25?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 87, previously agreed to, was modified by Unanimous Consent. (consideration: CR S2463; text as modified: CR S2463)"
+    },
+    "number": "87",
+    "purpose": "To amend section 104 of title 11, United States Code, to include certain provisions in the triennial inflation adjustment of dollar amounts.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/87?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Amendment SA 66 not agreed to in Senate by Yea-Nay Vote. 48 - 52. Record Vote Number: 32. "
+    },
+    "number": "66",
+    "purpose": "To increase the accrual period for the employee wage priority in bankruptcy.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/66?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "18:31:50",
+      "text": "By unanimous consent, the Markey amendment was withdrawn. "
+    },
+    "number": "59",
+    "purpose": "An amendment to add a new title prohibiting use of funds in the bill to implement any regulation reducing the total amount of monthly military pay for a member of the Armed Forces who is wounded or otherwise injured while assigned to duty in an area for which special pay is available.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/59?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "text": "Proposed amendment SA 94 withdrawn in Senate. "
+    },
+    "number": "94",
+    "purpose": "To clarify the application of the term disposable income.",
+    "type": "SAMDT",
+    "updateDate": "2019-11-15T21:55:52Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/94?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Proposed amendment SA 93 withdrawn in Senate. "
+    },
+    "number": "93",
+    "purpose": "To modify the disclosure requirements for debt relief agencies providing bankruptcy assistance.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:24Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/93?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-14",
+      "text": "Amendment SA 142 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "142",
+    "purpose": "Of a technical nature.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:43Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/142?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 121 agreed to in Senate by Yea-Nay. 73 - 26. Record Vote Number: 42. "
+    },
+    "number": "121",
+    "purpose": "To deter corporate fraud and prevent the abuse of State self-settled trust law.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/121?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 70 not agreed to in Senate by Yea-Nay Vote. 41 - 58. Record Vote Number: 36. "
+    },
+    "number": "70",
+    "purpose": "To exempt debtors whose financial problems were caused by failure to receive alimony or child support, or both, from means testing.",
+    "type": "SAMDT",
+    "updateDate": "2018-11-21T20:19:25Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/70?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "18:24:46",
+      "text": "By unanimous consent, the Lantos amendment was withdrawn. "
+    },
+    "number": "58",
+    "purpose": "An amendment numbered 4 printed in the Congressional Record to add a new title entitled the Hope at Home Act.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/58?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "text": "Amendment SA 145 not agreed to in Senate by Yea-Nay Vote. 50 - 50. Record Vote Number: 49. "
+    },
+    "number": "145",
+    "purpose": "To express the sense of the Senate that  Congress should reject any Social Security plan that requires deep benefit cuts or a massive increase in debt.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:55Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/145?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to provide for a congestion pricing pilot program which would allow fees to be charged electronically on new lanes, the use of which by drivers would be optional, and provide for the cessation of the collection of fees when construction and maintenance costs have been attained.",
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "16:46:17",
+      "text": "On agreeing to the Kennedy (MN) amendment (A008) Failed by recorded vote: 155 - 265 (Roll no. 59). "
+    },
+    "number": "27",
+    "purpose": "An amendment numbered eight printed in Part B of House Report 109-14 to streamline tolling authority to charge tolls on new lanes, and it dedicates those revenues to the user fee purpose. Additionally the amendment restricts the authority to convert existing non-toll Interstate highway lanes onto tolled roads and then indefinitely toll those roads.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/27?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Proposed amendment SA 96 withdrawn in Senate. "
+    },
+    "number": "96",
+    "purpose": "To amend the provisions relating to chapter 13 plans to have a 5-year duration in certain cases and to amend the definition of disposable income for purposes of chapter 13.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/96?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Manager's amendment consists of the text of the amendment contained in House Report 109-15 which is printed on pages H1277-H1299 and modifications printed on pages H1313-1314 in the Congressional Record for March 10, 2005.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "11:43:07",
+      "text": "On agreeing to the Young (AK) amendment (A010) Agreed to by voice vote. "
+    },
+    "number": "29",
+    "purpose": "An amendment numbered 1 printed in House Report 109-15 to make adjustments to the programmatic funding levels listed in Sec. 1101; to make adjustments to increase the scope over what it was in H.R. 3 as reported out of Committee and several other technical changes.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/29?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment names a portion of Interstate 86 in upstate New York in the vicinity of the City of Corning, as the \"Amo Houghton Bypass\".",
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "14:50:18",
+      "text": "On agreeing to the Kuhl (NY) amendment (A005) Agreed to by voice vote. "
+    },
+    "number": "24",
+    "purpose": "An amendment numbered five printed in Part B of House Report 109-14 to name a portion of Interstate 86 in upstate New York, in the vicinity of the City of Corning, the \"Amo Houghton Bypass\", after Former Congressman Amo Houghton who retired from Congress in 2004 after serving 18 years.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/24?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "15:29:26",
+      "text": "Mr. Lewis (CA) raised a point of order against the Filner amendment (A009). Mr. Lewis (CA) stated that the amendment sought to change existing law and constituted legislation in an appropriation bill. The Chair sustained the point of order. "
+    },
+    "number": "52",
+    "purpose": "An amendment to provide $3.1 billion for the Veterans' Health Administration.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/52?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "41",
+    "purpose": "An amendment to the preamble to the resolution.",
+    "type": "HAMDT",
+    "updateDate": "2019-11-15T21:07:31Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/41?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "text": "Amendment SA 83 not agreed to in Senate by Yea-Nay Vote. 44 - 55. Record Vote Number: 39. "
+    },
+    "number": "83",
+    "purpose": "To modify the definition of disinterested person in the Bankruptcy Code.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:15Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/83?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "13:18:42",
+      "text": "By unanimous consent, the Flake amendment was withdrawn. "
+    },
+    "number": "40",
+    "purpose": "An amendment numbered 12 printed in House Report 109-15 to subtract the amount that states receive in earmarks from their formula totals in the Surface Transportation Program. Apportions to states, via formula, any remaining funding that would have otherwise gone toward earmarks.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/40?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "148",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/148?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "165",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/165?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "13:57:35",
+      "text": "By unanimous consent, the Woolsey amendment was withdrawn. "
+    },
+    "number": "46",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T12:39:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/46?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "18:07:13",
+      "text": "By unanimous consent, the Kelly amendment was withdrawn. "
+    },
+    "number": "57",
+    "purpose": "An amendment to prohibit any of the funds made available in the Act to provide assistance to the Government of the Federal Republic of Nigeria.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/57?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "16:26:43",
+      "text": "Mr. Kolbe raised a point of order against the Reyes amendments (A011). Mr. Kolbe stated that the amendment sought to change existing law and constituted legislation in an appropriation bill. The Chair sustained the point of order. "
+    },
+    "number": "54",
+    "purpose": "An amendment comprised of two amendments offered en bloc to provide additional amounts for \"Medical Services\" and to add additional general provisions at the end of the bill.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/54?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "162",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/162?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "text": "Amendment SA 149 not agreed to in Senate by Yea-Nay Vote. 47 - 53. Record Vote Number: 55. "
+    },
+    "number": "149",
+    "purpose": "To increase veterans medical care by $2.8 billion in 2006.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/149?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment revises the definition of agricultural commodity for purposes of the hours of service exemption for agricultural products during the time of harvest and planting.",
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "14:48:17",
+      "text": "On agreeing to the Moran (KS) amendment (A004) Agreed to by recorded vote: 257 - 167 (Roll no. 57). "
+    },
+    "number": "23",
+    "purpose": "An amendment numbered four printed in Part B of House Report 109-14 to amend the exemption for maximum driving and on duty time for drivers of motor carriers transporting agricultural commodities or farm supplies at the time of planting for harvest for a 100 air mile radius to the distribution point of the commodities by including in the definition of \"agricultural commodities\", livestock, food, feed, and fiber, and other farm products. Amendment also extends to the agricultural hours of service exemption the same protection that currently applies to well drilling rigs.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/23?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "15:05:46",
+      "text": "Mr. Lewis (CA) raised a point of order against the Jackson-Lee (TX) amendment (A007). Mr. Lewis (CA) stated that the amendment was in violation of Section 302F of the Congressional Budget Act of 1974 and therefore constituted legislation in an appropriation bill. The Chair sustained the point of order. "
+    },
+    "number": "50",
+    "purpose": "An amendment to provide for an additional amount for salaries and expenses hereby derived from the amount provided in the Act for United States Coast Guard Operating Expenses.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/50?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to exempt commercial motor vehicle operators working in field operations for the natural gas and oil industry from the hours of service rules issued by the Federal Motor Carrier Safety Administration.",
+    "latestAction": {
+      "actionDate": "2005-03-09",
+      "actionTime": "14:38:20",
+      "text": "On agreeing to the Conaway amendment (A002) Failed by recorded vote: 198 - 226 (Roll no. 56). "
+    },
+    "number": "21",
+    "purpose": "An amendment numbered 2 printed in Part B of House Report 109-14 to exempt commercial motor vehicle operators working field operations for the natural gas and oil industry from the hours of service rules issued by the Federal Motor Carrier Safety Administration.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/21?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment makes it illegal to sell a traffic signal preemption transmitter to an unauthorized person.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "12:31:13",
+      "text": "On agreeing to the Rogers (MI) amendment Agreed to by voice vote. "
+    },
+    "number": "35",
+    "purpose": "An amendment numbered 7 printed in House Report 109-15 to prohibit the sale or use of a traffic signal preemption transmitter (device that changes or alters a traffic signal's phase time or sequence) by a non-government approved user. Violators would be subject to a fine of up to $10,000 or one year imprisonment.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/35?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "text": "Amendment SA 158 not agreed to in Senate by Yea-Nay Vote. 46 - 52. Record Vote Number: 51. "
+    },
+    "number": "158",
+    "purpose": "To provide adequate funding of $1.4 billion in fiscal year 2006 to preserve a national intercity passenger rail system.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/158?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "166",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/166?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "text": "Amendment SA 144 not agreed to in Senate by Yea-Nay Vote. 45 - 55. Record Vote Number: 47. "
+    },
+    "number": "144",
+    "purpose": "To ensure that 75-year solvency has been restored to Social Security before Congress considers new deficit-financed legislation that would increase mandatory spending or cut taxes.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:55Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/144?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "text": "Amendment SA 147 not agreed to in Senate by Yea-Nay Vote. 46 - 54. Record Vote Number: 50. "
+    },
+    "number": "147",
+    "purpose": "To protect the American people from terrorist attacks by providing the necessary resources to our firefighters, police, EMS workers and other first-responders by restoring $1,626 billion in cuts to first-responder programs.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/147?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-14",
+      "text": "Amendment SA 143 not agreed to in Senate by Yea-Nay Vote. 44 - 49. Record Vote Number: 45. "
+    },
+    "number": "143",
+    "purpose": "To restore funding for education programs that are cut and reduce debt by closing corporate tax loopholes.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:04Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/143?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "179",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/179?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "text": "Amendment SA 152 as modified agreed to in Senate by Yea-Nay Vote. 100 - 0. Record Vote Number: 46. (text as modified: CR S2691-2692)"
+    },
+    "number": "152",
+    "purpose": "To express the sense of the Senate regarding the urgent need for legislation to ensure the long-term viability of the Social Security program.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:43Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/152?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "185",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/185?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "141",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/141?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "text": "Amendment SA 150 agreed to in Senate by Yea-Nay Vote. 56 - 43. Record Vote Number: 48. "
+    },
+    "number": "150",
+    "purpose": "To express the sense of the Senate that failing to address the financial condition of Social Security will result in massive debt, deep benefit cuts and tax increases.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/150?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "text": "Amendment SA 168 not agreed to in Senate by Yea-Nay. 49 - 51. Record Vote Number: 52. "
+    },
+    "number": "168",
+    "purpose": "To strike section 201(a)(4) relative to the Arctic National Wildlife Refuge.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/168?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "196",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/196?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "actionTime": "10:45:35",
+      "text": "Mr. Lewis (CA) raised a point of order against the Filner amendment (A020). Mr. Lewis (CA) stated that the amendment sought to change existing law and constituted legislation in an appropriation bill. The Chair sustained the point of order. "
+    },
+    "number": "63",
+    "purpose": "An amendment to prohibit any of the funds made available in the Act be used to enter into a contract with a private sector contractor to perform reconstruction in Iraq unless, as a condition of the contract, or any subcontract at any tier under the contract, when hiring employees who will perform work under the contract (or subcontract), to extend to preference eligible veterans a hiring preference equivalent to the preference extended to preference eligible veterans for civilian employee positions in the Federal Government.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/63?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment provides that basic grant funds authorized under the Alcohol-Impaired Driving Countermeasures section of the bill can be used for Driving While Intoxicated (DWI) Courts.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "12:45:11",
+      "text": "On agreeing to the Honda amendment Agreed to by voice vote. "
+    },
+    "number": "37",
+    "purpose": "An amendment numbered 9 printed in House Report 109-15 to provide that basic grant funds authorized under the Alcohol-Impaired Driving Countermeasures section can be used for Driving While Intoxicated Courts that seek to change the behavior of alcohol or drug dependent offenders arrested while driving while impaired.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/37?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 229 not agreed to in Senate by Yea-Nay. 49 - 51. Record Vote Number: 57. "
+    },
+    "number": "229",
+    "purpose": "To express the sense of the Senate regarding Medicaid reconciliation legislation consistent with recommendations from the Secretary of Health and Human Services.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:42Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/229?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "actionTime": "10:34:15",
+      "text": "By unanimous consent, the Obey amendment was withdrawn. "
+    },
+    "number": "62",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/62?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "175",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/175?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to establish a select committee to investigate reconstruction efforts in Iraq and Afghanistan.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "13:27:07",
+      "text": "Mr. Lewis (CA) raised a point of order against the Tierney amendment (A001). Mr. Lewis stated that the amendment sought to change existing law and constituted legislation in an appropriation bill. The Chair sustained the point of order. "
+    },
+    "number": "44",
+    "purpose": "An amendment to add a new title providing for establishment of a select committee to investigate the awarding and carrying out of contracts to conduct activities in Afghanistan and Iraq and to fight the war on terrorism.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/44?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "15:22:51",
+      "text": "By unanimous consent, the Garrett (NJ) amendment was withdrawn. "
+    },
+    "number": "51",
+    "purpose": "An amendment to insert a new section at the end of Title V (relating to general provisions).",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/51?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "178",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/178?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "170",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/170?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "146",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/146?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "227",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/227?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment expresses the Sense of Congress that the Department of Transportation and the States should provide additional incentives to encourage the purchase and use of hybrid and other fuel efficient vehicles.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "12:16:20",
+      "text": "On agreeing to the Issa amendment (A014) Agreed to by voice vote. "
+    },
+    "number": "33",
+    "purpose": "An amendment numbered 5 printed in House Report 109-15 to express the Sense of Congress that the Department of Transportation and the States should provide additional incentives to encourage the purchase and use of hybrid and other fuel efficient vehicles.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/33?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "205",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/205?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment allows states to enact anti-corruption laws curbing the practice of \"pay-to-play\" contracting without losing Federal-aid highway funds.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "12:26:42",
+      "text": "On agreeing to the Pascrell amendment (A015) Agreed to by voice vote. "
+    },
+    "number": "34",
+    "purpose": "An amendment numbered 6 printed in House Report 109-15 to allow states to enact anti-corruption laws curbing the practice of `pay-to-play' contracting without losing their federal-aid highway dollars.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/34?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "249",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/249?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment is technical in nature.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "15:02:20",
+      "text": "On agreeing to the McCotter amendment (A002) Agreed to without objection. "
+    },
+    "number": "42",
+    "purpose": "An amendment to the preamble of the resolution.",
+    "type": "HAMDT",
+    "updateDate": "2019-11-15T21:07:31Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/42?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "228",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/228?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment changes the calculation of section 120(j) credits, which are based on toll revenues, to reflect the proportionate State and local investments in revenue-generating transportation facilities.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "12:18:41",
+      "text": "On agreeing to the Burgess amendment (A012) Agreed to by voice vote. "
+    },
+    "number": "31",
+    "purpose": "An amendment numbered 3 printed in House Report 109-15 to change the current calculation to a pro rata calculation, reflecting a state's level of investment in a toll facility. Currently it is a zero sum situation.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/31?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment removes the requirement that toll rates on high occupancy toll lanes be differentiated for low income drivers.",
+    "latestAction": {
+      "actionDate": "2005-03-10",
+      "actionTime": "13:59:41",
+      "text": "On agreeing to the Davis, Tom amendment (A011) Agreed to by recorded vote: 224 - 201 (Roll no. 62). "
+    },
+    "number": "30",
+    "purpose": "An amendment numbered 2 printed in House Report 109-15 to remove the requirement that toll rates on high occupancy toll lanes be differentiated for low income drivers.",
+    "type": "HAMDT",
+    "updateDate": "2021-01-25T17:56:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/30?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "176",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/176?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "212",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/212?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "184",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/184?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "183",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/183?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 259 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "259",
+    "purpose": "To express the sense of the Senate regarding the need for a comprehensive, coordinated, and integrated national ocean policy.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:42Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/259?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 207 not agreed to in Senate by Yea-Nay Vote. 49 - 51. Record Vote Number: 59. "
+    },
+    "number": "207",
+    "purpose": "To provide for full consideration of tax cuts in the Senate under regular order.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:47Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/207?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "235",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/235?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 208 agreed to in Senate by Yea-Nay Vote. 73 - 26. Record Vote Number: 67. "
+    },
+    "number": "208",
+    "purpose": "To modify the designation authority for an emergency requirement.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/208?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "181",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/181?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "text": "Amendment SA 186 not agreed to in Senate by Yea-Nay Vote. 50 - 50. Record Vote Number: 53. "
+    },
+    "number": "186",
+    "purpose": "To fully reinstate the pay-as-you-go requirement.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:45Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/186?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "200",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/200?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "242",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/242?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "174",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/174?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "text": "Amendment SA 173 agreed to in Senate by Yea-Nay Vote. 63 - 37. Record Vote Number: 56. "
+    },
+    "number": "173",
+    "purpose": "To increase discretionary health and education funding by $2,000,000,000.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:43Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/173?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "248",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/248?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 209 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "209",
+    "purpose": "to modify a provision defining advance appropriations subject to limit.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/209?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 215 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "215",
+    "purpose": "To provide additional funding for rural education, rural health access, and rural health outreach programs.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/215?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 157 as modified agreed to in Senate by Unanimous Consent. (text as modified: CR S2942)"
+    },
+    "number": "157",
+    "purpose": "To express the sense of the Senate regarding the amount of United States debt that is foreign-owned.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:01Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/157?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "201",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/201?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "206",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/206?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 182 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "182",
+    "purpose": "Expressing the sense of the Senate on the acquisition of the next generation destroyer (DDX).",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:51Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/182?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "190",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/190?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 164 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "164",
+    "purpose": "To provide a reserve fund for the Family Opportunity Act.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:00Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/164?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "193",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/193?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 198 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "198",
+    "purpose": "To express the sense of the Senate regarding funding for the National Aeronautics and Space Administration for subsonic and hypersonic aeronautics research.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:37Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/198?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 159 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "159",
+    "purpose": "To prevent and, if necessary, respond to an international outbreak of the avian flu.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:18Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/159?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 155 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "155",
+    "purpose": "To establish a deficit neutral reserve fund for influenza vaccine shortage prevention.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:33:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/155?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 257 not agreed to in Senate by Yea-Nay Vote. 44 - 54. Record Vote Number: 77. "
+    },
+    "number": "257",
+    "purpose": "To establish a point of order.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:50Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/257?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "text": "Amendment SA 171 agreed to in Senate by Yea-Nay Vote. 96 - 4. Record Vote Number: 54. "
+    },
+    "number": "171",
+    "purpose": "To increase veterans medical care by $410,000,000 in fiscal year 2006.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:40Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/171?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 262 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "262",
+    "purpose": "To express the sense of the Senate with respect to pension reform.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/262?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 194 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "194",
+    "purpose": "To provide a deficit-neutral reserve fund for the restoration of SCHIP funds.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/194?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 156 not agreed to in Senate by Yea-Nay Vote. 49 - 51. Record Vote Number: 65. "
+    },
+    "number": "156",
+    "purpose": "To restore funding for the Community Development Block Grant (CDBG) program.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/156?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 188 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "188",
+    "purpose": "To express the sense of the Senate that Congress should enact a long term reauthorization of the State Criminal Alien Assistance Program and appropriate $750,000,000 for the program in fiscal year 2006.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:37Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/188?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 210 not agreed to in Senate by Yea-Nay Vote. 40 - 59. Record Vote Number: 63. "
+    },
+    "number": "210",
+    "purpose": "To repeal the tax subsidy for certain domestic companies which move manufacturing operations and American jobs offshore.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/210?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "233",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/233?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "195",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/195?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 237 as modified agreed to in Senate by Unanimous Consent. (text as modified: CR S2944)"
+    },
+    "number": "237",
+    "purpose": "To increase funding for Boys and Girls Clubs.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/237?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 169 agreed to in Senate by Voice. "
+    },
+    "number": "169",
+    "purpose": "To reaffirm that the United States maintain a one-to- two ration for contributions to the Global Fund, that the United States not exceed contributing more than 33 percent of the Global Fund's revenue.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:42Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/169?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "221",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/221?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 264 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "264",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:45Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/264?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 218 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "218",
+    "purpose": "To fully fund the level of Border Patrol Agents authorized by the National Intelligence Reform Act of 2004 and as recommended by the 9/11 Commission.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/218?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 226 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "226",
+    "purpose": "To restore discretionary funding levels for crucial rural health programs, such as the rural health outreach grant program, the rural hospital flexibility grant program, the small hospital improvement program, tele-health, trauma programs, and rural AED programs to fiscal year 2005 levels.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:45Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/226?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 192 agreed to in Senate by Voice. "
+    },
+    "number": "192",
+    "purpose": "to restore funding the COPS Methamphetamine Enforcement and Clean Up Program to 2005 levels.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:51Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/192?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "199",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/199?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "250",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/250?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 167 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "167",
+    "purpose": "To express the sense of the Senate that the full amount of the President's request for the administrative costs of the Social Security Administration for fiscal year 2006 should be funded.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/167?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "191",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/191?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 163 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "163",
+    "purpose": "To express the sense of the Senate regarding tax relief to encourage charitable giving incentives.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:43Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/163?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 225 agreed to in Senate by Yea-Nay Vote. 81 - 19. Record Vote Number: 72. "
+    },
+    "number": "225",
+    "purpose": "To provide the flexibility to consider all available transportation funding options.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/225?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 154, previously agreed to, was modified by Unanimous Consent. "
+    },
+    "number": "154",
+    "purpose": "To express the sense of the Senate concerning comparative effectiveness studies.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/154?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "236",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/236?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 172 not agreed to in Senate by Yea-Nay Vote. 44 - 56. Record Vote Number: 61. "
+    },
+    "number": "172",
+    "purpose": "To restore the Perkins Vocational Education program and provide for deficit reduction paid for through the elimination of the phase out of the personal exemption limitation and itemized deduction limitation for high-income taxpayers now scheduled to start in 2006.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:53Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/172?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 238 as modified agreed to in Senate by Yea-Nay Vote. 53 - 46. Record Vote Number: 80. (text as modified: CR S2943-2944)"
+    },
+    "number": "238",
+    "purpose": "To promote innovation and U.S. competitiveness by expressing the sense of the Senate urging the Senate Committee on Appropriations to make efforts to fund the Advanced Technology Program, which supports industry-led research and development of cutting-edge technologies with broad commercial potential and societal benefits.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:38Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/238?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 230 agreed to in Senate by Yea-Nay Vote. 68 - 31. Record Vote Number: 66. "
+    },
+    "number": "230",
+    "purpose": "To fully fund the Community Development Block Grant (CDBG) program.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/230?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "189",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/189?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 203 agreed to in Senate by Voice Vote. "
+    },
+    "number": "203",
+    "purpose": "To express the sense of the Senate in support of full funding and availability of the Crime Victims Fund.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:43Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/203?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "245",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/245?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "251",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/251?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 177 as modified agreed to in Senate by Yea-Nay Vote. 51 - 49. Record Vote Number: 68. (consideration: CR S2925; text as modified: CR S2925)"
+    },
+    "number": "177",
+    "purpose": "Relative to education funding.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:46Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/177?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 214 not agreed to in Senate by Yea-Nay Vote. 49 - 50. Record Vote Number: 60. "
+    },
+    "number": "214",
+    "purpose": "To ensure that any savings associated with legislation that provides the Secretary of Health and Human Services with the authority to participate in the negotiation of contracts with manufacturers of covered part D drugs to achieve the best possible prices for such drugs under part D of title XVIII of the Social Security Act, that requires the Secretary to negotiate contracts with manufacturers of such drugs for each fallback prescription drug plan, and that requires the Secretary to participate in the negotiation for a contract for any such drug upon the request of a prescription drug plan or an MA-PD plan, is reserved for reducing expenditures under such part.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/214?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "246",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/246?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 202 not agreed to in Senate by Yea-Nay Vote. 37 - 63. Record Vote Number: 79. "
+    },
+    "number": "202",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/202?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 211 not agreed to in Senate by Yea-Nay Vote. 45 - 55. Record Vote Number: 78. "
+    },
+    "number": "211",
+    "purpose": "To restore funding for tribal programs and provide necessary additional funding based on recommendations from Indian country",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:40Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/211?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 160 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "160",
+    "purpose": "To increase funding for the United Nations Children's Fund (UNICEF) and other international organizations.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:38Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/160?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 219 agreed to in Senate by Yea-Nay Vote. 100 - 0. Record Vote Number: 62. "
+    },
+    "number": "219",
+    "purpose": "To establish a reserve fund in the event that legislation is passed to provide a 50 percent tax credit to employers that continue to pay the salaries of Guard and Reserve employees who have been called to active duty.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:42Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/219?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 224 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "224",
+    "purpose": "To restore funding for Corps of Engineers environmental programs to fiscal year 2005 levels.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:44Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/224?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Proposed amendment SA 197 withdrawn in Senate. "
+    },
+    "number": "197",
+    "purpose": "To increase, with an offset, by $1,582,700,000 over fiscal years 2006 through 2010 funding for Transportation (budget function 400) with the amount of the increase intended to be allocated to the Vehicle Systems account of the National Aeronautics and Space Administration for subsonic and hypersonic aeronautics research.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/197?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 258 not agreed to in Senate by Voice Vote. "
+    },
+    "number": "258",
+    "purpose": "To ensure that savings associated with legislation that reduces overpayments to medicare advantage plans is reserved for deficit reduction and to strengthen the Federal Hospital Insurance Trust Fund.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:38Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/258?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 243 agreed to in Senate by Yea-Nay. 94 - 6. Record Vote Number: 73. "
+    },
+    "number": "243",
+    "purpose": "To express the sense of the Senate that the tax cuts assumed in the budget resolution should include the repeal of the 1993 increase in the income tax on Social Security benefits.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:44Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/243?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "255",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/255?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "256",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/256?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "222",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/222?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 187 not agreed to in Senate by Yea-Nay Vote. 45 - 54. Record Vote Number: 76. "
+    },
+    "number": "187",
+    "purpose": "To strike the debt ceiling reconciliation instruction.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/187?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "260",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/260?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 234 not agreed to in Senate by Yea-Nay Vote. 46 - 54. Record Vote Number: 69. "
+    },
+    "number": "234",
+    "purpose": "To ensure that legislation to make cuts in agriculture programs receives full consideration and debate in the Senate under regular order, rather than being fast-tracked under reconciliation procedures.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:44Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/234?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 239 not agreed to in Senate by Yea-Nay Vote. 45 - 55. Record Vote Number: 70. "
+    },
+    "number": "239",
+    "purpose": "Relative to funding to the Office of Community Oriented Policing Services.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/239?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 161 as modified agreed to in Senate by Unanimous Consent. (text as modified: CR S2945)"
+    },
+    "number": "161",
+    "purpose": "To increase funding for Child Survival and Maternal Health Programs.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:40Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/161?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendments increase funding for International Disaster and Famine Assistance by $50 million and funding for Migration and Refugee Assistance by $50 million.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "14:48:48",
+      "text": "On agreeing to the Jackson (IL) amendments (A005) Agreed to by voice vote. "
+    },
+    "number": "48",
+    "purpose": "An amendment comprised of two amendments offered en bloc to increase disaster and famine assistance by $50 million and to increase migrations and refugee assistance by $50 million.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/48?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment printed in House Report 109-19 and numbered 1 sought to provide for increases of $15.8 billion in fiscal year 2006 new budget authority and outlays for veterans, education, health care needs, homeland security, the environment and infrastructure; and reduce the fiscal year 2006 tax benefit for those earning more than $1 million.",
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "actionTime": "11:29:40",
+      "text": "On agreeing to the Obey amendment (A002) Failed by recorded vote: 180 - 242 (Roll no. 82). "
+    },
+    "number": "66",
+    "purpose": "Amendment numbered two printed in House Report 109-19 to increase $15.8 billion in FY06 new BA and outlays for veterans, education, health care needs, homeland security, the environment and infrastructure. Reduces the FY06 tax benefits for those earning more than $1 million, increasing revenues by $25.818 billion.",
+    "type": "HAMDT",
+    "updateDate": "2022-02-03T05:35:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/66?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to increase \"Operation and Maintenance, Defense-Wide\" funding by $5 million.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "17:26:00",
+      "text": "On agreeing to the Tierney amendment (A002) Failed by recorded vote: 191 - 236 (Roll no. 72). "
+    },
+    "number": "45",
+    "purpose": "An amendment to add $5 million to the Operation and Maintenance, Defense-Wide account.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/45?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 213 not agreed to in Senate by Voice Vote. "
+    },
+    "number": "213",
+    "purpose": "To increase funding for the Low-Income Home Energy Assistance Program.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/213?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 217 as modified agreed to in Senate by Unanimous Consent. (consideration: CR S2942; text as modified: CR S2942)"
+    },
+    "number": "217",
+    "purpose": "To restore $1 billion to juvenile justice and local law enforcement programs funded by the Department of Justice.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:47Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/217?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "232",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/232?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 269 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "269",
+    "purpose": "To limit the compensation paid to employees of the Middle East Broadcasting Networks.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/269?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 180 as modified agreed to in Senate by Unanimous Consent. (text as modified: CR S2930)"
+    },
+    "number": "180",
+    "purpose": "To provide a deficit neutral reserve fund for the Hope credit.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:38Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/180?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 241 agreed to in Senate by Yea-Nay. 55 - 45. Record Vote Number: 74. "
+    },
+    "number": "241",
+    "purpose": "To repeal the 1993 tax increase on Social Security benefits.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:41Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/241?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 244 not agreed to in Senate by Yea-Nay Vote. 47 - 53. Record Vote Number: 75. "
+    },
+    "number": "244",
+    "purpose": "To expand access to preventive health care services that reduce unintended pregnancy (including teen pregnancy), reduce the number of abortions, and improve access to women's health care.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/244?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment prohibits the use of funds for embassy security, construction, and maintenance.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "17:35:33",
+      "text": "On agreeing to the Upton amendment (A012) Agreed to by recorded vote: 258 - 170 (Roll no. 73). "
+    },
+    "number": "55",
+    "purpose": "An amendment to insert a new section at the end of the bill prohibiting the funds made available in the Act to be used for embassy security, construction, and maintenance.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/55?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 153 as modified agreed to in Senate by Unanimous Consent. (text as modified: CR S2931)"
+    },
+    "number": "153",
+    "purpose": "To express the sense of the Senate concerning the care and treatment of children with HIV/AIDS.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/153?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment in the nature of a substitute printed in House Report 109-19 and numbered 4 was offered as the Democratic substitute.",
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "actionTime": "15:12:48",
+      "text": "On agreeing to the Spratt amendment (A004) Failed by recorded vote: 165 - 264, 1 Present (Roll no. 87). "
+    },
+    "number": "68",
+    "purpose": "An amendment in the nature of a substitute numbered 4 printed in House Report 109-19 to balance the budget by 2012; reverse mandatory cuts likely to fall on Medicaid, veterans, student loans, and other services; provide increased funding for important domestic priorities, such as education, veterans, community and regional development, and the environment; and impose a pay-as-you-go (PAYGO) rule, which protects the Social Security Trust Fund surplus by requiring that any mandatory spending increases or tax cuts be fully offset.",
+    "type": "HAMDT",
+    "updateDate": "2022-02-03T05:35:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/68?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 216 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "216",
+    "purpose": "To increase funding for the SBA's programs such as Microloans, Small Business Development Centers, Women's Business Centers, the HUBZone program and other small business programs and to offset the cost through a reduction in funds under function 150 for foreign microloans and other programs.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/216?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 252 as modified agreed to in Senate by Unanimous Consent. (consideration: CR S2943; text as modified: CR S2943)"
+    },
+    "number": "252",
+    "purpose": "To create a reserve fund for extension of the treatment of combat pay as earned income for purposes of the earned income tax credit and the child tax credit.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:54Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/252?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "247",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/247?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 279 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "279",
+    "purpose": "To strike section 207.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:50Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/279?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 220 agreed to in Senate by Yea-Nay Vote. 63 - 37. Record Vote Number: 64. "
+    },
+    "number": "220",
+    "purpose": "To protect the American people from terrorist attacks by restoring $565 million in cuts to vital first-responder programs in the Department of Homeland Security, including the State Homeland Security Grant program, by providing $150 million for port security grants and by providing $140 million for 1,000 new border patrol agents.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/220?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment in the nature of a substitute printed in House Report 109-19 and numbered 2 was offered as the Republican Study Committee substitute.",
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "actionTime": "11:37:53",
+      "text": "On agreeing to the Hensarling amendment (A001) Failed by recorded vote: 102 - 320 (Roll no. 83). (consideration: CR H1633-1640; text: CR H1633-1639)"
+    },
+    "number": "65",
+    "purpose": "An amendment numbered 2 printed in House Report 109-19 to replace the current 19 functional categories with four functions: Defense, Homeland Security, Non-Defense Discretionary and Mandatory Spending, and Interest. Accepts the Iraq Operations Reserve Fund and creates a new `rainy day' fund for non-military emergencies. Discretionary Spending: Defense: Accepts the President's and Budget Committee's levels that provide for a 4.4% increase over last year. Homeland Security: Accepts the President's and Budget Committee's levels that provide for a 3.6% increase over last year. Non-Security Discretionary: Reduces spending by 2% compared to last year's level (the Budget Committee calls for a .7% reduction), which is over $5.1 billion more in first-year savings than the Committee's bill. Mandatory Spending: Includes reconciliation instructions reducing the rate of growth of mandatory spending from 6.4% to 6.1% (while making no changes to Social Security), which is over $58 billion more in savings than the Budget Committee's levels and a total of $125 billion in savings over five years. The Committees would be permitted to apply the savings unevenly across mandatory programs with particular emphasis on exempting earned entitlement programs. Taxes: Assumes the Committee's number for tax relief over the next five years, whil. reconciling the entire amount (the Committee reconciles $45 billion of the $107 billion allotted over five years). Budget Enforcement: Creates a point of order against consideration of a rule or order reported by the Rules Committee waiving sections 302(f) or 303(a) (other than paragraph 2) of the Congressional Budget Act of 1974. This point of order can only be waived",
+    "type": "HAMDT",
+    "updateDate": "2022-02-03T05:35:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/65?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 254 as modified agreed to in Senate by Voice Vote. (text as modified: CR S2943)"
+    },
+    "number": "254",
+    "purpose": "To restore funding for the payment in lieu of taxes program (PILT), in order to compensate rural counties for decreased tax revenues as a result of non-taxed federally owned county lands.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/254?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "151",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/151?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 223, previously agreed to, was modified by Unanimous Consent. (consideration: CR S2923; text as modified: CR S2923)"
+    },
+    "number": "223",
+    "purpose": "To express the sense of the Senate that Congress should provide dedicated funding for port security enhancements.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/223?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 276 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "276",
+    "purpose": "To require a determination to provide assistance for the safeguarding, removal, or elimination of conventional weapons and related ammunition.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/276?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 272 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "272",
+    "purpose": "To clarify Foreign Service Grievance Board procedures in the case of an alleged overpayment of an annuity.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/272?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "288",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/288?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment reduces and then increases by the same amount \"Operation and Maintenance, Defense-Wide\" funding.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "14:02:18",
+      "text": "On agreeing to the Moran (VA) amendment (A004) Agreed to by voice vote. "
+    },
+    "number": "47",
+    "purpose": "An amendment to provide for dispensing of information to the Congress regarding administration strategy and evaluations of progress, stability and reconstruction with respect to the war in Iraq.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/47?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "289",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/289?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 266 agreed to in Senate by Voice Vote. "
+    },
+    "number": "266",
+    "purpose": "To strike the amendment to the limitation on the United States share of assessments for United Nations Peacekeeping operations.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:45Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/266?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 253 agreed to in Senate by Voice Vote. "
+    },
+    "number": "253",
+    "purpose": "to support full funding for High Intensity Drug Trafficking Area.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/253?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "231",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/231?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 240 not agreed to in Senate by Yea-Nay Vote. 45 - 54. Record Vote Number: 71. "
+    },
+    "number": "240",
+    "purpose": "Relative to transportation funding.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:39Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/240?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment requires that contracts funded by this bill be included in the calculation of small business goals.",
+    "latestAction": {
+      "actionDate": "2005-03-16",
+      "actionTime": "10:53:23",
+      "text": "On agreeing to the Velazquez amendment (A021) Agreed to by voice vote. "
+    },
+    "number": "64",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/64?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 268 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "268",
+    "purpose": "To permit grants to be used for broadcasting outside the Middle East region.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:38Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/268?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "285",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/285?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "263",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:19Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/263?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "299",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/299?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 286 not agreed to in Senate by Yea-Nay Vote. 40 - 57. Record Vote Number: 84. "
+    },
+    "number": "286",
+    "purpose": "To provide a second degree amendment related to the United States share of assessment for United Nations Peacekeeping operations.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:46Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/286?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment in the nature of a substitute printed in House Report 109-19 and numbered 3 was offered as the Congressional Black Caucus substitute.",
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "actionTime": "13:25:32",
+      "text": "On agreeing to the Watt amendment (A003) Failed by recorded vote: 134 - 292, 3 Present (Roll no. 85). "
+    },
+    "number": "67",
+    "purpose": "An amendment numbered 3 printed in House Report 109-19 to raise revenue by rescinding the tax cuts from 2001 and 2003 for the top two tax brackets, eliminating corporate tax incentives for off-shoring jobs, closing tax loopholes, abusive shelters, and methods of tax avoidance, and eliminating the repeal of the limitation on itemized deductions and the phase-out of personal exemptions (PEP) scheduled to take place between 2006 and 2010. These funds total an estimated $36.3 billion in FY 2006. Uses nearly $4 billion of these additional revenues for deficit reduction. The remaining funds are used to restore cuts and fund increases in specific budget function areas. These include full funding for No Child Left Behind and providing funds for school construction and increases for other education and job training programs. Allocates additional funding or job creation programs under SBA, community and regional development programs, and law enforcement initiatives such as juvenile justice and prisoner reentry programs. Provides funding for child nutrition programs, Community Health Centers, aeronautics and science research and development,.",
+    "type": "HAMDT",
+    "updateDate": "2022-02-03T05:35:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/67?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "312",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/312?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 275 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "275",
+    "purpose": "To require a determination to provide assistance for destruction of small arms and related ammunition.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:39Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/275?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 270 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "270",
+    "purpose": "To require payments from the Broadcasting Board of Governors for costs resulting from the creditable service of employees of the Middle East Broadcasting Networks.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/270?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Proposed amendment SA 274 withdrawn in Senate. "
+    },
+    "number": "274",
+    "purpose": "To provide a short title.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:48Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/274?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 261 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "261",
+    "purpose": "to express the sense of the Senate that the total amount of payments to States from the Water Pollution Control State Revolving Fund should be increased to $1,350,000,000.",
+    "type": "SAMDT",
+    "updateDate": "2018-03-30T03:10:20Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/261?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 278 agreed to in Senate by Yea-Nay Vote. 52 - 46. Record Vote Number: 83. "
+    },
+    "number": "278",
+    "purpose": "To prohibit the application of certain restrictive eligibility requirements to foreign nongovernmental organizations with respect to the provision of assistance under part I of the Foreign Assistance Act of 1961.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/278?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "329",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/329?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to delete the funds provided for relief to the countries affected by the Indian Ocean tsunami.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "16:19:06",
+      "text": "On agreeing to the Tancredo amendment (A010) Failed by voice vote. "
+    },
+    "number": "53",
+    "purpose": "An amendment to prohibit funds being used to provide emergency relief, rehabilitation or reconstruction aid to the tsunami recovery and reconstruction fund.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/53?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "305",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/305?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "306",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/306?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "304",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/304?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "302",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/302?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment sought to prohibit the use of funds for assistance to the Palestinian Authority or for programs, projects, and activities in the West Bank or Gaza.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "19:08:10",
+      "text": "On agreeing to the Weiner amendment (A018) Failed by voice vote. "
+    },
+    "number": "61",
+    "purpose": "An amendment to prohibit use of funds in the bill for the Palestinian Authority.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/61?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "287",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/287?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 308 proposed by Senator Salazar. (consideration: CR S3241; text: CR S3241) To increase the accountability and effectiveness of international police training."
+    },
+    "number": "308",
+    "purpose": "To increase the accountability and effectiveness of international police training.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/308?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 280 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "280",
+    "purpose": "To impose an economic sanction on foreign countries that owe parking fines and penalties or property taxes to Washington, D.C. or New York City.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/280?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 319 proposed by Senator Ensign. (consideration: CR S3259-3260; text: CR S3259-3260) To encourage multilateral cooperation and authorize a program of assistance to facilitate a peaceful transition in Cuba, and for other purposes."
+    },
+    "number": "319",
+    "purpose": "To encourage multilateral cooperation and authorize a program of assistance to facilitate a peaceful transition in Cuba, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/319?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 271 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "271",
+    "purpose": "To extend the United States Advisory Commission on Public Diplomacy until 2008.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:41Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/271?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "332",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/332?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-04",
+      "text": "Referred to the Committee on Appropriations. "
+    },
+    "number": "265",
+    "purpose": "To prohibit the reduction in the number of operational aircraft carriers of the Navy from 12 aircraft carriers to 11 aircraft carriers.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/265?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 273, previously agreed to, was modified by Unanimous Consent. (consideration: CR S3188; text as modified: CR S3188)"
+    },
+    "number": "273",
+    "purpose": "To limit the availability of funds authorized for contributions for international peacekeeping activities.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:47Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/273?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "314",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/314?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "296",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/296?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-05",
+      "text": "Amendment SA 277 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "277",
+    "purpose": "To waive the passport fees for a relative of a deceased member of the Armed Forces proceeding abroad to visit the grave of such member or to attend a funeral or memorial service for such member.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/277?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "298",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/298?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 290 proposed by Senator Sessions. (consideration: CR S3260-3261; text: CR S3260) To require aliens to affirm certain oaths prior to admission to the United States."
+    },
+    "number": "290",
+    "purpose": "To require aliens to affirm certain oaths prior to admission to the United States.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/290?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Considered by Senate. (consideration: CR S3240)"
+    },
+    "number": "281",
+    "purpose": "To facilitate the sale of United States agricultural products to Cuba, as authorized by the Trade Sanctions Reform and Export Enhancement Act of 2000.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/281?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Motion to table amendment SA 309 rejected in Senate by Yea-Nay Vote. 33 - 67. Record Vote Number: 86. "
+    },
+    "number": "309",
+    "purpose": "To authorize appropriate action if the negotiations with the People's Republic of China regarding China's undervalued currency are not successful.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:50Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/309?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "326",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/326?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "295",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/295?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "300",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/300?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 322 proposed by Senator Ensign. (consideration: CR S3259-3260; text: CR S3260) To ensure the United Nations maintains a no-growth budget."
+    },
+    "number": "322",
+    "purpose": "To ensure the United Nations maintains a no-growth budget.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/322?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Considered by Senate. (consideration: CR S3240)"
+    },
+    "number": "283",
+    "purpose": "To express the Sense of the Senate concerning recent provocative actions by the Peoples Republic of China and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/283?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Considered by Senate. (consideration: CR S3240)"
+    },
+    "number": "267",
+    "purpose": "To authorize the extension of nondiscriminatory treatment (normal trade relations treatment) to the products of Ukraine.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/267?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "324",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/324?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "328",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/328?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "311",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/311?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment increases funding for the Tsunami Recovery and Reconstruction Fund by $3 million.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "14:54:38",
+      "text": "On agreeing to the Maloney amendment (A006) Agreed to by voice vote. "
+    },
+    "number": "49",
+    "purpose": "An amendment to increase funding for tsunami relief and reconstruction by $3 million.",
+    "type": "HAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/49?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "336",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/336?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "310",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/310?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "307",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/307?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "303",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/303?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "294",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/294?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Referred to the Committee on Appropriations. "
+    },
+    "number": "315",
+    "purpose": "To specify requirements relating to a second supplier to the Army of secure type-1 multi-band, hand held radio systems.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/315?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 318 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "318",
+    "purpose": "To specify requirements under the Arms Export Control Act applicable to the VHXX Executive Helicopter Program (also known as the Marine One Presidential Helicopter Program).",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/318?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "292",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/292?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 291 proposed by Senator Sessions. (consideration: CR S3260-3261; text: CR S3260) To strike the authority to provide living quarters and allowances to the United States Representative to the United Nations."
+    },
+    "number": "291",
+    "purpose": "To strike the authority to provide living quarters and allowances to the United States Representative to the United Nations.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/291?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "349",
+    "type": "SAMDT",
+    "updateDate": "2020-12-05T12:39:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/349?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "323",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/323?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Motion to table amendment SA 284 agreed to in Senate by Yea-Nay Vote. 65 - 35. Record Vote Number: 85. "
+    },
+    "number": "284",
+    "purpose": "To prohibit funds from being used for television broadcasting to Cuba.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:48Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/284?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "346",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:21Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/346?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 320 proposed by Senator Ensign. (consideration: CR S3259-3260; text: CR S3260) To amend chapter 118 of title 18, United States Code, to prohibit foreign war crimes prosecutions of Americans."
+    },
+    "number": "320",
+    "purpose": "To amend chapter 118 of title 18, United States Code, to prohibit foreign war crimes prosecutions of Americans.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/320?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "297",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/297?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "325",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/325?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "348",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/348?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "362",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/362?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "301",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/301?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "339",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:21Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/339?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "396",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/396?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-03-17",
+      "text": "Amendment SA 204 agreed to in Senate by Yea-Nay Vote. 52 - 48. Record Vote Number: 58. "
+    },
+    "number": "204",
+    "purpose": "To create a reserve fund for the establishment of a Bipartisan Medicaid Commission to consider and recommend appropriate reforms to the Medicaid program, and to strike Medicaid cuts to protect states and vulnerable populations.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:44Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/204?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "313",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/313?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 317 proposed by Senator Sessions. (consideration: CR S3260-3261; text: CR S3261) To provide for accountability in the United Nations Headquarters renovation project."
+    },
+    "number": "317",
+    "purpose": "To provide for accountability in the United Nations Headquarters renovation project.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/317?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "330",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/330?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "335",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/335?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "378",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/378?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "392",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/392?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "331",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/331?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "359",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/359?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 356 agreed to in Senate by Voice Vote. "
+    },
+    "number": "356",
+    "purpose": "To ensure that a Federal employee who takes leave without pay in order to perform service as a member of the uniformed services or member of the National Guard shall continue to receive pay in an amount which when taken together with the pay and allowances such individual is receiving for such service, will be no less than the basic pay such individual would then be receiving if no interruption in employment had occurred.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:50Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/356?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "355",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:21Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/355?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "293",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/293?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "350",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/350?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "364",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/364?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "327",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T04:09:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/327?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "382",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:21Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/382?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "358",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/358?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Amendment SA 321 proposed by Senator Ensign. (consideration: CR S3259-3260; text: CR S3260) To ensure the independence of the Inspector General of the United Nations."
+    },
+    "number": "321",
+    "purpose": "To ensure the independence of the Inspector General of the United Nations.",
+    "type": "SAMDT",
+    "updateDate": "2022-02-03T05:26:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/321?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "369",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/369?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "365",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/365?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-12",
+      "text": "Amendment SA 344 ruled out of order by the chair. "
+    },
+    "number": "344",
+    "purpose": "To provide $1,975,183,000 for medical care for veterans.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:52Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/344?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "337",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/337?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment protects sections 1113 and 1114 in the bill from points of order.",
+    "latestAction": {
+      "actionDate": "2005-03-15",
+      "actionTime": "11:41:22",
+      "text": "On agreeing to the Cole (OK) amendment (A001) Agreed to by voice vote. "
+    },
+    "number": "43",
+    "purpose": "An amendment to protect sections 1113 and 1114 from possible points of order.",
+    "type": "HAMDT",
+    "updateDate": "2018-03-30T03:11:41Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/43?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 386 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "386",
+    "purpose": "To provide for an increase in the amount appropriated for the Intelligence Community Management Account.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/386?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 372 agreed to in Senate by Yea-Nay Vote. 61 - 38. Record Vote Number: 94. "
+    },
+    "number": "372",
+    "purpose": "To express the sense of the Senate that Congress should not delay enactment of critical appropriations necessary to ensure the well-being of the men and women of the United States Armed Forces fighting in Iraq and elsewhere around the world, by attempting to conduct a debate about immigration reform while the supplemental appropriations bill is pending on the floor of the United States Senate.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/372?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "360",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/360?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "398",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/398?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment nominated Democratic candidates for Officers of the House.",
+    "latestAction": {
+      "actionDate": "2005-01-04",
+      "actionTime": "14:25:13",
+      "text": "On agreeing to the Menendez amendment (A001) Failed by voice vote. (text: CR H7)"
+    },
+    "number": "1",
+    "type": "HAMDT",
+    "updateDate": "2018-02-03T08:23:29Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/1?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "419",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/419?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 405 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "405",
+    "purpose": "To require five day prior notification to the Committees on Appropriations for tsunami recovery and reconstruction funds.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/405?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "384",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/384?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "366",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/366?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "353",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/353?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment adds a new title III entitled \"Border Infrastructure and Technology Integration\" to the bill.",
+    "latestAction": {
+      "actionDate": "2005-02-10",
+      "actionTime": "12:39:55",
+      "text": "On agreeing to the Kolbe amendment (A003) Agreed to by voice vote. (text: CR H546)"
+    },
+    "number": "7",
+    "purpose": "An amendment numbered 3 printed in House Report 109-4. Amendment seeks to require the Department of Homeland Security to study the technology, equipment, and personnel needed to address security within the U.S. and submit a report to Congress including recommendations for improvement. Amendment also seeks to require the Department of Homeland Security to develop and carry out a ground surveillance pilot program to identify and test ground surveillance technologies that will improve border security. The amendment seeks to add the Judiciary committee to the reporting requirements and removes references to the \"Select\" Committee on Homeland Security.",
+    "type": "HAMDT",
+    "updateDate": "2020-12-05T13:38:06Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/7?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 402 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "402",
+    "purpose": "To address the avian flu influenza virus in Asia.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:35:08Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/402?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "408",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/408?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "371",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/371?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "410",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/410?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "449",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/449?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "383",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/383?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "376",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/376?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "385",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/385?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "412",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/412?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "347",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/347?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "428",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/428?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 404 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "404",
+    "purpose": "To modify language in the bill relating to environmental recovery activities in tsunami affected countries.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:55Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/404?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 401 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "401",
+    "purpose": "Technical amendment.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/401?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "420",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/420?format=json"
+  },
+  {
+    "congress": 109,
+    "description": "Amendment in the nature of a substitute sought to replace the language of the bill with the text of the \"Certain and Immediate Estate Tax Relief Act of 2005\".",
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "actionTime": "17:06:18",
+      "text": "On agreeing to the Pomeroy amendment (A001) Failed by recorded vote: 194 - 238 (Roll no. 101). "
+    },
+    "number": "69",
+    "purpose": "An amendment in the nature of a substitute to immediately eliminate the estate tax for most estates; to increase the estate tax exclusion to $3 million, effective January 1, 2004; to partially offset the cost of increasing the exclusion by freezing existing estate tax rates, eliminating the ability to claim valuation discounts by holding property through partnerships, and restoring the prior law phaseout of the benefit of the graduated rates and exclusion; to repeal the carryover basis rules contained in the 2001 tax bill, and in doing so, continue the favorable current law step-up in basis rules that eliminate capital gains taxes on increases in value before death.",
+    "type": "HAMDT",
+    "updateDate": "2021-08-16T03:16:00Z",
+    "url": "https://api.congress.gov/v3/amendment/109/hamdt/69?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "446",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/446?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "415",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:21Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/415?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 352 agreed to in Senate by Voice Vote. "
+    },
+    "number": "352",
+    "purpose": "To rename the death gratuity payable for deaths of members of the Armed Forces as fallen hero compensation, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:35:07Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/352?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "373",
+    "type": "SAMDT",
+    "updateDate": "2020-12-05T12:39:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/373?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 438 agreed to in Senate by Voice Vote. "
+    },
+    "number": "438",
+    "purpose": "To make a technical correction to cite the proper section intended to repeal the Department of Labor's transfer authority.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/438?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 367 not agreed to in Senate by Yea-Nay. 27 - 71. Record Vote Number: 93. "
+    },
+    "number": "367",
+    "purpose": "To reduce by $36,000,000 the amount appropriated for \"Military Construction, Army\", with the amount of the reduction to be allocated to funds available under that heading for the Camp 6 Detention Facility at Guantanamo Bay, Cuba.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/367?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "341",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/341?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 334 agreed to in Senate by Voice Vote. "
+    },
+    "number": "334",
+    "purpose": "To increase the military death gratuity to $100,000, effective with respect to any deaths of members of the Armed Forces on active duty after October 7, 2001.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/334?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 370 agreed to in Senate by Voice Vote. "
+    },
+    "number": "370",
+    "purpose": "To provide assistance to promote democracy in Lebanon.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:54Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/370?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "469",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/469?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "436",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/436?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "374",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/374?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "448",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/448?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "397",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/397?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 390 agreed to in Senate by Voice Vote. "
+    },
+    "number": "390",
+    "purpose": "To provide meal and telephone benefits for members of the Armed Forces who are recuperating from injuries incurred on active duty in Operation Iraqi Freedom or Operation Enduring Freedom.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/390?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "381",
+    "type": "SAMDT",
+    "updateDate": "2020-12-05T12:39:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/381?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 333 agreed to in Senate by Voice Vote. "
+    },
+    "number": "333",
+    "purpose": "To extend the period of temporary continuation of basic allowance for housing for dependents of members of the Armed Forces who die on active duty.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:48Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/333?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "479",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/479?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 422 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "422",
+    "purpose": "To make a technical change to the bill.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:35:11Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/422?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-06",
+      "text": "Referred to the Committee on Appropriations. "
+    },
+    "number": "316",
+    "purpose": "To repeal the requirement for the reduction of certain Survivor Benefit Plan annuities by the amount of dependency and indemnity compensation and to modify the effective date for paid-up coverage under the Survivor Benefit Plan.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/316?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "455",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/455?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "357",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/357?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "400",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/400?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "458",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/458?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "391",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/391?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 424 agreed to in Senate by Voice Vote. "
+    },
+    "number": "424",
+    "purpose": "To make a technical correction to the bill.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/424?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "442",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/442?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "529",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/529?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "363",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/363?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "426",
+    "type": "SAMDT",
+    "updateDate": "2020-12-05T12:39:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/426?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "377",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/377?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "465",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/465?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "478",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/478?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 430 as modified agreed to in Senate by Yea-Nay Vote. 98 - 0. Record Vote Number: 95. (text as modified: CR S3641)"
+    },
+    "number": "430",
+    "purpose": "To prohibit the use of funds by any Federal agency to produce a prepackaged news story without including in such story a clear notification for the audience that the story was prepared or funded by a Federal agency.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:35:02Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/430?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 403 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "403",
+    "purpose": "To provide additional amounts for diplomatic and consular programs and reduce the amount available for the Global War on Terror Partners Fund.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/403?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-13",
+      "text": "Amendment SA 411 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "411",
+    "purpose": "To amend the Internal Revenue Code of 1986 to provide for the proper tax treatment of certain disaster mitigation payments.",
+    "type": "SAMDT",
+    "updateDate": "2021-07-11T00:00:14Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/411?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "462",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/462?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "509",
+    "type": "SAMDT",
+    "updateDate": "2020-12-05T12:39:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/509?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 394 agreed to in Senate by Voice Vote. "
+    },
+    "number": "394",
+    "purpose": "To require a report on the re-use and redevelopment of military installations closed or realigned as part of the 2005 round of base closure and realignment.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:55Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/394?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "495",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/495?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "506",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/506?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "457",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/457?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "468",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/468?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "460",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/460?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 423 agreed to in Senate by Voice Vote. "
+    },
+    "number": "423",
+    "purpose": "To provide reprogramming authority for certain accounts in the Department of Commerce, Justice, State the Judiciary, and Related Agencies Appropriations Act, 2005.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:52Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/423?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 361 agreed to in Senate by Voice Vote. "
+    },
+    "number": "361",
+    "purpose": "To express the sense of the Senate that veterans with a service-connected disability rated as total by virtue of unemployability should be treated as covered by the repeal of the phase-in of concurrent receipt of retired pay and veterans disability compensation for military retirees.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/361?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "472",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/472?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "485",
+    "type": "SAMDT",
+    "updateDate": "2020-12-05T12:39:49Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/485?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-18",
+      "text": "Amendment SA 496 agreed to in Senate by Voice Vote. "
+    },
+    "number": "496",
+    "purpose": "To amend title XVIII of the Social Security Act to make a technical correction regarding the entities eligible to participate in the Health Care Infrastructure Improvement Program, and for other purposes.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/496?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-14",
+      "text": "Amendment SA 354 agreed to in Senate by Voice Vote. "
+    },
+    "number": "354",
+    "purpose": "To prohibit the implementation of certain orders and guidance on the functions and duties of the General Counsel and Judge Advocate General of the Air Force.",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/354?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "447",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/447?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "528",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/528?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "470",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/470?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "413",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/413?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "522",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/522?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "431",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/431?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "525",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:56Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/525?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "434",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/434?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "477",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/477?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "508",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/508?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "500",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/500?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-19",
+      "text": "Amendment SA 399 agreed to in Senate by Unanimous Consent. "
+    },
+    "number": "399",
+    "purpose": "To prohibit the continuation of the independent counsel investigation of Henry Cisneros past June 1, 2005 and request an accounting of costs from GAO.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:34:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/399?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "433",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:57Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/433?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "507",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/507?format=json"
+  },
+  {
+    "congress": 109,
+    "number": "461",
+    "type": "SAMDT",
+    "updateDate": "2019-02-06T22:27:58Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/461?format=json"
+  },
+  {
+    "congress": 109,
+    "latestAction": {
+      "actionDate": "2005-04-18",
+      "text": "Amendment SA 536 agreed to in Senate by Voice Vote. "
+    },
+    "number": "536",
+    "purpose": "To make technical correction to mortgage insurance fee requirements contained in the FY 2005 Omnibus Appropriations bill.",
+    "type": "SAMDT",
+    "updateDate": "2025-07-02T21:35:07Z",
+    "url": "https://api.congress.gov/v3/amendment/109/samdt/536?format=json"
+  }
+]

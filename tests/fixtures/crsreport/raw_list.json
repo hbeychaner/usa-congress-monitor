@@ -1,0 +1,5002 @@
+[
+  {
+    "contentType": "Posts",
+    "id": "IN12670",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "Parametric Insurance for Natural Disasters: Frequently Asked Questions",
+    "updateDate": "2026-03-20T04:23:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12670",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12921",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "Letters of Support for Grant Seekers: Considerations for a Congressional Office",
+    "updateDate": "2026-03-20T04:23:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12921",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10613",
+    "publishDate": "2025-09-11T04:00:00Z",
+    "status": "Active",
+    "title": "The Foreign Terrorist Organization (FTO) List",
+    "updateDate": "2026-03-20T04:22:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10613",
+    "version": 9
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13105",
+    "publishDate": "2026-03-19T04:00:00Z",
+    "status": "Active",
+    "title": "Overview of FY2026 Appropriations for the Census Bureau",
+    "updateDate": "2026-03-20T04:22:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13105",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48435",
+    "publishDate": "2025-04-23T04:00:00Z",
+    "status": "Active",
+    "title": "Congressional and Presidential Authority to Impose Import Tariffs",
+    "updateDate": "2026-03-20T04:22:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48435",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11407",
+    "publishDate": "2026-03-19T04:00:00Z",
+    "status": "Active",
+    "title": "Litigation Over the Trump Administration’s Grant Terminations",
+    "updateDate": "2026-03-20T04:22:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11407",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10733",
+    "publishDate": "2026-03-19T04:00:00Z",
+    "status": "Active",
+    "title": "U.S.-South Korea Bilateral Trade Relations",
+    "updateDate": "2026-03-20T04:22:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10733",
+    "version": 18
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13185",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "Worker Participation in Employer-Sponsored Pensions in 2025",
+    "updateDate": "2026-03-20T04:22:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13185",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11406",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "Prediction Markets and Insider Trading Law",
+    "updateDate": "2026-03-20T04:22:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11406",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48151",
+    "publishDate": "2026-03-16T04:00:00Z",
+    "status": "Active",
+    "title": "The Community Oriented Policing Services (COPS) Program: History, Funding, and Potential Issues for Reauthorization",
+    "updateDate": "2026-03-20T04:22:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48151",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13177",
+    "publishDate": "2026-03-19T04:00:00Z",
+    "status": "Active",
+    "title": "FY2026 Appropriations for U.S. Environmental Protection Agency (EPA) Water Infrastructure Programs",
+    "updateDate": "2026-03-20T04:22:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13177",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11092",
+    "publishDate": "2024-12-18T05:00:00Z",
+    "status": "Archived",
+    "title": "Fourth Circuit Holds That Certain Medicaid and State-Funded Health Plans Discriminate by Refusing to Cover Treatments for Gender Dysphoria",
+    "updateDate": "2026-03-20T04:22:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11092",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48877",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-South Korea Alliance: Background and Issues for Congress",
+    "updateDate": "2026-03-19T17:07:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48877",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45576",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "An Overview of Small Business Contracting",
+    "updateDate": "2026-03-19T16:52:45Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45576",
+    "version": 31
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13186",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "Corporate Governance",
+    "updateDate": "2026-03-19T16:07:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13186",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48884",
+    "publishDate": "2026-03-17T04:00:00Z",
+    "status": "Active",
+    "title": "Office of the U.S. Trade Representative: Overview and Issues for Congress in Brief",
+    "updateDate": "2026-03-19T14:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48884",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12988",
+    "publishDate": "2025-05-07T04:00:00Z",
+    "status": "Active",
+    "title": "Housing Supply",
+    "updateDate": "2026-03-19T13:38:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12988",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11405",
+    "publishDate": "2026-03-17T04:00:00Z",
+    "status": "Active",
+    "title": "Education Department’s DEI Certification Requirement for Schools: Overview and Legal Challenges",
+    "updateDate": "2026-03-19T12:22:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11405",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48883",
+    "publishDate": "2026-03-16T04:00:00Z",
+    "status": "Active",
+    "title": "An Overview of Decentralized Finance (Defi)",
+    "updateDate": "2026-03-19T12:08:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48883",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10691",
+    "publishDate": "2026-03-16T04:00:00Z",
+    "status": "Active",
+    "title": "The Edward Byrne Memorial Justice Assistance Grant (JAG) Program",
+    "updateDate": "2026-03-19T09:52:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10691",
+    "version": 10
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12645",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "The Terminal High Altitude Area Defense (THAAD) System",
+    "updateDate": "2026-03-19T09:37:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12645",
+    "version": 8
+  },
+  {
+    "contentType": "Reports",
+    "id": "R41313",
+    "publishDate": "2019-10-21T04:00:00Z",
+    "status": "Archived",
+    "title": "The District of Columbia Tuition Assistance Grant (DCTAG) Program",
+    "updateDate": "2026-03-19T09:37:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/R41313",
+    "version": 17
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46491",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "Resources for Tracking Federal COVID19 Spending",
+    "updateDate": "2026-03-19T09:22:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46491",
+    "version": 36
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11471",
+    "publishDate": "2026-03-18T04:00:00Z",
+    "status": "Active",
+    "title": "Central Bank Digital Currencies",
+    "updateDate": "2026-03-19T08:08:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11471",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "98-684",
+    "publishDate": "2026-03-16T04:00:00Z",
+    "status": "Active",
+    "title": "Latin America and the Caribbean: Fact Sheet on Leaders and Elections",
+    "updateDate": "2026-03-18T16:07:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/98-684",
+    "version": 207
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13184",
+    "publishDate": "2026-03-17T04:00:00Z",
+    "status": "Active",
+    "title": "Airlift Aircraft: Background and Issues for Congress",
+    "updateDate": "2026-03-18T15:08:42Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13184",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45342",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Central Valley Project: Issues and Legislation",
+    "updateDate": "2026-03-18T15:07:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45342",
+    "version": 52
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47295",
+    "publishDate": "2026-03-16T04:00:00Z",
+    "status": "Active",
+    "title": "Economic Forecasts and Projections: Fact Sheet",
+    "updateDate": "2026-03-18T13:23:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47295",
+    "version": 16
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10639",
+    "publishDate": "2026-03-16T04:00:00Z",
+    "status": "Active",
+    "title": "Farm Bill Primer: Energy Title",
+    "updateDate": "2026-03-18T12:23:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10639",
+    "version": 11
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL33243",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Small Business Administration: A Primer on Programs and Funding",
+    "updateDate": "2026-03-17T18:22:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL33243",
+    "version": 137
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48705",
+    "publishDate": "2025-09-09T04:00:00Z",
+    "status": "Active",
+    "title": "Department of Homeland Security Appropriations: FY2026 Provisions",
+    "updateDate": "2026-03-17T17:52:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48705",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47002",
+    "publishDate": "2026-03-16T04:00:00Z",
+    "status": "Active",
+    "title": "Federal Public Transportation Program: In Brief",
+    "updateDate": "2026-03-17T17:22:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47002",
+    "version": 7
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13183",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Federal Grant Pass-Through Entity Oversight of Subrecipients",
+    "updateDate": "2026-03-17T11:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13183",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12669",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Pentagon-Anthropic Dispute over Autonomous Weapon Systems: Potential Issues for Congress",
+    "updateDate": "2026-03-17T11:22:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12669",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10017",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Export-Import Bank: Overview and Reauthorization Debate",
+    "updateDate": "2026-03-17T08:38:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10017",
+    "version": 37
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11404",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Congressional Court Watcher: Circuit Splits from February 2026",
+    "updateDate": "2026-03-17T07:37:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11404",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43846",
+    "publishDate": "2026-03-12T04:00:00Z",
+    "status": "Active",
+    "title": "Small Business Administration (SBA) Funding: Overview and Recent Trends",
+    "updateDate": "2026-03-14T17:38:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43846",
+    "version": 50
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48732",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "ROAD to Housing Act of 2025",
+    "updateDate": "2026-03-14T17:38:10Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48732",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13024",
+    "publishDate": "2026-03-12T04:00:00Z",
+    "status": "Active",
+    "title": "National Oceanic and Atmospheric Administration (NOAA) FY2026 Budget Request and Appropriations",
+    "updateDate": "2026-03-14T17:38:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13024",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48849",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Housing for the 21st Century Act",
+    "updateDate": "2026-03-14T17:22:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48849",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL31675",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Arms Sales: Congressional Review Process",
+    "updateDate": "2026-03-14T16:52:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL31675",
+    "version": 74
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12909",
+    "publishDate": "2026-03-09T04:00:00Z",
+    "status": "Active",
+    "title": "The Decennial Census of Population and Housing: An Overview",
+    "updateDate": "2026-03-14T16:38:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12909",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10506",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Social Security Disability Insurance (SSDI)",
+    "updateDate": "2026-03-14T15:38:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10506",
+    "version": 10
+  },
+  {
+    "contentType": "Infographics",
+    "id": "IG10093",
+    "publishDate": "2026-03-12T04:00:00Z",
+    "status": "Active",
+    "title": "Available Student Loan Repayment Plans Following the FY2025 Budget Reconciliation Law",
+    "updateDate": "2026-03-14T15:22:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IG10093",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11346",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Section 301 of the Trade Act of 1974",
+    "updateDate": "2026-03-14T15:08:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11346",
+    "version": 23
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48781",
+    "publishDate": "2025-12-30T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-Canada Softwood Lumber Trade: Current Issues for Congress",
+    "updateDate": "2026-03-14T14:53:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48781",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47240",
+    "publishDate": "2026-03-03T05:00:00Z",
+    "status": "Active",
+    "title": "Navigating the Appropriations Status Table",
+    "updateDate": "2026-03-14T14:53:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47240",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44234",
+    "publishDate": "2026-03-13T04:00:00Z",
+    "status": "Active",
+    "title": "Supreme Court Appointment Process: Senate Debate and Confirmation Vote",
+    "updateDate": "2026-03-14T14:38:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44234",
+    "version": 11
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48879",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "Trusts: Income and Estate and Gift Tax Issues",
+    "updateDate": "2026-03-14T12:52:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48879",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48882",
+    "publishDate": "2026-03-12T04:00:00Z",
+    "status": "Active",
+    "title": "Medicare Advantage (MA): Proposed Benchmark Update and Other Adjustments for CY2027 in Brief",
+    "updateDate": "2026-03-14T12:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48882",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48848",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "The Federal Research and Development (R&D) Tax Credit",
+    "updateDate": "2026-03-14T12:22:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48848",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12668",
+    "publishDate": "2026-03-12T04:00:00Z",
+    "status": "Active",
+    "title": "U.S. Military Operations Against Iran: Munitions and Missile Defense",
+    "updateDate": "2026-03-14T11:07:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12668",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12667",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "The Trump Administration’s Cyber Strategy",
+    "updateDate": "2026-03-14T10:38:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12667",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12782",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Offshore Energy Agency Appropriations, FY2025",
+    "updateDate": "2026-03-13T17:07:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12782",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48609",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "District of Columbia FY2025 Budget Status: In Brief",
+    "updateDate": "2026-03-13T16:37:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48609",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13120",
+    "publishDate": "2025-11-13T05:00:00Z",
+    "status": "Active",
+    "title": "Direct Loan Program Student Loans: Loan Discharge and Forgiveness",
+    "updateDate": "2026-03-13T15:07:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13120",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12438",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "India-U.S.: Major Arms Transfers and Military Exercises",
+    "updateDate": "2026-03-13T14:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12438",
+    "version": 30
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48876",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "The U.S. Automotive Industry: Selected Issues",
+    "updateDate": "2026-03-13T14:37:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48876",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48880",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "The Annual Mandatory Spending Sequester Through FY2033",
+    "updateDate": "2026-03-13T14:07:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48880",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10799",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Prospects for U.S.-Saudi Nuclear Energy Cooperation",
+    "updateDate": "2026-03-13T13:22:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10799",
+    "version": 23
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48878",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "Critical Infrastructure: Emerging Trends and Policy Considerations for Congress",
+    "updateDate": "2026-03-13T13:08:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48878",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48881",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Surface Transportation Reauthorization: Passenger and Freight Rail Issues",
+    "updateDate": "2026-03-13T12:37:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48881",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11779",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Hydrofluorocarbon Phasedown: Background and Issues Facing Congress",
+    "updateDate": "2026-03-13T12:22:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11779",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12861",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "Interest Rate Caps on Credit Cards: Policy Issues",
+    "updateDate": "2026-03-13T12:07:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12861",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46143",
+    "publishDate": "2025-12-04T05:00:00Z",
+    "status": "Active",
+    "title": "The Office of Federal Student Aid as a Performance-Based Organization",
+    "updateDate": "2026-03-13T10:52:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46143",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12270",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "The Federal Status of Marijuana and the Policy Gap with States",
+    "updateDate": "2026-03-13T09:08:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12270",
+    "version": 8
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12665",
+    "publishDate": "2026-03-06T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Military Operations Against Iran’s Missile and Nuclear Programs",
+    "updateDate": "2026-03-13T08:22:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12665",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13149",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Offshore Energy Agency Appropriations, FY2026",
+    "updateDate": "2026-03-12T15:52:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13149",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11403",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "International Agreements and Non-binding Instruments: The Case-Zablocki Act (Case Act)",
+    "updateDate": "2026-03-12T15:52:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11403",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12397",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "U.S. Army’s Maneuver Short-Range Air Defense (MSHORAD) System—SGT Stout",
+    "updateDate": "2026-03-12T15:22:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12397",
+    "version": 17
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47927",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "District of Columbia Local Lawmaking and Congressional Authority",
+    "updateDate": "2026-03-12T14:52:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47927",
+    "version": 4
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12609",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "FEMA’s Building Resilient Infrastructure and Communities (BRIC): Recent Developments",
+    "updateDate": "2026-03-12T14:08:10Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12609",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13181",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "Implementation of the Social Security Fairness Act of 2023 and Retroactivity for Benefit Applications",
+    "updateDate": "2026-03-12T13:08:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13181",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11108",
+    "publishDate": "2026-03-09T04:00:00Z",
+    "status": "Active",
+    "title": "The Second Amendment at the Supreme Court: Challenges to Federal Gun Laws",
+    "updateDate": "2026-03-12T12:52:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11108",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45281",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Iran Conflict and the Strait of Hormuz: Impacts on Oil, Gas, and Other Commodities",
+    "updateDate": "2026-03-12T11:07:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45281",
+    "version": 2
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11166",
+    "publishDate": "2025-01-17T05:00:00Z",
+    "status": "Active",
+    "title": "Montana’s TikTok Ban Goes Before the Ninth Circuit",
+    "updateDate": "2026-03-12T10:52:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11166",
+    "version": 5
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11120",
+    "publishDate": "2024-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Foreign Ownership of U.S. Real Property: Developments in Shen v. Simpson",
+    "updateDate": "2026-03-12T10:52:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11120",
+    "version": 2
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11402",
+    "publishDate": "2026-03-11T04:00:00Z",
+    "status": "Active",
+    "title": "Trump Administration Actions to Curtail Offshore Wind Energy Development Meet Judicial Resistance",
+    "updateDate": "2026-03-12T09:52:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11402",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48072",
+    "publishDate": "2026-03-06T05:00:00Z",
+    "status": "Active",
+    "title": "Kenya: Current Issues and U.S. Relations",
+    "updateDate": "2026-03-12T09:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48072",
+    "version": 10
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11367",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "National Security Exclusions from the Federal Service Labor-Management Relations Statutes",
+    "updateDate": "2026-03-11T17:38:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11367",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13182",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "The Impact of Generative AI on Labor Markets: Frameworks",
+    "updateDate": "2026-03-11T16:22:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13182",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45809",
+    "publishDate": "2019-07-08T04:00:00Z",
+    "status": "Archived",
+    "title": "Critical Infrastructure: Emerging Trends and Policy Considerations for Congress",
+    "updateDate": "2026-03-11T16:22:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45809",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13170",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "The House Consensus Calendar: Principal Features",
+    "updateDate": "2026-03-11T16:07:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13170",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13179",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "The Automobile Loan Market: Policy Issues for Congress",
+    "updateDate": "2026-03-11T16:07:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13179",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11192",
+    "publishDate": "2019-04-25T04:00:00Z",
+    "status": "Archived",
+    "title": "The Automobile Lending Market and Policy Issues",
+    "updateDate": "2026-03-11T16:07:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11192",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46259",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "Northern Ireland: The Peace Process, Ongoing Challenges, and U.S. Interests",
+    "updateDate": "2026-03-11T15:22:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46259",
+    "version": 16
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12934",
+    "publishDate": "2025-02-28T05:00:00Z",
+    "status": "Active",
+    "title": "Farm Bill Primer: Animal Disease Management and Prevention",
+    "updateDate": "2026-03-11T15:22:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12934",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12661",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "Law Enforcement and the Evolving Counter-Unmanned Aircraft Systems (C-UAS) Landscape",
+    "updateDate": "2026-03-11T14:52:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12661",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13178",
+    "publishDate": "2026-03-09T04:00:00Z",
+    "status": "Active",
+    "title": "NHTSA’s Authorities and Rulemaking Process",
+    "updateDate": "2026-03-11T14:38:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13178",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN10784",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "National Flood Insurance Program Borrowing Authority",
+    "updateDate": "2026-03-11T14:38:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN10784",
+    "version": 45
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12505",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "China Primer: China’s Political System",
+    "updateDate": "2026-03-11T14:07:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12505",
+    "version": 9
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43325",
+    "publishDate": "2025-09-24T04:00:00Z",
+    "status": "Active",
+    "title": "The Renewable Fuel Standard (RFS): An Overview",
+    "updateDate": "2026-03-11T13:53:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43325",
+    "version": 50
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13180",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "H.R. 4776, Standardizing Permitting and Expediting Economic Development Act (SPEED Act), as Passed by the House",
+    "updateDate": "2026-03-11T13:52:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13180",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11056",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "Prescription Drug Importation",
+    "updateDate": "2026-03-11T13:37:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11056",
+    "version": 7
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13176",
+    "publishDate": "2026-03-09T04:00:00Z",
+    "status": "Active",
+    "title": "Foreign Agents Registration Act (FARA): Foreign Principal Locations and Activities in the United States",
+    "updateDate": "2026-03-11T12:53:09Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13176",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45122",
+    "publishDate": "2026-03-10T04:00:00Z",
+    "status": "Active",
+    "title": "Afghanistan: Background and U.S. Policy in Brief",
+    "updateDate": "2026-03-11T12:52:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45122",
+    "version": 67
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12666",
+    "publishDate": "2026-03-09T04:00:00Z",
+    "status": "Active",
+    "title": "Security of Weapons of Mass Destruction (WMD)-Related Materials in the Iran Conflict: Considerations for Congress",
+    "updateDate": "2026-03-11T12:22:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12666",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12976",
+    "publishDate": "2026-03-06T05:00:00Z",
+    "status": "Active",
+    "title": "1944 U.S.-Mexico Water Treaty: Issues in the 119th Congress",
+    "updateDate": "2026-03-11T11:07:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12976",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13175",
+    "publishDate": "2026-03-09T04:00:00Z",
+    "status": "Active",
+    "title": "Defense POW/MIA Accounting Agency",
+    "updateDate": "2026-03-11T11:07:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13175",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47676",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "Disaster Relief Fund State of Play: In Brief",
+    "updateDate": "2026-03-10T17:53:33Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47676",
+    "version": 17
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11548",
+    "publishDate": "2026-03-06T05:00:00Z",
+    "status": "Active",
+    "title": "Assisting and Evacuating U.S. Citizens Abroad During International Crises",
+    "updateDate": "2026-03-10T17:43:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11548",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48875",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-Australia Relations: Background and Issues for Congress",
+    "updateDate": "2026-03-10T17:09:33Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48875",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10247",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-Indonesia Relations",
+    "updateDate": "2026-03-10T17:09:24Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10247",
+    "version": 54
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44593",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "Introduction to the National Flood Insurance Program (NFIP)",
+    "updateDate": "2026-03-10T17:08:25Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44593",
+    "version": 69
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12125",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "Section 301 and China: The U.S.-China Phase One Trade Deal",
+    "updateDate": "2026-03-10T15:38:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12125",
+    "version": 7
+  },
+  {
+    "contentType": "Reports",
+    "id": "R42769",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Grants-in-Aid Administration: A Primer",
+    "updateDate": "2026-03-10T15:38:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/R42769",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11284",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-China Trade Relations",
+    "updateDate": "2026-03-10T15:23:18Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11284",
+    "version": 32
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44389",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "Statutory Framework for Congressional Management of DOD General and Flag Officers",
+    "updateDate": "2026-03-10T15:23:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44389",
+    "version": 12
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13172",
+    "publishDate": "2026-03-06T05:00:00Z",
+    "status": "Active",
+    "title": "Iranian Kurds and Possible Support",
+    "updateDate": "2026-03-10T14:53:11Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13172",
+    "version": 1
+  },
+  {
+    "contentType": "Infographics",
+    "id": "IG10046",
+    "publishDate": "2026-03-03T05:00:00Z",
+    "status": "Active",
+    "title": "Middle East Natural Gas",
+    "updateDate": "2026-03-10T14:08:32Z",
+    "url": "https://api.congress.gov/v3/crsreport/IG10046",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12421",
+    "publishDate": "2026-03-09T04:00:00Z",
+    "status": "Active",
+    "title": "The U.S. Army’s Indirect Fire Protection Capability (IFPC) System",
+    "updateDate": "2026-03-10T13:22:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12421",
+    "version": 10
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13174",
+    "publishDate": "2026-03-06T05:00:00Z",
+    "status": "Active",
+    "title": "The Stablecoin Yield Debate",
+    "updateDate": "2026-03-10T11:54:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13174",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10316",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "Malaysia",
+    "updateDate": "2026-03-07T17:23:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10316",
+    "version": 17
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48873",
+    "publishDate": "2026-03-05T05:00:00Z",
+    "status": "Active",
+    "title": "The Prohibitions on Private Inurement & Benefit by Tax-Exempt Organizations and Intermediate Sanctions",
+    "updateDate": "2026-03-07T17:22:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48873",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48874",
+    "publishDate": "2026-02-28T05:00:00Z",
+    "status": "Active",
+    "title": "Department of Homeland Security Appropriations: FY2026 State of Play",
+    "updateDate": "2026-03-07T17:07:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48874",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13173",
+    "publishDate": "2026-03-06T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Management of Tribal Trust Funds: Overview and Selected Issues for Congress",
+    "updateDate": "2026-03-07T16:07:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13173",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45813",
+    "publishDate": "2021-01-14T05:00:00Z",
+    "status": "Archived",
+    "title": "An Overview of Consumer Finance and Policy Issues",
+    "updateDate": "2026-03-06T17:22:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45813",
+    "version": 4
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN11053",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Redistricting Commissions for Congressional Districts",
+    "updateDate": "2026-03-06T17:08:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN11053",
+    "version": 5
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48872",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Nippon Steel’s Acquisition of U.S. Steel: Potential Implications for the Industry",
+    "updateDate": "2026-03-06T16:38:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48872",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48861",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "History of the Federal Communications Commission’s Spectrum Auction Authority: 1993-2025",
+    "updateDate": "2026-03-06T15:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48861",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13162",
+    "publishDate": "2026-03-03T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. International Food Assistance Primer",
+    "updateDate": "2026-03-06T15:22:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13162",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10349",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Congressionally Directed Medical Research Programs Funding for FY2026",
+    "updateDate": "2026-03-06T15:07:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10349",
+    "version": 14
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11401",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "The United States’ Prosecution of Nicolás Maduro Moros: United States v. Maduro",
+    "updateDate": "2026-03-06T14:37:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11401",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10951",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Problematic Substance Use in the Military: Prevention, Treatment, and Research Efforts",
+    "updateDate": "2026-03-06T13:37:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10951",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10250",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "The Philippines",
+    "updateDate": "2026-03-06T13:10:39Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10250",
+    "version": 58
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12664",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "Executive Office for Immigration Review Immigration Judge Staffing Issues",
+    "updateDate": "2026-03-06T12:22:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12664",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13171",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Rare Earth Elements and U.S. Supply Chains",
+    "updateDate": "2026-03-06T12:07:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13171",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL33865",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "Arms Control and Nonproliferation: A Catalog of Treaties and Agreements",
+    "updateDate": "2026-03-06T11:52:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL33865",
+    "version": 59
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13082",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Mid-Decade Congressional Redistricting: Key Issues",
+    "updateDate": "2026-03-05T17:38:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13082",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN11618",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Congressional Redistricting Criteria and Considerations",
+    "updateDate": "2026-03-05T17:38:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN11618",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46963",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "SBA Disaster Loan Interest Rates: Overview and Policy Options",
+    "updateDate": "2026-03-05T16:52:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46963",
+    "version": 5
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48545",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Public Broadcasting: Background Information and Issues for Congress",
+    "updateDate": "2026-03-05T14:07:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48545",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45951",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Apportionment and Redistricting Process for the U.S. House of Representatives",
+    "updateDate": "2026-03-05T13:37:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45951",
+    "version": 9
+  },
+  {
+    "contentType": "Infographics",
+    "id": "IG10076",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Coal Production & Federal Lands",
+    "updateDate": "2026-03-05T13:37:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IG10076",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11681",
+    "publishDate": "2026-03-04T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: LGM-35A Sentinel Intercontinental Ballistic Missile",
+    "updateDate": "2026-03-05T11:52:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11681",
+    "version": 16
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45003",
+    "publishDate": "2026-03-03T05:00:00Z",
+    "status": "Active",
+    "title": "Muslim Holidays: Fact Sheet",
+    "updateDate": "2026-03-05T11:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45003",
+    "version": 14
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12094",
+    "publishDate": "2026-03-03T05:00:00Z",
+    "status": "Active",
+    "title": "The Army’s XM-30 Mechanized Infantry Combat Vehicle (Formerly the Optionally Manned Fighting Vehicle [OMFV])",
+    "updateDate": "2026-03-05T11:22:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12094",
+    "version": 15
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12347",
+    "publishDate": "2024-10-29T04:00:00Z",
+    "status": "Active",
+    "title": "Escalation of the Israel-Iran Conflict",
+    "updateDate": "2026-03-05T09:08:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12347",
+    "version": 8
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13057",
+    "publishDate": "2025-07-09T04:00:00Z",
+    "status": "Active",
+    "title": "What Is Disparate-Impact Discrimination?",
+    "updateDate": "2026-03-05T09:08:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13057",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12014",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "Social Security Retirement Earnings Test Overview",
+    "updateDate": "2026-03-04T17:37:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12014",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11200",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "Gold Star Designation: An Overview",
+    "updateDate": "2026-03-04T16:37:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11200",
+    "version": 7
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12663",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "Elections in Bangladesh",
+    "updateDate": "2026-03-04T13:31:25Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12663",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48866",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "Toward Commercial Fusion Energy: Considerations for Congress",
+    "updateDate": "2026-03-04T13:31:23Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48866",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12662",
+    "publishDate": "2026-03-01T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. and Israeli Military Operations Against Iran: Issues for Congress",
+    "updateDate": "2026-03-04T12:53:18Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12662",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R41364",
+    "publishDate": "2026-03-03T05:00:00Z",
+    "status": "Active",
+    "title": "Capital Gains Tax Options: Behavioral Responses and Revenues",
+    "updateDate": "2026-03-04T12:53:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/R41364",
+    "version": 13
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47578",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Archived",
+    "title": "The Federal Communications Commission’s Spectrum Auction Authority: History and Options for Reinstatement",
+    "updateDate": "2026-03-04T11:09:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47578",
+    "version": 8
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13116",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "National Park Service: FY2026 Appropriations",
+    "updateDate": "2026-03-04T10:53:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13116",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12759",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "The HIPAA Privacy Rule: Overview and Issues",
+    "updateDate": "2026-03-04T07:55:44Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12759",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43419",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "NASA Appropriations and Authorizations: At a Glance",
+    "updateDate": "2026-03-04T07:54:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43419",
+    "version": 112
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44782",
+    "publishDate": "2022-04-07T04:00:00Z",
+    "status": "Active",
+    "title": "The Evolution of Marijuana as a Controlled Substance and the Federal-State Policy Gap",
+    "updateDate": "2026-03-04T07:54:42Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44782",
+    "version": 6
+  },
+  {
+    "contentType": "Infographics",
+    "id": "IG10044",
+    "publishDate": "2025-09-09T04:00:00Z",
+    "status": "Active",
+    "title": "Middle East Oil",
+    "updateDate": "2026-03-04T07:54:41Z",
+    "url": "https://api.congress.gov/v3/crsreport/IG10044",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11573",
+    "publishDate": "2026-03-03T05:00:00Z",
+    "status": "Active",
+    "title": "USDA’s Regulation of Agricultural Biotechnology",
+    "updateDate": "2026-03-04T07:54:40Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11573",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13168",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Data Privacy vs. Bank Secrecy: Regulating the Flow of Information Within Bank-Fintech Partnerships",
+    "updateDate": "2026-03-03T17:52:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13168",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R42353",
+    "publishDate": "2026-02-19T05:00:00Z",
+    "status": "Active",
+    "title": "Domestic Food Assistance: Summary of Programs",
+    "updateDate": "2026-03-03T16:52:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R42353",
+    "version": 26
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48868",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "Separation of Powers and NATO Withdrawal",
+    "updateDate": "2026-03-03T16:08:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48868",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12150",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "Ukrainian Military Performance and Outlook",
+    "updateDate": "2026-03-03T15:23:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12150",
+    "version": 13
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN11693",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "The Budget Resolution and the Senate’s Automatic Discharge Process",
+    "updateDate": "2026-03-03T15:08:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN11693",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12744",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "Patent Law: An Introduction and Issues for Congress",
+    "updateDate": "2026-03-03T14:38:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12744",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45160",
+    "publishDate": "2026-03-02T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Election Commission: Membership and Policymaking Quorum, In Brief",
+    "updateDate": "2026-03-03T13:53:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45160",
+    "version": 18
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10317",
+    "publishDate": "2023-09-15T04:00:00Z",
+    "status": "Archived",
+    "title": "Policy Issues Involving Food Loss and Waste",
+    "updateDate": "2026-03-03T08:52:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10317",
+    "version": 9
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12411",
+    "publishDate": "2023-05-24T04:00:00Z",
+    "status": "Archived",
+    "title": "Fusion Energy",
+    "updateDate": "2026-03-03T08:52:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12411",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48864",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "The SUPPORT for Patients and Communities Reauthorization Act of 2025: SectionbySection Summary",
+    "updateDate": "2026-02-28T20:22:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48864",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11400",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "Does Federal Law Preempt Negligent Selection Claims Against Freight Brokers?",
+    "updateDate": "2026-02-28T17:07:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11400",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL33487",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "Syria: Transition and U.S. Policy",
+    "updateDate": "2026-02-28T16:52:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL33487",
+    "version": 175
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45422",
+    "publishDate": "2021-02-23T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S. International Food Assistance:An Overview",
+    "updateDate": "2026-02-28T14:52:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45422",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48518",
+    "publishDate": "2025-04-29T04:00:00Z",
+    "status": "Active",
+    "title": "The Highly Pathogenic Avian Influenza (HPAI) Outbreak in Poultry, 2022-Present",
+    "updateDate": "2026-02-28T14:37:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48518",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12653",
+    "publishDate": "2024-05-15T04:00:00Z",
+    "status": "Active",
+    "title": "Highly Pathogenic Avian Influenza in Dairy Herds",
+    "updateDate": "2026-02-28T14:37:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12653",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12837",
+    "publishDate": "2024-12-03T05:00:00Z",
+    "status": "Active",
+    "title": "H5N1 HPAI Continues to Spread in Dairy Herds",
+    "updateDate": "2026-02-28T14:22:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12837",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43631",
+    "publishDate": "2026-02-24T05:00:00Z",
+    "status": "Active",
+    "title": "The Individuals with Disabilities Education Act (IDEA), Part C: Early Intervention for Infants and Toddlers with Disabilities",
+    "updateDate": "2026-02-28T13:38:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43631",
+    "version": 13
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10538",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Intelligence Community (IC): Appointment Dates and Appointment Legal Provisions for Selected IC Leadership",
+    "updateDate": "2026-02-28T13:08:06Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10538",
+    "version": 9
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12964",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-Russian Nuclear Arms Control: Overview and Potential Considerations for Congress",
+    "updateDate": "2026-02-28T12:22:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12964",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12990",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-China Tariff Actions Since 2018: An Overview",
+    "updateDate": "2026-02-28T10:52:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12990",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48643",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Overview of FY2026 Appropriations for Commerce, Justice, Science, and Related Agencies (CJS)",
+    "updateDate": "2026-02-28T09:22:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48643",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12660",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "The Child Support Enforcement Passport Denial Program",
+    "updateDate": "2026-02-28T09:07:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12660",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11399",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Congressional Court Watcher: Circuit Splits from January 2026",
+    "updateDate": "2026-02-28T07:07:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11399",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12310",
+    "publishDate": "2026-02-27T05:00:00Z",
+    "status": "Active",
+    "title": "The Small Business Administration’s Growth Accelerator Fund Competition",
+    "updateDate": "2026-02-27T17:52:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12310",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12640",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "TikTok and China’s Digital Platforms: Issues for Congress",
+    "updateDate": "2026-02-27T17:52:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12640",
+    "version": 10
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46858",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "Europe: Fact Sheet on Parliamentary and Presidential Elections",
+    "updateDate": "2026-02-27T17:52:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46858",
+    "version": 20
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL33003",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Egypt: Background and U.S. Relations",
+    "updateDate": "2026-02-27T17:23:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL33003",
+    "version": 124
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12473",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-China Competition in Emerging Technologies: LiDAR",
+    "updateDate": "2026-02-27T17:23:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12473",
+    "version": 7
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48568",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Power Act: The Department of Energy’s Emergency Authority",
+    "updateDate": "2026-02-27T16:54:31Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48568",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48863",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Local and Regional Project Assistance Program: Background and Selected Considerations",
+    "updateDate": "2026-02-27T16:52:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48863",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48191",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "Connecting Constituents to Health Information and Services: Resources for Congressional Offices",
+    "updateDate": "2026-02-27T15:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48191",
+    "version": 2
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12630",
+    "publishDate": "2025-12-18T05:00:00Z",
+    "status": "Active",
+    "title": "Claiming Age Clarity Act (H.R. 5284): Background for Congress",
+    "updateDate": "2026-02-27T14:38:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12630",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12734",
+    "publishDate": "2024-08-08T04:00:00Z",
+    "status": "Archived",
+    "title": "Rapidly Growing “Buy Now, Pay Later” (BNPL) Financing: Market Developments and Policy Issues",
+    "updateDate": "2026-02-27T14:38:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12734",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13169",
+    "publishDate": "2026-02-26T05:00:00Z",
+    "status": "Active",
+    "title": "Fourth Amendment Search Warrant Requirements",
+    "updateDate": "2026-02-27T11:08:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13169",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46991",
+    "publishDate": "2026-02-24T05:00:00Z",
+    "status": "Active",
+    "title": "Economic Development Administration: An Overview of Programs and Appropriations (FY2012-FY2026)",
+    "updateDate": "2026-02-27T10:53:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46991",
+    "version": 25
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10256",
+    "publishDate": "2026-02-24T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-Taiwan Trade and Economic Relations",
+    "updateDate": "2026-02-27T10:38:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10256",
+    "version": 31
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11332",
+    "publishDate": "2025-09-15T04:00:00Z",
+    "status": "Archived",
+    "title": "Court Decisions Regarding Tariffs Imposed Under the International Emergency Economic Powers Act (IEEPA)",
+    "updateDate": "2026-02-27T09:38:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11332",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12652",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "FY2026 NDAA: Reserve Component EndStrength",
+    "updateDate": "2026-02-27T09:38:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12652",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11281",
+    "publishDate": "2025-04-07T04:00:00Z",
+    "status": "Archived",
+    "title": "Legal Authority for the President to Impose Tariffs Under the International Emergency Economic Powers Act (IEEPA)",
+    "updateDate": "2026-02-27T09:38:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11281",
+    "version": 2
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12651",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "FY2026 NDAA: Active Component EndStrength",
+    "updateDate": "2026-02-27T09:08:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12651",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48862",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Spectrum Provisions in P.L. 119-21, the FY2025 Reconciliation Law",
+    "updateDate": "2026-02-26T17:08:12Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48862",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12902",
+    "publishDate": "2026-02-24T05:00:00Z",
+    "status": "Active",
+    "title": "Safeguard American Voter Eligibility Act (SAVE America Act) and Federal Voter Registration Policy and Law",
+    "updateDate": "2026-02-26T16:38:10Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12902",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12265",
+    "publishDate": "2026-02-24T05:00:00Z",
+    "status": "Active",
+    "title": "China Primer: Human Rights",
+    "updateDate": "2026-02-26T16:23:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12265",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45460",
+    "publishDate": "2026-02-19T05:00:00Z",
+    "status": "Active",
+    "title": "Coastal Zone Management Act (CZMA): Overview and Issues for Congress",
+    "updateDate": "2026-02-26T14:38:24Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45460",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11141",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Employer Tax Credit for Paid Family and Medical Leave",
+    "updateDate": "2026-02-26T13:08:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11141",
+    "version": 5
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48794",
+    "publishDate": "2026-02-25T05:00:00Z",
+    "status": "Active",
+    "title": "Social Security Administration (SSA): FY2026 Annual Limitation on Administrative Expenses (LAE) Appropriation: In Brief",
+    "updateDate": "2026-02-26T10:38:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48794",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48859",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "Mexico: Background and Key Issues in U.S. Relations",
+    "updateDate": "2026-02-26T09:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48859",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48444",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "The Reconciliation Process: Frequently Asked Questions",
+    "updateDate": "2026-02-25T17:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48444",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13025",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "The U.S. Geological Survey (USGS): FY2026 Appropriations",
+    "updateDate": "2026-02-25T16:52:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13025",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48768",
+    "publishDate": "2026-02-24T05:00:00Z",
+    "status": "Active",
+    "title": "The Department of Education’s Proposed Rule to Define “Professional Student”: Frequently Asked Questions",
+    "updateDate": "2026-02-25T16:37:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48768",
+    "version": 1
+  },
+  {
+    "contentType": "Infographics",
+    "id": "IG10049",
+    "publishDate": "2026-02-24T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Shale Gas and Federal Lands",
+    "updateDate": "2026-02-25T16:07:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IG10049",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11665",
+    "publishDate": "2026-02-19T05:00:00Z",
+    "status": "Active",
+    "title": "President Reagan’s Six Assurances to Taiwan",
+    "updateDate": "2026-02-25T14:38:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11665",
+    "version": 10
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12581",
+    "publishDate": "2026-02-20T05:00:00Z",
+    "status": "Active",
+    "title": "Yemen: Conflict, Red Sea Security, and U.S. Policy",
+    "updateDate": "2026-02-25T14:22:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12581",
+    "version": 15
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11793",
+    "publishDate": "2025-06-25T04:00:00Z",
+    "status": "Active",
+    "title": "Indian Energy Programs at the Department of Energy",
+    "updateDate": "2026-02-25T12:52:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11793",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44425",
+    "publishDate": "2026-02-19T05:00:00Z",
+    "status": "Active",
+    "title": "Health Insurance Premium Tax Credit and Cost-Sharing Reductions",
+    "updateDate": "2026-02-25T12:07:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44425",
+    "version": 28
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11398",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "Supreme Court Rules Against Tariffs Imposed Under the International Emergency Economic Powers Act (IEEPA)",
+    "updateDate": "2026-02-25T11:52:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11398",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12853",
+    "publishDate": "2026-02-20T05:00:00Z",
+    "status": "Active",
+    "title": "Sole-Source Contracts for Small Businesses",
+    "updateDate": "2026-02-25T11:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12853",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12606",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "Russian Military Performance and Outlook",
+    "updateDate": "2026-02-25T10:22:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12606",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13121",
+    "publishDate": "2025-11-14T05:00:00Z",
+    "status": "Active",
+    "title": "Bureau of Land Management: FY2026 Appropriations",
+    "updateDate": "2026-02-25T09:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13121",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48726",
+    "publishDate": "2025-11-19T05:00:00Z",
+    "status": "Active",
+    "title": "Interior, Environment, and Related Agencies: Overview of FY2026 Appropriations",
+    "updateDate": "2026-02-25T07:52:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48726",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12484",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Reauthorizing the Defense Production Act",
+    "updateDate": "2026-02-24T17:07:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12484",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45277",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "Health Savings Accounts (HSAs)",
+    "updateDate": "2026-02-24T16:37:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45277",
+    "version": 10
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13017",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "President Trump’s April 2025 Executive Order on American Seafood Competitiveness: Considerations for U.S. Fisheries",
+    "updateDate": "2026-02-24T16:07:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13017",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47037",
+    "publishDate": "2026-02-23T05:00:00Z",
+    "status": "Active",
+    "title": "Geographic Cost of Living Differences: In Brief",
+    "updateDate": "2026-02-24T15:37:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47037",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48858",
+    "publishDate": "2026-02-18T05:00:00Z",
+    "status": "Active",
+    "title": "Buy Now, Pay Later: Policy Issues and Options for Congress",
+    "updateDate": "2026-02-24T15:37:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48858",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48860",
+    "publishDate": "2026-02-20T05:00:00Z",
+    "status": "Active",
+    "title": "FY2026 Defense Budget: Funding for Selected Weapon Systems",
+    "updateDate": "2026-02-24T14:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48860",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47065",
+    "publishDate": "2022-04-12T04:00:00Z",
+    "status": "Archived",
+    "title": "China’s Role in the Exploitation of Global Fisheries: Issues for Congress",
+    "updateDate": "2026-02-24T12:28:17Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47065",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48413",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "Temporary Assistance for Needy Families (TANF) Block Grant: A Primer",
+    "updateDate": "2026-02-24T09:23:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48413",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10348",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "The Association of Southeast Asian Nations (ASEAN)",
+    "updateDate": "2026-02-24T08:22:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10348",
+    "version": 22
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12608",
+    "publishDate": "2026-02-18T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Interest in Seabed Mining in Areas Beyond National Jurisdiction: Brief Background and Recent Developments",
+    "updateDate": "2026-02-21T16:22:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12608",
+    "version": 8
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12852",
+    "publishDate": "2026-02-20T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Contract Set-Asides for Small Businesses",
+    "updateDate": "2026-02-21T14:07:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12852",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48646",
+    "publishDate": "2026-01-23T05:00:00Z",
+    "status": "Active",
+    "title": "Data Centers and Their Energy Consumption: Frequently Asked Questions",
+    "updateDate": "2026-02-21T13:37:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48646",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10540",
+    "publishDate": "2026-02-19T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: Reserve Forces",
+    "updateDate": "2026-02-21T12:38:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10540",
+    "version": 18
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12448",
+    "publishDate": "2026-02-19T05:00:00Z",
+    "status": "Active",
+    "title": "Venezuela’s Natural Gas: Opportunity Knocks?",
+    "updateDate": "2026-02-21T12:38:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12448",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10298",
+    "publishDate": "2026-02-02T05:00:00Z",
+    "status": "Active",
+    "title": "India’s Domestic Political Setting",
+    "updateDate": "2026-02-21T09:52:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10298",
+    "version": 29
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13160",
+    "publishDate": "2026-01-23T05:00:00Z",
+    "status": "Active",
+    "title": "Commemorating the Anniversaries of Natural Disasters: Past Practices and Considerations for Congress",
+    "updateDate": "2026-02-20T14:23:27Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13160",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48855",
+    "publishDate": "2026-02-11T05:00:00Z",
+    "status": "Active",
+    "title": "The Shareholder Proposal Rule",
+    "updateDate": "2026-02-20T14:23:22Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48855",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13147",
+    "publishDate": "2026-01-09T05:00:00Z",
+    "status": "Active",
+    "title": "History of Federal Student Loan Origination Fees",
+    "updateDate": "2026-02-20T14:23:22Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13147",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13148",
+    "publishDate": "2026-01-12T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Agencies: Public-Private Competitions",
+    "updateDate": "2026-02-20T14:23:21Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13148",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44624",
+    "publishDate": "2026-02-13T05:00:00Z",
+    "status": "Active",
+    "title": "The Individuals with Disabilities Education Act (IDEA) Funding: A Primer",
+    "updateDate": "2026-02-20T14:23:12Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44624",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10890",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "China Primer: Illicit Fentanyl and China’s Role",
+    "updateDate": "2026-02-20T14:23:09Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10890",
+    "version": 18
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12659",
+    "publishDate": "2026-02-18T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. District Court Nominees Confirmed During the First Year of the Second Trump Presidency: Comparative Overview and Statistics",
+    "updateDate": "2026-02-20T14:23:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12659",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12595",
+    "publishDate": "2025-12-05T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-Canada Trade Relations",
+    "updateDate": "2026-02-20T14:23:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12595",
+    "version": 19
+  },
+  {
+    "contentType": "Reports",
+    "id": "R41833",
+    "publishDate": "2026-02-13T05:00:00Z",
+    "status": "Active",
+    "title": "The Individuals with Disabilities Education Act (IDEA), Part B: Key Statutory and Regulatory Provisions",
+    "updateDate": "2026-02-20T12:52:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R41833",
+    "version": 22
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12658",
+    "publishDate": "2026-02-13T05:00:00Z",
+    "status": "Active",
+    "title": "Burma’s Election and Possible U.S. Revocation of Temporary Protected Status",
+    "updateDate": "2026-02-20T12:08:09Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12658",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48856",
+    "publishDate": "2026-01-29T05:00:00Z",
+    "status": "Active",
+    "title": "The FEMA Act of 2025: An Overview",
+    "updateDate": "2026-02-20T12:08:06Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48856",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12639",
+    "publishDate": "2026-01-13T05:00:00Z",
+    "status": "Active",
+    "title": "The Chief Statistician of the United States: Overview and Analysis",
+    "updateDate": "2026-02-20T11:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12639",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48785",
+    "publishDate": "2026-01-08T05:00:00Z",
+    "status": "Active",
+    "title": "Funding a Congressional Advisory Commission: Options for Congress",
+    "updateDate": "2026-02-20T11:07:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48785",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10454",
+    "publishDate": "2026-02-18T05:00:00Z",
+    "status": "Active",
+    "title": "United Nations Issues: Appointing the UN Secretary-General",
+    "updateDate": "2026-02-20T10:22:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10454",
+    "version": 5
+  },
+  {
+    "contentType": "Infographics",
+    "id": "IG10053",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "Seabed Mining in the Clarion-Clipperton Zone",
+    "updateDate": "2026-02-20T10:08:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/IG10053",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13155",
+    "publishDate": "2026-01-15T05:00:00Z",
+    "status": "Active",
+    "title": "The Family Educational Rights and Privacy Act (FERPA) and Its Exceptions",
+    "updateDate": "2026-02-20T09:22:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13155",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48564",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "Agriculture and Related Agencies: FY2026 Appropriations",
+    "updateDate": "2026-02-19T17:22:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48564",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44770",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "History, Evolution, and Practices of the President’s State of the Union Address: Frequently Asked Questions",
+    "updateDate": "2026-02-19T16:37:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44770",
+    "version": 26
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12987",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "Smithsonian Institution: Selected Legislation, 119th Congress",
+    "updateDate": "2026-02-19T15:52:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12987",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44236",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "Supreme Court Appointment Process: Consideration by the Senate Judiciary Committee",
+    "updateDate": "2026-02-19T15:22:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44236",
+    "version": 15
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10149",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "African Growth and Opportunity Act (AGOA)",
+    "updateDate": "2026-02-19T14:22:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10149",
+    "version": 24
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12657",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "FDA Oversight of General Wellness Products",
+    "updateDate": "2026-02-19T12:22:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12657",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11643",
+    "publishDate": "2026-02-18T05:00:00Z",
+    "status": "Active",
+    "title": "Artemis: NASA’s Program to Return Humans to the Moon",
+    "updateDate": "2026-02-19T11:38:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11643",
+    "version": 18
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12320",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "Internal Revenue Service (IRS) Standard Mileage Rates",
+    "updateDate": "2026-02-19T10:07:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12320",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13167",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "Violence Against Members of Congress, Their Families, and Staff: Policy Responses",
+    "updateDate": "2026-02-18T12:08:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13167",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11326",
+    "publishDate": "2026-02-13T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Prosecutorial Discretion: A Brief Overview",
+    "updateDate": "2026-02-18T11:38:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11326",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47020",
+    "publishDate": "2026-02-13T05:00:00Z",
+    "status": "Active",
+    "title": "A Guide to Major Congressional and Presidential Awards",
+    "updateDate": "2026-02-18T10:08:22Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47020",
+    "version": 9
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45125",
+    "publishDate": "2026-02-17T05:00:00Z",
+    "status": "Active",
+    "title": "Women’s History Month Speech Resources: Fact Sheet",
+    "updateDate": "2026-02-18T09:22:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45125",
+    "version": 10
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11397",
+    "publishDate": "2026-02-13T05:00:00Z",
+    "status": "Active",
+    "title": "Ellingburg v. United States: Supreme Court Holds Criminal Restitution Statute Punitive for Purposes of the Ex Post Facto Clause",
+    "updateDate": "2026-02-18T08:38:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11397",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47337",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Military Memorials, Monuments, and Museums: Selected Resources for Federal, State, and Local Funding",
+    "updateDate": "2026-02-14T17:22:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47337",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13090",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "The Pacific Islands Heritage Marine National Monument: Commercial Fishing Interests and Considerations for Congress",
+    "updateDate": "2026-02-14T15:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13090",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46537",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Revenues and Disbursements from Oil and Natural Gas Leases on Onshore Federal Lands",
+    "updateDate": "2026-02-14T13:52:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46537",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10482",
+    "publishDate": "2026-02-13T05:00:00Z",
+    "status": "Active",
+    "title": "Supplemental Security Income (SSI)",
+    "updateDate": "2026-02-14T13:22:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10482",
+    "version": 17
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48854",
+    "publishDate": "2026-02-11T05:00:00Z",
+    "status": "Active",
+    "title": "Poverty in the United States in 2024",
+    "updateDate": "2026-02-14T13:07:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48854",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11396",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Supreme Court to Examine ERISA Pleading Standards",
+    "updateDate": "2026-02-14T12:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11396",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44668",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "The Temporary Assistance for Needy Families (TANF) Block Grant: A Legislative History",
+    "updateDate": "2026-02-14T10:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44668",
+    "version": 31
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11395",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "A Tale of Two Immunities: Constitutional Protections for Members of Congress and Presidents When Speaking to the Public",
+    "updateDate": "2026-02-14T09:37:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11395",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45920",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Discharge Procedure in the House",
+    "updateDate": "2026-02-13T18:37:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45920",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "RS22131",
+    "publishDate": "2024-04-09T04:00:00Z",
+    "status": "Active",
+    "title": "What Is the Farm Bill?",
+    "updateDate": "2026-02-13T17:22:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/RS22131",
+    "version": 81
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12656",
+    "publishDate": "2026-02-11T05:00:00Z",
+    "status": "Active",
+    "title": "Japan’s Landslide Election: Implications for the United States",
+    "updateDate": "2026-02-13T17:22:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12656",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48851",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "An Analysis of No Surprises Act (NSA) Independent Dispute Resolution (IDR) Emergency Service Outcomes Relative to In-Network Rates",
+    "updateDate": "2026-02-13T16:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48851",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12655",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Financial Stability and Economic Growth",
+    "updateDate": "2026-02-13T16:22:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12655",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47697",
+    "publishDate": "2023-09-19T04:00:00Z",
+    "status": "Active",
+    "title": "Cell-Cultivated Meat: An Overview",
+    "updateDate": "2026-02-13T16:22:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47697",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12414",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Bureau of Reclamation WaterSMART Program",
+    "updateDate": "2026-02-13T16:08:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12414",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10834",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: Under Secretary of Defense for Research and Engineering",
+    "updateDate": "2026-02-13T16:08:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10834",
+    "version": 15
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47313",
+    "publishDate": "2025-04-29T04:00:00Z",
+    "status": "Active",
+    "title": "Next Farm Bill Primer Series",
+    "updateDate": "2026-02-13T15:37:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47313",
+    "version": 8
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48427",
+    "publishDate": "2025-02-19T05:00:00Z",
+    "status": "Active",
+    "title": "Meat, Poultry, and Egg Product Labeling",
+    "updateDate": "2026-02-13T15:08:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48427",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48169",
+    "publishDate": "2024-09-03T04:00:00Z",
+    "status": "Active",
+    "title": "Animal Disease Traceability: Electronic Identification Requirements",
+    "updateDate": "2026-02-13T14:52:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48169",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL30959",
+    "publishDate": "2021-12-28T05:00:00Z",
+    "status": "Archived",
+    "title": "Presidential Appointee Positions Requiring Senate Confirmation and Committees Handling Nominations",
+    "updateDate": "2026-02-13T14:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL30959",
+    "version": 23
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11394",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Supreme Court Upholds Warrantless Entry in Emergency Aid Case",
+    "updateDate": "2026-02-13T12:52:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11394",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44136",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "The Agency for Healthcare Research and Quality (AHRQ) Budget: Fact Sheet",
+    "updateDate": "2026-02-13T12:23:25Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44136",
+    "version": 19
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13006",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Section 232 of the Trade Expansion Act of 1962",
+    "updateDate": "2026-02-13T11:53:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13006",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10514",
+    "publishDate": "2026-02-11T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: Defense Appropriations Process",
+    "updateDate": "2026-02-13T10:53:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10514",
+    "version": 15
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12564",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Statutory PAYGO and Budget Reconciliation Legislation",
+    "updateDate": "2026-02-13T10:23:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12564",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48520",
+    "publishDate": "2026-02-12T05:00:00Z",
+    "status": "Active",
+    "title": "Telecommunications: CRS Products",
+    "updateDate": "2026-02-13T09:23:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48520",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43744",
+    "publishDate": "2026-02-09T05:00:00Z",
+    "status": "Active",
+    "title": "Monuments and Memorials Authorized Under the Commemorative Works Act in the District of Columbia: Current Development of In-Progress and Lapsed Works",
+    "updateDate": "2026-02-12T17:08:16Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43744",
+    "version": 43
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12653",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "FY2026 NDAA: Status of Legislative Activity",
+    "updateDate": "2026-02-12T17:08:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12653",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48852",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "Geofence and Keyword Searches: Reverse Warrants and the Fourth Amendment",
+    "updateDate": "2026-02-12T16:53:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48852",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48141",
+    "publishDate": "2024-07-25T04:00:00Z",
+    "status": "Active",
+    "title": "Trends in USDA Procurement of U.S. Food and Agricultural Products",
+    "updateDate": "2026-02-12T16:38:37Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48141",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "RS22937",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "Nuclear Cooperation with Other Countries: A Primer",
+    "updateDate": "2026-02-12T16:38:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/RS22937",
+    "version": 87
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48269",
+    "publishDate": "2024-11-18T05:00:00Z",
+    "status": "Active",
+    "title": "Beginning Farmers or Ranchers (BFRs): Challenges and Opportunities",
+    "updateDate": "2026-02-12T16:38:09Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48269",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48610",
+    "publishDate": "2025-07-29T04:00:00Z",
+    "status": "Active",
+    "title": "Regenerative Agriculture and Related Food Product Labeling and Marketing Claims",
+    "updateDate": "2026-02-12T16:23:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48610",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45777",
+    "publishDate": "2019-06-19T04:00:00Z",
+    "status": "Active",
+    "title": "Livestock Mandatory Reporting Act: Overview for Reauthorization in the 116th Congress",
+    "updateDate": "2026-02-12T16:23:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45777",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48574",
+    "publishDate": "2025-06-23T04:00:00Z",
+    "status": "Active",
+    "title": "One Big Beautiful Bill Act (H.R. 1): Title I, Farm Safety Net and Miscellaneous Provisions",
+    "updateDate": "2026-02-12T16:23:09Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48574",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46538",
+    "publishDate": "2020-09-23T04:00:00Z",
+    "status": "Active",
+    "title": "Local and Urban Food Systems: Selected Farm Bill and Other Federal Programs",
+    "updateDate": "2026-02-12T16:08:17Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46538",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47933",
+    "publishDate": "2024-04-01T04:00:00Z",
+    "status": "Active",
+    "title": "Programs for Beginning, Limited Resource, Veteran, Socially Disadvantaged, and Tribal and Indigenous Farmers and Ranchers and for Small Farms and Ranches",
+    "updateDate": "2026-02-12T15:53:12Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47933",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10590",
+    "publishDate": "2025-09-02T04:00:00Z",
+    "status": "Active",
+    "title": "Child Welfare: Purposes, Federal Programs, and Funding",
+    "updateDate": "2026-02-12T15:38:11Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10590",
+    "version": 49
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12096",
+    "publishDate": "2024-12-20T05:00:00Z",
+    "status": "Active",
+    "title": "Farm Bill Primer: Beginning and Underserved Producers",
+    "updateDate": "2026-02-12T14:08:45Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12096",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12588",
+    "publishDate": "2026-02-11T05:00:00Z",
+    "status": "Active",
+    "title": "Fannie Mae and Freddie Mac Adopt Alternative Credit Scores",
+    "updateDate": "2026-02-12T13:08:06Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12588",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13166",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "Supreme Court Decisions Without a Majority",
+    "updateDate": "2026-02-12T12:22:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13166",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12654",
+    "publishDate": "2026-02-11T05:00:00Z",
+    "status": "Active",
+    "title": "Executive Order on Defense Contracting",
+    "updateDate": "2026-02-12T11:53:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12654",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12481",
+    "publishDate": "2026-02-09T05:00:00Z",
+    "status": "Active",
+    "title": "Taiwan: Defense and Military Issues",
+    "updateDate": "2026-02-12T11:52:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12481",
+    "version": 14
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11126",
+    "publishDate": "2019-03-08T05:00:00Z",
+    "status": "Active",
+    "title": "2018 Farm Bill Primer: Agriculture Improvement Act of 2018",
+    "updateDate": "2026-02-12T11:38:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11126",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10599",
+    "publishDate": "2026-02-11T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: Procurement",
+    "updateDate": "2026-02-12T10:08:11Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10599",
+    "version": 15
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12047",
+    "publishDate": "2024-12-27T05:00:00Z",
+    "status": "Active",
+    "title": "Farm Bill Primer: Background and Status",
+    "updateDate": "2026-02-12T08:22:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12047",
+    "version": 14
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47987",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "Bureau of Reclamation Support for Water Storage Projects",
+    "updateDate": "2026-02-11T17:52:43Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47987",
+    "version": 2
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11393",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "The Fourth Amendment Meets the Fourth Estate: Law Enforcement Searches of Journalists",
+    "updateDate": "2026-02-11T17:07:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11393",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13165",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "Commemoration of the 250th Anniversary of the Declaration of Independence: Coins and Medals",
+    "updateDate": "2026-02-11T16:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13165",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45101",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "Congressional Gold Medals: Background, Legislative Process, and Issues for Congress",
+    "updateDate": "2026-02-11T16:08:19Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45101",
+    "version": 21
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL34619",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "Use of the Capitol Rotunda, Capitol Grounds, and Emancipation Hall: Concurrent Resolutions, 101st to 119th Congresses",
+    "updateDate": "2026-02-11T16:07:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL34619",
+    "version": 30
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48606",
+    "publishDate": "2026-01-22T05:00:00Z",
+    "status": "Active",
+    "title": "2025 Army Transformation Initiative (ATI) Force Structure and Organizational Proposals: Background and Issues for Congress",
+    "updateDate": "2026-02-11T14:38:27Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48606",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11977",
+    "publishDate": "2023-01-24T05:00:00Z",
+    "status": "Active",
+    "title": "Foreign Ownership and Holdings of U.S. Agricultural Land",
+    "updateDate": "2026-02-11T14:08:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11977",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12955",
+    "publishDate": "2026-02-10T05:00:00Z",
+    "status": "Active",
+    "title": "Telecommunications and the 119th Congress: A Primer on Programs, Authorities, and Emerging Issues",
+    "updateDate": "2026-02-11T14:08:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12955",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13128",
+    "publishDate": "2026-02-09T05:00:00Z",
+    "status": "Active",
+    "title": "The U.S. Army’s Mobile Brigade Combat Team (MBCT)",
+    "updateDate": "2026-02-11T13:52:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13128",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48850",
+    "publishDate": "2026-02-09T05:00:00Z",
+    "status": "Active",
+    "title": "Centralizing Access to Data to Prevent Improper Payments: A Discussion of the Do Not Pay Data System",
+    "updateDate": "2026-02-11T11:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48850",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12173",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "Firearms and Ammunition Excise Tax (FAET)",
+    "updateDate": "2026-02-11T11:23:18Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12173",
+    "version": 7
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46709",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "The Application of Internal Revenue Code Section 280E to Marijuana Businesses: Selected Legal Issues",
+    "updateDate": "2026-02-11T11:08:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46709",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44363",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "National African American History Month Speech Resources: Fact Sheet",
+    "updateDate": "2026-02-11T10:38:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44363",
+    "version": 15
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10600",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: Department of Defense Contractors",
+    "updateDate": "2026-02-10T17:22:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10600",
+    "version": 17
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48846",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "The U.S. Courts of Appeals: Background and Circuit Splits from 2025",
+    "updateDate": "2026-02-10T16:07:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48846",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11791",
+    "publishDate": "2021-03-15T04:00:00Z",
+    "status": "Active",
+    "title": "Mitigating Greenhouse Gas Emissions: Selected Policy Options",
+    "updateDate": "2026-02-10T13:08:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11791",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12160",
+    "publishDate": "2025-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "Farm Bill Primer: Support for Tribal Food and Agriculture",
+    "updateDate": "2026-02-10T11:37:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12160",
+    "version": 3
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12640",
+    "publishDate": "2026-02-09T05:00:00Z",
+    "status": "Active",
+    "title": "Extension of New START Central Limits: Overview of the Expert Debate",
+    "updateDate": "2026-02-10T10:37:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12640",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13039",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Army Corps of Engineers: FY2026 Appropriations",
+    "updateDate": "2026-02-10T10:08:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13039",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11583",
+    "publishDate": "2026-02-09T05:00:00Z",
+    "status": "Active",
+    "title": "Iran’s Nuclear Program and UN Sanctions Reimposition",
+    "updateDate": "2026-02-10T09:52:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11583",
+    "version": 20
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48845",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "Surface Transportation Reauthorization: Federal Highway Programs",
+    "updateDate": "2026-02-07T18:52:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48845",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11999",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "AUKUS Nuclear Cooperation",
+    "updateDate": "2026-02-07T16:37:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11999",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12735",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Extended Deterrence and Regional Nuclear Capabilities",
+    "updateDate": "2026-02-07T16:23:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12735",
+    "version": 3
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN10835",
+    "publishDate": "2025-09-25T04:00:00Z",
+    "status": "Active",
+    "title": "What Happens If the National Flood Insurance Program (NFIP) Lapses?",
+    "updateDate": "2026-02-07T16:22:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN10835",
+    "version": 56
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12577",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "Governing the District of Columbia: Overview and Timeline",
+    "updateDate": "2026-02-07T16:07:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12577",
+    "version": 2
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12558",
+    "publishDate": "2025-06-02T04:00:00Z",
+    "status": "Active",
+    "title": "New World Screwworm: Current Issues",
+    "updateDate": "2026-02-07T15:22:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12558",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10199",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "U.S.-Japan Relations",
+    "updateDate": "2026-02-07T15:22:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10199",
+    "version": 41
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12171",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "Benefit Reductions to Participants in Delphi Pension Plans",
+    "updateDate": "2026-02-07T15:07:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12171",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47277",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "Reserve Funds in the Congressional Budget Process: Frequently Asked Questions",
+    "updateDate": "2026-02-07T14:52:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47277",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13164",
+    "publishDate": "2026-02-06T05:00:00Z",
+    "status": "Active",
+    "title": "The Polar Vortex: Background and Forecasting",
+    "updateDate": "2026-02-07T14:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13164",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12949",
+    "publishDate": "2025-07-03T04:00:00Z",
+    "status": "Active",
+    "title": "U.S. Egg Production and Retail Prices",
+    "updateDate": "2026-02-07T14:37:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12949",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11795",
+    "publishDate": "2021-03-30T04:00:00Z",
+    "status": "Active",
+    "title": "COVID-19 Response: Broadband Funding for Tribes, Tribal Colleges and Universities, the Bureau of Indian Affairs, the Bureau of Indian Education, and the Indian Health Service",
+    "updateDate": "2026-02-07T12:07:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11795",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11748",
+    "publishDate": "2021-01-28T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Universal Service Fund and Other Selected Federal Broadband Programs: A Primer",
+    "updateDate": "2026-02-07T11:22:43Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11748",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11764",
+    "publishDate": "2021-05-20T04:00:00Z",
+    "status": "Active",
+    "title": "U.S. Agricultural Aid in Response to COVID-19",
+    "updateDate": "2026-02-07T11:07:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11764",
+    "version": 17
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12784",
+    "publishDate": "2024-10-16T04:00:00Z",
+    "status": "Active",
+    "title": "Federal Inspection of Meat, Poultry, and Egg Products",
+    "updateDate": "2026-02-07T11:07:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12784",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12275",
+    "publishDate": "2025-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "Farm Bill Primer: USDA Support for Aquaculture Operations",
+    "updateDate": "2026-02-07T08:52:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12275",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12604",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: U.S. Indo-Pacific Command (INDOPACOM)",
+    "updateDate": "2026-02-06T16:37:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12604",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44623",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "Commemorative Coins: Background, Legislative Process, and Issues for Congress",
+    "updateDate": "2026-02-06T14:23:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44623",
+    "version": 24
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11130",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: U.S. European Command (EUCOM)",
+    "updateDate": "2026-02-06T14:23:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11130",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10673",
+    "publishDate": "2026-01-30T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Trade and Development Agency (USTDA)",
+    "updateDate": "2026-02-06T13:38:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10673",
+    "version": 8
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12772",
+    "publishDate": "2026-02-05T05:00:00Z",
+    "status": "Active",
+    "title": "The Army’s Self-Propelled Howitzer Modernization (SPH-M) Program",
+    "updateDate": "2026-02-06T13:38:04Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12772",
+    "version": 12
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44564",
+    "publishDate": "2016-07-14T04:00:00Z",
+    "status": "Archived",
+    "title": "Agriculture and the Transatlantic Trade and Investment Partnership (T-TIP) Negotiations",
+    "updateDate": "2026-02-06T10:40:31Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44564",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12202",
+    "publishDate": "2025-01-29T05:00:00Z",
+    "status": "Active",
+    "title": "Farm Bill Primer: Support for the Dairy Industry",
+    "updateDate": "2026-02-06T10:38:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12202",
+    "version": 6
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12626",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "HUD’s FY2025 Continuum of Care Program Competition",
+    "updateDate": "2026-02-06T10:23:26Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12626",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12006",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "Arctic National Wildlife Refuge: Status of Oil and Gas Program",
+    "updateDate": "2026-02-06T09:37:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12006",
+    "version": 25
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12963",
+    "publishDate": "2025-04-10T04:00:00Z",
+    "status": "Archived",
+    "title": "The Dietary Guidelines for Americans (DGA): Current Status",
+    "updateDate": "2026-02-06T08:38:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12963",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11133",
+    "publishDate": "2019-03-12T04:00:00Z",
+    "status": "Archived",
+    "title": "Opioid Use and Neonatal Abstinence Syndrome",
+    "updateDate": "2026-02-06T08:38:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11133",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10262",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "Commemorative Coins: An Overview",
+    "updateDate": "2026-02-05T17:37:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10262",
+    "version": 16
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47166",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "Career and Technical Education: A Primer",
+    "updateDate": "2026-02-05T16:52:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47166",
+    "version": 3
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11392",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "Department of Education Interagency Agreements",
+    "updateDate": "2026-02-05T16:07:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11392",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13066",
+    "publishDate": "2026-02-02T05:00:00Z",
+    "status": "Active",
+    "title": "Bureau of Reclamation: FY2026 Budget and Appropriations",
+    "updateDate": "2026-02-05T16:07:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13066",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47651",
+    "publishDate": "2023-08-16T04:00:00Z",
+    "status": "Archived",
+    "title": "Sources for Frequently Requested Foreclosure Statistics",
+    "updateDate": "2026-02-05T16:07:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47651",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46676",
+    "publishDate": "2021-02-09T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Farm Income Outlook: December 2020 Forecast",
+    "updateDate": "2026-02-05T11:39:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46676",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46347",
+    "publishDate": "2020-05-08T04:00:00Z",
+    "status": "Archived",
+    "title": "COVID-19, U.S. Agriculture, and USDA’s Coronavirus Food Assistance Program (CFAP)",
+    "updateDate": "2026-02-05T11:39:06Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46347",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46189",
+    "publishDate": "2020-01-21T05:00:00Z",
+    "status": "Archived",
+    "title": "FDA Regulation of Cannabidiol (CBD) Consumer Products: Overview and Considerations for Congress",
+    "updateDate": "2026-02-05T11:39:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46189",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44742",
+    "publishDate": "2019-03-22T04:00:00Z",
+    "status": "Archived",
+    "title": "Defining Hemp: A Fact Sheet",
+    "updateDate": "2026-02-05T11:39:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44742",
+    "version": 9
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45659",
+    "publishDate": "2019-06-14T04:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Farm Program Eligibility and Payment Limits Under the 2018 Farm Bill (P.L. 115-334)",
+    "updateDate": "2026-02-05T11:39:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45659",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL32725",
+    "publishDate": "2018-07-09T04:00:00Z",
+    "status": "Archived",
+    "title": "Hemp as an Agricultural Commodity",
+    "updateDate": "2026-02-05T11:38:35Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL32725",
+    "version": 49
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL34468",
+    "publishDate": "2016-12-01T05:00:00Z",
+    "status": "Archived",
+    "title": "The U.S. Trade Situation for Fruit and Vegetable Products",
+    "updateDate": "2026-02-05T11:38:27Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL34468",
+    "version": 27
+  },
+  {
+    "contentType": "Reports",
+    "id": "RS22541",
+    "publishDate": "2016-12-08T05:00:00Z",
+    "status": "Archived",
+    "title": "Generalized System of Preferences: Agricultural Imports",
+    "updateDate": "2026-02-05T11:38:23Z",
+    "url": "https://api.congress.gov/v3/crsreport/RS22541",
+    "version": 21
+  },
+  {
+    "contentType": "Reports",
+    "id": "RS22600",
+    "publishDate": "2016-12-16T05:00:00Z",
+    "status": "Archived",
+    "title": "The Federal Food Safety System: A Primer",
+    "updateDate": "2026-02-05T11:38:06Z",
+    "url": "https://api.congress.gov/v3/crsreport/RS22600",
+    "version": 52
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44719",
+    "publishDate": "2017-01-09T05:00:00Z",
+    "status": "Archived",
+    "title": "Defining “Specialty Crops”: A Fact Sheet",
+    "updateDate": "2026-02-05T11:38:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44719",
+    "version": 5
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44875",
+    "publishDate": "2017-06-22T04:00:00Z",
+    "status": "Archived",
+    "title": "The North American Free Trade Agreement (NAFTA) and U.S. Agriculture",
+    "updateDate": "2026-02-05T11:38:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44875",
+    "version": 6
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44985",
+    "publishDate": "2017-10-17T04:00:00Z",
+    "status": "Archived",
+    "title": "USDA Export Market Development and Export Credit Programs: Selected Issues",
+    "updateDate": "2026-02-05T11:38:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44985",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45018",
+    "publishDate": "2017-11-16T05:00:00Z",
+    "status": "Archived",
+    "title": "Potential Effects of a U.S. NAFTA Withdrawal: Agricultural Markets",
+    "updateDate": "2026-02-05T11:37:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45018",
+    "version": 8
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45038",
+    "publishDate": "2017-12-07T05:00:00Z",
+    "status": "Archived",
+    "title": "Efforts to Address Seasonal Agricultural Import Competition in the NAFTA Renegotiation",
+    "updateDate": "2026-02-05T11:37:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45038",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R42771",
+    "publishDate": "2014-07-11T04:00:00Z",
+    "status": "Archived",
+    "title": "Fruits, Vegetables, and Other Specialty Crops: Selected Farm Bill and Federal Programs",
+    "updateDate": "2026-02-05T11:26:22Z",
+    "url": "https://api.congress.gov/v3/crsreport/R42771",
+    "version": 7
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43358",
+    "publishDate": "2014-01-10T05:00:00Z",
+    "status": "Archived",
+    "title": "Food Fraud and “Economically Motivated Adulteration” of Food and Food Ingredients",
+    "updateDate": "2026-02-05T11:26:19Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43358",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11092",
+    "publishDate": "2019-02-04T05:00:00Z",
+    "status": "Archived",
+    "title": "Foodborne Illnesses and Outbreaks from Fresh Produce",
+    "updateDate": "2026-02-05T11:26:18Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11092",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11988",
+    "publishDate": "2021-12-07T05:00:00Z",
+    "status": "Archived",
+    "title": "Build Back Better Act: Agriculture and Forestry Provisions",
+    "updateDate": "2026-02-05T11:26:17Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11988",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11770",
+    "publishDate": "2021-02-24T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Farm Income Outlook: February 2021 Forecast",
+    "updateDate": "2026-02-05T11:26:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11770",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11287",
+    "publishDate": "2019-08-12T04:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Support for Indian Tribes",
+    "updateDate": "2026-02-05T11:26:09Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11287",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11252",
+    "publishDate": "2019-06-18T04:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Support for Local Food Systems",
+    "updateDate": "2026-02-05T11:26:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11252",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11227",
+    "publishDate": "2019-05-28T04:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Beginning Farmers and Ranchers",
+    "updateDate": "2026-02-05T11:26:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11227",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11210",
+    "publishDate": "2019-05-16T04:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Support for Urban Agriculture",
+    "updateDate": "2026-02-05T11:26:06Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11210",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11250",
+    "publishDate": "2020-02-10T05:00:00Z",
+    "status": "Archived",
+    "title": "FDA Regulation of Cannabidiol (CBD) Consumer Products",
+    "updateDate": "2026-02-05T11:26:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11250",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10650",
+    "publishDate": "2017-05-12T04:00:00Z",
+    "status": "Archived",
+    "title": "Understanding Process Labels and Certification for Foods",
+    "updateDate": "2026-02-05T11:25:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10650",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11317",
+    "publishDate": "2019-09-23T04:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Specialty Crops and Organic Agriculture",
+    "updateDate": "2026-02-05T11:25:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11317",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10391",
+    "publishDate": "2019-06-21T04:00:00Z",
+    "status": "Archived",
+    "title": "Hemp-Derived Cannabidiol (CBD) and Related Hemp Extracts",
+    "updateDate": "2026-02-05T11:25:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10391",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10240",
+    "publishDate": "2016-07-21T04:00:00Z",
+    "status": "Archived",
+    "title": "Agriculture Issues in U.S.-EU Trade Negotiations",
+    "updateDate": "2026-02-05T11:25:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10240",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10232",
+    "publishDate": "2016-02-24T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Farm Policy: Local and Regional Food Systems",
+    "updateDate": "2026-02-05T11:25:54Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10232",
+    "version": 13
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10465",
+    "publishDate": "2016-09-09T04:00:00Z",
+    "status": "Archived",
+    "title": "China’s Efforts to Address Ongoing Food Safety Concerns",
+    "updateDate": "2026-02-05T11:25:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10465",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10403",
+    "publishDate": "2016-05-05T04:00:00Z",
+    "status": "Archived",
+    "title": "Efforts to Address the Safety of FDA-Regulated Food Imports",
+    "updateDate": "2026-02-05T11:25:53Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10403",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10682",
+    "publishDate": "2017-06-22T04:00:00Z",
+    "status": "Archived",
+    "title": "NAFTA Renegotiation: Issues for U.S. Agriculture",
+    "updateDate": "2026-02-05T11:25:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10682",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10800",
+    "publishDate": "2017-12-29T05:00:00Z",
+    "status": "Archived",
+    "title": "Agricultural Trade Balances Under NAFTA",
+    "updateDate": "2026-02-05T11:25:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10800",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10498",
+    "publishDate": "2017-01-09T05:00:00Z",
+    "status": "Archived",
+    "title": "Expanding Federal Support for Urban Agriculture",
+    "updateDate": "2026-02-05T11:25:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10498",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11165",
+    "publishDate": "2019-04-03T04:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Program Eligibility and Payment Limits",
+    "updateDate": "2026-02-05T11:25:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11165",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10811",
+    "publishDate": "2018-01-18T05:00:00Z",
+    "status": "Archived",
+    "title": "Standards of Identity for Foods and Plant-Based Food Products",
+    "updateDate": "2026-02-05T11:25:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10811",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10974",
+    "publishDate": "2018-09-07T04:00:00Z",
+    "status": "Archived",
+    "title": "Proposed Reorganization of U.S. Federal Food Safety Agencies",
+    "updateDate": "2026-02-05T11:25:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10974",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43408",
+    "publishDate": "2014-02-26T05:00:00Z",
+    "status": "Archived",
+    "title": "Emergency Water Assistance During Drought: Federal Non-Agricultural Programs",
+    "updateDate": "2026-02-05T11:25:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43408",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11093",
+    "publishDate": "2019-02-04T05:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Veteran Farmers and Ranchers",
+    "updateDate": "2026-02-05T11:25:45Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11093",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11088",
+    "publishDate": "2019-01-30T05:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Hemp Cultivation and Processing",
+    "updateDate": "2026-02-05T11:25:45Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11088",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43076",
+    "publishDate": "2014-02-12T05:00:00Z",
+    "status": "Archived",
+    "title": "The 2014 Farm Bill (P.L. 113-79): Summary and Side-by-Side",
+    "updateDate": "2026-02-05T11:24:39Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43076",
+    "version": 45
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43450",
+    "publishDate": "2014-03-31T04:00:00Z",
+    "status": "Archived",
+    "title": "Sanitary and Phytosanitary (SPS) and Related Non-Tariff Barriers to Agricultural Trade",
+    "updateDate": "2026-02-05T11:24:36Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43450",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43632",
+    "publishDate": "2014-07-10T04:00:00Z",
+    "status": "Archived",
+    "title": "Specialty Crop Provisions in the 2014 Farm Bill (P.L. 113-79)",
+    "updateDate": "2026-02-05T11:24:34Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43632",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R42885",
+    "publishDate": "2015-04-10T04:00:00Z",
+    "status": "Archived",
+    "title": "Food Safety Issues for the 114th Congress",
+    "updateDate": "2026-02-05T11:24:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/R42885",
+    "version": 16
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44390",
+    "publishDate": "2016-02-18T05:00:00Z",
+    "status": "Archived",
+    "title": "The Role of Local and Regional Food Systems in U.S. Farm Policy",
+    "updateDate": "2026-02-05T11:23:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44390",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43658",
+    "publishDate": "2016-07-25T04:00:00Z",
+    "status": "Archived",
+    "title": "The U.S. Wine Industry and Selected Trade Issues with the European Union",
+    "updateDate": "2026-02-05T11:23:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43658",
+    "version": 12
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43724",
+    "publishDate": "2016-12-16T05:00:00Z",
+    "status": "Archived",
+    "title": "Implementation of the FDA Food Safety Modernization Act (FSMA, P.L. 111-353)",
+    "updateDate": "2026-02-05T11:23:24Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43724",
+    "version": 11
+  },
+  {
+    "contentType": "Reports",
+    "id": "R40449",
+    "publishDate": "2017-01-09T05:00:00Z",
+    "status": "Archived",
+    "title": "The U.S.-EU Beef Hormone Dispute",
+    "updateDate": "2026-02-05T11:23:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/R40449",
+    "version": 21
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44556",
+    "publishDate": "2017-03-21T04:00:00Z",
+    "status": "Archived",
+    "title": "Geographical Indications (GIs) in U.S. Food and Agricultural Trade",
+    "updateDate": "2026-02-05T11:23:11Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44556",
+    "version": 6
+  },
+  {
+    "contentType": "Reports",
+    "id": "R40199",
+    "publishDate": "2017-01-05T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S.-EU Poultry Dispute on the Use of Pathogen Reduction Treatments (PRTs)",
+    "updateDate": "2026-02-05T11:23:10Z",
+    "url": "https://api.congress.gov/v3/crsreport/R40199",
+    "version": 14
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46241",
+    "publishDate": "2020-02-27T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S.-EU Trade Agreement Negotiations: Trade in Food and Agricultural Products",
+    "updateDate": "2026-02-05T11:12:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46241",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11863",
+    "publishDate": "2021-06-23T04:00:00Z",
+    "status": "Archived",
+    "title": "Support for Supply-Chain Resilience of Locally Sourced Foods",
+    "updateDate": "2026-02-05T11:11:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11863",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11860",
+    "publishDate": "2021-06-22T04:00:00Z",
+    "status": "Archived",
+    "title": "Production, Marketing, and Regulation of Hemp Products",
+    "updateDate": "2026-02-05T11:11:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11860",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11841",
+    "publishDate": "2021-06-01T04:00:00Z",
+    "status": "Archived",
+    "title": "Defining Low-Income, Low-Access Food Areas (Food Deserts)",
+    "updateDate": "2026-02-05T11:11:49Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11841",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46727",
+    "publishDate": "2021-03-19T04:00:00Z",
+    "status": "Archived",
+    "title": "Defining a Socially Disadvantaged Farmer or Rancher (SDFR): In Brief",
+    "updateDate": "2026-02-05T11:11:45Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46727",
+    "version": 8
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11704",
+    "publishDate": "2020-12-15T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Trade Concerns Regarding the EU’s Farm to Fork Strategy",
+    "updateDate": "2026-02-05T11:11:40Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11704",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46440",
+    "publishDate": "2020-07-01T04:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Food and Agricultural Imports: Safeguards and Selected Issues",
+    "updateDate": "2026-02-05T11:11:34Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46440",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46348",
+    "publishDate": "2020-05-08T04:00:00Z",
+    "status": "Archived",
+    "title": "COVID-19: Supply Chain Disruptions in the U.S. Fruit and Vegetable Industry: In Brief",
+    "updateDate": "2026-02-05T11:11:33Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46348",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10188",
+    "publishDate": "2016-07-21T04:00:00Z",
+    "status": "Archived",
+    "title": "Geographical Indications (GIs) in U.S. Agricultural Trade",
+    "updateDate": "2026-02-05T11:11:22Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10188",
+    "version": 6
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47095",
+    "publishDate": "2022-06-03T04:00:00Z",
+    "status": "Archived",
+    "title": "U.S.-EU Trade Relations",
+    "updateDate": "2026-02-05T10:57:29Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47095",
+    "version": 7
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12017",
+    "publishDate": "2025-01-30T05:00:00Z",
+    "status": "Archived",
+    "title": "Farm Bill Primer: Horticulture Title and Related Provisions",
+    "updateDate": "2026-02-05T10:57:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12017",
+    "version": 7
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12278",
+    "publishDate": "2025-01-10T05:00:00Z",
+    "status": "Archived",
+    "title": "Farm Bill Primer: Hemp Industry Support and Regulation",
+    "updateDate": "2026-02-05T10:57:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12278",
+    "version": 8
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48213",
+    "publishDate": "2024-10-04T04:00:00Z",
+    "status": "Archived",
+    "title": "Marketing and Pricing in the U.S. Fruit and Vegetable Industry",
+    "updateDate": "2026-02-05T10:57:11Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48213",
+    "version": 2
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12381",
+    "publishDate": "2024-06-17T04:00:00Z",
+    "status": "Archived",
+    "title": "Hemp Provisions in the House Farm Bill and FY2025 Agriculture Appropriations Bill",
+    "updateDate": "2026-02-05T10:57:10Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12381",
+    "version": 3
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12294",
+    "publishDate": "2024-01-03T05:00:00Z",
+    "status": "Archived",
+    "title": "Selected Outcomes of COP28: Agriculture and Food Systems",
+    "updateDate": "2026-02-05T10:57:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12294",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47893",
+    "publishDate": "2024-01-05T05:00:00Z",
+    "status": "Archived",
+    "title": "Selected Recent Actions Involving Foreign Ownership and Investment in U.S. Food and Agriculture: In Brief",
+    "updateDate": "2026-02-05T10:57:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47893",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10622",
+    "publishDate": "2023-12-05T05:00:00Z",
+    "status": "Archived",
+    "title": "USDA’s Organic Livestock and Poultry Standards Regulations",
+    "updateDate": "2026-02-05T10:57:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10622",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10278",
+    "publishDate": "2023-10-20T04:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Farm Policy: USDA-Certified Organic Production",
+    "updateDate": "2026-02-05T10:57:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10278",
+    "version": 8
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10398",
+    "publishDate": "2023-09-15T04:00:00Z",
+    "status": "Archived",
+    "title": "Uniform Date Labeling of Food May Address Food Waste",
+    "updateDate": "2026-02-05T10:57:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10398",
+    "version": 6
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12485",
+    "publishDate": "2023-08-31T04:00:00Z",
+    "status": "Archived",
+    "title": "Controlled Environment Agriculture (CEA) Production",
+    "updateDate": "2026-02-05T10:57:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12485",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12477",
+    "publishDate": "2023-08-18T04:00:00Z",
+    "status": "Archived",
+    "title": "FDA’s Oversight of Hemp-Derived Compounds",
+    "updateDate": "2026-02-05T10:57:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12477",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12475",
+    "publishDate": "2023-08-18T04:00:00Z",
+    "status": "Archived",
+    "title": "Outreach for Socially Disadvantaged Producers (2501 Program)",
+    "updateDate": "2026-02-05T10:57:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12475",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11701",
+    "publishDate": "2023-02-22T05:00:00Z",
+    "status": "Archived",
+    "title": "Seasonal Fruit and Vegetable Competition in U.S.-Mexico Trade",
+    "updateDate": "2026-02-05T10:57:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11701",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12312",
+    "publishDate": "2023-01-19T05:00:00Z",
+    "status": "Archived",
+    "title": "Foreign Ownership of U.S. Agriculture: Selected Policy Options",
+    "updateDate": "2026-02-05T10:56:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12312",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10765",
+    "publishDate": "2022-05-11T04:00:00Z",
+    "status": "Archived",
+    "title": "Federal Crop Insurance: Fruits, Vegetables and Specialty Crops",
+    "updateDate": "2026-02-05T10:56:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10765",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12185",
+    "publishDate": "2022-08-05T04:00:00Z",
+    "status": "Archived",
+    "title": "Ongoing Efforts to Address Fraud and Adulteration of Honey",
+    "updateDate": "2026-02-05T10:56:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12185",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11984",
+    "publishDate": "2021-12-02T05:00:00Z",
+    "status": "Archived",
+    "title": "Comparing Hemp Provisions in the 2014 and 2018 Farm Bills",
+    "updateDate": "2026-02-05T10:56:57Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11984",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11903",
+    "publishDate": "2021-08-16T04:00:00Z",
+    "status": "Archived",
+    "title": "Addressing Nontariff Barriers to Agricultural Trade at the WTO",
+    "updateDate": "2026-02-05T10:56:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11903",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11919",
+    "publishDate": "2021-09-09T04:00:00Z",
+    "status": "Archived",
+    "title": "Federal Crop Insurance for Hemp Crops",
+    "updateDate": "2026-02-05T10:56:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11919",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12649",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "FY2026 NDAA: TRICARE Reimbursement to Children’s Hospitals",
+    "updateDate": "2026-02-05T09:42:05Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12649",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12565",
+    "publishDate": "2025-08-28T04:00:00Z",
+    "status": "Archived",
+    "title": "Hemp Restrictions in FY2026 Agriculture Appropriations",
+    "updateDate": "2026-02-05T08:42:20Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12565",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12559",
+    "publishDate": "2025-07-16T04:00:00Z",
+    "status": "Archived",
+    "title": "Selected Horticultural Provisions in FY2025 Budget Reconciliation (P.L. 119-21, Title I)",
+    "updateDate": "2026-02-05T08:42:19Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12559",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL34124",
+    "publishDate": "2015-08-31T04:00:00Z",
+    "status": "Archived",
+    "title": "Seafood Fraud",
+    "updateDate": "2026-02-05T08:41:43Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL34124",
+    "version": 22
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12081",
+    "publishDate": "2022-04-21T04:00:00Z",
+    "status": "Archived",
+    "title": "Farm Bill Primer: International Food Aid Programs, McGovern-Dole and Local and Regional Procurement",
+    "updateDate": "2026-02-05T08:41:41Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12081",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12018",
+    "publishDate": "2022-01-13T05:00:00Z",
+    "status": "Archived",
+    "title": "International Food Assistance and Agricultural Cargo Preference",
+    "updateDate": "2026-02-05T08:41:41Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12018",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46706",
+    "publishDate": "2021-03-09T05:00:00Z",
+    "status": "Archived",
+    "title": "Produce Safety: Requirements, Implementation, and Issues for Congress",
+    "updateDate": "2026-02-05T08:41:33Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46706",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12757",
+    "publishDate": "2026-02-04T05:00:00Z",
+    "status": "Active",
+    "title": "Sustainable Aviation Fuel (SAF): An Overview of Current Laws and Legislation Introduced in the 119th Congress",
+    "updateDate": "2026-02-05T08:27:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12757",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45044",
+    "publishDate": "2022-06-15T04:00:00Z",
+    "status": "Archived",
+    "title": "Federal Milk Marketing Orders: An Overview",
+    "updateDate": "2026-02-05T08:27:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45044",
+    "version": 7
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47057",
+    "publishDate": "2022-03-31T04:00:00Z",
+    "status": "Archived",
+    "title": "Preparing for the Next Farm Bill",
+    "updateDate": "2026-02-05T08:27:09Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47057",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46653",
+    "publishDate": "2021-01-08T05:00:00Z",
+    "status": "Archived",
+    "title": "Major Agricultural Trade Issues in the 117th Congress",
+    "updateDate": "2026-02-05T08:27:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46653",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46454",
+    "publishDate": "2020-07-17T04:00:00Z",
+    "status": "Archived",
+    "title": "Climate Change Adaptation: U.S. Department of Agriculture",
+    "updateDate": "2026-02-05T08:26:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46454",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46242",
+    "publishDate": "2020-02-27T05:00:00Z",
+    "status": "Archived",
+    "title": "Major Agricultural Trade Issues in 2020",
+    "updateDate": "2026-02-05T08:26:38Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46242",
+    "version": 7
+  },
+  {
+    "contentType": "Reports",
+    "id": "R45728",
+    "publishDate": "2019-05-20T04:00:00Z",
+    "status": "Archived",
+    "title": "Major Agricultural Trade Issues in the 116th Congress",
+    "updateDate": "2026-02-05T08:26:35Z",
+    "url": "https://api.congress.gov/v3/crsreport/R45728",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11149",
+    "publishDate": "2019-12-16T05:00:00Z",
+    "status": "Archived",
+    "title": "Dairy Provisions in USMCA",
+    "updateDate": "2026-02-05T08:26:31Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11149",
+    "version": 5
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44091",
+    "publishDate": "2015-10-09T04:00:00Z",
+    "status": "Archived",
+    "title": "Meat Animal Research Center: The Animal Welfare Act and Farm Animal Research",
+    "updateDate": "2026-02-05T08:26:29Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44091",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10148",
+    "publishDate": "2015-03-12T04:00:00Z",
+    "status": "Archived",
+    "title": "Chicken Imports from China",
+    "updateDate": "2026-02-05T08:26:28Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10148",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10373",
+    "publishDate": "2016-03-02T05:00:00Z",
+    "status": "Archived",
+    "title": "Fresh Beef Import Rules for Brazil and Argentina",
+    "updateDate": "2026-02-05T08:26:28Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10373",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11215",
+    "publishDate": "2019-05-17T04:00:00Z",
+    "status": "Archived",
+    "title": "African Swine Fever (ASF)",
+    "updateDate": "2026-02-05T08:26:19Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11215",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10833",
+    "publishDate": "2018-02-22T05:00:00Z",
+    "status": "Archived",
+    "title": "Dairy Provisions in the Bipartisan Budget Act (P.L. 115-123)",
+    "updateDate": "2026-02-05T08:26:17Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10833",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11188",
+    "publishDate": "2019-04-24T04:00:00Z",
+    "status": "Archived",
+    "title": "2018 Farm Bill Primer: Dairy Programs",
+    "updateDate": "2026-02-05T08:26:16Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11188",
+    "version": 3
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10947",
+    "publishDate": "2018-10-25T04:00:00Z",
+    "status": "Archived",
+    "title": "Regulation of Cell-Cultured Meat",
+    "updateDate": "2026-02-05T08:26:15Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10947",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10985",
+    "publishDate": "2018-09-20T04:00:00Z",
+    "status": "Archived",
+    "title": "Dairy Revenue Protection Insurance",
+    "updateDate": "2026-02-05T08:26:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10985",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44114",
+    "publishDate": "2015-07-20T04:00:00Z",
+    "status": "Archived",
+    "title": "Update on the Highly-Pathogenic Avian Influenza Outbreak of 2014-2015",
+    "updateDate": "2026-02-05T08:24:29Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44114",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44025",
+    "publishDate": "2015-11-20T05:00:00Z",
+    "status": "Archived",
+    "title": "Reauthorization of the Livestock Mandatory Reporting (LMR) Act in the 114th Congress",
+    "updateDate": "2026-02-05T08:24:28Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44025",
+    "version": 4
+  },
+  {
+    "contentType": "Reports",
+    "id": "R41673",
+    "publishDate": "2016-01-07T05:00:00Z",
+    "status": "Archived",
+    "title": "USDA’s “GIPSA Rule” on Livestock and Poultry Marketing Practices",
+    "updateDate": "2026-02-05T08:24:21Z",
+    "url": "https://api.congress.gov/v3/crsreport/R41673",
+    "version": 20
+  },
+  {
+    "contentType": "Reports",
+    "id": "R43803",
+    "publishDate": "2015-11-12T05:00:00Z",
+    "status": "Archived",
+    "title": "U.S. Grain Standards Act: Reauthorization in the 114th Congress",
+    "updateDate": "2026-02-05T08:24:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/R43803",
+    "version": 23
+  },
+  {
+    "contentType": "Reports",
+    "id": "RS22955",
+    "publishDate": "2016-03-08T05:00:00Z",
+    "status": "Archived",
+    "title": "Country-of-Origin Labeling for Foods and the WTO Trade Dispute on Meat Labeling",
+    "updateDate": "2026-02-05T08:23:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/RS22955",
+    "version": 47
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12647",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "August 19, 2025, Is Estimated to Be the Beginning of the Congressional Review Act “Lookback” Period",
+    "updateDate": "2026-02-04T16:58:16Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12647",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10525",
+    "publishDate": "2026-02-02T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: National and Defense Intelligence",
+    "updateDate": "2026-02-04T16:58:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10525",
+    "version": 17
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48835",
+    "publishDate": "2026-01-27T05:00:00Z",
+    "status": "Active",
+    "title": "Student Aid Index and Free Application for Federal Student Aid: Frequently Asked Questions",
+    "updateDate": "2026-02-04T16:43:30Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48835",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48544",
+    "publishDate": "2026-01-30T05:00:00Z",
+    "status": "Active",
+    "title": "Connecting Constituents to Federal Programs That Fund Home Repairs or Modifications",
+    "updateDate": "2026-02-04T16:43:28Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48544",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12650",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Policy Toward Cuba: Recent Developments and Congressional Considerations",
+    "updateDate": "2026-02-04T16:13:18Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12650",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R41857",
+    "publishDate": "2023-03-20T04:00:00Z",
+    "status": "Archived",
+    "title": "Use of National Statuary Hall: Assignment and Historic Events",
+    "updateDate": "2026-02-04T16:12:38Z",
+    "url": "https://api.congress.gov/v3/crsreport/R41857",
+    "version": 22
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48549",
+    "publishDate": "2026-01-12T05:00:00Z",
+    "status": "Active",
+    "title": "Presidential 2025 Tariff Actions: Timeline and Status",
+    "updateDate": "2026-02-04T15:58:23Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48549",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13098",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "National Park Service: Fee Increases for International Visitors",
+    "updateDate": "2026-02-04T15:58:22Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13098",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10165",
+    "publishDate": "2026-01-29T05:00:00Z",
+    "status": "Active",
+    "title": "South Korea: Background and U.S. Relations",
+    "updateDate": "2026-02-04T15:58:14Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10165",
+    "version": 53
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13151",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "Agentic Artificial Intelligence and Cyberattacks",
+    "updateDate": "2026-02-04T14:14:13Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13151",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12648",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "FY2026 NDAA: Military Child Care Programs",
+    "updateDate": "2026-02-04T13:58:43Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12648",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10594",
+    "publishDate": "2026-02-02T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: Concurrent Receipt of Military Retirement and VA Disability",
+    "updateDate": "2026-02-04T12:43:36Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10594",
+    "version": 12
+  },
+  {
+    "contentType": "Reports",
+    "id": "R47705",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "Congressional Rules Pertaining to Changes in Mandatory Program Spending in Appropriations Bills (CHIMPs)",
+    "updateDate": "2026-02-04T10:09:18Z",
+    "url": "https://api.congress.gov/v3/crsreport/R47705",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R46647",
+    "publishDate": "2021-07-21T04:00:00Z",
+    "status": "Archived",
+    "title": "Tribal Land and Ownership Statuses: Overview and Selected Issues for Congress",
+    "updateDate": "2026-02-04T09:09:08Z",
+    "url": "https://api.congress.gov/v3/crsreport/R46647",
+    "version": 5
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11602",
+    "publishDate": "2021-02-04T05:00:00Z",
+    "status": "Archived",
+    "title": "The Bureau of Indian Affairs: FY2021 Appropriations",
+    "updateDate": "2026-02-04T09:09:07Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11602",
+    "version": 4
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12953",
+    "publishDate": "2026-02-03T05:00:00Z",
+    "status": "Active",
+    "title": "The Office of Navajo and Hopi Indian Relocation",
+    "updateDate": "2026-02-04T08:54:30Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12953",
+    "version": 2
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48827",
+    "publishDate": "2026-01-27T05:00:00Z",
+    "status": "Active",
+    "title": "Work Requirements: The Temporary Assistance for Needy Families (TANF) Work Standard and How States Met It",
+    "updateDate": "2026-02-04T08:08:03Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48827",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12645",
+    "publishDate": "2026-01-29T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Tariff and Trade Framework Agreements with Europe: Outlook and Issues for Congress",
+    "updateDate": "2026-02-04T07:37:58Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12645",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "LSB11391",
+    "publishDate": "2026-02-02T05:00:00Z",
+    "status": "Active",
+    "title": "The “Interim Docket” or “Shadow Docket”: Non-Merits Matters at the Supreme Court",
+    "updateDate": "2026-02-03T16:53:11Z",
+    "url": "https://api.congress.gov/v3/crsreport/LSB11391",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R44503",
+    "publishDate": "2021-12-21T05:00:00Z",
+    "status": "Archived",
+    "title": "Federal Student Aid: Need Analysis Formulas and Expected Family Contribution",
+    "updateDate": "2026-02-03T16:52:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/R44503",
+    "version": 10
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48522",
+    "publishDate": "2026-01-30T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Statistical Data for U.S. Territories: Issues and Resources",
+    "updateDate": "2026-02-03T15:53:02Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48522",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48195",
+    "publishDate": "2026-01-23T05:00:00Z",
+    "status": "Active",
+    "title": "Fact Sheet: Congressional Votes in Response to the Russia-Ukraine War",
+    "updateDate": "2026-02-03T14:53:01Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48195",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10553",
+    "publishDate": "2026-01-30T05:00:00Z",
+    "status": "Active",
+    "title": "Defense Primer: Research, Development, Test, and Evaluation",
+    "updateDate": "2026-02-03T14:38:28Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10553",
+    "version": 28
+  },
+  {
+    "contentType": "Reports",
+    "id": "RL33315",
+    "publishDate": "2026-01-29T05:00:00Z",
+    "status": "Active",
+    "title": "Money Laundering: An Overview of 18 U.S.C. § 1956 and Related Federal Criminal Law",
+    "updateDate": "2026-02-03T14:38:19Z",
+    "url": "https://api.congress.gov/v3/crsreport/RL33315",
+    "version": 13
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12646",
+    "publishDate": "2026-02-02T05:00:00Z",
+    "status": "Active",
+    "title": "Oversight of the Use of Force by Department of Homeland Security (DHS) Law Enforcement Officers",
+    "updateDate": "2026-02-03T12:53:18Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12646",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48641",
+    "publishDate": "2026-02-02T05:00:00Z",
+    "status": "Active",
+    "title": "Proposals to Limit Member of Congress Financial Activities: Analysis of Introduced Legislation in the 119th Congress",
+    "updateDate": "2026-02-03T10:38:59Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48641",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13135",
+    "publishDate": "2025-12-17T05:00:00Z",
+    "status": "Active",
+    "title": "Artificial Intelligence (AI) in Health Care: Recent Federal Activity",
+    "updateDate": "2026-02-03T10:27:00Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13135",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48390",
+    "publishDate": "2026-01-14T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Reserve: Policy Issues in the 119th Congress",
+    "updateDate": "2026-02-03T10:26:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48390",
+    "version": 2
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF13146",
+    "publishDate": "2026-01-08T05:00:00Z",
+    "status": "Active",
+    "title": "Federal Reserve Independence",
+    "updateDate": "2026-02-03T10:26:55Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF13146",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48736",
+    "publishDate": "2025-11-21T05:00:00Z",
+    "status": "Active",
+    "title": "Vehicle Geolocation Data Collection: Issues for the 119th Congress",
+    "updateDate": "2026-02-03T10:26:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48736",
+    "version": 1
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48833",
+    "publishDate": "2026-01-28T05:00:00Z",
+    "status": "Active",
+    "title": "Concise History of Wage Regulations for the H-2A Agricultural Worker Visa",
+    "updateDate": "2026-01-31T16:22:48Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48833",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF10253",
+    "publishDate": "2026-01-28T05:00:00Z",
+    "status": "Active",
+    "title": "Thailand: Background and U.S. Relations",
+    "updateDate": "2026-01-31T15:37:50Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF10253",
+    "version": 20
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48832",
+    "publishDate": "2026-01-29T05:00:00Z",
+    "status": "Active",
+    "title": "The 2025 (FY2026) Government Shutdown: Economic Effects",
+    "updateDate": "2026-01-31T13:52:52Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48832",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12644",
+    "publishDate": "2026-01-26T05:00:00Z",
+    "status": "Active",
+    "title": "2026 Winter Storm Fern: A Brief Overview of FEMA Programs and Resources",
+    "updateDate": "2026-01-31T13:52:51Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12644",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12608",
+    "publishDate": "2026-01-30T05:00:00Z",
+    "status": "Active",
+    "title": "U.S. Tariffs and the 2025 U.S.-Japan Framework Agreement",
+    "updateDate": "2026-01-31T13:07:56Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12608",
+    "version": 1
+  },
+  {
+    "contentType": "Posts",
+    "id": "IN12598",
+    "publishDate": "2026-01-22T05:00:00Z",
+    "status": "Active",
+    "title": "Attempted Dismissals of Members of Puerto Rico’s Financial Oversight and Management Board",
+    "updateDate": "2026-01-31T12:22:44Z",
+    "url": "https://api.congress.gov/v3/crsreport/IN12598",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF12835",
+    "publishDate": "2025-07-23T04:00:00Z",
+    "status": "Active",
+    "title": "The Rice’s Whale: Conservation Efforts, Implications for Ocean Sectors, and Considerations for Congress",
+    "updateDate": "2026-01-31T09:37:47Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF12835",
+    "version": 3
+  },
+  {
+    "contentType": "Reports",
+    "id": "R48540",
+    "publishDate": "2026-01-29T05:00:00Z",
+    "status": "Active",
+    "title": "Universities and Indirect Costs for Federally Funded Research",
+    "updateDate": "2026-01-31T09:37:45Z",
+    "url": "https://api.congress.gov/v3/crsreport/R48540",
+    "version": 1
+  },
+  {
+    "contentType": "Resources",
+    "id": "IF11090",
+    "publishDate": "2026-01-30T05:00:00Z",
+    "status": "Active",
+    "title": "The Terrorism Risk Insurance Act (TRIA)",
+    "updateDate": "2026-01-31T07:07:46Z",
+    "url": "https://api.congress.gov/v3/crsreport/IF11090",
+    "version": 6
+  }
+]

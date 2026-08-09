@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 
 def search(
     client: Any,
     resource: str,
-    query: Optional[dict] = None,
+    query: dict | None = None,
     size: int = 20,
     from_: int = 0,
 ) -> dict:
