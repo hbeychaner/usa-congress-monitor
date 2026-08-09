@@ -6,6 +6,7 @@ from cdm.data_collection.endpoint_registry import (
     register_specs,
 )
 from cdm.models.endpoint_spec import EndpointSpec as ModelEndpointSpec
+from cdm.models.endpoint_spec import ReferenceSource
 from cdm.models.other_models import BoundCongressionalRecordListItem
 
 # list endpoint
@@ -15,7 +16,9 @@ list_spec = EndpointSpec(
     param_specs=[],
     data_key="boundCongressionalRecord",
     id_strategy=ModelEndpointSpec.IdStrategy(
-        reference_from="url", unique_from=["date"], section_bounds="sections.0"
+        reference_from=ReferenceSource.URL,
+        unique_from=["date"],
+        section_bounds="sections.0",
     ),
     response_model=BoundCongressionalRecordListItem,
 )
@@ -37,7 +40,9 @@ item_spec = EndpointSpec(
     data_key=None,
     response_model=BoundCongressionalRecordListItem,
     id_strategy=ModelEndpointSpec.IdStrategy(
-        reference_from="url", unique_from=["date"], section_bounds="sections.0"
+        reference_from=ReferenceSource.URL,
+        unique_from=["date"],
+        section_bounds="sections.0",
     ),
 )
 

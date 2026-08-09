@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 
-from cdm.models.endpoint_spec import EndpointSpec, ParamLocation, ParamSpec
+from cdm.models.endpoint_spec import (
+    EndpointSpec,
+    ParamLocation,
+    ParamSpec,
+    ReferenceSource,
+)
 from cdm.models.endpoint_spec import EndpointSpec as _ES
 
 _REGISTRY: dict[str, EndpointSpec] = {}
@@ -40,7 +45,7 @@ def make_list_and_item_specs(
         path_template=path_root,
         param_specs=[],
         data_key=data_key,
-        id_strategy=_ES.IdStrategy(reference_from="url"),
+        id_strategy=_ES.IdStrategy(reference_from=ReferenceSource.URL),
         response_model=list_model,
     )
 
@@ -57,7 +62,7 @@ def make_list_and_item_specs(
             )
         ],
         data_key=None,
-        id_strategy=_ES.IdStrategy(reference_from="url"),
+        id_strategy=_ES.IdStrategy(reference_from=ReferenceSource.URL),
         unwrap_key=resource_name,
         response_model=item_model,
     )
