@@ -62,6 +62,7 @@ class PipelineConfig:
     # Shared rate limiter (TokenBucket); None = no rate limiting
     rate_limiter: TokenBucket | None = None
     record_sink: Callable[[str, dict], None] | None = None
+    record_archive_sink: Callable[[str, dict], None] | None = None
     # API auth
     api_key: str | None = None
     # Whether to continue past errors in individual resources
@@ -182,6 +183,7 @@ class Pipeline:
                 concurrency=self.config.concurrency,
                 rate_limiter=self.config.rate_limiter,
                 record_sink=self.config.record_sink,
+                record_archive_sink=self.config.record_archive_sink,
             )
             counts = runner.run()
             result.list_count = int(counts["list_count"])

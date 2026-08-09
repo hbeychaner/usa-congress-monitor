@@ -175,6 +175,9 @@ class IngestRunner:
     # Rate limiter: if provided, each worker calls limiter.acquire() before each request
     rate_limiter: TokenBucket | None = field(default=None, repr=False)
     record_sink: Callable[[str, dict], None] | None = field(default=None, repr=False)
+    record_archive_sink: Callable[[str, dict], None] | None = field(
+        default=None, repr=False
+    )
 
     def _client(self):
         """Return (or create) a per-thread SDK client."""
@@ -284,9 +287,16 @@ class IngestRunner:
             logger.info("Parsed response; extracted %d records", len(records))
             if not records:
                 break
-            all_models.extend(
-                client.coerce_records(list_model_cls, records, spec=list_spec)
+            page_models = client.coerce_records(
+                list_model_cls, records, spec=list_spec
             )
+            all_models.extend(page_models)
+            if self.record_archive_sink is not None:
+                for model in page_models:
+                    self.record_archive_sink(
+                        self.resource.value,
+                        model.model_dump(mode="json", exclude_none=True),
+                    )
             meta = resolve_pagination(
                 parsed, records_len=len(records), offset=offset, page_size=limit
             )
@@ -355,6 +365,8 @@ class IngestRunner:
                         return
                     seen_ids.add(item_id or "")
                     records.append(item_data)
+                    if self.record_archive_sink is not None:
+                        self.record_archive_sink(self.resource.value, item_data)
                     if self.record_sink is not None:
                         self.record_sink(self.resource.value, item_data)
                 with counters_lock:

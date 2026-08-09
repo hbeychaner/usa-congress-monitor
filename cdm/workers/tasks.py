@@ -10,6 +10,7 @@ from typing import Any, NoReturn
 
 from redis import Redis
 
+from cdm.ingest.archive import JsonlRecordArchive
 from cdm.ingest.pipeline import Pipeline, PipelineConfig
 from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.jobs.store import JobStore
@@ -74,6 +75,8 @@ def run_ingest_job(self, job_id: str) -> dict:
     payload = job["payload"]
     try:
         redis_client = _redis()
+        job_outdir = Path(payload["outdir"]) / job_id
+        archive = JsonlRecordArchive(job_outdir, int(job["attempts"]))
 
         def publish_record(resource: str, record: dict) -> None:
             stream = RedisRecordStream(
@@ -85,17 +88,19 @@ def run_ingest_job(self, job_id: str) -> dict:
 
         resources = payload.get("resources")
         config = PipelineConfig(
-            outdir=Path(payload["outdir"]),
+            outdir=job_outdir,
             from_date=payload.get("from_date"),
             to_date=payload.get("to_date"),
             congress=payload.get("congress"),
             fetch_items=bool(payload.get("fetch_items", False)),
+            force_item_fetch=bool(payload.get("force_item_fetch", False)),
             max_pages=payload.get("max_pages"),
             max_items=payload.get("max_items"),
             concurrency=int(payload.get("concurrency", 1)),
             api_key=payload.get("api_key"),
             skip_errors=False,
             record_sink=publish_record,
+            record_archive_sink=archive.write,
         )
         selected = None
         if resources:

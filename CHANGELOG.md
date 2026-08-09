@@ -26,3 +26,7 @@
 
 - Centralized endpoint HTTP methods and identifier-reference sources as string
   enums while preserving existing serialized values.
+- Added a smoke-tested full-ingest planner with historical date windows,
+  congress-scoped jobs, and idempotent queue submission.
+- Added per-job, per-attempt JSONL archives for fetched list and item records,
+  with durable flushes before indexing.

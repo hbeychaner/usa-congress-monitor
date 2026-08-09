@@ -42,6 +42,30 @@ of creating duplicate work. Job records live in SQLite, configured with
 `JOB_DB_PATH` (default: `data/jobs.sqlite3`). RabbitMQ is the delivery layer;
 SQLite is the durable job history and idempotency store.
 
+## Queue A Full Ingest
+
+Start a worker, run the bounded smoke job, then queue the complete historical
+plan:
+
+```bash
+make worker
+uv run python scripts/queue_full_ingest.py --smoke
+uv run python scripts/queue_full_ingest.py
+```
+
+The planner queues static resources once, date-windowed resources in one-year
+windows from 1789 through today, and congress-scoped resources once per
+Congress. Use `--dry-run` to inspect a plan, or override the bounds with
+`--first-congress`, `--last-congress`, `--start-date`, `--end-date`, and
+`--window-days`.
+
+Each job writes fetched list and item records immediately to
+`data/full_history/<job-id>/<resource>/records-attempt-<n>.jsonl`, flushing and
+syncing each record before continuing. Redis remains the indexing handoff, and
+SQLite tracks job attempts and failures. A retry writes a separate attempt
+file, so data fetched before a failure is retained for later reprocessing even
+if OpenSearch indexing is unavailable.
+
 ## System Flow
 
 ```text
