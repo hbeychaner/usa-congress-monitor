@@ -54,6 +54,8 @@ def test_every_text_field_has_whitespace_analyzed_lemma_multifield():
 
     assert text_fields
     for index_name, field_name, field in text_fields:
+        if field.get("index") is False:
+            continue
         assert field.get("fields", {}).get("lemma") == {
             "type": "text",
             "analyzer": "whitespace",

@@ -1,0 +1,23 @@
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm
+
+WORKDIR /workspace
+
+# Keep the virtual environment outside the bind-mounted project folder
+# so container installs are stable across host tooling differences.
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_LINK_MODE=copy \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Prime dependency metadata layer for better caching.
+COPY pyproject.toml uv.lock requirements.txt ./
+
+# Copy project package so editable installs/import paths are available.
+COPY cdm ./cdm
+COPY settings.py ./settings.py
+
+# Install Python dependencies with uv. `--no-sources` avoids local path
+# overrides from tool.uv.sources (e.g., ../pycongress) that do not exist in container.
+RUN uv sync --no-sources
+
+CMD ["uv", "run", "python", "-V"]

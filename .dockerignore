@@ -1,0 +1,11 @@
+.git
+.gitignore
+.pytest_cache
+.ruff_cache
+__pycache__
+.venv
+.vscode
+node_modules
+frontend/app/node_modules
+data
+tmp

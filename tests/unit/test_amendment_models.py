@@ -39,3 +39,19 @@ def test_amendment_model_parse():
     assert a.type == "SAMDT"
     # update_date should be parsed
     assert isinstance(a.update_date, datetime)
+
+
+def test_amendment_accepts_list_on_behalf_of_sponsors():
+    sample = {
+        "congress": 114,
+        "number": "573",
+        "type": "SAMDT",
+        "updateDate": "2020-06-01T00:00:00Z",
+        "onBehalfOfSponsor": [
+            {"bioguideId": "E000285", "fullName": "Sen. Enzi"}
+        ],
+    }
+
+    amendment = Amendment.model_validate(sample)
+
+    assert len(amendment.on_behalf_of_sponsor or []) == 1

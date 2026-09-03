@@ -10,6 +10,8 @@ import inspect
 import threading
 import time
 from collections.abc import Iterator, Mapping
+from datetime import UTC
+from email.utils import parsedate_to_datetime
 from typing import cast
 from urllib.parse import urljoin
 
@@ -105,7 +107,11 @@ class CDGClient:
             # keep behavior but avoid requiring Response in type hints
             self._session.hooks["response"] = [
                 lambda r, *a, **k: (
-                    r.raise_for_status() if isinstance(r, requests.Response) else None
+                    r.raise_for_status()
+                    if isinstance(r, requests.Response)
+                    and r.status_code != 429
+                    and r.status_code < 500
+                    else None
                 )
             ]
 
@@ -185,10 +191,27 @@ class CDGClient:
         """
         attempts = 0
         cumulative_sleep = 0.0
+        rate_limit_attempts = 0
         while True:
             try:
                 req_params = {k: str(v) for k, v in (params or {}).items()}
                 resp = self._session.get(url, params=req_params, timeout=timeout)
+                if getattr(resp, "status_code", None) == 429:
+                    rate_limit_attempts += 1
+                    retry_after = resp.headers.get("Retry-After")
+                    delay = self._retry_after_seconds(retry_after)
+                    if delay is None:
+                        delay = min(
+                            3600.0, 60.0 * (2 ** min(rate_limit_attempts - 1, 6))
+                        )
+                    logger.warning(
+                        "Congress.gov rate limit received; retrying in %.0f seconds "
+                        "(attempt %d)",
+                        delay,
+                        rate_limit_attempts,
+                    )
+                    time.sleep(delay)
+                    continue
                 # Treat 5xx as retryable when a real status_code is present.
                 if hasattr(resp, "status_code") and resp.status_code >= 500:
                     raise requests.HTTPError(
@@ -212,6 +235,21 @@ class CDGClient:
                 time.sleep(sleep_for)
                 cumulative_sleep += sleep_for
                 continue
+
+    @staticmethod
+    def _retry_after_seconds(value: str | None) -> float | None:
+        if not value:
+            return None
+        try:
+            return max(0.0, float(value))
+        except ValueError:
+            try:
+                retry_at = parsedate_to_datetime(value)
+                if retry_at.tzinfo is None:
+                    retry_at = retry_at.replace(tzinfo=UTC)
+                return max(0.0, retry_at.timestamp() - time.time())
+            except (TypeError, ValueError, OverflowError):
+                return None
 
     def iterate_pages(
         self, spec: EndpointSpec, base_params: Mapping[str, Json] | None = None

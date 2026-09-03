@@ -34,6 +34,8 @@
 #                 key query: "voting record of member X" / "who voted Yea on HR 1"
 #                 enables: party-unity scores, cross-aisle vote analysis
 #
+#   district stores imported 119th-Congress district boundaries for map reads.
+#
 # Indices: 17 total (15 primary + 2 bridge)
 #   legislation, amendment, communication, committee, committee_meeting,
 #   committee_print, committee_report, congressional_record, hearing,
@@ -62,10 +64,165 @@ legislation:
       source_type:   { type: keyword }             # "bill" | "law"
       url:           { type: keyword }
 
+      # ── ingest provenance and completeness ──
+      hydration_status: { type: keyword }
+      hydrated_at:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      hydrated_sources: { type: keyword }
+      hydrated_relationships: { type: keyword }
+      hydration_errors: { type: keyword }
+      source_updated_at:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      raw_artifact_hash: { type: keyword }
+      source_urls: { type: keyword }
+      source_package_ids: { type: keyword }
+      source_metadata:
+        type: object
+        dynamic: false
+        properties:
+          collection: { type: keyword }
+          package_id: { type: keyword }
+          url: { type: keyword }
+          source: { type: keyword }
+      detail_hydration:
+        type: object
+        dynamic: false
+        properties:
+          page_count: { type: integer }
+          expected_count: { type: integer }
+          fetched_count: { type: integer }
+          state: { type: keyword }
+          complete: { type: boolean }
+
+      # ── normalized hydrated collections ──
+      actions:
+        type: nested
+        dynamic: false
+        properties:
+          action_date: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
+          action_code: { type: keyword }
+          source_system: { type: keyword }
+          type: { type: keyword }
+          text:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          action_time: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
+      amendments:
+        type: nested
+        dynamic: false
+        properties:
+          id: { type: keyword }
+          congress: { type: integer }
+          number: { type: keyword }
+          type: { type: keyword }
+          description:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          purpose:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          url: { type: keyword }
+      cosponsors:
+        type: nested
+        dynamic: false
+        properties:
+          bioguide_id: { type: keyword }
+          full_name:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          first_name: { type: keyword }
+          last_name: { type: keyword }
+          sponsorship_date: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
+      committees:
+        type: nested
+        dynamic: false
+        properties:
+          system_code: { type: keyword }
+          name:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          chamber: { type: keyword }
+          type: { type: keyword }
+          url: { type: keyword }
+      related_bills:
+        type: nested
+        dynamic: false
+        properties:
+          id: { type: keyword }
+          congress: { type: integer }
+          number: { type: keyword }
+          type: { type: keyword }
+          title:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          url: { type: keyword }
+      titles:
+        type: nested
+        dynamic: false
+        properties:
+          type: { type: keyword }
+          title:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          text:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          chamber: { type: keyword }
+          version_code: { type: keyword }
+      text_versions:
+        type: nested
+        dynamic: false
+        properties:
+          type: { type: keyword }
+          date: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
+          formats: { type: object, enabled: false }
+          package_id: { type: keyword }
+          source_url: { type: keyword }
+      full_text: { type: text, index: false }
+      notes:
+        type: nested
+        dynamic: false
+        properties:
+          text:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          type: { type: keyword }
+      laws:
+        type: nested
+        dynamic: false
+        properties:
+          number: { type: keyword }
+          law_type: { type: keyword }
+      subjects:
+        type: object
+        dynamic: false
+        properties:
+          policy_area:
+            type: object
+            dynamic: false
+            properties:
+              name: { type: keyword }
+          legislative_subjects:
+            type: nested
+            dynamic: false
+            properties:
+              name: { type: keyword }
+
       # ── bill fields ──
       congress:      { type: integer }
       bill_type:     { type: keyword }             # HR, S, HJRES, SRES, HRES, SCONRES…
-      number:        { type: integer }
+      number:        { type: keyword }             # bill identifiers may be fractional (e.g. "260½")
       title:
         type: text
         fields:
@@ -73,6 +230,8 @@ legislation:
           lemma:     { type: text, analyzer: whitespace }
       origin_chamber:      { type: keyword }       # House | Senate
       origin_chamber_code: { type: keyword }       # H | S
+      sponsor_bioguide_ids: { type: keyword }
+      cosponsor_bioguide_ids: { type: keyword }
 
       # ── dates ──
       update_date:
@@ -426,6 +585,20 @@ member:
       update_date:
         type: date
         format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── 12. district ──────────────────────────────────────────────────────────────
+district:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+      id:          { type: keyword }
+      state_code:  { type: keyword }
+      district:    { type: integer }
+      geometry:    { type: geo_shape }
 
 
 # ── 12. nomination ────────────────────────────────────────────────────────────

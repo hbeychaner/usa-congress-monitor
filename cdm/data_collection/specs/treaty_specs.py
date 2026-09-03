@@ -29,6 +29,7 @@ item_spec = EndpointSpec(
         )
     ],
     data_key=None,
+    unwrap_key="treaty",
     response_model=Treaty,
 )
 

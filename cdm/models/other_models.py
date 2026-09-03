@@ -9,7 +9,7 @@ from enum import StrEnum
 from threading import Lock
 from typing import Annotated, Optional
 
-from pydantic import BaseModel, Field, HttpUrl, model_validator
+from pydantic import AliasChoices, BaseModel, Field, HttpUrl, model_validator
 
 from cdm.data_collection.id_utils import parse_url_to_id
 from cdm.models.shared import CountUrl, EntityBase, Format
@@ -483,6 +483,10 @@ class CRSReport(EntityBase):
             description="When the CRS report was published.",
         ),
     ] = None
+    publish_date_raw: Annotated[str | None, Field(alias="publish_date")] = None
+    content_type: Annotated[str | None, Field(alias="contentType")] = None
+    version: int | str | None = None
+    update_date: Annotated[datetime | None, Field(alias="updateDate")] = None
     url: Annotated[
         HttpUrl | None,
         Field(description="Where to retrieve the CRS report in the API."),
@@ -1228,6 +1232,10 @@ class HouseRollCallVoteListItem(EntityBase, RecordTypeBase):
             description="Where to retrieve the vote record in the API.",
         ),
     ] = None
+    api_url: Annotated[
+        HttpUrl | None,
+        Field(default=None, alias="url", description="Where to retrieve the vote in the API."),
+    ] = None
 
     model_config = {"populate_by_name": True}
 
@@ -1473,7 +1481,8 @@ class BoundCongressionalRecordListItem(EntityBase, RecordTypeBase):
         str | None,
         Field(
             default=None,
-            alias="referenceId",
+            alias="reference_id",
+            validation_alias=AliasChoices("reference_id", "referenceId"),
             description="Reference id parsed from the source URL (non-unique).",
         ),
     ] = None
@@ -1791,6 +1800,7 @@ class CommitteeListItem(EntityBase, RecordTypeBase):
             description="When the committee was last updated.",
         ),
     ]
+    subcommittees: list[dict] | None = None
 
 
 class CommitteeReportListItem(EntityBase, RecordTypeBase):

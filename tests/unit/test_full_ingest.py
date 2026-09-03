@@ -18,11 +18,11 @@ def test_full_plan_covers_static_date_and_congress_scopes() -> None:
     labels = {job.label for job in jobs}
 
     assert "static:congress" in labels
-    assert "date:amendment:2024-01-01:2024-12-30" in labels
-    assert "date:amendment:2024-12-31:2025-01-01" in labels
+    assert "date:bill:2024-01-01:2024-12-30" in labels
+    assert "date:bill:2024-12-31:2025-01-01" in labels
     assert "congress:law:118" in labels
     assert "congress:law:119" in labels
-    assert all(job.payload["force_item_fetch"] is True for job in jobs)
+    assert all(job.payload["force_item_fetch"] is False for job in jobs)
 
 
 def test_smoke_job_is_bounded() -> None:

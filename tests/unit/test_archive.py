@@ -1,18 +1,20 @@
-import json
+import sqlite3
 
-from cdm.ingest.archive import JsonlRecordArchive
+from cdm.ingest.archive import SQLiteRecordArchive
 
 
-def test_archive_writes_records_per_resource_and_attempt(tmp_path) -> None:
-    archive = JsonlRecordArchive(tmp_path, attempt=3)
+def test_archive_writes_compressed_deduplicated_records(tmp_path) -> None:
+    archive = SQLiteRecordArchive(tmp_path, attempt=3)
 
     archive.write("bill", {"id": "bill:1", "title": "First"})
     archive.write("bill", {"id": "bill:2", "title": "Second"})
 
-    path = tmp_path / "bill" / "records-attempt-3.jsonl"
-    records = [json.loads(line) for line in path.read_text().splitlines()]
-
-    assert records == [
+    archive.write("bill", {"id": "bill:1", "title": "First"})
+    with sqlite3.connect(tmp_path / "records.sqlite3") as connection:
+        count = connection.execute("SELECT COUNT(*) FROM records").fetchone()[0]
+    assert count == 2
+    assert archive.ids("bill") == {"bill:1", "bill:2"}
+    assert archive.records("bill") == [
         {"id": "bill:1", "title": "First"},
         {"id": "bill:2", "title": "Second"},
     ]

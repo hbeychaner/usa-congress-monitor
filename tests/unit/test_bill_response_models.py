@@ -1,6 +1,21 @@
 from datetime import datetime
 
-from cdm.models.bills import BillActionsResponse, BillTextResponse
+from cdm.models.bills import BillActionsResponse, BillMetadata, BillTextResponse
+
+
+def test_bill_metadata_preserves_fractional_source_number():
+    bill = BillMetadata.model_validate(
+        {
+            "congress": 117,
+            "number": "260½",
+            "title": "Historical bill",
+            "type": "hr",
+            "url": "https://api.congress.gov/v3/bill/117/hr/260%C2%BD",
+        }
+    )
+
+    assert bill.number == "260½"
+    assert bill.id == "bill:117:hr:260½"
 
 
 def test_bill_text_response_parse():

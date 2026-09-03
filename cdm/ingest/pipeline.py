@@ -37,6 +37,7 @@ from cdm.ingest.resource_config import (
     static_resources,
 )
 from cdm.ingest.runner import FatalIngestError, IngestRunner, Resource
+from cdm.jobs.store import CoverageStage
 
 logger = logging.getLogger(__name__)
 
@@ -57,12 +58,14 @@ class PipelineConfig:
     # Limits (useful for sampling / smoke-tests)
     max_pages: int | None = None
     max_items: int | None = None
+    list_page_size: int = 250
     # Concurrency: parallel item-fetch workers
     concurrency: int = 1
     # Shared rate limiter (TokenBucket); None = no rate limiting
     rate_limiter: TokenBucket | None = None
     record_sink: Callable[[str, dict], None] | None = None
     record_archive_sink: Callable[[str, dict], None] | None = None
+    progress_sink: Callable[[str, CoverageStage, dict], None] | None = None
     # API auth
     api_key: str | None = None
     # Whether to continue past errors in individual resources
@@ -75,6 +78,7 @@ class ResourceResult:
     success: bool
     list_count: int = 0
     item_count: int = 0
+    published_count: int = 0
     error: str | None = None
     outdir: Path | None = None
 
@@ -175,6 +179,7 @@ class Pipeline:
                 force_item_fetch=self.config.force_item_fetch,
                 max_pages=self.config.max_pages,
                 max_items=self.config.max_items,
+                list_page_size=self.config.list_page_size,
                 congress=self.config.congress,
                 from_date=from_date,
                 to_date=to_date,
@@ -184,10 +189,14 @@ class Pipeline:
                 rate_limiter=self.config.rate_limiter,
                 record_sink=self.config.record_sink,
                 record_archive_sink=self.config.record_archive_sink,
+                progress_sink=self.config.progress_sink,
             )
             counts = runner.run()
             result.list_count = int(counts["list_count"])
             result.item_count = int(counts["item_count"])
+            result.published_count = (
+                result.item_count if fetch_items else result.list_count
+            )
 
             # Write per-resource metadata
             meta = {

@@ -25,19 +25,22 @@ the domain behavior and can be tested independently of Celery.
 ### Job lifecycle
 
 Jobs use a deterministic idempotency key derived from their kind and payload.
-The lifecycle is `queued -> running -> succeeded` or `failed`. A worker marks
+The lifecycle is `queued -> running -> retrying -> succeeded` or `failed`. A worker marks
 the job running before work begins and marks it succeeded only after all work,
 including child indexing jobs, has been dispatched successfully.
 
-Celery is configured with late acknowledgements and worker-loss requeue. Task
-failures use bounded exponential retry/backoff. The task functions are thin
+Celery is configured with late acknowledgements and worker-loss requeue.
+Transient task failures retry without a fixed terminal count, using capped
+exponential backoff. Non-transient failures remain terminal, and a scheduled
+recovery task requeues transient failures stranded by older workers. The task functions are thin
 wrappers; ingest, transformation, validation, and checkpoint semantics remain
 in ordinary Python services so they can be tested without a broker.
 
 ### Retry and failure behavior
 
 - Congress.gov request retries remain inside the API client.
-- Celery retries task-level transient failures up to `CELERY_RETRY_MAX` times.
+- Celery retries transient task-level failures indefinitely; `CELERY_RETRY_MAX`
+  remains the bound for non-transient failures.
 - Backoff is capped by `CELERY_RETRY_BACKOFF_MAX` seconds.
 - Index checkpoints advance only after `bulk_upsert()` reports no errors.
 - A failed batch is retried from its prior offset; already committed batches
@@ -47,10 +50,12 @@ in ordinary Python services so they can be tested without a broker.
 
 ### Daily ingestion
 
-Celery Beat schedules `schedule_daily_ingest` at 02:00 UTC. The task submits a
-two-day overlapping window ending on the current UTC date. The overlap catches
-late API updates; canonical IDs and OpenSearch upserts make the overlap
-idempotent.
+Celery Beat schedules `schedule_daily_ingest` at 02:00 UTC and
+`recover_failed_ingest_jobs` every 10 minutes. The daily task submits a
+two-day overlapping window ending on the current UTC date, includes only
+date-windowed and valid Congress-scoped resources, and excludes static/global
+endpoints. The overlap catches late API updates; canonical IDs and OpenSearch
+upserts make it idempotent.
 
 ### Historical backfills
 
@@ -59,7 +64,7 @@ Use the submission CLI for backfills rather than invoking worker internals:
 ```bash
 uv run python scripts/submit_ingest.py \
   --outdir data/full_history \
-  --resources amendment,bill \
+  --resources bill,committee \
   --from-date 2020-01-01T00:00:00Z \
   --to-date 2020-12-31T23:59:59Z \
   --fetch-items \
@@ -78,6 +83,23 @@ make beat
 
 For Linux production workers, omit `--pool=solo` and choose concurrency based
 on API rate limits and OpenSearch capacity.
+
+### GovInfo coverage audits
+
+Before scaling a historical GovInfo run, compare the discovered package
+inventory with the durable per-job manifests:
+
+```bash
+uv run python scripts/report_govinfo_coverage.py \
+  --congress 118 \
+  --manifest-root data/full_history/govinfo \
+  --out data/full_history/govinfo/coverage-report-118.json
+```
+
+The report classifies each expected package as `available`, `failed`,
+`not_available`, or `pending`. It exits with status 2 while failed or pending
+packages remain, and preserves the non-available distinctions for acceptance
+reporting. A parsed package counts as available.
 
 ## Setup
 
@@ -138,6 +160,7 @@ cdm/                    — Congress Data Model (core library)
     runner.py           — Single-resource ingest (list + items, concurrent)
     pipeline.py         — Multi-resource orchestration
     rate_limiter.py     — Thread-safe token bucket (default 4800 req/hr)
+    archive.py          — Compressed SQLite record archives and list caches
     checkpoint.py       — Resume state tracking
   jobs/store.py         — SQLite job ledger and idempotency store
   workers/              — Celery app, beat schedule, and task wrappers
@@ -166,14 +189,16 @@ Resources are classified into three scopes:
 
 | Scope | Strategy | Examples |
 |---|---|---|
-| `date_window` | Chunked by year (e.g. 2020–2026) using `fromDateTime`/`toDateTime` | amendment, bill, committee, member, … |
-| `congress_scoped` | Chunked by Congress number (116–119) | house_vote, law, nomination |
-| `static` | Run once, no date filter | congress_ref, bound_congressional_record, house_requirement |
+| `date_window` | Uses configured date parameter names | bill, committee, member, nomination, … |
+| `congress_scoped` | Requires a Congress path parameter | law |
+| `static` | No server-side incremental filter | amendment, house_vote, congress, and reference collections |
 
-Item fetches use a `ThreadPoolExecutor` (default 20 workers) governed by a
-`TokenBucket` rate limiter so the pipeline stays within the 4 800 req/hr API
-limit. Each deduplicated item is published directly to the resource's Redis
-Stream; consumer-group pending state provides crash recovery.
+Item fetches use a `ThreadPoolExecutor` governed by a `TokenBucket` rate
+limiter (worker default: 4; local runner default: 1) so the pipeline stays
+within the 4 800 req/hr API limit. Each deduplicated item is published directly
+to the resource's Redis Stream; consumer-group pending state provides crash
+recovery. List pages and item records are compressed and deduplicated in
+per-resource SQLite databases.
 
 ### Full-history ingest
 
@@ -187,9 +212,25 @@ uv run python scripts/ingest_history.py \
   --rate-limit 4800
 ```
 
-The history command creates Redis-backed ingest and indexing jobs for each
-chunk. SQLite checkpoints and job records track chunk progress; records are
-not staged in local JSON or JSONL files.
+For durable queue submission, use `scripts/queue_full_ingest.py`; it creates
+idempotent jobs for static resources, date windows, and Congress-scoped
+resources. `scripts/ingest_history.py` remains a local compatibility/backfill
+tool. Both use SQLite checkpoints and avoid large local JSON or JSONL staging
+files.
+
+For a complete historical legislation corpus, discover and queue official
+GovInfo packages into a precreated versioned OpenSearch index:
+
+```bash
+uv run python scripts/queue_govinfo_bulk.py --congress 118
+uv run python scripts/queue_govinfo_bulk.py \
+  --congress 118 --queue --staging-version 118 \
+  --outdir data/full_history/govinfo
+```
+
+The first command is a dry run. Queueing requires `--staging-version`; workers
+fail closed if that physical staging index does not exist. Switch aliases only
+after package, document, and reconciliation acceptance checks pass.
 
 ### OpenSearch indices
 
@@ -231,7 +272,7 @@ This diagram summarizes the core data models, their relationships, and the field
 
 ## Using the Client
 
-The project uses the [pycongress](https://github.com/hbeychaner/pycongress) SDK which wraps the Congress.gov API via `CDGClient`. The client reads the API key from `CONGRESS_API_KEY`.
+The project uses its native `CDGClient` to wrap the Congress.gov API. The client reads the API key from `CONGRESS_API_KEY`, and response models are defined in `cdm.models`.
 
 ```python
 from cdm.data_collection.client import CDGClient
@@ -268,10 +309,12 @@ from cdm.data_collection.endpoints.bill import get_bills_metadata
 client = CDGClient(api_key="YOUR_API_KEY")
 
 all_bills = gather_paginated_metadata(
-  lambda offset, page_size: get_bills_metadata(client, offset=offset, pageSize=page_size),
-  data_key=CongressDataType.BILLS,
-  desc="Bills",
-  unit="bill",
+    lambda offset, page_size: get_bills_metadata(
+        client, offset=offset, pageSize=page_size
+    ),
+    data_key=CongressDataType.BILLS,
+    desc="Bills",
+    unit="bill",
 )
 ```
 
@@ -291,27 +334,31 @@ from cdm.data_collection.endpoints.bill import get_bills_metadata
 
 client = CDGClient(api_key="YOUR_API_KEY")
 
+
 def list_fetcher(offset: int, page_size: int) -> dict:
-  return get_bills_metadata(client, offset=offset, pageSize=page_size)
+    return get_bills_metadata(client, offset=offset, pageSize=page_size)
+
 
 def id_getter(item: dict) -> str:
-  return f"{item.get('congress')}-{item.get('type')}-{item.get('number')}"
+    return f"{item.get('congress')}-{item.get('type')}-{item.get('number')}"
+
 
 def detail_fetcher(item: dict) -> dict:
-  congress = item["congress"]
-  bill_type = item["type"].lower()
-  number = item["number"]
-  return client.get(f"bill/{congress}/{bill_type}/{number}")["bill"]
+    congress = item["congress"]
+    bill_type = item["type"].lower()
+    number = item["number"]
+    return client.get(f"bill/{congress}/{bill_type}/{number}")["bill"]
+
 
 results = collect_with_details(
-  fetch_page=list_fetcher,
-  data_key=CongressDataType.BILLS,
-  detail_fetcher=detail_fetcher,
-  id_getter=id_getter,
-  list_checkpoint=Path("checkpoints/bills_list.json"),
-  list_results=Path("checkpoints/bills_list_results.json"),
-  detail_checkpoint=Path("checkpoints/bills_detail.json"),
-  detail_results=Path("checkpoints/bills_detail_results.json"),
+    fetch_page=list_fetcher,
+    data_key=CongressDataType.BILLS,
+    detail_fetcher=detail_fetcher,
+    id_getter=id_getter,
+    list_checkpoint=Path("checkpoints/bills_list.json"),
+    list_results=Path("checkpoints/bills_list_results.json"),
+    detail_checkpoint=Path("checkpoints/bills_detail.json"),
+    detail_results=Path("checkpoints/bills_detail_results.json"),
 )
 ```
 

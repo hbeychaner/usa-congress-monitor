@@ -22,10 +22,21 @@ class RedisRecordStream:
     def stream_name(job_id: str, resource: str) -> str:
         return f"congress:ingest:{job_id}:{resource}"
 
-    def publish(self, resource: str, record: dict[str, Any]) -> str:
+    def publish(
+        self,
+        resource: str,
+        record: dict[str, Any],
+        ingest_metadata: dict[str, Any] | None = None,
+    ) -> str:
+        fields: dict[str, Any] = {
+            "resource": resource,
+            "record": json.dumps(record, default=str),
+        }
+        if ingest_metadata is not None:
+            fields["ingest_metadata"] = json.dumps(ingest_metadata, default=str)
         entry_id = self.client.xadd(
             self.stream,
-            {"resource": resource, "record": json.dumps(record, default=str)},
+            fields,
             maxlen=self.maxlen,
             approximate=True,
         )
@@ -90,10 +101,19 @@ class RedisRecordStream:
             }
             record = json.loads(normalized["record"])
             resource = normalized["resource"]
+            ingest_metadata = None
+            if normalized.get("ingest_metadata"):
+                ingest_metadata = json.loads(normalized["ingest_metadata"])
+                if not isinstance(ingest_metadata, dict):
+                    ingest_metadata = None
             decoded.append(
                 (
                     entry_id.decode() if isinstance(entry_id, bytes) else entry_id,
-                    {"resource": resource, "record": record},
+                    {
+                        "resource": resource,
+                        "record": record,
+                        "ingest_metadata": ingest_metadata,
+                    },
                 )
             )
         return decoded

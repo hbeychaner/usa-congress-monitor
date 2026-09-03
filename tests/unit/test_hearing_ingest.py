@@ -1,6 +1,23 @@
 import json
 from pathlib import Path
 
+from cdm.models.bills import Hearing
+
+
+def test_hearing_model_accepts_missing_title():
+    hearing = Hearing.model_validate(
+        {
+            "chamber": "Senate",
+            "citation": "S.Hrg. 116-40901",
+            "jacketNumber": 40901,
+            "congress": 116,
+            "formats": [{"url": "https://api.congress.gov/v3/hearing/116/senate/40901"}],
+        }
+    )
+
+    assert hearing.title is None
+    assert hearing.jacket_number == 40901
+
 
 def test_ingest_hearing(tmp_path, monkeypatch):
     repo = Path(__file__).resolve().parents[2]

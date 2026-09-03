@@ -32,7 +32,7 @@ class FullIngestConfig:
     concurrency: int = 4
     index_batch_size: int = 500
     fetch_items: bool = True
-    force_item_fetch: bool = True
+    force_item_fetch: bool = False
     preserve_raw: bool = False
 
     def __post_init__(self) -> None:

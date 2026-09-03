@@ -1,8 +1,9 @@
 # Congress Tracker
 
-Congress Tracker collects typed Congress.gov records, stores durable ingest
-outputs, and indexes them into OpenSearch. The system supports one-off runs,
-scheduled daily collection, and resumable historical backfills.
+Congress Tracker collects typed Congress.gov records, stores compressed,
+deduplicated SQLite archives, and indexes them into OpenSearch. The system
+supports one-off runs, scheduled daily collection, and resumable historical
+backfills without staging large JSON or JSONL files.
 
 Endpoint configuration uses centralized string enums for HTTP methods, parameter
 locations, pagination modes, ingest resources, and identifier sources. Their
@@ -21,6 +22,24 @@ make worker
 make beat
 ```
 
+For unattended local operation, use `make start`. It starts OpenSearch,
+Redis, and RabbitMQ, then opens a Celery worker and beat scheduler. Beat runs
+the normal daily overlap and, every 24 hours, checks durable coverage windows
+for date-capable endpoints. When a successful endpoint window is more than 24
+hours behind UTC, it queues an idempotent gap job with indexing enabled. The
+worker publishes hydrated records to Redis and automatically dispatches their
+OpenSearch indexing jobs; no separate indexing command is required.
+
+Inspect durable job states and coverage with:
+
+```bash
+make status
+```
+
+Static endpoints are not gap-scheduled because their APIs do not expose a
+reliable time cursor; they remain covered by the historical/static ingest
+plan.
+
 `make worker` uses Celery's `solo` pool for macOS local development. Linux
 deployments can use the default prefork pool with multiple processes.
 
@@ -31,7 +50,7 @@ Submit work through the durable job ledger and RabbitMQ queue:
 ```bash
 uv run python scripts/submit_ingest.py \
     --outdir data/full_history \
-    --resources amendment,bill \
+    --resources bill,committee \
     --from-date 2020-01-01T00:00:00Z \
     --to-date 2020-12-31T23:59:59Z \
     --fetch-items
@@ -41,6 +60,10 @@ Repeated submissions with the same parameters return the existing job instead
 of creating duplicate work. Job records live in SQLite, configured with
 `JOB_DB_PATH` (default: `data/jobs.sqlite3`). RabbitMQ is the delivery layer;
 SQLite is the durable job history and idempotency store.
+
+Date filters are sent only to resources whose API endpoints support them.
+Amendments and other static/global resources are ingested without date filters;
+the resource catalog is the source of truth for this behavior.
 
 ## Queue A Full Ingest
 
@@ -59,12 +82,11 @@ Congress. Use `--dry-run` to inspect a plan, or override the bounds with
 `--first-congress`, `--last-congress`, `--start-date`, `--end-date`, and
 `--window-days`.
 
-Each job writes fetched list and item records immediately to
-`data/full_history/<job-id>/<resource>/records-attempt-<n>.jsonl`, flushing and
-syncing each record before continuing. Redis remains the indexing handoff, and
-SQLite tracks job attempts and failures. A retry writes a separate attempt
-file, so data fetched before a failure is retained for later reprocessing even
-if OpenSearch indexing is unavailable.
+Each job writes fetched list pages to a compressed SQLite cache and item records
+to `data/full_history/<job-id>/<resource>/records.sqlite3`. Checkpoints advance
+only after a page is persisted, and canonical IDs make retries and overlapping
+windows idempotent. Redis remains the indexing handoff, while SQLite tracks job
+attempts, failures, and resumable archive state.
 
 ## System Flow
 
@@ -84,7 +106,26 @@ Pending entries can be reclaimed after a worker failure.
 
 The C4 container architecture is in
 [worker-architecture.mmd](worker-architecture.mmd),
-and operational details are in [Documentation/README.md](Documentation/README.md).
+and operational details are in [documentation/README.md](documentation/README.md).
+
+## Autonomous Operation
+
+Celery Beat submits a bounded daily job at 02:00 UTC. The job covers a
+two-day-overlapping window ending on the current UTC date and limits
+Congress-scoped resources to the current Congress. Static resources are
+excluded because their endpoints do not provide a safe incremental filter.
+
+Transient HTTP, timeout, and connection failures retry with capped exponential
+backoff. A recovery task runs every 10 minutes and requeues transient failures
+left by older workers or interrupted deliveries. Celery late acknowledgements
+and worker-loss requeue protect jobs during process failure.
+
+The migration utility is restart-safe and deletes legacy sources only after
+successful verification:
+
+```bash
+uv run python scripts/migrate_jsonl_to_sqlite.py data --delete-source
+```
 
 ## Tests
 

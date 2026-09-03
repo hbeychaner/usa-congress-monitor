@@ -1,5 +1,11 @@
 # Ingest Checklist
 
+> Historical smoke-test notes are retained below for reference. New ingestion
+> should use the durable queue commands in `README.md` and
+> `documentation/README.md`; they write compressed SQLite archives and support
+> automatic retry and resume. Do not use the old JSON/JSONL output examples for
+> new runs.
+
 Instructions
 - Run the ingest for each resource one at a time using the existing `scripts/ingest.py`.
 - We use `--max-pages 2` and `--max 500` to limit scope.

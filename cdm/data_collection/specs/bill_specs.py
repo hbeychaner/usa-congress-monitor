@@ -250,7 +250,18 @@ bill_summaries_all = EndpointSpec(
 summaries_list = EndpointSpec(
     name="summaries_list",
     path_template="/summaries",
-    param_specs=[],
+    param_specs=[
+        ParamSpec(
+            name="fromDateTime",
+            location=ParamLocation.QUERY,
+            required=True,
+        ),
+        ParamSpec(
+            name="toDateTime",
+            location=ParamLocation.QUERY,
+            required=True,
+        ),
+    ],
     data_key="summaries",
     response_model=BillSummaryListItem,
 )

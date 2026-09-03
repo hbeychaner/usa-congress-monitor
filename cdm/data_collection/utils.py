@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import time
 from collections.abc import Callable
@@ -12,11 +11,9 @@ from math import ceil
 from urllib.parse import parse_qs, urlparse
 
 from pydantic import HttpUrl
-from requests.exceptions import ChunkedEncodingError
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver as Chrome
 from tqdm import tqdm
-from urllib3.exceptions import ProtocolError
 
 from cdm.data_collection.id_utils import parse_url_to_id
 from cdm.utils.logger import get_logger
@@ -25,73 +22,6 @@ logger = get_logger(__name__)
 
 RESULT_LIMIT = 100
 RATE_LIMIT_CONSTANT = 5000 / 60 / 60  # 5000 requests per hour, divided into seconds
-
-
-def checkpointed_paginate(
-    endpoint_func,
-    *args,
-    from_date=None,
-    to_date=None,
-    max_retries=3,
-    start_offset=0,
-    **kwargs,
-):
-    """Paginate with checkpointing and batch persistence to disk.
-
-    This helper repeatedly calls ``endpoint_func`` with an ``offset`` and
-    stores progress to a checkpoint file and result file so the operation
-    can be resumed in case of failures.
-
-    Args:
-        endpoint_func: Callable to fetch a page of results. It should accept
-            parameters similar to ``(offset, limit, from_date=..., to_date=...)``
-            and return a tuple ``(results, next_offset, count)``.
-        from_date: Optional ISO date to bound results.
-        to_date: Optional ISO date to bound results.
-        max_retries: Number of retry attempts for transient failures.
-        start_offset: Initial offset to begin pagination from.
-        *args, **kwargs: Forwarded to ``endpoint_func``.
-
-    Returns:
-        None. Results are persisted to files named ``<func>_results.json`` and
-        checkpointed state is written to ``<func>_checkpoint.json``.
-    """
-    func_name = endpoint_func.__name__
-    checkpoint_file = f"{func_name}_checkpoint.json"
-    results_file = f"{func_name}_results.json"
-    offset = start_offset
-    try:
-        with open(checkpoint_file, "r", encoding="utf-8") as f:
-            offset = json.load(f)["offset"]
-    except FileNotFoundError:
-        pass
-    try:
-        with open(results_file, "r", encoding="utf-8") as f:
-            all_results = json.load(f)
-    except FileNotFoundError:
-        all_results = []
-    while offset != -1:
-        for attempt in range(max_retries):
-            try:
-                call_kwargs = dict(kwargs)
-                call_kwargs["offset"] = offset
-                if from_date is not None:
-                    call_kwargs["from_date"] = from_date
-                if to_date is not None:
-                    call_kwargs["to_date"] = to_date
-                results, next_offset, _count = endpoint_func(*args, **call_kwargs)
-                break
-            except (ChunkedEncodingError, ProtocolError) as exc:
-                logger.warning("Paginated request failed: %s", exc)
-                time.sleep(2)
-        else:
-            break
-        all_results.extend(results)
-        with open(results_file, "w", encoding="utf-8") as f:
-            json.dump(all_results, f)
-        with open(checkpoint_file, "w", encoding="utf-8") as f:
-            json.dump({"offset": next_offset}, f)
-        offset = next_offset
 
 
 def datetime_convert(date_str: str) -> str:

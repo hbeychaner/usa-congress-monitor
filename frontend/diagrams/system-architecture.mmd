@@ -1,0 +1,25 @@
+flowchart TB
+    U[User Browser] --> FE[React SPA]
+    FE -->|HTTPS JSON| API[FastAPI Backend cdm/backend]
+
+    API --> Q[Query Service]
+    API --> SS[Search Service]
+    API --> TS[Timeline Service]
+    API --> NLP[NLP Topic Service]
+
+    Q --> DB[(SQLite/Postgres Read Models)]
+    SS --> OS[(OpenSearch)]
+    TS --> DB
+    NLP --> OS
+    NLP --> V[(Vector or Topic Store)]
+
+    API --> CACHE[(Redis Cache)]
+
+    subgraph Ingest and Index Pipeline
+      ING[Ingest Jobs] --> NORM[Normalization]
+      NORM --> IDX[Indexing Jobs]
+      IDX --> OS
+      NORM --> DB
+    end
+
+    ING -.offline pipeline output.-> API

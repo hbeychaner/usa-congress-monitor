@@ -1,3 +1,7 @@
+from collections.abc import Mapping
+from typing import Any
+
+from cdm.models.bills import Bill
 from cdm.models.shared import CountUrl
 
 
@@ -56,3 +60,75 @@ def test_relatedbills_and_textversions_counturl_parsing():
 
     assert isinstance(parsed_tv, CountUrl)
     assert parsed_tv.count == 0
+
+
+class PaginatedClient:
+    def __init__(self, responses):
+        self.responses = responses
+        self.calls = []
+
+    def get_json(self, endpoint: str) -> Mapping[str, Any]:
+        self.calls.append(endpoint)
+        return self.responses[endpoint]
+
+
+def test_detail_collection_aggregates_all_pages():
+    client = PaginatedClient(
+        {
+            "actions": {"actions": [{"id": "first"}], "pagination": {"next": "page-2"}},
+            "page-2": {"actions": [{"id": "second"}]},
+        }
+    )
+
+    records = Bill._fetch_detail_collection(client, "actions", "actions", 3)
+
+    assert records == [{"id": "first"}, {"id": "second"}]
+    assert client.calls == ["actions", "page-2"]
+
+
+def test_detail_collection_reports_counts_and_completeness():
+    client = PaginatedClient(
+        {
+            "actions": {
+                "actions": [{"id": "first"}],
+                "pagination": {"total": 2, "next": "page-2"},
+            },
+            "page-2": {"actions": [{"id": "second"}], "pagination": {"total": 2}},
+        }
+    )
+
+    records, metadata = Bill._fetch_detail_collection_with_metadata(
+        client, "actions", "actions", 3
+    )
+
+    assert len(records) == 2
+    assert metadata == {
+        "page_count": 2,
+        "expected_count": 2,
+        "fetched_count": 2,
+        "state": "expanded",
+        "complete": True,
+    }
+
+
+def test_detail_collection_preserves_count_url_envelope():
+    client = PaginatedClient(
+        {"text": {"textVersions": {"count": 2, "url": "text"}}}
+    )
+
+    envelope = Bill._fetch_detail_collection(client, "text", "textVersions", 3)
+
+    assert envelope == {"count": 2, "url": "text"}
+
+
+def test_detail_collection_rejects_pagination_loop():
+    client = PaginatedClient(
+        {"actions": {"actions": [], "pagination": {"next": "actions"}}}
+    )
+
+    try:
+        Bill._fetch_detail_collection(client, "actions", "actions", 3)
+    except RuntimeError as exc:
+        assert "loop" in str(exc)
+    else:
+        raise AssertionError("expected pagination loop failure")

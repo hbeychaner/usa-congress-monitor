@@ -32,6 +32,9 @@ Examples
 
     # Smoke-test: 1 year, 1 page per resource:
     python scripts/ingest_history.py --from-year 2024 --to-year 2024 --max-pages 1
+
+    # Monitor aggregate hydration progress across queued/running ingest jobs:
+    uv run python scripts/monitor_ingest_progress.py
 """
 
 from __future__ import annotations
@@ -94,6 +97,13 @@ def _is_done(outdir: Path, resource: Resource, fetch_items: bool) -> bool:
     meta_path = outdir / resource.value / "meta.json"
     if not meta_path.exists() or meta_path.stat().st_size < 10:
         return False
+    try:
+        metadata = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return metadata.get("resource") == resource.value and (
+        not fetch_items or bool(metadata.get("fetch_items"))
+    )
 
 
 # ── Normalise date strings for the API ───────────────────────────────────────
@@ -150,6 +160,7 @@ def _checkpoint_matches(
 
 def _parse_args() -> argparse.Namespace:
     this_year = datetime.now(UTC).year
+    default_from_year = max(1789, this_year - 10)
 
     p = argparse.ArgumentParser(
         description="Full-history bulk ingest across all Congress.gov resources.",
@@ -161,9 +172,9 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument(
         "--from-year",
         type=int,
-        default=1990,
+        default=default_from_year,
         metavar="YYYY",
-        help="Earliest year to ingest (default: 1990).",
+        help=f"Earliest year to ingest (default: {default_from_year}, last 10 years).",
     )
     p.add_argument(
         "--to-year",
@@ -460,13 +471,11 @@ def main() -> None:
             if not pending and (not checkpoint_state or checkpoint_matches):
                 logger.debug("[%s] all resources already done — skipping", label)
                 skip_count += len(resources)
-                coverage["chunks"].append(
-                    {
-                        "label": label,
-                        "status": "skipped",
-                        "resources": [r.value for r in resources],
-                    }
-                )
+                coverage["chunks"].append({
+                    "label": label,
+                    "status": "skipped",
+                    "resources": [r.value for r in resources],
+                })
                 return
             if not pending and checkpoint_state and not checkpoint_matches:
                 logger.warning(
@@ -498,22 +507,20 @@ def main() -> None:
             outdir / ".checkpoints",
         )
 
-        coverage["chunks"].append(
-            {
-                "label": label,
-                "status": "completed",
-                "resources": [
-                    {
-                        "resource": result.resource.value,
-                        "success": result.success,
-                        "list_count": result.list_count,
-                        "item_count": result.item_count,
-                        "error": result.error,
-                    }
-                    for result in results
-                ],
-            }
-        )
+        coverage["chunks"].append({
+            "label": label,
+            "status": "completed",
+            "resources": [
+                {
+                    "resource": result.resource.value,
+                    "success": result.success,
+                    "list_count": result.list_count,
+                    "item_count": result.item_count,
+                    "error": result.error,
+                }
+                for result in results
+            ],
+        })
 
         for r in results:
             if not r.success:
@@ -562,13 +569,11 @@ def main() -> None:
     print(f"Output root            : {outdir.resolve()}")
     print("=" * 60)
 
-    coverage.update(
-        {
-            "attempted_chunks": chunk_num,
-            "skipped_resources": skip_count,
-            "resource_failures": fail_count,
-        }
-    )
+    coverage.update({
+        "attempted_chunks": chunk_num,
+        "skipped_resources": skip_count,
+        "resource_failures": fail_count,
+    })
     report_path = _write_coverage_report(outdir, coverage)
     logger.info("Coverage report: %s", report_path)
 

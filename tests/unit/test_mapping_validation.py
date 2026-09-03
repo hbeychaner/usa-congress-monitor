@@ -47,6 +47,33 @@ def test_audit_reports_unmapped_fields_without_silently_dropping_them():
     assert audit["valid"] is True
 
 
+def test_hydrated_bill_fields_are_declared_in_legislation_mapping():
+    document = to_document(
+        {
+            "id": "bill:118:hr:1",
+            "hydration_status": "complete",
+            "hydrated_sources": ["govinfo:billstatus"],
+            "detail_hydration": {
+                "actions": {
+                    "page_count": 2,
+                    "expected_count": 2,
+                    "fetched_count": 2,
+                    "state": "expanded",
+                    "complete": True,
+                }
+            },
+            "actions": [{"action_date": "2024-01-01", "text": "Introduced"}],
+            "cosponsors": [{"bioguide_id": "A000001"}],
+            "full_text": "Section 1.",
+        },
+        "bill",
+    )
+
+    audit = audit_document(document, "bill")
+
+    assert audit["unmapped_fields"] == []
+
+
 def test_validate_rejects_wrong_consolidation_discriminator():
     with pytest.raises(ValueError, match="discriminator errors"):
         validate_document(

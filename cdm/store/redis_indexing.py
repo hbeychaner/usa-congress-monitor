@@ -22,6 +22,8 @@ class RedisIndexingRunner:
     consumer_group: str = "congress-indexers"
     consumer: str = ""
     preserve_raw: bool = False
+    target_index: str | None = None
+    replace: bool = False
 
     def run(self) -> dict:
         if self.batch_size < 1:
@@ -44,15 +46,23 @@ class RedisIndexingRunner:
                     entry["record"],
                     self.resource,
                     preserve_raw=self.preserve_raw,
+                    ingest_metadata=entry.get("ingest_metadata"),
                 )
                 for _, entry in entries
             ]
             for document in documents:
                 validate_document(document, self.resource)
-            result = bulk_upsert(self.opensearch_client, self.resource, documents)
+            result = bulk_upsert(
+                self.opensearch_client,
+                self.resource,
+                documents,
+                target_index=self.target_index,
+                replace=self.replace,
+            )
             if result.get("errors"):
                 raise RuntimeError(
-                    f"OpenSearch bulk indexing failed for Redis stream {self.stream}"
+                    "OpenSearch bulk indexing failed for Redis stream "
+                    f"{self.stream}: {result.get('error_details', [])}"
                 )
             stream.acknowledge(
                 self.consumer_group,
@@ -66,5 +76,9 @@ class RedisIndexingRunner:
             "resource": self.resource,
             "indexed": indexed,
             "batches": batches,
+            "pending": int(
+                self.redis_client.xpending(self.stream, self.consumer_group)["pending"]
+            ),
+            "stream_length": int(self.redis_client.xlen(self.stream)),
             "status": "completed",
         }

@@ -35,8 +35,13 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 REDIS_STREAM_MAXLEN = int(os.getenv("REDIS_STREAM_MAXLEN", "1000000"))
 REDIS_CONSUMER_GROUP = os.getenv("REDIS_CONSUMER_GROUP", "congress-indexers")
 CELERY_TASK_QUEUE = os.getenv("CELERY_TASK_QUEUE", "congress-sync")
+CELERY_INGEST_QUEUE = os.getenv("CELERY_INGEST_QUEUE", "congress-ingest")
+CELERY_INDEX_QUEUE = os.getenv("CELERY_INDEX_QUEUE", "congress-index")
 CELERY_RETRY_MAX = int(os.getenv("CELERY_RETRY_MAX", "8"))
+CELERY_RETRY_MAX_TRANSIENT = int(os.getenv("CELERY_RETRY_MAX_TRANSIENT", "24"))
 CELERY_RETRY_BACKOFF_MAX = int(os.getenv("CELERY_RETRY_BACKOFF_MAX", "3600"))
+CELERY_TASK_SOFT_TIME_LIMIT = int(os.getenv("CELERY_TASK_SOFT_TIME_LIMIT", "3600"))
+CELERY_TASK_TIME_LIMIT = int(os.getenv("CELERY_TASK_TIME_LIMIT", "3900"))
 # When true, the client will raise an error if response fields are
 # present in the API payload but not represented in our Pydantic models.
 # Set via environment variable to one of: 1,true,yes

@@ -11,6 +11,7 @@ dependencies = [
     "celery>=5.4,<6",
     "chromedriver-py==134.0.6998.88",
     "dataclasses-json==0.6.7",
+    "fastapi>=0.116.0,<1",
     "elasticsearch==9.3.0",
     "openai==1.61.1",
     "plotly==5.18.0",
@@ -20,11 +21,11 @@ dependencies = [
     "smolagents==1.8.1",
     "streamlit==1.42.0",
     "streamlit_agraph==0.0.45",
+    "uvicorn[standard]>=0.35.0,<1",
     "pydantic>=2.0",
     "requests",
     "redis>=5.0,<6",
-    # Congress.gov SDK — switch to git+https://github.com/hbeychaner/pycongress.git after push
-    "pycongress",
+    "sqlalchemy>=2.0,<3",
 ]
 
 [project.optional-dependencies]
@@ -49,6 +50,3 @@ packages = ["cdm"]
 [tool.pytest.ini_options]
 # pytest.ini already present; these are duplicated here for uv-managed envs
 testpaths = ["tests"]
-
-[tool.uv.sources]
-pycongress = { path = "../pycongress" }

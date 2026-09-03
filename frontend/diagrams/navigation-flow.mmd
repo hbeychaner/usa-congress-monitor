@@ -1,0 +1,19 @@
+flowchart LR
+    A[Home] --> B[States Directory]
+    B --> C[State Detail]
+    C --> D[Member Profile]
+    D --> E[Recent Bills Activity]
+    D --> F[Topic Profile]
+    B --> G[Global Search]
+    G --> C
+    G --> D
+
+    subgraph State Detail Page
+      C1[House Timeline by Congress]
+      C2[Senate Timeline by Congress]
+      C3[Filters Congress Range Party Chamber]
+    end
+
+    C --> C1
+    C --> C2
+    C --> C3

@@ -4,9 +4,10 @@ Each model includes per-field descriptions that explain what each attribute answ
 """
 
 import logging
+from collections.abc import Mapping
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, Optional, Union
+from typing import Annotated, Any, Optional, Protocol, Union
 
 from bs4 import BeautifulSoup
 from pydantic import (
@@ -35,6 +36,13 @@ from cdm.models.validators import convert_law_type, normalize_chamber
 
 logger = logging.getLogger(__name__)
 
+
+class BillDetailClient(Protocol):
+    """Minimal client contract required to fetch paginated bill details."""
+
+    def get_json(self, endpoint: str) -> Mapping[str, Any]: ...
+
+
 # The API returns CountUrl envelopes for these fields (never expanded lists).
 # Keep the typing succinct: these fields are `CountUrl` when present.
 
@@ -42,7 +50,13 @@ logger = logging.getLogger(__name__)
 class Hearing(BaseModel):
     """Hearing metadata with title, chamber, committee, and timing details."""
 
-    title: Annotated[str, Field(description="What the hearing title is.")]
+    title: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="What the hearing title is (can be absent in some API records).",
+        ),
+    ] = None
     url: Annotated[
         HttpUrl | None,
         Field(default=None, description="Where to retrieve the hearing in the API."),
@@ -708,13 +722,36 @@ class AmendmentMetadata(BaseModel):
 class Treaty(BaseModel):
     """Treaty reference used in amendment or bill metadata."""
 
-    congress: Annotated[int, Field(description="Which Congress the treaty belongs to.")]
+    congress: Annotated[
+        int | None, Field(description="Which Congress the treaty belongs to.")
+    ] = None
     treaty_number: Annotated[
-        str, Field(alias="treatyNumber", description="What the treaty number is.")
-    ]
+        str | None,
+        Field(alias="treatyNumber", description="What the treaty number is."),
+    ] = None
     url: Annotated[
-        HttpUrl, Field(description="Where to retrieve the treaty in the API.")
-    ]
+        HttpUrl | None, Field(description="Where to retrieve the treaty in the API.")
+    ] = None
+    congress_received: Annotated[int | None, Field(alias="congressReceived")] = None
+    congress_considered: Annotated[int | None, Field(alias="congressConsidered")] = None
+    number: int | None = None
+    countries_parties: Annotated[
+        list[dict[str, Any]], Field(alias="countriesParties")
+    ] = []
+    in_force_date: Annotated[str | None, Field(alias="inForceDate")] = None
+    index_terms: Annotated[list[dict[str, Any]], Field(alias="indexTerms")] = []
+    old_number: Annotated[str | None, Field(alias="oldNumber")] = None
+    old_number_display_name: Annotated[
+        str | None, Field(alias="oldNumberDisplayName")
+    ] = None
+    parts: dict[str, Any] = {}
+    related_docs: list[dict[str, Any]] = []
+    resolution_text: str | None = None
+    suffix: str | None = None
+    topic: str | None = None
+    titles: list[dict[str, Any]] = []
+    transmitted_date: Annotated[str | None, Field(alias="transmittedDate")] = None
+    update_date: Annotated[str | None, Field(alias="updateDate")] = None
 
 
 class Subjects(BaseModel):
@@ -739,7 +776,17 @@ class BillMetadata(EntityBase):
         LatestAction | None,
         Field(alias="latestAction", description="What the latest action is."),
     ] = None
-    number: Annotated[int, Field(description="What the bill number is.")]
+    introduced_date: Annotated[
+        str | None,
+        Field(
+            alias="introducedDate",
+            description="When this historical bill entry was introduced.",
+        ),
+    ] = None
+    number: Annotated[
+        str,
+        Field(description="What the bill number is, as supplied by the source."),
+    ]
     relationship_details: Annotated[
         list[RelationshipDetail],
         Field(
@@ -768,6 +815,16 @@ class BillMetadata(EntityBase):
             description="Update date including text availability.",
         ),
     ] = None
+    update_date: Annotated[
+        str | None,
+        Field(alias="updateDate", description="When the bill record was last updated."),
+    ] = None
+
+    @field_validator("number", mode="before")
+    @classmethod
+    def _coerce_number_to_string(cls, value: Any) -> str:
+        """Preserve source identifiers such as fractional bill numbers."""
+        return str(value)
 
     @model_validator(mode="after")
     def _populate_id_if_missing(self):
@@ -848,7 +905,7 @@ class Amendment(BaseModel):
         Field(description="Which members or refs sponsored the amendment."),
     ] = []
     on_behalf_of_sponsor: Annotated[
-        Member | None,
+        list[Member | SponsorRef] | None,
         Field(
             alias="onBehalfOfSponsor",
             description="Who introduced the amendment on behalf of the sponsor.",
@@ -1051,6 +1108,10 @@ class Bill(EntityBase):
         Field(description="Which titles are recorded for the bill."),
     ] = None
     full_text: Annotated[str, Field(description="What the full bill text is.")] = ""
+    detail_hydration: Annotated[
+        dict[str, dict[str, Any]],
+        Field(description="Pagination and completeness metadata for bill details."),
+    ] = Field(default_factory=dict)
 
     # Fields from original data
     congress: Annotated[int, Field(description="Which Congress the bill belongs to.")]
@@ -1163,7 +1224,7 @@ class Bill(EntityBase):
                     return full_text
         return ""
 
-    def add_bill_details(self, client: CDGClient):
+    def add_bill_details(self, client: CDGClient, max_pages: int = 100):
         """Populate the bill with related actions, summaries, and linked entities."""
         """
         Retrieve additional data for a bill.
@@ -1184,14 +1245,20 @@ class Bill(EntityBase):
             "textVersions": "text",
             "titles": "titles",
         }
+        if max_pages < 1:
+            raise ValueError("max_pages must be positive")
         congress = self.congress
         bill_type = self.type.lower()
         bill_number = self.number
         for key, endpoint in additional_bill_data.items():
-            data = client.get_json(
-                f"bill/{congress}/{bill_type}/{bill_number}/{endpoint}"
+            data, metadata = self._fetch_detail_collection_with_metadata(
+                client,
+                f"bill/{congress}/{bill_type}/{bill_number}/{endpoint}",
+                key,
+                max_pages,
             )
-            bill_data[key] = data[key]
+            bill_data[key] = data
+            self.detail_hydration[key] = metadata
 
         self.actions = [
             Action(**x)
@@ -1217,6 +1284,8 @@ class Bill(EntityBase):
         else:
             self.related_bills = None
         subjects_data = bill_data["subjects"]
+        if not isinstance(subjects_data, dict):
+            subjects_data = {}
         legislative_subjects = [
             LegislativeSubject(**x)
             for x in subjects_data.get("legislativeSubjects", [])
@@ -1242,8 +1311,75 @@ class Bill(EntityBase):
             self.text_versions = [TextVersion(**x) for x in tv]
         else:
             self.text_versions = None
-        self.titles = [Title(**x) for x in bill_data["titles"]]
+        titles = bill_data.get("titles")
+        self.titles = [Title(**x) for x in titles] if isinstance(titles, list) else []
         self.full_text = self.add_full_text(client)
+
+    @staticmethod
+    def _fetch_detail_collection(
+        client: BillDetailClient, endpoint: str, key: str, max_pages: int
+    ) -> list[dict] | dict:
+        """Fetch every page of a detail collection or preserve its envelope."""
+        records, _ = Bill._fetch_detail_collection_with_metadata(
+            client, endpoint, key, max_pages
+        )
+        return records
+
+    @staticmethod
+    def _fetch_detail_collection_with_metadata(
+        client: BillDetailClient, endpoint: str, key: str, max_pages: int
+    ) -> tuple[list[dict] | dict, dict[str, Any]]:
+        """Fetch a detail collection and return records with completeness metadata."""
+        records: list[dict] = []
+        next_endpoint: str | None = endpoint
+        visited: set[str] = set()
+        page_count = 0
+        expected_count: int | None = None
+        for _ in range(1, max_pages + 1):
+            if next_endpoint is None or next_endpoint in visited:
+                if next_endpoint in visited:
+                    raise RuntimeError(f"Pagination loop detected for {key}")
+                break
+            visited.add(next_endpoint)
+            page_count += 1
+            response = client.get_json(next_endpoint)
+            value = response.get(key)
+            if not isinstance(value, list):
+                metadata = {
+                    "page_count": page_count,
+                    "expected_count": value.get("count")
+                    if isinstance(value, dict)
+                    else None,
+                    "fetched_count": 0,
+                    "state": "envelope" if isinstance(value, dict) else "empty",
+                    "complete": False,
+                }
+                return value if isinstance(value, dict) else [], metadata
+            records.extend(item for item in value if isinstance(item, dict))
+            pagination = response.get("pagination")
+            if isinstance(pagination, Mapping) and pagination.get("total") is not None:
+                try:
+                    expected_count = int(str(pagination["total"]))
+                except (TypeError, ValueError):
+                    expected_count = None
+            next_value = (
+                pagination.get("next") if isinstance(pagination, Mapping) else None
+            )
+            next_endpoint = str(next_value) if next_value else None
+            if next_endpoint is None:
+                break
+        else:
+            raise RuntimeError(
+                f"Pagination limit of {max_pages} pages exceeded for {key}"
+            )
+        metadata = {
+            "page_count": page_count,
+            "expected_count": expected_count,
+            "fetched_count": len(records),
+            "state": "expanded",
+            "complete": expected_count is None or len(records) >= expected_count,
+        }
+        return records, metadata
 
     def build_id(self) -> str:
         """Return a canonical id for this bill instance."""

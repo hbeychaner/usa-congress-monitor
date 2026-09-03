@@ -37,7 +37,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl --output /dev/null --silent --head --fail -u elastic:${ES_LOCAL_PASSWORD} http://elasticsearch:9200",
+          "code=$$(curl --output /dev/null --silent --head --write-out '%{http_code}' http://elasticsearch:9200); test \"$$code\" = 200 || test \"$$code\" = 401 || test \"$$code\" = 403",
         ]
       interval: 10s
       timeout: 10s

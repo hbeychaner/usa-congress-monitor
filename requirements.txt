@@ -2,6 +2,7 @@ bs4==0.0.2
 celery>=5.4,<6
 chromedriver-py==134.0.6998.88
 dataclasses-json==0.6.7
+fastapi>=0.116,<1
 openai==1.61.1
 plotly==5.18.0
 PyPDF2==3.0.1
@@ -16,3 +17,4 @@ selenium==4.11.0
 smolagents==1.8.1
 streamlit==1.42.0
 streamlit_agraph==0.0.45
+uvicorn[standard]>=0.35,<1

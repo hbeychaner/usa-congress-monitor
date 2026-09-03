@@ -1,5 +1,10 @@
 import json
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any, cast
+
+import requests
+from requests.structures import CaseInsensitiveDict
 
 
 def test_ingest_bill_produces_expected_items(tmp_path, monkeypatch):
@@ -24,13 +29,14 @@ def test_ingest_bill_produces_expected_items(tmp_path, monkeypatch):
         list_resp = raw_list
     responses = [list_resp, list_resp] + list(raw_items)
 
-    class ResponseStub:
+    class ResponseStub(requests.Response):
         def __init__(self, obj):
+            super().__init__()
             self._obj = obj
-            self.headers = {"content-type": "application/json"}
+            self.headers = CaseInsensitiveDict({"content-type": "application/json"})
             self.status_code = 200
 
-        def json(self):
+        def json(self, **kwargs):
             return self._obj
 
         def raise_for_status(self):
@@ -45,7 +51,11 @@ def test_ingest_bill_produces_expected_items(tmp_path, monkeypatch):
             raise RuntimeError("No more canned responses available for test")
         return ResponseStub(obj)
 
-    client._request_with_backoff = _request_with_backoff
+    cast(Any, client)._request_with_backoff = _request_with_backoff
+    monkeypatch.setattr(
+        "cdm.models.bills.Bill.add_bill_details",
+        lambda self, detail_client: None,
+    )
     monkeypatch.setattr(
         "cdm.ingest.runner.get_client", lambda api_key=None, **k: client
     )
@@ -62,7 +72,7 @@ def test_ingest_bill_produces_expected_items(tmp_path, monkeypatch):
     )
     result = runner.run()
 
-    actual = result["records"]
+    actual = cast(list[dict[str, Any]], result.get("records") or [])
     # produced count may be <= raw_items due to deduplication
     assert len(actual) <= len(raw_items)
 
@@ -70,13 +80,19 @@ def test_ingest_bill_produces_expected_items(tmp_path, monkeypatch):
     for idx in range(min(5, len(actual))):
         produced = actual[idx]
         raw_entry = raw_items[idx]
-        raw_payload = (
+        raw_payload_candidate = (
             raw_entry.get("bill")
             if isinstance(raw_entry, dict) and "bill" in raw_entry
             else raw_entry
         )
+        raw_payload: Mapping[str, Any] = (
+            raw_payload_candidate if isinstance(raw_payload_candidate, dict) else {}
+        )
 
-        assert int(raw_payload.get("congress")) == int(produced.get("congress"))
+        raw_congress = raw_payload.get("congress")
+        produced_congress = produced.get("congress")
+        assert raw_congress is not None and produced_congress is not None
+        assert int(raw_congress) == int(produced_congress)
         # bill number may be a string in raw, produced should have number
         assert str(raw_payload.get("number")) in str(produced.get("number"))
         if raw_payload.get("type"):

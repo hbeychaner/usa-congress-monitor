@@ -20,11 +20,22 @@ Usage
     # Dry run (print what would happen)
     uv run scripts/create_indices.py --dry-run
 
+    # Audit physical indices and aliases without changing anything
+    uv run scripts/create_indices.py --audit
+
+    # Reindex one logical index into a versioned staging index
+    uv run scripts/create_indices.py --reindex-version 2 --index amendment
+
+    # Validate one populated versioned staging index
+    uv run scripts/create_indices.py --validate-version 2 --index amendment
+
 Options
 ───────
     --index NAME   Target a single logical index name (default: all)
     --update       Push updated mappings onto existing indices
     --status       Print index status table and exit
+    --reindex-version VERSION  Copy one index into its versioned staging index
+    --validate-version VERSION  Validate one versioned staging index
     --dry-run      Print actions without executing them
     --url URL      OpenSearch base URL (default: http://localhost:9200)
     --user USER    Basic-auth username (default: admin)
@@ -90,6 +101,24 @@ def _print_status(rows: list[dict]) -> None:
     print()
 
 
+def _print_audit(audit: dict) -> None:
+    print(f"Declared indices: {audit['declared_count']}")
+    print("\nTargets:")
+    for row in audit["targets"]:
+        state = "present" if row["exists"] else "missing"
+        aliases = ", ".join(row["aliases"]) or "—"
+        print(
+            f"  {row['full_name']}: {state}, docs={row['doc_count']:,}, "
+            f"aliases={aliases}"
+        )
+    print("\nUnexpected physical indices:")
+    for name in audit["unexpected_physical_indices"] or ["—"]:
+        print(f"  {name}")
+    print("\nStaging indices:")
+    for name in audit.get("staging_indices", []) or ["—"]:
+        print(f"  {name}")
+
+
 def main() -> None:
     _env = _load_env_defaults()
 
@@ -104,6 +133,21 @@ def main() -> None:
     )
     parser.add_argument(
         "--status", action="store_true", help="Print status table and exit"
+    )
+    parser.add_argument(
+        "--audit", action="store_true", help="Audit indices and aliases without changes"
+    )
+    parser.add_argument(
+        "--reindex-version",
+        type=int,
+        metavar="VERSION",
+        help="Copy one index into its versioned staging index",
+    )
+    parser.add_argument(
+        "--validate-version",
+        type=int,
+        metavar="VERSION",
+        help="Validate one versioned staging index",
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Print actions, don't execute"
@@ -140,6 +184,28 @@ def main() -> None:
     # ── status ────────────────────────────────────────────────────────────
     if args.status:
         _print_status(mgr.status())
+        return
+
+    if args.audit:
+        _print_audit(mgr.audit())
+        return
+
+    if args.reindex_version is not None:
+        if not args.index:
+            parser.error("--reindex-version requires --index NAME")
+        print(
+            f"Reindexing {args.index!r} into version {args.reindex_version} staging..."
+        )
+        mgr.reindex_to_versioned(args.index, args.reindex_version)
+        return
+
+    if args.validate_version is not None:
+        if not args.index:
+            parser.error("--validate-version requires --index NAME")
+        result = mgr.validate_versioned(args.index, args.validate_version)
+        print(result)
+        if not result["valid"]:
+            sys.exit(1)
         return
 
     # ── update ────────────────────────────────────────────────────────────

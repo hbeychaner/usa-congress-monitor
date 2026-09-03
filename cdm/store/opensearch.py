@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, cast
 
 INDEX_PREFIX = "congress"
 
@@ -11,6 +11,7 @@ INDEX_PREFIX = "congress"
 # the document so queries can distinguish their source shapes.
 _RESOURCE_TARGETS: dict[str, tuple[str, dict[str, str]]] = {
     "bill": ("legislation", {"source_type": "bill"}),
+    "bill_text": ("legislation", {"source_type": "bill_text"}),
     "law": ("legislation", {"source_type": "law"}),
     "house_communication": ("communication", {"chamber": "House"}),
     "senate_communication": ("communication", {"chamber": "Senate"}),
@@ -23,6 +24,7 @@ _RESOURCE_TARGETS: dict[str, tuple[str, dict[str, str]]] = {
         {"record_subtype": "daily"},
     ),
     "congress": ("congress_ref", {}),
+    "district": ("district", {}),
 }
 
 
@@ -46,45 +48,77 @@ def write_alias(resource: str) -> str:
 
 
 def read_alias(resource: str) -> str:
-    return index_name(resource)
+    return f"{index_name(resource)}-read"
 
 
-def bulk_upsert(client: Any, resource: str, docs: Iterable[dict]) -> dict:
-    """Upsert *docs* into the OpenSearch index for *resource*.
-
-    Each doc must have an ``id`` field which becomes the document ``_id``.
-    Uses the ``_update`` API with ``doc_as_upsert=True`` for idempotency.
-
-    Parameters
-    ----------
-    client:
-        A connected ``elasticsearch.Elasticsearch`` instance.
-    resource:
-        Logical resource name (e.g. ``"legislation"``).  The full index name
-        is resolved via :func:`write_alias`.
-    docs:
-        Iterable of dicts; each must contain an ``"id"`` key.
-
-    Returns
-    -------
-    dict
-        ``{"updated": int, "errors": bool}``
-    """
+def bulk_upsert(
+    client: Any,
+    resource: str,
+    docs: Iterable[dict],
+    *,
+    target_index: str | None = None,
+    replace: bool = False,
+) -> dict:
+    """Upsert records, or replace complete documents when ``replace`` is true."""
     from elasticsearch.helpers import bulk
 
     documents = list(docs)
-    index = write_alias(resource)
-    actions = [
-        {
-            "_op_type": "update",
-            "_index": index,
-            "_id": doc["id"],
-            "doc": doc,
-            "doc_as_upsert": True,
-        }
-        for doc in documents
-        if doc.get("id")
-    ]
+    index = target_index or write_alias(resource)
+    merge_script = (
+        "for (entry in params.doc.entrySet()) {"
+        " def key = entry.getKey();"
+        " def value = entry.getValue();"
+        " if (value != null) {"
+        "  if (value instanceof List) {"
+        "   if (!value.isEmpty()) {"
+        "    if (ctx._source[key] == null) { ctx._source[key] = value; }"
+        "    else {"
+        "     if (!(ctx._source[key] instanceof List)) { ctx._source[key] = [ctx._source[key]]; }"
+        "     for (item in value) {"
+        "      if (!ctx._source[key].contains(item)) { ctx._source[key].add(item); }"
+        "     }"
+        "    }"
+        "   }"
+        "  } else if (value instanceof Map && ctx._source[key] instanceof Map) {"
+        "   ctx._source[key].putAll(value);"
+        "  } else if (!(value instanceof String && value.isEmpty())) {"
+        "   ctx._source[key] = value;"
+        "  }"
+        " }"
+        "}"
+    )
+    actions = []
+    for doc in documents:
+        if not doc.get("id"):
+            continue
+        if replace:
+            actions.append({
+                "_op_type": "index",
+                "_index": index,
+                "_id": doc["id"],
+                "_source": doc,
+            })
+        elif resource == "bill":
+            actions.append({
+                "_op_type": "update",
+                "_index": index,
+                "_id": doc["id"],
+                "script": {
+                    "lang": "painless",
+                    "source": merge_script,
+                    "params": {"doc": doc},
+                },
+                "upsert": doc,
+                "scripted_upsert": True,
+            })
+        else:
+            actions.append({
+                "_op_type": "update",
+                "_index": index,
+                "_id": doc["id"],
+                "doc": doc,
+                "doc_as_upsert": True,
+            })
     if not actions:
         return {
             "updated": 0,
@@ -93,8 +127,12 @@ def bulk_upsert(client: Any, resource: str, docs: Iterable[dict]) -> dict:
         }
 
     success, errors = bulk(client, actions, raise_on_error=False)
-    return {
+    errors = cast(list[dict[str, Any]], errors)
+    result = {
         "updated": success,
         "errors": bool(errors),
         "skipped_missing_ids": sum(1 for doc in documents if not doc.get("id")),
     }
+    if errors:
+        result["error_details"] = errors[:3]
+    return result

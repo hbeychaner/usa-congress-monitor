@@ -55,10 +55,9 @@ RESOURCE_CONFIGS: dict[Resource, ResourceConfig] = {
             Resource.AMENDMENT,
             ResourceConfig(
                 resource=Resource.AMENDMENT,
-                scope="date_window",
-                from_date_param="fromDateTime",
-                to_date_param="toDateTime",
+                scope="static",
                 fetch_items_default=True,
+                notes="Static; amendment list endpoint does not support date filters",
             ),
         ),
         (
@@ -180,7 +179,7 @@ RESOURCE_CONFIGS: dict[Resource, ResourceConfig] = {
             Resource.HOUSE_VOTE,
             ResourceConfig(
                 resource=Resource.HOUSE_VOTE,
-                scope="congress_scoped",
+                scope="static",
                 fetch_items_default=True,
                 notes="Global list; item URLs may include session details",
             ),

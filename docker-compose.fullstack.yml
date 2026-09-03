@@ -1,0 +1,111 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: congress-backend
+    working_dir: /workspace
+    command: >
+      sh -lc "uv sync --no-sources && /opt/venv/bin/uvicorn cdm.backend.app:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    env_file:
+      - elastic-start-local/.env
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@host.docker.internal:5672/
+      REDIS_URL: redis://host.docker.internal:6379/0
+      ES_LOCAL_URL: http://host.docker.internal:9200
+    volumes:
+      - ./:/workspace
+      - uv-cache:/root/.cache/uv
+      - uv-venv:/opt/venv
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: congress-worker-ingest
+    working_dir: /workspace
+    command: >
+      sh -lc "uv sync --no-sources && /opt/venv/bin/celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest"
+    env_file:
+      - elastic-start-local/.env
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@host.docker.internal:5672/
+      REDIS_URL: redis://host.docker.internal:6379/0
+      ES_LOCAL_URL: http://host.docker.internal:9200
+    volumes:
+      - ./:/workspace
+      - uv-cache:/root/.cache/uv
+      - uv-venv:/opt/venv
+    depends_on:
+      backend:
+        condition: service_started
+
+  worker-index:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: congress-worker-index
+    working_dir: /workspace
+    command: >
+      sh -lc "uv sync --no-sources && /opt/venv/bin/celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=2 --max-tasks-per-child=1 --loglevel=INFO --queues=congress-index"
+    env_file:
+      - elastic-start-local/.env
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@host.docker.internal:5672/
+      REDIS_URL: redis://host.docker.internal:6379/0
+      ES_LOCAL_URL: http://host.docker.internal:9200
+    volumes:
+      - ./:/workspace
+      - uv-cache:/root/.cache/uv
+      - uv-venv:/opt/venv
+    depends_on:
+      backend:
+        condition: service_started
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: congress-beat
+    working_dir: /workspace
+    command: >
+      sh -lc "uv sync --no-sources && /opt/venv/bin/celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO"
+    env_file:
+      - elastic-start-local/.env
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@host.docker.internal:5672/
+      REDIS_URL: redis://host.docker.internal:6379/0
+      ES_LOCAL_URL: http://host.docker.internal:9200
+    volumes:
+      - ./:/workspace
+      - uv-cache:/root/.cache/uv
+      - uv-venv:/opt/venv
+    depends_on:
+      backend:
+        condition: service_started
+
+  frontend:
+    build:
+      context: frontend/app
+      dockerfile: Dockerfile
+    container_name: congress-frontend
+    working_dir: /app
+    command: >
+      sh -lc "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+      OPENAPI_URL: http://backend:8000/openapi.json
+    volumes:
+      - ./frontend/app:/app
+      - ./frontend/app/node_modules:/app/node_modules
+    depends_on:
+      backend:
+        condition: service_started
+
+volumes:
+  uv-cache:
+  uv-venv:

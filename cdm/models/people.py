@@ -99,6 +99,7 @@ class CongressMetadata(BaseModel):
             description="When the Congress record was last updated.",
         ),
     ] = None
+    sessions: list[Session] = []
     start_year: Annotated[
         int | None, Field(alias="startYear", default=None, description="Start year")
     ] = None
@@ -111,8 +112,8 @@ class Depiction(BaseModel):
     """Member image metadata including attribution and image URL."""
 
     attribution: Annotated[
-        str, Field(description="Who to credit for the member image.")
-    ]
+        str, Field(default="", description="Who to credit for the member image.")
+    ] = ""
     image_url: Annotated[
         HttpUrl | None,
         Field(
