@@ -17,6 +17,7 @@ Typical usage
 from __future__ import annotations
 
 from copy import deepcopy
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -38,11 +39,13 @@ def _prefixed(name: str) -> str:
     return index_name(name)
 
 
+@lru_cache(maxsize=1)
 def load_definitions() -> dict[str, dict]:
     """Parse the mappings YAML and return ``{name: {settings, mappings}}`` dict.
 
     Top-level YAML keys that start with ``#`` (comments) or are clearly not
-    index definitions are silently ignored.
+    index definitions are silently ignored. Cached because callers such as
+    per-document mapping validation invoke this on every indexed record.
     """
     raw = yaml.safe_load(_MAPPINGS_YAML.read_text())
     return {k: v for k, v in raw.items() if isinstance(v, dict)}

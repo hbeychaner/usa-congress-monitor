@@ -177,14 +177,13 @@ class CDGClient:
         base_delay: float = 0.5,
         max_delay: float = 10.0,
         max_attempts: int = 5,
+        max_rate_limit_attempts: int = 8,
     ) -> requests.Response:
-        """Perform GET with exponential backoff. Raises RuntimeError if
-        cumulative backoff exceeds `self._max_total_retry_wait`.
-        """
         """Perform a GET using an internal session with exponential backoff.
 
         Raises:
-            RuntimeError: if cumulative backoff exceeds configured threshold.
+            RuntimeError: if cumulative backoff exceeds configured threshold, or
+                if 429 responses persist past ``max_rate_limit_attempts``.
 
         Returns:
             requests.Response: the successful HTTP response.
@@ -198,6 +197,11 @@ class CDGClient:
                 resp = self._session.get(url, params=req_params, timeout=timeout)
                 if getattr(resp, "status_code", None) == 429:
                     rate_limit_attempts += 1
+                    if rate_limit_attempts > max_rate_limit_attempts:
+                        raise RuntimeError(
+                            "Exceeded max rate-limit retries "
+                            f"({max_rate_limit_attempts}) for {url}"
+                        )
                     retry_after = resp.headers.get("Retry-After")
                     delay = self._retry_after_seconds(retry_after)
                     if delay is None:

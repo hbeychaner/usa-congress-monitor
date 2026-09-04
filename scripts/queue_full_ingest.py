@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from datetime import date
 from pathlib import Path
 
@@ -36,6 +37,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--preserve-raw", action="store_true")
     parser.add_argument("--smoke", action="store_true", help="Queue one bounded smoke job")
     parser.add_argument("--dry-run", action="store_true", help="Print jobs without queueing")
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=50,
+        help="Pause after this many dispatches (default: 50)",
+    )
+    parser.add_argument(
+        "--batch-delay",
+        type=float,
+        default=2.0,
+        help="Seconds to pause between batches (default: 2.0)",
+    )
     return parser.parse_args()
 
 
@@ -67,9 +80,15 @@ def main() -> None:
             _print_job(job)
         return
 
-    for job in jobs:
+    # Dispatch in small batches with a pause between them so a full historical
+    # backfill (potentially thousands of jobs) doesn't flood the broker in one
+    # burst; the ingest worker only consumes a handful of jobs concurrently
+    # anyway, so pacing dispatch costs nothing and is easy to Ctrl-C mid-run.
+    for index, job in enumerate(jobs, start=1):
         record = submit_job("ingest", job.payload)
         print(f"{job.label}\t{record['id']}\t{record['status']}")
+        if args.batch_size > 0 and index % args.batch_size == 0 and index < len(jobs):
+            time.sleep(args.batch_delay)
     print(f"queued_jobs={len(jobs)}")
 
 

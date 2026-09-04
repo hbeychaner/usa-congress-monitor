@@ -55,8 +55,9 @@ def _archive_engine(path: Path) -> Engine:
     event.listen(
         engine,
         "connect",
-        lambda connection, _: connection.executescript(
-            "PRAGMA journal_mode=DELETE; PRAGMA synchronous=NORMAL;"
+        lambda connection, _: (
+            connection.execute("PRAGMA journal_mode=DELETE"),
+            connection.execute("PRAGMA synchronous=NORMAL"),
         ),
     )
     return engine

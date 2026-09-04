@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 import json
-import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import requests
 from elastic_transport import TransportError
-from sqlalchemy import Column, MetaData, String, Table, create_engine, func, select
+from sqlalchemy import (
+    Column,
+    MetaData,
+    String,
+    Table,
+    create_engine,
+    func,
+    select,
+)
+from sqlalchemy.engine import Connection
 
 from cdm.contracts.api import (
     AdminIngestSnapshot,
@@ -27,17 +34,23 @@ from settings import (
     JOB_DB_PATH,
 )
 
-_REPO_ROOT = Path(__file__).resolve().parents[3]
-_GOVINFO_REPORT = (
-    _REPO_ROOT / "data" / "full_history" / "govinfo" / "coverage-report-118.json"
-)
 _STAGING_INDEX = "congress-legislation-v118"
 _JOBS_ENGINE = create_engine(f"sqlite:///{JOB_DB_PATH}")
 _JOBS_TABLE = Table(
     "jobs",
     MetaData(),
     Column("id", String),
+    Column("kind", String),
     Column("status", String),
+    Column("payload", String),
+    Column("created_at", String),
+)
+_RECORDS_TABLE = Table(
+    "records",
+    MetaData(),
+    Column("record_id", String),
+    Column("resource", String),
+    Column("payload", String),
 )
 
 
@@ -51,24 +64,32 @@ class _ActiveJob:
     to_date: str | None
     fetch_items: bool
     package_ids: tuple[str, ...] = ()
+    counts_toward_aggregate: bool = True
 
 
-def _connect_jobs() -> sqlite3.Connection:
-    conn = sqlite3.connect(JOB_DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+def _connect_jobs():
+    return _JOBS_ENGINE.connect()
 
 
-def _load_active_ingest_jobs(conn: sqlite3.Connection) -> list[_ActiveJob]:
-    rows = conn.execute(
-        """
-        SELECT id, kind, status, payload
-        FROM jobs
-                WHERE kind IN ('ingest', 'govinfo_bulk_batch')
-                    AND status IN ('queued', 'running', 'retrying')
-        ORDER BY created_at
-        """
-    ).fetchall()
+def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
+    rows = (
+        conn
+        .execute(
+            select(
+                _JOBS_TABLE.c.id,
+                _JOBS_TABLE.c.kind,
+                _JOBS_TABLE.c.status,
+                _JOBS_TABLE.c.payload,
+            )
+            .where(
+                _JOBS_TABLE.c.kind.in_(("ingest", "govinfo_bulk", "govinfo_bulk_batch"))
+            )
+            .where(_JOBS_TABLE.c.status.in_(("queued", "running", "retrying")))
+            .order_by(_JOBS_TABLE.c.created_at)
+        )
+        .mappings()
+        .all()
+    )
 
     jobs: list[_ActiveJob] = []
     for row in rows:
@@ -84,6 +105,22 @@ def _load_active_ingest_jobs(conn: sqlite3.Connection) -> list[_ActiveJob]:
                     to_date=None,
                     fetch_items=True,
                     package_ids=tuple(payload.get("job_ids", ())),
+                )
+            )
+            continue
+        if row["kind"] == "govinfo_bulk":
+            package_id = str(payload.get("package_id") or row["id"])
+            jobs.append(
+                _ActiveJob(
+                    job_id=str(row["id"]),
+                    status=str(row["status"]),
+                    resource=f"GovInfo package {package_id}",
+                    outdir=Path(str(payload.get("outdir", "."))),
+                    from_date=None,
+                    to_date=None,
+                    fetch_items=True,
+                    package_ids=(str(row["id"]),),
+                    counts_toward_aggregate=False,
                 )
             )
             continue
@@ -106,11 +143,12 @@ def _load_active_ingest_jobs(conn: sqlite3.Connection) -> list[_ActiveJob]:
     return jobs
 
 
-def _count_rows(db_path: Path, query: str, params: tuple[Any, ...] = ()) -> int:
+def _count_rows(db_path: Path, statement) -> int:
     if not db_path.exists():
         return 0
-    with sqlite3.connect(db_path) as conn:
-        row = conn.execute(query, params).fetchone()
+    engine = create_engine(f"sqlite:///{db_path}")
+    with engine.connect() as conn:
+        row = conn.execute(statement).scalar_one_or_none()
     if not row:
         return 0
     return int(row[0] or 0)
@@ -120,14 +158,15 @@ def _hydrated_count(job: _ActiveJob) -> int:
     records_db = job.outdir / "records.sqlite3"
     return _count_rows(
         records_db,
-        "SELECT count(*) FROM records WHERE resource = ?",
-        (job.resource,),
+        select(func.count())
+        .select_from(_RECORDS_TABLE)
+        .where(_RECORDS_TABLE.c.resource == job.resource),
     )
 
 
 def _cached_list_count(job: _ActiveJob) -> int:
     cache_db = job.outdir / job.resource / "list_records.sqlite3"
-    return _count_rows(cache_db, "SELECT count(*) FROM records")
+    return _count_rows(cache_db, select(func.count()).select_from(_RECORDS_TABLE))
 
 
 def _fetch_bill_total(
@@ -189,15 +228,15 @@ def get_ingest_progress() -> IngestProgressResponse:
             )
             with _JOBS_ENGINE.connect() as batch_conn:
                 status_rows = batch_conn.execute(status_query).all()
-            package_counts = {
-                str(status): int(count) for status, count in status_rows
-            }
+            package_counts = {str(status): int(count) for status, count in status_rows}
             hydrated = package_counts.get("succeeded", 0)
             discovered = hydrated + package_counts.get("running", 0)
             target = len(job.package_ids)
             api_total = None
         else:
-            hydrated = _hydrated_count(job) if job.fetch_items else _cached_list_count(job)
+            hydrated = (
+                _hydrated_count(job) if job.fetch_items else _cached_list_count(job)
+            )
             discovered = _cached_list_count(job)
             api_total = _fetch_bill_total(job, api_total_cache)
 
@@ -209,9 +248,10 @@ def get_ingest_progress() -> IngestProgressResponse:
         discovered = min(target, discovered)
         remaining = max(0, target - hydrated)
 
-        total_hydrated += hydrated
-        total_discovered += discovered
-        total_target += target
+        if job.counts_toward_aggregate:
+            total_hydrated += hydrated
+            total_discovered += discovered
+            total_target += target
 
         jobs.append(
             IngestProgressJob(
@@ -238,35 +278,40 @@ def get_ingest_progress() -> IngestProgressResponse:
     )
 
 
-def _job_status_counts(conn: sqlite3.Connection, kind: str) -> JobStatusCounts:
+def _job_status_counts(conn: Connection, kind: str) -> JobStatusCounts:
     counts = {field: 0 for field in JobStatusCounts.model_fields}
     rows = conn.execute(
-        "SELECT status, count(*) FROM jobs WHERE kind = ? GROUP BY status", (kind,)
-    ).fetchall()
+        select(_JOBS_TABLE.c.status, func.count())
+        .where(_JOBS_TABLE.c.kind == kind)
+        .group_by(_JOBS_TABLE.c.status)
+    ).all()
     for status, count in rows:
         if status in counts:
             counts[status] = int(count)
     return JobStatusCounts(**counts)
 
 
-def _govinfo_coverage() -> GovInfoCoverage:
-    if not _GOVINFO_REPORT.exists():
-        return GovInfoCoverage(congress=118)
-    try:
-        report = json.loads(_GOVINFO_REPORT.read_text(encoding="utf-8"))
-        counts = report.get("counts", {})
-        return GovInfoCoverage(
-            congress=int(report.get("congress", 118)),
-            expected=int(report.get("expected_count", 0)),
-            available=int(counts.get("available", 0)),
-            pending=int(counts.get("pending", 0)),
-            failed=int(counts.get("failed", 0)),
-            not_available=int(counts.get("not_available", 0)),
-            complete=bool(report.get("complete", False)),
-            report_found=True,
-        )
-    except (OSError, TypeError, ValueError, json.JSONDecodeError):
-        return GovInfoCoverage(congress=118, report_found=True)
+def _govinfo_coverage(conn: Connection) -> GovInfoCoverage:
+    rows = conn.execute(
+        select(_JOBS_TABLE.c.status, func.count())
+        .where(_JOBS_TABLE.c.kind == "govinfo_bulk")
+        .group_by(_JOBS_TABLE.c.status)
+    ).all()
+    counts = {str(status): int(count) for status, count in rows}
+    available = counts.get("succeeded", 0)
+    pending = sum(counts.get(status, 0) for status in ("queued", "running", "retrying"))
+    failed = counts.get("failed", 0) + counts.get("cancelled", 0)
+    expected = available + pending + failed + counts.get("not_available", 0)
+    return GovInfoCoverage(
+        congress=118,
+        expected=expected,
+        available=available,
+        pending=pending,
+        failed=failed,
+        not_available=counts.get("not_available", 0),
+        complete=pending == 0 and failed == 0,
+        report_found=False,
+    )
 
 
 def _staging_status() -> StagingStatus:
@@ -285,8 +330,8 @@ def _staging_status() -> StagingStatus:
 
 
 def get_admin_ingest_snapshot() -> AdminIngestSnapshot:
-    coverage = _govinfo_coverage()
     with _connect_jobs() as conn:
+        coverage = _govinfo_coverage(conn)
         govinfo_jobs = _job_status_counts(conn, "govinfo_bulk")
         govinfo_batch_jobs = _job_status_counts(conn, "govinfo_bulk_batch")
         index_jobs = _job_status_counts(conn, "index")

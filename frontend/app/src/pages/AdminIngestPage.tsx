@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { fetchAdminIngestSnapshot, fetchIngestProgress, type AdminIngestSnapshot, type IngestProgressResponse } from '../api/admin';
 
@@ -7,21 +7,6 @@ function formatPct(done: number, total: number): string {
         return '0.0';
     }
     return ((done / total) * 100).toFixed(1);
-}
-
-function formatDuration(seconds: number): string {
-    const roundedSeconds = Math.max(0, Math.round(seconds));
-    const days = Math.floor(roundedSeconds / 86400);
-    const hours = Math.floor((roundedSeconds % 86400) / 3600);
-    const minutes = Math.floor((roundedSeconds % 3600) / 60);
-
-    if (days > 0) {
-        return `${days}d ${hours}h`;
-    }
-    if (hours > 0) {
-        return `${hours}h ${minutes}m`;
-    }
-    return `${Math.max(1, minutes)}m`;
 }
 
 function formatDate(date: string | null): string {
@@ -39,12 +24,6 @@ export function AdminIngestPage() {
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [statusFilter, setStatusFilter] = useState('');
 
-    const previousHydratedRef = useRef<number | null>(null);
-    const previousDiscoveredRef = useRef<number | null>(null);
-    const previousAtRef = useRef<number | null>(null);
-    const [hydrationRate, setHydrationRate] = useState<number | null>(null);
-    const [discoveryRate, setDiscoveryRate] = useState<number | null>(null);
-
     useEffect(() => {
         let cancelled = false;
 
@@ -59,20 +38,6 @@ export function AdminIngestPage() {
                 }
 
                 const now = Date.now();
-                if (
-                    previousAtRef.current !== null &&
-                    previousHydratedRef.current !== null &&
-                    previousDiscoveredRef.current !== null &&
-                    now > previousAtRef.current
-                ) {
-                    const elapsed = (now - previousAtRef.current) / 1000;
-                    setHydrationRate(Math.max(0, (progress.hydrated - previousHydratedRef.current) / elapsed));
-                    setDiscoveryRate(Math.max(0, (progress.discovered - previousDiscoveredRef.current) / elapsed));
-                }
-
-                previousAtRef.current = now;
-                previousHydratedRef.current = progress.hydrated;
-                previousDiscoveredRef.current = progress.discovered;
                 setData(progress);
                 setSnapshot(status);
                 setLastUpdated(new Date(now));
@@ -97,15 +62,19 @@ export function AdminIngestPage() {
         };
     }, []);
 
-    const totals = useMemo(() => {
-        if (!data) {
+    const pipelineProgress = useMemo(() => {
+        if (!snapshot) {
             return null;
         }
+        const packageJobs = snapshot.govinfo_jobs;
+        const indexJobs = snapshot.index_jobs;
+        const jobTotal = (jobs: typeof packageJobs) => Object.values(jobs).reduce((sum, count) => sum + count, 0);
         return {
-            hydratedPct: formatPct(data.hydrated, data.target),
-            discoveredPct: formatPct(data.discovered, data.target),
+            packages: { completed: packageJobs.succeeded, target: jobTotal(packageJobs), queued: packageJobs.queued, running: packageJobs.running },
+            indexing: { completed: indexJobs.succeeded, target: jobTotal(indexJobs), queued: indexJobs.queued, running: indexJobs.running },
+            coverage: { completed: snapshot.govinfo.available, target: snapshot.govinfo.expected, queued: snapshot.govinfo.pending, running: 0 },
         };
-    }, [data]);
+    }, [snapshot]);
 
     const filteredJobs = useMemo(() => {
         if (!data || !statusFilter) {
@@ -113,16 +82,6 @@ export function AdminIngestPage() {
         }
         return data.jobs.filter((job) => job.status === statusFilter);
     }, [data, statusFilter]);
-
-    const completionEta = useMemo(() => {
-        if (!data || data.remaining === 0) {
-            return data ? 'Complete' : 'Calculating';
-        }
-        if (hydrationRate === null || hydrationRate <= 0) {
-            return 'Calculating';
-        }
-        return `About ${formatDuration(data.remaining / hydrationRate)}`;
-    }, [data, hydrationRate]);
 
     return (
         <section className="admin-page">
@@ -144,7 +103,7 @@ export function AdminIngestPage() {
                 <div className="panel"><p>Loading ingest progress...</p></div>
             ) : null}
 
-            {data && totals ? (
+            {data && pipelineProgress ? (
                 <>
                     {snapshot ? (
                         <div className="admin-overview-grid">
@@ -180,32 +139,24 @@ export function AdminIngestPage() {
                     ) : null}
 
                     <div className="panel admin-bars">
-                        <h2>Aggregate Progress</h2>
-                        <div className="progress-row">
-                            <div className="progress-label">Hydrated</div>
-                            <div className="progress-track" role="progressbar" aria-label="Hydration completion" aria-valuemin={0} aria-valuemax={data.target} aria-valuenow={data.hydrated}>
-                                <div className="progress-fill progress-fill-hydrated" style={{ width: `${Math.min(100, Number(totals.hydratedPct))}%` }} />
-                            </div>
-                            <div className="progress-metric">{data.hydrated.toLocaleString()} / {data.target.toLocaleString()} ({totals.hydratedPct}%)</div>
-                        </div>
-
-                        <div className="progress-row">
-                            <div className="progress-label">Discovered</div>
-                            <div className="progress-track" role="progressbar" aria-label="Discovery completion" aria-valuemin={0} aria-valuemax={data.target} aria-valuenow={data.discovered}>
-                                <div className="progress-fill progress-fill-discovered" style={{ width: `${Math.min(100, Number(totals.discoveredPct))}%` }} />
-                            </div>
-                            <div className="progress-metric">{data.discovered.toLocaleString()} / {data.target.toLocaleString()} ({totals.discoveredPct}%)</div>
-                        </div>
-
-                        <p>
-                            Remaining to hydrate: <strong>{data.remaining.toLocaleString()}</strong>
-                            {' · '}
-                            Hydration rate: <strong>{hydrationRate === null ? 'n/a' : `${hydrationRate.toFixed(2)} rec/s`}</strong>
-                            {' · '}
-                            Discovery rate: <strong>{discoveryRate === null ? 'n/a' : `${discoveryRate.toFixed(2)} rec/s`}</strong>
-                            {' · '}
-                            Estimated completion: <strong>{completionEta}</strong>
-                        </p>
+                        <h2>Pipeline Progress</h2>
+                        <p>These bars measure the complete durable workload. Batch jobs below only describe how package work was dispatched.</p>
+                        {([
+                            ['GovInfo packages', pipelineProgress.packages, 'Package jobs succeeded'],
+                            ['OpenSearch indexing', pipelineProgress.indexing, 'Index jobs succeeded'],
+                            ['GovInfo coverage', pipelineProgress.coverage, 'Live package-job state'],
+                        ] as const).map(([label, progress, description]) => {
+                            const percentage = formatPct(progress.completed, progress.target);
+                            return (
+                                <div className="progress-row" key={label}>
+                                    <div className="progress-label">{label}</div>
+                                    <div className="progress-track" role="progressbar" aria-label={`${label} completion`} aria-valuemin={0} aria-valuemax={progress.target} aria-valuenow={progress.completed}>
+                                        <div className="progress-fill progress-fill-hydrated" style={{ width: `${Math.min(100, Number(percentage))}%` }} />
+                                    </div>
+                                    <div className="progress-metric">{progress.completed.toLocaleString()} / {progress.target.toLocaleString()} ({percentage}%) · {progress.queued.toLocaleString()} queued · {progress.running.toLocaleString()} running · {description}</div>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     <div className="panel">
@@ -234,8 +185,8 @@ export function AdminIngestPage() {
                                         <th>Status</th>
                                         <th>Resource</th>
                                         <th>Window</th>
-                                        <th>Hydrated</th>
-                                        <th>Discovered</th>
+                                        <th>Completed</th>
+                                        <th>Observed</th>
                                         <th>Target</th>
                                         <th>Remaining</th>
                                     </tr>

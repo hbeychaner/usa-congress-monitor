@@ -10,6 +10,7 @@ from typing import Any, NoReturn
 
 import requests
 from celery.exceptions import MaxRetriesExceededError
+from kombu.exceptions import OperationalError
 from redis import Redis
 
 from cdm.ingest.archive import JsonlRecordArchive
@@ -173,8 +174,9 @@ def _retry(task: Any, job_id: str, exc: Exception) -> NoReturn:
 def run_ingest_job(self, job_id: str) -> dict:
     store = _store()
     job = store.mark_running(job_id)
-    if job["status"] != JobStatus.RUNNING:
-        return {"job_id": job_id, "skipped": True, "status": job["status"]}
+    if job is None:
+        existing = store.get(job_id)
+        return {"job_id": job_id, "skipped": True, "status": existing["status"]}
     payload = job["payload"]
     try:
         redis_client = _redis()
@@ -252,7 +254,7 @@ def run_ingest_job(self, job_id: str) -> dict:
 def _process_govinfo_bulk_job(job_id: str) -> dict:
     """Download, normalize, archive, and queue one GovInfo package."""
     store = _store()
-    job = store.claim_running(job_id)
+    job = store.mark_running(job_id, update_windows=False)
     if job is None:
         existing = store.get(job_id)
         return {"job_id": job_id, "skipped": True, "status": existing["status"]}
@@ -304,7 +306,7 @@ def _process_govinfo_bulk_job(job_id: str) -> dict:
         resource, record
     )
     index_job = submit_job(
-        "index",
+        JobKind.INDEX.value,
         {
             "stream": stream_name,
             "resource": resource,
@@ -316,8 +318,18 @@ def _process_govinfo_bulk_job(job_id: str) -> dict:
             "target_index": payload.get("target_index"),
             "replace": bool(payload.get("replace", False)),
         },
+        dispatch=False,
     )
     store.mark_succeeded(job_id)
+    try:
+        celery_app.send_task(
+            "cdm.workers.tasks.run_index_job",
+            args=[index_job["id"]],
+            queue=CELERY_INDEX_QUEUE,
+        )
+    except (OperationalError, ConnectionError):
+        # The durable index row remains queued for periodic recovery.
+        pass
     return {"job_id": job_id, "index_jobs": [index_job["id"]], "resource": resource}
 
 
@@ -335,8 +347,9 @@ def run_govinfo_bulk_batch(self, batch_id: str) -> dict:
     """Fan out a durable batch into independently retryable package tasks."""
     store = _store()
     batch = store.mark_running(batch_id)
-    if batch["status"] != JobStatus.RUNNING:
-        return {"job_id": batch_id, "skipped": True, "status": batch["status"]}
+    if batch is None:
+        existing = store.get(batch_id)
+        return {"job_id": batch_id, "skipped": True, "status": existing["status"]}
 
     dispatched = []
     for package_job_id in batch["payload"]["job_ids"]:
@@ -354,8 +367,9 @@ def run_govinfo_bulk_batch(self, batch_id: str) -> dict:
 def run_index_job(self, job_id: str) -> dict:
     store = _store()
     job = store.mark_running(job_id)
-    if job["status"] != JobStatus.RUNNING:
-        return {"job_id": job_id, "skipped": True, "status": job["status"]}
+    if job is None:
+        existing = store.get(job_id)
+        return {"job_id": job_id, "skipped": True, "status": existing["status"]}
     payload = job["payload"]
     try:
         client = get_opensearch_client(url=ES_LOCAL_URL, api_key=ES_LOCAL_API_KEY)
@@ -401,8 +415,9 @@ def run_reconciliation_job(self, job_id: str) -> dict:
     """Replay archived GovInfo records into a validated staging index."""
     store = _store()
     job = store.mark_running(job_id)
-    if job["status"] != JobStatus.RUNNING:
-        return {"job_id": job_id, "skipped": True, "status": job["status"]}
+    if job is None:
+        existing = store.get(job_id)
+        return {"job_id": job_id, "skipped": True, "status": existing["status"]}
     payload = job["payload"]
     try:
         client = get_opensearch_client(url=ES_LOCAL_URL, api_key=ES_LOCAL_API_KEY)
@@ -507,9 +522,29 @@ def daily_ingest_payload(today) -> dict:
     return payload
 
 
+# Redispatching an already-QUEUED job is a rare safety net for messages lost
+# to broker hiccups, not a routine driver of work. Keep the staleness window
+# long and the per-tick batch small so a stalled/absent consumer can never
+# turn recovery into a duplicate-message storm.
+_CRASH_RECOVERY_CUTOFF_MINUTES = 15
+_ORPHAN_RECOVERY_CUTOFF_MINUTES = 60
+_ORPHAN_RECOVERY_BATCH_LIMIT = 25
+_ORPHAN_RECOVERABLE_KINDS = (
+    JobKind.GOVINFO_BULK.value,
+    JobKind.GOVINFO_BULK_BATCH.value,
+    JobKind.INDEX.value,
+)
+
+
 @celery_app.task(name="cdm.workers.tasks.recover_failed_ingest_jobs")
 def recover_failed_ingest_jobs() -> dict:
-    """Requeue failed or stale jobs stranded by a worker restart."""
+    """Requeue jobs stranded by a worker crash and redispatch rare orphaned jobs.
+
+    Crash recovery (RUNNING/RETRYING jobs whose worker died) runs every tick.
+    Redispatching QUEUED jobs is capped and uses a much longer staleness
+    window since a normal queued job already has a message sitting in the
+    broker; redispatching it repeatedly would just duplicate that message.
+    """
     redis_client = _redis()
     recovery_lock = redis_client.lock(
         "congress:workers:recover_failed_ingest_jobs",
@@ -522,15 +557,15 @@ def recover_failed_ingest_jobs() -> dict:
     try:
         store = _store()
         recovered = []
-        cutoff = datetime.now(UTC) - timedelta(minutes=15)
+        now = datetime.now(UTC)
+        crash_cutoff = (now - timedelta(minutes=_CRASH_RECOVERY_CUTOFF_MINUTES)).isoformat()
+        orphan_cutoff = (now - timedelta(minutes=_ORPHAN_RECOVERY_CUTOFF_MINUTES)).isoformat()
         candidates = [
             *store.failed(),
-            *[
-                job
-                for job in store.jobs()
-                if job["status"] in {JobStatus.RUNNING, JobStatus.RETRYING}
-                and datetime.fromisoformat(job["updated_at"]) < cutoff
-            ],
+            *store.stale_active(crash_cutoff),
+            *store.stale_queued(
+                _ORPHAN_RECOVERABLE_KINDS, orphan_cutoff, _ORPHAN_RECOVERY_BATCH_LIMIT
+            ),
         ]
         batched_package_ids = {
             package_id
@@ -550,9 +585,7 @@ def recover_failed_ingest_jobs() -> dict:
                 job["last_error"]
             ):
                 continue
-            requeued = (
-                store.requeue(job["id"]) if job["status"] != JobStatus.QUEUED else job
-            )
+            requeued = store.requeue(job["id"])
             if job["kind"] == JobKind.INGEST:
                 task_name = "cdm.workers.tasks.run_ingest_job"
             elif job["kind"] == JobKind.INDEX:

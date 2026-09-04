@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sqlite3
 import threading
 import zlib
 from collections.abc import Callable
@@ -19,6 +18,8 @@ from pathlib import Path
 from typing import NotRequired, TypedDict
 
 import requests
+from sqlalchemy import Column, MetaData, String, Table, create_engine, select
+from sqlalchemy.exc import SQLAlchemyError
 
 # Ensure known specs are registered (importing the package imports submodules)
 import cdm.data_collection.specs  # noqa: F401
@@ -33,10 +34,19 @@ from cdm.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+_ARCHIVE_METADATA = MetaData()
+_ARCHIVE_RECORDS = Table(
+    "records",
+    _ARCHIVE_METADATA,
+    Column("record_id", String),
+    Column("resource", String),
+    Column("payload", String),
+)
+
 
 def _normalize_api_datetime(value: str) -> str:
     """Format an ISO timestamp in the precision accepted by Congress.gov."""
-    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    parsed = datetime.fromisoformat(value)
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=UTC)
     return parsed.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -775,10 +785,13 @@ class IngestRunner:
             sqlite_path = archive_root / "records.sqlite3"
             if sqlite_path.exists():
                 try:
-                    with sqlite3.connect(sqlite_path) as connection:
-                        rows = connection.execute("SELECT record_id FROM records")
+                    engine = create_engine(f"sqlite:///{sqlite_path}")
+                    with engine.connect() as connection:
+                        rows = connection.execute(
+                            select(_ARCHIVE_RECORDS.c.record_id)
+                        )
                         ids.update(row[0] for row in rows)
-                except (OSError, sqlite3.Error):
+                except (OSError, SQLAlchemyError):
                     logger.warning(
                         "Could not read SQLite archive for resume: %s", sqlite_path
                     )
@@ -829,9 +842,12 @@ class IngestRunner:
             if not sqlite_path.exists():
                 continue
             try:
-                with sqlite3.connect(sqlite_path) as connection:
+                engine = create_engine(f"sqlite:///{sqlite_path}")
+                with engine.connect() as connection:
                     rows = connection.execute(
-                        "SELECT payload FROM records WHERE resource = 'bill'"
+                        select(_ARCHIVE_RECORDS.c.payload).where(
+                            _ARCHIVE_RECORDS.c.resource == "bill"
+                        )
                     )
                     for (payload,) in rows:
                         try:
@@ -844,7 +860,7 @@ class IngestRunner:
                         ):
                             continue
                         signatures.add(IngestRunner._bill_signature(record))
-            except (OSError, sqlite3.Error):
+            except (OSError, SQLAlchemyError):
                 logger.warning(
                     "Could not read bill signatures from SQLite archive: %s",
                     sqlite_path,

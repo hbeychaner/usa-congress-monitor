@@ -12,16 +12,31 @@ from __future__ import annotations
 
 import argparse
 import json
-import sqlite3
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import requests
+from sqlalchemy import Column, MetaData, String, Table, create_engine, func, select
+from sqlalchemy.engine import Connection
 
 from settings import CONGRESS_API_KEY, CONGRESS_API_URL, JOB_DB_PATH
+
+_JOBS_TABLE = Table(
+    "jobs",
+    MetaData(),
+    Column("id", String),
+    Column("kind", String),
+    Column("status", String),
+    Column("payload", String),
+    Column("created_at", String),
+)
+_RECORDS_TABLE = Table(
+    "records",
+    MetaData(),
+    Column("resource", String),
+)
 
 
 @dataclass
@@ -33,23 +48,22 @@ class IngestJob:
     from_date: str | None
     to_date: str | None
     fetch_items: bool
+    hydrated: int = 0
+    discovered: int = 0
+    target: int = 0
 
 
-def _connect_jobs() -> sqlite3.Connection:
-    conn = sqlite3.connect(JOB_DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+def _connect_jobs():
+    return create_engine(f"sqlite:///{JOB_DB_PATH}").connect()
 
 
-def _load_active_ingest_jobs(conn: sqlite3.Connection) -> list[IngestJob]:
+def _load_active_ingest_jobs(conn: Connection) -> list[IngestJob]:
     rows = conn.execute(
-        """
-        SELECT id, status, payload
-        FROM jobs
-        WHERE kind = 'ingest' AND status IN ('queued', 'running', 'retrying')
-        ORDER BY created_at
-        """
-    ).fetchall()
+        select(_JOBS_TABLE.c.id, _JOBS_TABLE.c.status, _JOBS_TABLE.c.payload)
+        .where(_JOBS_TABLE.c.kind == "ingest")
+        .where(_JOBS_TABLE.c.status.in_(("queued", "running", "retrying")))
+        .order_by(_JOBS_TABLE.c.created_at)
+    ).mappings().all()
 
     jobs: list[IngestJob] = []
     for row in rows:
@@ -72,11 +86,12 @@ def _load_active_ingest_jobs(conn: sqlite3.Connection) -> list[IngestJob]:
     return jobs
 
 
-def _count_rows(db_path: Path, query: str, params: tuple[Any, ...] = ()) -> int:
+def _count_rows(db_path: Path, statement) -> int:
     if not db_path.exists():
         return 0
-    with sqlite3.connect(db_path) as conn:
-        row = conn.execute(query, params).fetchone()
+    engine = create_engine(f"sqlite:///{db_path}")
+    with engine.connect() as conn:
+        row = conn.execute(statement).scalar_one_or_none()
     if not row:
         return 0
     return int(row[0] or 0)
@@ -86,14 +101,15 @@ def _hydrated_count(job: IngestJob) -> int:
     records_db = job.outdir / "records.sqlite3"
     return _count_rows(
         records_db,
-        "SELECT count(*) FROM records WHERE resource = ?",
-        (job.resource,),
+        select(func.count()).select_from(_RECORDS_TABLE).where(
+            _RECORDS_TABLE.c.resource == job.resource
+        ),
     )
 
 
 def _cached_list_count(job: IngestJob) -> int:
     cache_db = job.outdir / job.resource / "list_records.sqlite3"
-    return _count_rows(cache_db, "SELECT count(*) FROM records")
+    return _count_rows(cache_db, select(func.count()).select_from(_RECORDS_TABLE))
 
 
 def _checkpoint_next_offset(job: IngestJob) -> int | None:
@@ -138,7 +154,7 @@ def _fetch_bill_total(job: IngestJob, cache: dict[tuple[str | None, str | None],
         total = int(payload.get("pagination", {}).get("total", 0))
         cache[key] = total
         return total
-    except Exception:
+    except (KeyError, TypeError, ValueError, requests.RequestException):
         cache[key] = None
         return None
 
@@ -168,7 +184,7 @@ def _render(
     hydration_rate: float | None,
     discovery_rate: float | None,
 ) -> str:
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     remaining = max(0, total_target - total_hydrated)
     eta_seconds = (remaining / hydration_rate) if hydration_rate and hydration_rate > 0 else None
 
@@ -196,9 +212,9 @@ def _render(
         short_id = job.job_id.replace("ingest:", "")[:10]
         lines.append(
             f"- {short_id} {job.status:<8} {job.resource:<12} "
-            f"hydrated {job._hydrated:,}/{job._target:,} "
-            f"discovered {job._discovered:,}/{job._target:,} "
-            f"(rem {max(0, job._target - job._hydrated):,})"
+            f"hydrated {job.hydrated:,}/{job.target:,} "
+            f"discovered {job.discovered:,}/{job.target:,} "
+            f"(rem {max(0, job.target - job.hydrated):,})"
         )
 
     if not jobs:
@@ -240,9 +256,9 @@ def main() -> None:
                 target = max(hydrated, cached_total)
 
             discovered = min(target, cached_total)
-            job._hydrated = hydrated  # type: ignore[attr-defined]
-            job._discovered = discovered  # type: ignore[attr-defined]
-            job._target = target  # type: ignore[attr-defined]
+            job.hydrated = hydrated
+            job.discovered = discovered
+            job.target = target
             total_hydrated += hydrated
             total_discovered += discovered
             total_target += target

@@ -82,6 +82,11 @@ Congress. Use `--dry-run` to inspect a plan, or override the bounds with
 `--first-congress`, `--last-congress`, `--start-date`, `--end-date`, and
 `--window-days`.
 
+A default plan submits ~2,000 jobs. To avoid bursting the broker in one shot,
+dispatch is paced with `--batch-size` (default 50) and `--batch-delay` (default
+2.0s) — the loop pauses briefly every `batch-size` jobs. Pass `--batch-size 0`
+to disable pacing.
+
 Each job writes fetched list pages to a compressed SQLite cache and item records
 to `data/full_history/<job-id>/<resource>/records.sqlite3`. Checkpoints advance
 only after a page is persisted, and canonical IDs make retries and overlapping
@@ -127,12 +132,98 @@ successful verification:
 uv run python scripts/migrate_jsonl_to_sqlite.py data --delete-source
 ```
 
+## Operations: Start / Restart / Kill Everything
+
+Local defaults (from `.env` / `settings.py`): RabbitMQ at
+`amqp://guest:guest@localhost:5672/`, Redis at `redis://localhost:6379/0`,
+OpenSearch/Elastic at `http://localhost:9200` (Kibana at `:5601`), backend API
+at `http://localhost:8000`, frontend dev server at `http://localhost:5173`.
+
+### Start everything (native processes, macOS)
+
+```bash
+make local        # OpenSearch/Elastic + Redis + RabbitMQ containers
+make worker        # ingest worker (foreground; opens progress monitor)
+make worker-index  # index worker, run in a second terminal
+make beat          # Celery beat scheduler, run in a third terminal
+make backend-api   # FastAPI backend (optional, only if using the web UI)
+make frontend-dev  # Vite dev server (optional, only if using the web UI)
+```
+
+`make services` starts the containers plus worker/index-worker/beat together,
+each in its own Terminal window (macOS) or backgrounded with logs under
+`logs/` (other platforms).
+
+### Start everything (containerized full stack)
+
+```bash
+make stack-up      # infra + backend + worker + worker-index + beat + frontend
+```
+
+This builds/starts `docker-compose.fullstack.yml` on top of the local infra
+stack. Frontend is served at `http://localhost:5173`, backend at
+`http://localhost:8000`.
+
+### Check health
+
+```bash
+make status         # durable job states and ingest coverage from SQLite
+make health-check    # SQLite, Celery, Redis, OpenSearch, backlog, failures
+celery -A cdm.workers.celery_app:celery_app status   # confirm workers are online
+```
+
+### Restart
+
+Native processes: stop the specific process (see below) and re-run the
+corresponding `make` target. Containers only need a restart if their image or
+compose file changed:
+
+```bash
+make local-stop && make local     # restart infra containers, keep volumes
+make stack-down && make stack-up  # restart the full containerized stack
+```
+
+Celery worker/beat processes do not need the broker restarted; killing and
+re-running `make worker` / `make worker-index` / `make beat` is enough after a
+code change.
+
+### Kill
+
+```bash
+# Native Celery worker/beat processes
+pkill -f "celery -A cdm.workers.celery_app:celery_app worker"
+pkill -f "celery -A cdm.workers.celery_app:celery_app beat"
+
+# Native backend/frontend dev servers
+pkill -f "uvicorn cdm.backend.app:app"
+pkill -f "vite"
+
+# Infra containers (preserves volumes/data)
+make local-stop
+
+# Infra containers + delete volumes (destructive, wipes local OpenSearch data)
+make local-down
+
+# Full containerized stack
+make stack-down
+```
+
+Always stop old worker/beat processes before starting new ones after a code
+change to `cdm/workers/`; running two generations of Beat at once will
+duplicate scheduled/recovered jobs against the same RabbitMQ queues.
+
 ## Tests
 
 ```bash
 make uv-test
 OPENSEARCH_INTEGRATION=1 uv run pytest -q tests/integration/test_opensearch_connection.py tests/integration/test_opensearch_roundtrip.py
 ```
+
+The unit suite (`tests/unit`) runs in a few seconds — `tests/unit/conftest.py`
+neutralizes the Congress.gov client's real rate-limit sleep (~0.72s/call) so
+fixture-driven ingest tests don't incur real wall-clock delay. Tests that
+assert on retry/backoff timing (e.g. `tests/unit/test_client.py`) override
+this locally and are unaffected.
 
 The repository validation baseline is:
 

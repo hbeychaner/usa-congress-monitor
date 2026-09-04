@@ -320,50 +320,11 @@ all_bills = gather_paginated_metadata(
 
 ## Data Collection Orchestration
 
-Use cdm/data_collection/collector.py to orchestrate two-step data collection:
-1) fetch list-level records from paginated endpoints, and
-2) enrich each record with detail data, while saving progress for resumable runs.
+> **Note:** the `cdm/data_collection/collector.py` module this section used to document
+> was unused dead code and has been removed (see `NOTES_FOR_JUNIOR.md`). Current ingest
+> orchestration lives in `cdm/ingest/pipeline.py` and `cdm/ingest/runner.py`, dispatched
+> via `cdm/workers/tasks.py` Celery tasks.
 
-```python
-from pathlib import Path
-
-from cdm.data_collection.client import CDGClient
-from cdm.data_collection.collector import collect_with_details
-from cdm.data_collection.data_types import CongressDataType
-from cdm.data_collection.endpoints.bill import get_bills_metadata
-
-client = CDGClient(api_key="YOUR_API_KEY")
-
-
-def list_fetcher(offset: int, page_size: int) -> dict:
-    return get_bills_metadata(client, offset=offset, pageSize=page_size)
-
-
-def id_getter(item: dict) -> str:
-    return f"{item.get('congress')}-{item.get('type')}-{item.get('number')}"
-
-
-def detail_fetcher(item: dict) -> dict:
-    congress = item["congress"]
-    bill_type = item["type"].lower()
-    number = item["number"]
-    return client.get(f"bill/{congress}/{bill_type}/{number}")["bill"]
-
-
-results = collect_with_details(
-    fetch_page=list_fetcher,
-    data_key=CongressDataType.BILLS,
-    detail_fetcher=detail_fetcher,
-    id_getter=id_getter,
-    list_checkpoint=Path("checkpoints/bills_list.json"),
-    list_results=Path("checkpoints/bills_list_results.json"),
-    detail_checkpoint=Path("checkpoints/bills_detail.json"),
-    detail_results=Path("checkpoints/bills_detail_results.json"),
-)
-```
-
-This pattern is intended for scheduled, incremental collection (e.g., daily runs). The
-checkpoint files allow the job to resume without duplicating previously collected data.
 
 ## Daily Window Collector
 

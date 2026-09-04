@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import argparse
 import json
-import sqlite3
 import sys
 from collections import Counter
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
+
+from sqlalchemy import text
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -26,14 +27,17 @@ def _parse_timestamp(value: str) -> datetime:
 
 def _failure_category(error: str | None) -> str:
     text = (error or "").lower()
-    if any(marker in text for marker in (
-        "timeout",
-        "connection",
-        "database is locked",
-        "server error: 5",
-        "http 5",
-        "429",
-    )):
+    if any(
+        marker in text
+        for marker in (
+            "timeout",
+            "connection",
+            "database is locked",
+            "server error: 5",
+            "http 5",
+            "429",
+        )
+    ):
         return "transient"
     if "400 client error" in text or "bad request" in text:
         return "vendor_4xx"
@@ -48,22 +52,14 @@ def _job_snapshot(store: JobStore, window_minutes: int) -> dict[str, Any]:
     jobs = store.jobs()
     cutoff = datetime.now(UTC) - timedelta(minutes=window_minutes)
     counts = Counter((job["kind"], job["status"]) for job in jobs)
-    recent = [
-        job
-        for job in jobs
-        if _parse_timestamp(job["updated_at"]) >= cutoff
-    ]
+    recent = [job for job in jobs if _parse_timestamp(job["updated_at"]) >= cutoff]
     failures = Counter(
         (job["kind"], _failure_category(job.get("last_error")))
         for job in jobs
         if job["status"] == "failed"
     )
     latest_finished = max(
-        (
-            job["finished_at"]
-            for job in jobs
-            if job.get("finished_at")
-        ),
+        (job["finished_at"] for job in jobs if job.get("finished_at")),
         default=None,
     )
     return {
@@ -75,11 +71,7 @@ def _job_snapshot(store: JobStore, window_minutes: int) -> dict[str, Any]:
             for (kind, status), count in sorted(counts.items())
         },
         "recent_updates": len(recent),
-        "recent_succeeded": sum(
-            1
-            for job in recent
-            if job["status"] == "succeeded"
-        ),
+        "recent_succeeded": sum(1 for job in recent if job["status"] == "succeeded"),
         "latest_finished_at": latest_finished,
         "failures": [
             {"kind": kind, "category": category, "count": count}
@@ -129,8 +121,8 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
     }
 
     try:
-        with sqlite3.connect(JOB_DB_PATH) as connection:
-            integrity = connection.execute("PRAGMA integrity_check").fetchone()[0]
+        with JobStore(JOB_DB_PATH).engine.connect() as connection:
+            integrity = connection.execute(text("PRAGMA integrity_check")).scalar_one()
         if integrity != "ok":
             raise RuntimeError(f"SQLite integrity check failed: {integrity}")
         report["checks"]["jobs"] = _job_snapshot(JobStore(JOB_DB_PATH), window_minutes)
@@ -138,7 +130,11 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
         report["status"] = "failed"
         report["checks"]["jobs"] = {"status": "failed", "error": str(exc)}
 
-    for name, check in (("celery", _check_celery), ("redis", _check_redis), ("opensearch", _check_opensearch)):
+    for name, check in (
+        ("celery", _check_celery),
+        ("redis", _check_redis),
+        ("opensearch", _check_opensearch),
+    ):
         try:
             report["checks"][name] = check()
         except Exception as exc:  # noqa: BLE001 - report dependency failures without aborting the check.
@@ -147,11 +143,7 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
 
     jobs = report["checks"].get("jobs", {})
     counts = jobs.get("counts", {})
-    backlog = sum(
-        count
-        for key, count in counts.items()
-        if key.endswith(":queued")
-    )
+    backlog = sum(count for key, count in counts.items() if key.endswith(":queued"))
     if backlog:
         report["warnings"].append(f"{backlog:,} queued jobs remain")
     if jobs.get("failures"):
@@ -164,7 +156,9 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--window-minutes", type=int, default=15)
-    parser.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+    parser.add_argument(
+        "--json", action="store_true", help="Print machine-readable JSON"
+    )
     args = parser.parse_args()
     if args.window_minutes < 1:
         parser.error("--window-minutes must be positive")

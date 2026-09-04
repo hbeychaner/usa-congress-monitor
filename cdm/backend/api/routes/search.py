@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
-from cdm.contracts.api import SearchResponse
 from cdm.backend.services.search_service import search_entities
+from cdm.contracts.api import SearchResponse
 
 router = APIRouter(prefix="/search", tags=["search"])
 

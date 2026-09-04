@@ -263,41 +263,16 @@ class JobStore:
         result["payload"] = json.loads(result["payload"])
         return result
 
-    def mark_running(self, job_id: str) -> dict:
-        now = _now()
-        with self._transaction_lock(), self.engine.begin() as connection:
-            connection.execute(
-                update(_JOBS)
-                .where(
-                    (_JOBS.c.id == job_id)
-                    & _JOBS.c.status.in_([
-                        JobStatus.QUEUED.value,
-                        JobStatus.RUNNING.value,
-                        JobStatus.RETRYING.value,
-                        JobStatus.FAILED.value,
-                    ])
-                )
-                .values(
-                    status=JobStatus.RUNNING.value,
-                    attempts=_JOBS.c.attempts + 1,
-                    started_at=now,
-                    updated_at=now,
-                    last_error=None,
-                )
-            )
-            connection.execute(
-                update(_INGEST_WINDOWS)
-                .where(_INGEST_WINDOWS.c.job_id == job_id)
-                .values(
-                    status=JobStatus.RUNNING.value,
-                    last_started_at=now,
-                    last_progress_at=now,
-                )
-            )
-        return self.get(job_id)
+    def mark_running(self, job_id: str, *, update_windows: bool = True) -> dict | None:
+        """Atomically claim a job for execution, returning ``None`` if already claimed.
 
-    def claim_running(self, job_id: str) -> dict | None:
-        """Claim a queued package job, returning ``None`` if already claimed."""
+        RUNNING is intentionally excluded from the claimable source statuses so
+        a duplicate message delivered for a job that's already in progress (or
+        finished) becomes a safe no-op instead of a second concurrent run.
+
+        ``update_windows`` is ``False`` for package jobs (e.g. GovInfo bulk)
+        that have no corresponding ``_INGEST_WINDOWS`` row.
+        """
         now = _now()
         with self._transaction_lock(), self.engine.begin() as connection:
             result = connection.execute(
@@ -318,8 +293,18 @@ class JobStore:
                     last_error=None,
                 )
             )
-        if result.rowcount != 1:
-            return None
+            if result.rowcount != 1:
+                return None
+            if update_windows:
+                connection.execute(
+                    update(_INGEST_WINDOWS)
+                    .where(_INGEST_WINDOWS.c.job_id == job_id)
+                    .values(
+                        status=JobStatus.RUNNING.value,
+                        last_started_at=now,
+                        last_progress_at=now,
+                    )
+                )
         return self.get(job_id)
 
     def mark_succeeded(self, job_id: str) -> dict:
@@ -428,6 +413,11 @@ class JobStore:
             )
 
     def requeue(self, job_id: str) -> dict:
+        """Move a job back to QUEUED, also refreshing an already-QUEUED job's timestamp.
+
+        Refreshing the timestamp on a no-op QUEUED->QUEUED transition lets
+        callers rate-limit redispatch of the same stale job via ``updated_at``.
+        """
         now = _now()
         with self._transaction_lock(), self.engine.begin() as connection:
             connection.execute(
@@ -435,6 +425,7 @@ class JobStore:
                 .where(
                     (_JOBS.c.id == job_id)
                     & _JOBS.c.status.in_([
+                        JobStatus.QUEUED.value,
                         JobStatus.FAILED.value,
                         JobStatus.RUNNING.value,
                         JobStatus.RETRYING.value,
@@ -444,29 +435,68 @@ class JobStore:
             )
         return self.get(job_id)
 
+    def _fetch(self, statement: Any) -> list[dict]:
+        """Execute a ``select(_JOBS)`` statement and decode payloads in one round trip.
+
+        Avoids the N+1 pattern of selecting ids then calling ``get()`` per row.
+        """
+        with self.engine.connect() as connection:
+            rows = connection.execute(statement).mappings().all()
+        results = []
+        for row in rows:
+            result = dict(row)
+            result["payload"] = json.loads(result["payload"])
+            results.append(result)
+        return results
+
     def failed(self, kind: str | None = None) -> list[dict]:
-        statement = select(_JOBS.c.id).where(_JOBS.c.status == JobStatus.FAILED.value)
+        statement = select(_JOBS).where(_JOBS.c.status == JobStatus.FAILED.value)
         if kind:
             statement = statement.where(_JOBS.c.kind == kind)
         statement = statement.order_by(_JOBS.c.updated_at)
-        with self.engine.connect() as connection:
-            ids = connection.execute(statement).all()
-        return [self.get(row.id) for row in ids]
+        return self._fetch(statement)
+
+    def stale_active(self, cutoff: str) -> list[dict]:
+        """Return RUNNING/RETRYING jobs stranded past ``cutoff`` (e.g. a worker crash)."""
+        statement = (
+            select(_JOBS)
+            .where(
+                _JOBS.c.status.in_([JobStatus.RUNNING.value, JobStatus.RETRYING.value])
+            )
+            .where(_JOBS.c.updated_at < cutoff)
+            .order_by(_JOBS.c.updated_at)
+        )
+        return self._fetch(statement)
+
+    def stale_queued(
+        self, kinds: tuple[str, ...], cutoff: str, limit: int
+    ) -> list[dict]:
+        """Return up to ``limit`` QUEUED jobs of ``kinds`` stale past ``cutoff``.
+
+        This is a rare safety net for dispatch messages lost to broker hiccups;
+        callers should keep ``limit`` small so a large backlog can't flood the
+        broker with duplicate messages in a single sweep.
+        """
+        statement = (
+            select(_JOBS)
+            .where(_JOBS.c.status == JobStatus.QUEUED.value)
+            .where(_JOBS.c.kind.in_(kinds))
+            .where(_JOBS.c.updated_at < cutoff)
+            .order_by(_JOBS.c.updated_at)
+            .limit(limit)
+        )
+        return self._fetch(statement)
 
     def queued(self, kind: str | None = None) -> list[dict]:
-        statement = select(_JOBS.c.id).where(_JOBS.c.status == JobStatus.QUEUED.value)
+        statement = select(_JOBS).where(_JOBS.c.status == JobStatus.QUEUED.value)
         if kind:
             statement = statement.where(_JOBS.c.kind == kind)
         statement = statement.order_by(_JOBS.c.created_at)
-        with self.engine.connect() as connection:
-            ids = connection.execute(statement).all()
-        return [self.get(row.id) for row in ids]
+        return self._fetch(statement)
 
     def jobs(self, kind: str | None = None) -> list[dict]:
         """Return durable jobs ordered from newest to oldest."""
-        statement = select(_JOBS.c.id).order_by(_JOBS.c.created_at.desc())
+        statement = select(_JOBS).order_by(_JOBS.c.created_at.desc())
         if kind:
             statement = statement.where(_JOBS.c.kind == kind)
-        with self.engine.connect() as connection:
-            ids = connection.execute(statement).all()
-        return [self.get(row.id) for row in ids]
+        return self._fetch(statement)

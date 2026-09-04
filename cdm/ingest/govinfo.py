@@ -6,7 +6,6 @@ import hashlib
 import json
 import os
 import re
-import sqlite3
 import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import asdict, dataclass
@@ -17,6 +16,8 @@ from typing import Any, Protocol
 from urllib.parse import urljoin
 
 import requests
+from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine, select
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 
 class GovInfoHttpSession(Protocol):
@@ -38,36 +39,37 @@ class GovInfoPackage:
     version_code: str | None = None
 
 
+_METADATA = MetaData()
+_GOVINFO_PACKAGES = Table(
+    "govinfo_packages",
+    _METADATA,
+    Column("collection", String, primary_key=True),
+    Column("congress", Integer, primary_key=True),
+    Column("measure_type", String, primary_key=True),
+    Column("package_id", String, primary_key=True),
+    Column("url", String, nullable=False),
+    Column("session", Integer),
+    Column("version_code", String),
+    Column("status", String, nullable=False),
+    Column("path", String),
+    Column("bytes", Integer),
+    Column("sha256", String),
+    Column("etag", String),
+    Column("last_modified", String),
+    Column("fetched_at", String),
+    Column("parser_version", String),
+    Column("error", String),
+)
+
+
 class GovInfoManifestStore:
     """Persist GovInfo package state for resumable acquisition and parsing."""
 
     def __init__(self, path: Path) -> None:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(self.path) as connection:
-            connection.execute(
-                """
-                CREATE TABLE IF NOT EXISTS govinfo_packages (
-                    collection TEXT NOT NULL,
-                    congress INTEGER NOT NULL,
-                    measure_type TEXT NOT NULL,
-                    package_id TEXT NOT NULL,
-                    url TEXT NOT NULL,
-                    session INTEGER,
-                    version_code TEXT,
-                    status TEXT NOT NULL,
-                    path TEXT,
-                    bytes INTEGER,
-                    sha256 TEXT,
-                    etag TEXT,
-                    last_modified TEXT,
-                    fetched_at TEXT,
-                    parser_version TEXT,
-                    error TEXT,
-                    PRIMARY KEY (collection, congress, measure_type, package_id)
-                )
-                """
-            )
+        self.engine = create_engine(f"sqlite:///{self.path}")
+        _METADATA.create_all(self.engine)
 
     def upsert(
         self,
@@ -83,69 +85,58 @@ class GovInfoManifestStore:
         parser_version: str | None = None,
         error: str | None = None,
     ) -> None:
-        values = (
-            package.collection,
-            package.congress,
-            package.measure_type,
-            package.package_id,
-            package.url,
-            package.session,
-            package.version_code,
-            status,
-            path,
-            byte_count,
-            sha256,
-            etag,
-            last_modified,
-            fetched_at,
-            parser_version,
-            error,
+        values = {
+            "collection": package.collection,
+            "congress": package.congress,
+            "measure_type": package.measure_type,
+            "package_id": package.package_id,
+            "url": package.url,
+            "session": package.session,
+            "version_code": package.version_code,
+            "status": status,
+            "path": path,
+            "bytes": byte_count,
+            "sha256": sha256,
+            "etag": etag,
+            "last_modified": last_modified,
+            "fetched_at": fetched_at,
+            "parser_version": parser_version,
+            "error": error,
+        }
+        statement = sqlite_insert(_GOVINFO_PACKAGES).values(values)
+        statement = statement.on_conflict_do_update(
+            index_elements=(
+                _GOVINFO_PACKAGES.c.collection,
+                _GOVINFO_PACKAGES.c.congress,
+                _GOVINFO_PACKAGES.c.measure_type,
+                _GOVINFO_PACKAGES.c.package_id,
+            ),
+            set_={column: getattr(statement.excluded, column) for column in (
+                "url", "session", "version_code", "status", "path", "bytes",
+                "sha256", "etag", "last_modified", "fetched_at", "parser_version", "error",
+            )},
         )
-        with sqlite3.connect(self.path) as connection:
-            connection.execute(
-                """
-                INSERT INTO govinfo_packages (
-                    collection, congress, measure_type, package_id, url, session,
-                    version_code, status, path, bytes, sha256, etag, last_modified,
-                    fetched_at, parser_version, error
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(collection, congress, measure_type, package_id)
-                DO UPDATE SET
-                    url=excluded.url, session=excluded.session,
-                    version_code=excluded.version_code, status=excluded.status,
-                    path=excluded.path, bytes=excluded.bytes, sha256=excluded.sha256,
-                    etag=excluded.etag, last_modified=excluded.last_modified,
-                    fetched_at=excluded.fetched_at,
-                    parser_version=excluded.parser_version, error=excluded.error
-                """,
-                values,
-            )
+        with self.engine.begin() as connection:
+            connection.execute(statement)
 
     def get(self, package: GovInfoPackage) -> dict[str, Any] | None:
-        with sqlite3.connect(self.path) as connection:
-            connection.row_factory = sqlite3.Row
-            row = connection.execute(
-                """
-                SELECT * FROM govinfo_packages
-                WHERE collection = ? AND congress = ? AND measure_type = ?
-                  AND package_id = ?
-                """,
-                (
-                    package.collection,
-                    package.congress,
-                    package.measure_type,
-                    package.package_id,
-                ),
-            ).fetchone()
+        statement = select(_GOVINFO_PACKAGES).where(
+            _GOVINFO_PACKAGES.c.collection == package.collection,
+            _GOVINFO_PACKAGES.c.congress == package.congress,
+            _GOVINFO_PACKAGES.c.measure_type == package.measure_type,
+            _GOVINFO_PACKAGES.c.package_id == package.package_id,
+        )
+        with self.engine.connect() as connection:
+            row = connection.execute(statement).mappings().first()
         return dict(row) if row else None
 
     def rows(self) -> list[dict[str, Any]]:
         """Return all persisted package states for coverage reporting."""
-        with sqlite3.connect(self.path) as connection:
-            connection.row_factory = sqlite3.Row
-            return [dict(row) for row in connection.execute(
-                "SELECT * FROM govinfo_packages ORDER BY collection, package_id"
-            )]
+        statement = select(_GOVINFO_PACKAGES).order_by(
+            _GOVINFO_PACKAGES.c.collection, _GOVINFO_PACKAGES.c.package_id
+        )
+        with self.engine.connect() as connection:
+            return [dict(row) for row in connection.execute(statement).mappings()]
 
 
 def summarize_govinfo_coverage(

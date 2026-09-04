@@ -33,6 +33,7 @@ def test_job_store_tracks_retrying_state(tmp_path):
     assert retrying["last_error"] == "server error: 500"
 
     resumed = store.mark_running(job["id"])
+    assert resumed
     assert resumed["status"] == "running"
     assert resumed["attempts"] == 2
 
@@ -45,6 +46,30 @@ def test_job_store_requeues_failed_job(tmp_path):
     requeued = store.requeue(job["id"])
 
     assert requeued["status"] == "queued"
+
+
+def test_job_store_requeue_refreshes_already_queued_job(tmp_path):
+    store = JobStore(tmp_path / "jobs.sqlite3")
+    job = store.create("index", "index:refresh", {"resource": "bill"})
+    original_updated_at = job["updated_at"]
+
+    refreshed = store.requeue(job["id"])
+
+    assert refreshed["status"] == "queued"
+    assert refreshed["updated_at"] >= original_updated_at
+
+
+def test_job_store_mark_running_rejects_duplicate_claim(tmp_path):
+    store = JobStore(tmp_path / "jobs.sqlite3")
+    job = store.create("index", "index:duplicate", {"resource": "bill"})
+
+    first_claim = store.mark_running(job["id"])
+    duplicate_claim = store.mark_running(job["id"])
+
+    assert first_claim
+    assert first_claim["status"] == "running"
+    assert duplicate_claim is None
+    assert store.get(job["id"])["attempts"] == 1
 
 
 def test_job_store_lists_jobs_newest_first(tmp_path):
