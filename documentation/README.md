@@ -155,11 +155,15 @@ PYTHONPATH=. uv run pytest -q
 
 ```
 cdm/                    — Congress Data Model (core library)
+  data_collection/
+    client.py            — Congress.gov HTTP client; enforces rate limiting
+                           on every request via an injected/default TokenBucket
+  utils/
+    rate_limiter.py      — Thread-safe token bucket (default 4800 req/hr)
   ingest/               — API collection pipeline
     resource_config.py  — Per-resource metadata (scope, date params, etc.)
     runner.py           — Single-resource ingest (list + items, concurrent)
     pipeline.py         — Multi-resource orchestration
-    rate_limiter.py     — Thread-safe token bucket (default 4800 req/hr)
     archive.py          — Compressed SQLite record archives and list caches
     checkpoint.py       — Resume state tracking
   jobs/store.py         — SQLite job ledger and idempotency store
@@ -193,12 +197,14 @@ Resources are classified into three scopes:
 | `congress_scoped` | Requires a Congress path parameter | law |
 | `static` | No server-side incremental filter | amendment, house_vote, congress, and reference collections |
 
-Item fetches use a `ThreadPoolExecutor` governed by a `TokenBucket` rate
-limiter (worker default: 4; local runner default: 1) so the pipeline stays
-within the 4 800 req/hr API limit. Each deduplicated item is published directly
-to the resource's Redis Stream; consumer-group pending state provides crash
-recovery. List pages and item records are compressed and deduplicated in
-per-resource SQLite databases.
+Item fetches use a `ThreadPoolExecutor`. A single `TokenBucket` rate limiter
+(worker default: 4800 req/hr) is injected into `IngestRunner` and shared by
+every per-thread `CDGClient`, which enforces it on every HTTP call (both list
+pages and item fetches) so the pipeline stays within the API's 4 800 req/hr
+limit with one coordinated budget instead of per-client throttling. Each
+deduplicated item is published directly to the resource's Redis Stream;
+consumer-group pending state provides crash recovery. List pages and item
+records are compressed and deduplicated in per-resource SQLite databases.
 
 ### Full-history ingest
 
@@ -321,9 +327,9 @@ all_bills = gather_paginated_metadata(
 ## Data Collection Orchestration
 
 > **Note:** the `cdm/data_collection/collector.py` module this section used to document
-> was unused dead code and has been removed (see `NOTES_FOR_JUNIOR.md`). Current ingest
-> orchestration lives in `cdm/ingest/pipeline.py` and `cdm/ingest/runner.py`, dispatched
-> via `cdm/workers/tasks.py` Celery tasks.
+> was unused dead code and has been removed. Current ingest orchestration lives in
+> `cdm/ingest/pipeline.py` and `cdm/ingest/runner.py`, dispatched via
+> `cdm/workers/tasks.py` Celery tasks.
 
 
 ## Daily Window Collector

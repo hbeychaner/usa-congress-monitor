@@ -28,7 +28,6 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from cdm.ingest.rate_limiter import TokenBucket
 from cdm.ingest.resource_config import (
     RESOURCE_CONFIGS,
     ResourceConfig,
@@ -38,6 +37,7 @@ from cdm.ingest.resource_config import (
 )
 from cdm.ingest.runner import FatalIngestError, IngestRunner, Resource
 from cdm.jobs.store import CoverageStage
+from cdm.utils.rate_limiter import TokenBucket
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,10 @@ class PipelineConfig:
     list_page_size: int = 250
     # Concurrency: parallel item-fetch workers
     concurrency: int = 1
-    # Shared rate limiter (TokenBucket); None = no rate limiting
+    # Shared rate limiter (TokenBucket), injected into every per-thread
+    # CDGClient. None = each client falls back to its own default budget
+    # (DEFAULT_RATE_PER_HOUR in cdm.data_collection.client), unshared across
+    # threads.
     rate_limiter: TokenBucket | None = None
     record_sink: Callable[[str, dict], None] | None = None
     record_archive_sink: Callable[[str, dict], None] | None = None

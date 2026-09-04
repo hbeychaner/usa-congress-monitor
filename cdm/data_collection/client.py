@@ -7,7 +7,6 @@ returning mixed types or raw byte fallbacks.
 
 import importlib
 import inspect
-import threading
 import time
 from collections.abc import Iterator, Mapping
 from datetime import UTC
@@ -21,7 +20,12 @@ from pydantic import BaseModel, ValidationError
 from cdm.data_collection.id_strategy import apply_id_strategy
 from cdm.models.endpoint_spec import EndpointSpec
 from cdm.utils.logger import get_logger
+from cdm.utils.rate_limiter import TokenBucket
 from settings import CONGRESS_API_KEY, CONGRESS_STRICT_FIELD_CHECK
+
+# Default request rate used when no rate_limiter is injected. Matches the
+# previous hardcoded client-side throttle (5000 requests/hour).
+DEFAULT_RATE_PER_HOUR = 5000.0
 
 logger = get_logger(__name__)
 
@@ -85,6 +89,7 @@ class CDGClient:
         response_format: str = RESPONSE_FORMAT,
         raise_on_error: bool = True,
         added_headers: dict[str, str] | None = None,
+        rate_limiter: TokenBucket | None = None,
     ) -> None:
         """Initialize the CDGClient.
 
@@ -94,6 +99,12 @@ class CDGClient:
             response_format: desired response format (default 'json').
             raise_on_error: if True, attach a response hook to raise on HTTP errors.
             added_headers: additional headers to include on the session.
+            rate_limiter: shared :class:`TokenBucket` governing request pacing.
+                Callers that fan out work across multiple threads/clients
+                (e.g. `IngestRunner`) should inject the SAME instance so all
+                requests are throttled against one shared budget. If omitted,
+                a private `TokenBucket` at `DEFAULT_RATE_PER_HOUR` is created,
+                preserving this client's previous standalone behavior.
         """
         self.base_url = urljoin(ROOT_URL, api_version) + "/"
         self._session = requests.Session()
@@ -115,9 +126,7 @@ class CDGClient:
                 )
             ]
 
-        self._rate_limit_lock = threading.Lock()
-        self._rate_limit_last_call = 0.0
-        self._rate_limit_interval = 3600.0 / 5000.0
+        self._rate_limiter = rate_limiter or TokenBucket(rate_per_hour=DEFAULT_RATE_PER_HOUR)
         # configurable retry total wait (seconds). If cumulative backoff
         # exceeds this, requests will raise a RuntimeError.
         self._max_total_retry_wait = 10.0
@@ -615,24 +624,20 @@ class CDGClient:
     def _rate_limited(self) -> None:
         """Enforce client-wide rate limiting between HTTP calls.
 
-        Uses a thread-safe lock and a per-call interval derived from the
-        configured rate limit settings. This method blocks the caller when
-        the last request occurred more recently than the allowed interval.
+        Delegates to the injected (or default) `TokenBucket`, which blocks
+        the caller until a token is available. Callers may share one
+        `TokenBucket` across multiple `CDGClient` instances/threads to
+        enforce a single, coordinated rate budget.
         """
-        with self._rate_limit_lock:
-            now = time.time()
-            elapsed = now - self._rate_limit_last_call
-            if elapsed < self._rate_limit_interval:
-                time.sleep(self._rate_limit_interval - elapsed)
-            self._rate_limit_last_call = time.time()
+        self._rate_limiter.acquire()
 
 
 def get_client(api_key: str | None = None, **kwargs) -> CDGClient:
     """Return a configured :class:`CDGClient` instance.
 
     If ``api_key`` is not provided the module-level ``CONGRESS_API_KEY`` is used.
-    Additional keyword arguments are forwarded to the ``CDGClient``
-    constructor.
+    Additional keyword arguments (including ``rate_limiter``) are forwarded
+    to the ``CDGClient`` constructor.
     """
     key = api_key or CONGRESS_API_KEY
     return CDGClient(api_key=key, **kwargs)

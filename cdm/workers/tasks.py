@@ -23,7 +23,6 @@ from cdm.ingest.govinfo import (
     GovInfoPackage,
 )
 from cdm.ingest.pipeline import Pipeline, PipelineConfig
-from cdm.ingest.rate_limiter import TokenBucket
 from cdm.ingest.reconciliation import replay_govinfo_archives
 from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.ingest.resource_config import congress_scoped, date_windowed
@@ -32,6 +31,7 @@ from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
 from cdm.store.opensearch import resource_target
 from cdm.store.redis_indexing import RedisIndexingRunner
+from cdm.utils.rate_limiter import TokenBucket
 from cdm.workers.celery_app import celery_app
 from settings import (
     CELERY_INDEX_QUEUE,

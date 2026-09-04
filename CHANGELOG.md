@@ -70,9 +70,6 @@
 - `frontend/app/src/pages/AdminIngestPage.tsx` simplified to match the
   updated admin ingest-progress API shape.
 
-See `NOTES_FOR_JUNIOR.md` for the full engineering writeup of what was wrong
-and why, intended as review notes for less experienced contributors.
-
 ## 2026-08-22
 
 ### Added

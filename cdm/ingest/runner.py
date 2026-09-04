@@ -28,9 +28,9 @@ from cdm.data_collection.endpoint_registry import get_spec
 from cdm.data_collection.id_utils import canonical_id
 from cdm.data_collection.utils import resolve_pagination
 from cdm.ingest.archive import SQLiteListCache
-from cdm.ingest.rate_limiter import TokenBucket
 from cdm.jobs.store import CoverageStage
 from cdm.utils.logger import get_logger
+from cdm.utils.rate_limiter import TokenBucket
 
 logger = get_logger(__name__)
 
@@ -201,7 +201,9 @@ class IngestRunner:
     extra_params: dict | None = None
     # Concurrency: number of parallel item-fetch workers (1 = serial)
     concurrency: int = 1
-    # Rate limiter: if provided, each worker calls limiter.acquire() before each request
+    # Rate limiter: shared across all per-thread CDGClients (see `_client`),
+    # so every list-page and item-detail request is throttled against one
+    # coordinated budget instead of each client pacing itself independently.
     rate_limiter: TokenBucket | None = field(default=None, repr=False)
     record_sink: Callable[[str, dict], None] | None = field(default=None, repr=False)
     progress_sink: Callable[[str, CoverageStage, dict], None] | None = field(
@@ -249,14 +251,26 @@ class IngestRunner:
                 key = CONGRESS_API_KEY or None
             except ImportError:
                 pass
-        # Reuse the client stored on the current thread to avoid sharing Sessions
+        # Reuse the client stored on the current thread to avoid sharing Sessions.
+        # Cache-key also includes the rate_limiter identity so that switching
+        # runners (with a different shared TokenBucket) on a reused thread
+        # doesn't silently keep throttling against a stale limiter.
         cached = getattr(_thread_local, "client", None)
         cached_key = getattr(_thread_local, "client_key", None)
         cached_factory = getattr(_thread_local, "client_factory", None)
-        if cached is None or cached_key != key or cached_factory is not get_client:
-            _thread_local.client = get_client(api_key=key)
+        cached_limiter = getattr(_thread_local, "client_rate_limiter", None)
+        if (
+            cached is None
+            or cached_key != key
+            or cached_factory is not get_client
+            or cached_limiter is not self.rate_limiter
+        ):
+            _thread_local.client = get_client(
+                api_key=key, rate_limiter=self.rate_limiter
+            )
             _thread_local.client_key = key
             _thread_local.client_factory = get_client
+            _thread_local.client_rate_limiter = self.rate_limiter
         return _thread_local.client
 
     def _fetch_single_item(
@@ -266,9 +280,6 @@ class IngestRunner:
         outdir: Path,
     ) -> dict:
         """Fetch one item and return its data dict.  Thread-safe; raises on failure."""
-        if self.rate_limiter is not None:
-            self.rate_limiter.acquire()
-
         client = self._client()
         meta_mapping = (
             meta.model_dump(mode="json") if hasattr(meta, "model_dump") else dict(meta)
@@ -787,9 +798,7 @@ class IngestRunner:
                 try:
                     engine = create_engine(f"sqlite:///{sqlite_path}")
                     with engine.connect() as connection:
-                        rows = connection.execute(
-                            select(_ARCHIVE_RECORDS.c.record_id)
-                        )
+                        rows = connection.execute(select(_ARCHIVE_RECORDS.c.record_id))
                         ids.update(row[0] for row in rows)
                 except (OSError, SQLAlchemyError):
                     logger.warning(

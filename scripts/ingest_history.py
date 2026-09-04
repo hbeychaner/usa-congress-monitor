@@ -51,7 +51,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cdm.ingest import checkpoint
 from cdm.ingest.pipeline import Pipeline, PipelineConfig
-from cdm.ingest.rate_limiter import TokenBucket
 from cdm.ingest.resource_config import (
     RESOURCE_CONFIGS,
     congress_scoped,
@@ -61,6 +60,7 @@ from cdm.ingest.resource_config import (
     validate_scope_catalog,
 )
 from cdm.ingest.runner import Resource
+from cdm.utils.rate_limiter import TokenBucket
 
 logger = logging.getLogger("ingest_history")
 
