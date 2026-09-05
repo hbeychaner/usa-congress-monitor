@@ -281,48 +281,38 @@ This diagram summarizes the core data models, their relationships, and the field
 The project uses its native `CDGClient` to wrap the Congress.gov API. The client reads the API key from `CONGRESS_API_KEY`, and response models are defined in `cdm.models`.
 
 ```python
-from cdm.data_collection.client import CDGClient
+from cdm.data_collection.client import get_client
+from cdm.data_collection.endpoint_registry import get_spec
 
-client = CDGClient()  # reads CONGRESS_API_KEY from environment
-members = client.get_members(limit=5)
+client = get_client()  # reads CONGRESS_API_KEY from environment
+spec = get_spec("member_list")
+response = client.request_for_spec(spec, runtime_params={"pageSize": 5})
 ```
 
-## Using Endpoint Helpers
+## Using Endpoint Specs
 
-Endpoint modules live under cdm/data_collection/specs and provide typed endpoint specifications for parsed API responses.
+Endpoint specs live under `cdm/data_collection/specs/` and are registered by name via
+`cdm.data_collection.endpoint_registry`. Each spec describes the path, query params,
+and the Pydantic response model used to validate results. `CDGClient.request_for_spec`
+performs the request and returns the raw JSON mapping; `CDGClient.get_json` is used
+for arbitrary URLs (e.g. a `detailUrl` embedded in a prior response).
 
 ```python
-from cdm.data_collection.client import CDGClient
-from cdm.data_collection.endpoints.member import get_members_list, gather_members
+from cdm.data_collection.client import get_client
+from cdm.data_collection.endpoint_registry import get_spec
 
-client = CDGClient(api_key="YOUR_API_KEY")
+client = get_client(api_key="YOUR_API_KEY")
 
-# raw paginated response
-page = get_members_list(client, offset=0, pageSize=250)
-
-# aggregated results for non-paginated endpoints
-members = gather_members(client)
+list_spec = get_spec("bill_list")
+page = client.request_for_spec(list_spec, runtime_params={"offset": 0, "pageSize": 250})
 ```
 
-For paginated endpoints that expose list-level results, use the shared pagination helpers in cdm/data_collection/utils.py. They accept a page-fetcher and the response list key from `CongressDataType` in cdm/models/data_types.py.
-
-```python
-from cdm.data_collection.client import CDGClient
-from cdm.data_collection.utils import gather_paginated_metadata
-from cdm.data_collection.data_types import CongressDataType
-from cdm.data_collection.endpoints.bill import get_bills_metadata
-
-client = CDGClient(api_key="YOUR_API_KEY")
-
-all_bills = gather_paginated_metadata(
-    lambda offset, page_size: get_bills_metadata(
-        client, offset=offset, pageSize=page_size
-    ),
-    data_key=CongressDataType.BILLS,
-    desc="Bills",
-    unit="bill",
-)
-```
+For multi-page aggregation and rate-limited, checkpointed ingestion across an entire
+resource, use `IngestRunner`/`Pipeline` in `cdm/ingest/` rather than looping over
+`request_for_spec` by hand — see "Ingest pipeline" below. The single remaining
+low-level pagination helper, `resolve_pagination` in `cdm/data_collection/utils.py`,
+normalizes the different pagination conventions used across endpoints and is what
+`IngestRunner` calls internally.
 
 ## Data Collection Orchestration
 

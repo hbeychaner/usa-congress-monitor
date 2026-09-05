@@ -2,24 +2,33 @@ flowchart TB
     U[User Browser] --> FE[React SPA]
     FE -->|HTTPS JSON| API[FastAPI Backend cdm/backend]
 
-    API --> Q[Query Service]
+    API --> BS[Bill Service]
+    API --> MS[Member Service]
     API --> SS[Search Service]
-    API --> TS[Timeline Service]
-    API --> NLP[NLP Topic Service]
+    API --> ST[State Service]
+    API --> AS[Admin Service]
 
-    Q --> DB[(SQLite/Postgres Read Models)]
-    SS --> OS[(OpenSearch)]
-    TS --> DB
-    NLP --> OS
-    NLP --> V[(Vector or Topic Store)]
+    BS --> OS[(OpenSearch)]
+    MS --> OS
+    SS --> OS
+    ST --> OS
+    AS --> OS
+    AS -->|reads status directly, no queue| JOBS[(Job Ledger SQLite)]
 
-    API --> CACHE[(Redis Cache)]
-
-    subgraph Ingest and Index Pipeline
-      ING[Ingest Jobs] --> NORM[Normalization]
-      NORM --> IDX[Indexing Jobs]
-      IDX --> OS
-      NORM --> DB
+    subgraph NLP["Topic/NLP Analysis (planned, not implemented)"]
+      TOPICS[Topic Service]
     end
+    API -. not yet built .-> NLP
 
-    ING -.offline pipeline output.-> API
+    subgraph Ingest["Ingest and Indexing Pipeline (separate offline process)"]
+      CLI[Submission CLI / Celery Beat] --> JOBS
+      CLI --> RABBIT[[RabbitMQ Task Queue]]
+      RABBIT --> WORKER[Celery Worker]
+      WORKER --> ING[Ingest Pipeline]
+      WORKER --> GOVINFO[GovInfo Bulk Acquisition]
+      ING -->|Congress.gov API| STREAMS[(Redis Streams)]
+      GOVINFO --> ARCHIVE[(GovInfo Archive SQLite+FS)]
+      STREAMS --> IDX[Redis Indexing Runner]
+      IDX --> OS
+      GOVINFO -->|enqueues| JOBS
+    end

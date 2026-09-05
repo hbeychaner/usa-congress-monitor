@@ -1,6 +1,6 @@
 """Scan repository Python files and report functions/classes without docstrings.
 
-Usage: python scripts/find_missing_docstrings.py
+Usage: python tools/find_missing_docstrings.py
 """
 
 import ast
