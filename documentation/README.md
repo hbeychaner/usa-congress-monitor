@@ -173,17 +173,29 @@ cdm/                    — Congress Data Model (core library)
     opensearch.py       — Bulk upsert helpers
     indexer.py          — Transforms records into OpenSearch documents
     redis_indexing.py    — Redis Stream consumer and bulk indexing runner
-  links/                — Cross-index relationship resolution
-  search/               — Query helpers
+  backend/              — FastAPI app (bill/member/search/state/admin services)
+  contracts/            — API request/response schemas used by cdm/backend
 
 scripts/
   ingest_history.py     — Full-history bulk ingest CLI (year-by-year + congress-by-congress)
   submit_ingest.py      — Idempotent RabbitMQ/Celery job submission CLI
-  create_indices.py     — OpenSearch index creation/update CLI
-  ingest.py             — Single-resource ingest CLI
+  queue_full_ingest.py  — Durable, batched full-historical-plan job submission
+  create_indices.py     — OpenSearch index creation/update/status CLI
+  ingest.py             — Single-resource ingest CLI (legacy; prefer cdm.ingest.runner)
+  ingest_all.py         — Local (non-durable) multi-resource ingest CLI
+  queue_govinfo_bulk.py     — Discover/queue GovInfo bulk package jobs
+  reconcile_govinfo_bulk.py — Submit a reconciliation replay job
+  report_govinfo_coverage.py — Coverage report for discovered vs archived GovInfo packages
+  health_check.py       — Dependency/backlog health check (`make health-check`)
+  job_status.py         — Durable job-state summary (`make status`)
+  monitor_ingest_progress.py — Live ingest/index throughput monitor (`make monitor`)
+  migrate_jsonl_to_sqlite.py — One-time JSONL archive → SQLite migration helper
+  backfill_bill_member_links.py — One-off backfill of sponsor/cosponsor bioguide-id fields
+                                  on documents indexed before that field existed
+  ingest_district_boundaries.py — One-time import of 119th-Congress district boundaries
 
 documentation/
-  opensearch_mappings.yaml  — Single source of truth for all 17 OpenSearch indices
+  opensearch_mappings.yaml  — Single source of truth for all 18 OpenSearch indices
   README.md                 — This file
 ```
 
@@ -205,6 +217,7 @@ limit with one coordinated budget instead of per-client throttling. Each
 deduplicated item is published directly to the resource's Redis Stream;
 consumer-group pending state provides crash recovery. List pages and item
 records are compressed and deduplicated in per-resource SQLite databases.
+
 
 ### Full-history ingest
 

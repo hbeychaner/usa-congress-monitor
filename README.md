@@ -299,3 +299,10 @@ flowchart TB
 
     %% ── amendment voted on ──────────────────────────────────────────────────
     HV   -->|"amendment_type + amendment_number"| AMD
+
+## Planning & Notes
+
+In-progress design docs, operational runbooks, and architecture review notes
+live in `planning/` and are untracked (see `.gitignore`) — they're working
+notes, not committed history. `CHANGELOG.md` (this directory) remains the
+tracked, dated record of completed work.

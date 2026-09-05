@@ -33,14 +33,12 @@ for root, dirs, files in os.walk(ROOT):
                 name = node.name
                 doc = ast.get_docstring(node)
                 if not doc:
-                    results.append(
-                        (
-                            path.removeprefix("./"),
-                            node.lineno,
-                            type(node).__name__,
-                            name,
-                        )
-                    )
+                    results.append((
+                        path.removeprefix("./"),
+                        node.lineno,
+                        type(node).__name__,
+                        name,
+                    ))
 
 # deduplicate and sort
 seen = set()
