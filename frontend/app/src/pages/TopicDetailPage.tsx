@@ -1,3 +1,4 @@
+import { Card, Flex, Heading, Text } from '@radix-ui/themes';
 import { useParams } from 'react-router-dom';
 
 export function TopicDetailPage() {
@@ -5,21 +6,23 @@ export function TopicDetailPage() {
   const title = topicLabel.replace(/-/g, ' ');
 
   return (
-    <section className="topic-detail-page">
-      <h1>{title}</h1>
-      <p>Topic detail scaffold page for explaining member-topic associations and provenance.</p>
+    <Flex direction="column" gap="5">
+      <Flex direction="column" gap="2">
+        <Heading size="8" style={{ textTransform: 'capitalize' }}>{title}</Heading>
+        <Text color="gray">Topic detail scaffold page for explaining member-topic associations and provenance.</Text>
+      </Flex>
 
-      <div className="panel">
-        <h2>Topic Notes</h2>
-        <p>
+      <Card size="3">
+        <Heading size="4" mb="1">Topic Notes</Heading>
+        <Text as="p">
           Placeholder: backend NLP pipeline will return representative phrases and bill references for this topic.
-        </p>
-      </div>
+        </Text>
+      </Card>
 
-      <div className="panel">
-        <h2>Related Members</h2>
-        <p>No indexed member associations are available for this topic.</p>
-      </div>
-    </section>
+      <Card size="3">
+        <Heading size="4" mb="1">Related Members</Heading>
+        <Text as="p" color="gray">No indexed member associations are available for this topic.</Text>
+      </Card>
+    </Flex>
   );
 }

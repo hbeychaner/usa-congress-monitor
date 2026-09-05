@@ -1,3 +1,4 @@
+import { Badge, Button, Card, Flex, Heading, Select, Table, Text, TextField } from '@radix-ui/themes';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -43,19 +44,101 @@ export function BillsPage() {
   };
 
   return (
-    <section className="bills-page">
-      <header className="list-header"><div><p className="eyebrow">Legislation index</p><h1>Bills</h1><p>Browse {total.toLocaleString()} indexed bills with server-side search and filters.</p></div><span className="result-count">{loading ? 'Loading' : `${((page - 1) * PAGE_SIZE + (bills.length ? 1 : 0)).toLocaleString()}–${Math.min(page * PAGE_SIZE, total).toLocaleString()}`} of {total.toLocaleString()}</span></header>
-      <form className="bill-filters" onSubmit={applyFilters}>
-        <label className="filter-search">Search bills<input className="search-input" value={draft.query ?? ''} onChange={(event) => setDraft({ ...draft, query: event.target.value })} placeholder="Title, sponsor, policy area, or bill ID" /></label>
-        <label>Congress<input className="filter-input" inputMode="numeric" value={draft.congress ?? ''} onChange={(event) => setDraft({ ...draft, congress: event.target.value })} placeholder="119" /></label>
-        <label>Chamber<select className="filter-input" value={draft.chamber ?? ''} onChange={(event) => setDraft({ ...draft, chamber: event.target.value })}><option value="">All chambers</option><option value="House">House</option><option value="Senate">Senate</option></select></label>
-        <label>Type<select className="filter-input" value={draft.billType ?? ''} onChange={(event) => setDraft({ ...draft, billType: event.target.value })}><option value="">All types</option>{BILL_TYPES.filter(Boolean).filter((type, index, list) => list.indexOf(type) === index).map((type) => <option key={type} value={type}>{type.toUpperCase()}</option>)}</select></label>
-        <button className="button" type="submit">Apply filters</button>
-      </form>
-      {error ? <div className="panel"><p>Unable to load bills: {error}</p></div> : null}
-      {!loading && !error && bills.length === 0 ? <div className="panel"><p>No bills match these filters.</p></div> : null}
-      {bills.length > 0 ? <div className="table-shell"><table className="data-table"><thead><tr><th scope="col">Bill</th><th scope="col">Title</th><th scope="col">Congress</th><th scope="col">Chamber</th><th scope="col">Updated</th></tr></thead><tbody>{bills.map((bill) => <tr key={bill.bill_id}><th scope="row"><Link to={`/bills/${encodeURIComponent(bill.bill_id)}`}>{label(bill) || bill.bill_id}</Link></th><td className="title-cell">{bill.title}</td><td>{bill.congress ?? '—'}</td><td>{bill.chamber ?? '—'}</td><td>{bill.updated_at ? new Date(bill.updated_at).toLocaleDateString() : '—'}</td></tr>)}</tbody></table></div> : null}
-      <nav className="table-pagination" aria-label="Bill pages"><button className="button button-secondary" disabled={page <= 1 || loading} onClick={() => setPage(page - 1)}>Previous</button><span>Page {page} of {pageCount}</span><button className="button" disabled={page >= pageCount || loading} onClick={() => setPage(page + 1)}>Next</button></nav>
-    </section>
+    <Flex direction="column" gap="5">
+      <Flex justify="between" align="end" wrap="wrap" gap="3">
+        <Flex direction="column" gap="1">
+          <Text size="1" color="gray">Legislation index</Text>
+          <Heading size="7">Bills</Heading>
+          <Text color="gray">Browse {total.toLocaleString()} indexed bills with server-side search and filters.</Text>
+        </Flex>
+        <Badge size="2" variant="soft">
+          {loading ? 'Loading' : `${((page - 1) * PAGE_SIZE + (bills.length ? 1 : 0)).toLocaleString()}–${Math.min(page * PAGE_SIZE, total).toLocaleString()}`} of {total.toLocaleString()}
+        </Badge>
+      </Flex>
+
+      <Card size="3" asChild>
+        <form onSubmit={applyFilters}>
+          <Flex wrap="wrap" gap="3" align="end">
+            <label>
+              <Text as="div" size="2" mb="1" weight="medium">Search bills</Text>
+              <TextField.Root
+                value={draft.query ?? ''}
+                onChange={(event) => setDraft({ ...draft, query: event.target.value })}
+                placeholder="Title, sponsor, policy area, or bill ID"
+              />
+            </label>
+            <label>
+              <Text as="div" size="2" mb="1" weight="medium">Congress</Text>
+              <TextField.Root
+                inputMode="numeric"
+                value={draft.congress ?? ''}
+                onChange={(event) => setDraft({ ...draft, congress: event.target.value })}
+                placeholder="119"
+              />
+            </label>
+            <label>
+              <Text as="div" size="2" mb="1" weight="medium">Chamber</Text>
+              <Select.Root value={draft.chamber ?? 'all'} onValueChange={(value) => setDraft({ ...draft, chamber: value === 'all' ? undefined : value })}>
+                <Select.Trigger placeholder="All chambers" />
+                <Select.Content>
+                  <Select.Item value="all">All chambers</Select.Item>
+                  <Select.Item value="House">House</Select.Item>
+                  <Select.Item value="Senate">Senate</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </label>
+            <label>
+              <Text as="div" size="2" mb="1" weight="medium">Type</Text>
+              <Select.Root value={draft.billType ?? 'all'} onValueChange={(value) => setDraft({ ...draft, billType: value === 'all' ? undefined : value })}>
+                <Select.Trigger placeholder="All types" />
+                <Select.Content>
+                  <Select.Item value="all">All types</Select.Item>
+                  {BILL_TYPES.filter(Boolean).filter((type, index, list) => list.indexOf(type) === index).map((type) => (
+                    <Select.Item key={type} value={type}>{type.toUpperCase()}</Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            </label>
+            <Button type="submit">Apply filters</Button>
+          </Flex>
+        </form>
+      </Card>
+
+      {error ? <Card size="3"><Text as="p">Unable to load bills: {error}</Text></Card> : null}
+      {!loading && !error && bills.length === 0 ? <Card size="3"><Text as="p">No bills match these filters.</Text></Card> : null}
+
+      {bills.length > 0 ? (
+        <Table.Root variant="surface">
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeaderCell>Bill</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Congress</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Chamber</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Updated</Table.ColumnHeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {bills.map((bill) => (
+              <Table.Row key={bill.bill_id}>
+                <Table.RowHeaderCell>
+                  <Link to={`/bills/${encodeURIComponent(bill.bill_id)}`}>{label(bill) || bill.bill_id}</Link>
+                </Table.RowHeaderCell>
+                <Table.Cell>{bill.title}</Table.Cell>
+                <Table.Cell>{bill.congress ?? '—'}</Table.Cell>
+                <Table.Cell>{bill.chamber ?? '—'}</Table.Cell>
+                <Table.Cell>{bill.updated_at ? new Date(bill.updated_at).toLocaleDateString() : '—'}</Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table.Root>
+      ) : null}
+
+      <Flex justify="center" align="center" gap="3" aria-label="Bill pages">
+        <Button variant="soft" disabled={page <= 1 || loading} onClick={() => setPage(page - 1)}>Previous</Button>
+        <Text>Page {page} of {pageCount}</Text>
+        <Button disabled={page >= pageCount || loading} onClick={() => setPage(page + 1)}>Next</Button>
+      </Flex>
+    </Flex>
   );
 }

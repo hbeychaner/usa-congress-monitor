@@ -1,3 +1,4 @@
+import { Button, Card, Flex, Heading, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import { useNavigate } from 'react-router-dom';
@@ -46,9 +47,11 @@ export function StatesPage() {
   }, [selectedCode]);
 
   return (
-    <section className="states-map-page">
-      <h1>States</h1>
-      <p>Select a state to preview its 119th Congress delegation. Open the state for its full history.</p>
+    <Flex direction="column" gap="5">
+      <Flex direction="column" gap="2">
+        <Heading size="7">States</Heading>
+        <Text color="gray">Select a state to preview its 119th Congress delegation. Open the state for its full history.</Text>
+      </Flex>
 
       <div className="map-layout">
         <div className="map-panel">
@@ -74,13 +77,30 @@ export function StatesPage() {
           </ComposableMap>
         </div>
 
-        <aside className="hover-card" aria-live="polite">
-          {!selectedCode ? <><h2>Select a state</h2><p>Choose a state on the map to see verified delegation data.</p></> : null}
-          {loading ? <p>Loading delegation...</p> : null}
-          {error ? <p>Delegation unavailable: {error}</p> : null}
-          {timeline && !loading && !error ? <><h2>{timeline.state_name} ({timeline.state_code})</h2><p className="hover-label">119th Congress</p><p><strong>House:</strong> {timeline.house.groups?.[0]?.members.length ?? 0} member{(timeline.house.groups?.[0]?.members.length ?? 0) === 1 ? '' : 's'}</p><p><strong>Senate:</strong> {timeline.senate.groups?.[0]?.members.length ?? 0} members</p><button className="button" type="button" onClick={() => navigate(`/states/${timeline.state_code}`)}>Open state timeline</button></> : null}
-        </aside>
+        <Card size="3" asChild>
+          <aside aria-live="polite">
+            <Flex direction="column" gap="2">
+              {!selectedCode ? (
+                <>
+                  <Heading size="4">Select a state</Heading>
+                  <Text color="gray">Choose a state on the map to see verified delegation data.</Text>
+                </>
+              ) : null}
+              {loading ? <Text as="p">Loading delegation...</Text> : null}
+              {error ? <Text as="p">Delegation unavailable: {error}</Text> : null}
+              {timeline && !loading && !error ? (
+                <>
+                  <Heading size="4">{timeline.state_name} ({timeline.state_code})</Heading>
+                  <Text size="1" color="gray">119th Congress</Text>
+                  <Text as="p"><Text weight="bold">House:</Text> {timeline.house.groups?.[0]?.members.length ?? 0} member{(timeline.house.groups?.[0]?.members.length ?? 0) === 1 ? '' : 's'}</Text>
+                  <Text as="p"><Text weight="bold">Senate:</Text> {timeline.senate.groups?.[0]?.members.length ?? 0} members</Text>
+                  <Button onClick={() => navigate(`/states/${timeline.state_code}`)}>Open state timeline</Button>
+                </>
+              ) : null}
+            </Flex>
+          </aside>
+        </Card>
       </div>
-    </section>
+    </Flex>
   );
 }

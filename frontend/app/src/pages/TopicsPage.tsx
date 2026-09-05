@@ -1,3 +1,4 @@
+import { Card, Flex, Grid, Heading, Progress, Text } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
 
 const SAMPLE_TOPICS = [
@@ -20,36 +21,36 @@ const SAMPLE_TOPICS = [
 
 export function TopicsPage() {
   return (
-    <section className="topics-page">
-      <h1>Topics</h1>
-      <p>
-        Topic profiles are scaffolded for now and will be populated from backend NLP pipelines as ingest completes.
-      </p>
+    <Flex direction="column" gap="5">
+      <Flex direction="column" gap="2">
+        <Heading size="8">Topics</Heading>
+        <Text color="gray">
+          Topic profiles are scaffolded for now and will be populated from backend NLP pipelines as ingest completes.
+        </Text>
+      </Flex>
 
-      <div className="card-grid">
+      <Grid columns={{ initial: '1', sm: '2', md: '3' }} gap="4">
         {SAMPLE_TOPICS.map((topic) => (
-          <article key={topic.label} className="card">
-            <h2>
+          <Card key={topic.label} size="3">
+            <Heading size="4" mb="1">
               <Link to={`/topics/${topic.label.toLowerCase().replace(/\s+/g, '-')}`}>{topic.label}</Link>
-            </h2>
-            <p>Members tagged: {topic.memberCount}</p>
-            <p>Average confidence: {Math.round(topic.avgConfidence * 100)}%</p>
-            <div className="topic-bar">
-              <div className="topic-bar-fill" style={{ width: `${Math.round(topic.avgConfidence * 100)}%` }} />
-            </div>
-          </article>
+            </Heading>
+            <Text as="p" color="gray">Members tagged: {topic.memberCount}</Text>
+            <Text as="p" color="gray" mb="2">Average confidence: {Math.round(topic.avgConfidence * 100)}%</Text>
+            <Progress value={Math.round(topic.avgConfidence * 100)} />
+          </Card>
         ))}
-      </div>
+      </Grid>
 
-      <div className="panel">
-        <h2>Planned Backend Contract</h2>
-        <p>
+      <Card size="3">
+        <Heading size="4" mb="1">Planned Backend Contract</Heading>
+        <Text as="p">
           The final UI will consume <strong>GET /api/v1/members/{'{id}'}/topics</strong> plus aggregate topic endpoints.
-        </p>
-        <p>
+        </Text>
+        <Text as="p">
           For now, explore an archived <Link to="/members/H001092">member profile</Link>.
-        </p>
-      </div>
-    </section>
+        </Text>
+      </Card>
+    </Flex>
   );
 }

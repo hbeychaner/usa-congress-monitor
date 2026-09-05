@@ -1,3 +1,4 @@
+import { Card, Flex, Grid, Heading, Text, TextField } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -11,9 +12,9 @@ function partyClass(party: string): string {
 function ChamberSection({ title, members }: { title: string; members: TimelineMember[] }) {
   return (
     <section className="chamber-section">
-      <h2>{title}</h2>
+      <Heading size="4" mb="2">{title}</Heading>
       {members.length === 0 ? (
-        <p>No members in selected range.</p>
+        <Text as="p" color="gray">No members in selected range.</Text>
       ) : (
         <ul className="timeline-group-members">
           {members.map((member) => (
@@ -48,11 +49,11 @@ export function StateDetailPage() {
   }, [stateCode, fromCongress, toCongress]);
 
   if (loading) {
-    return <p>Loading timeline...</p>;
+    return <Text as="p">Loading timeline...</Text>;
   }
 
   if (error || !timeline) {
-    return <p>Failed to load timeline: {error ?? 'Unknown error'}</p>;
+    return <Text as="p">Failed to load timeline: {error ?? 'Unknown error'}</Text>;
   }
 
   const houseGroups = timeline.house.groups ?? [];
@@ -65,19 +66,18 @@ export function StateDetailPage() {
   const senateByCongress = new Map(senateGroups.map((group) => [group.congress, group.members]));
 
   return (
-    <section className="state-detail-page">
-      <h1>
-        {timeline.state_name} ({timeline.state_code})
-      </h1>
-      <p>Delegations grouped by Congress from OpenSearch member records.</p>
+    <Flex direction="column" gap="5">
+      <Flex direction="column" gap="2">
+        <Heading size="7">{timeline.state_name} ({timeline.state_code})</Heading>
+        <Text color="gray">Delegations grouped by Congress from OpenSearch member records.</Text>
+      </Flex>
 
-      <div className="timeline-controls panel">
-        <h2>Timeline Filters</h2>
-        <div className="filter-grid">
+      <Card size="3">
+        <Heading size="4" mb="2">Timeline Filters</Heading>
+        <Flex gap="4" wrap="wrap">
           <label>
-            From Congress
-            <input
-              className="search-input"
+            <Text as="div" size="2" mb="1" weight="medium">From Congress</Text>
+            <TextField.Root
               type="number"
               value={fromCongress}
               min={1}
@@ -85,38 +85,37 @@ export function StateDetailPage() {
             />
           </label>
           <label>
-            To Congress
-            <input
-              className="search-input"
+            <Text as="div" size="2" mb="1" weight="medium">To Congress</Text>
+            <TextField.Root
               type="number"
               value={toCongress}
               min={1}
               onChange={(event) => setToCongress(Number(event.target.value || 1))}
             />
           </label>
-        </div>
-      </div>
+        </Flex>
+      </Card>
 
-      <div className="timeline-stats">
-        <div className="panel">
-          <h2>House Seats</h2>
-          <p>{timeline.house.members.length} matching timeline entries</p>
-        </div>
-        <div className="panel">
-          <h2>Senate Seats</h2>
-          <p>{timeline.senate.members.length} matching timeline entries</p>
-        </div>
-      </div>
+      <Grid columns={{ initial: '1', sm: '2' }} gap="4">
+        <Card size="3">
+          <Heading size="4" mb="1">House Seats</Heading>
+          <Text as="p" color="gray">{timeline.house.members.length} matching timeline entries</Text>
+        </Card>
+        <Card size="3">
+          <Heading size="4" mb="1">Senate Seats</Heading>
+          <Text as="p" color="gray">{timeline.senate.members.length} matching timeline entries</Text>
+        </Card>
+      </Grid>
 
       <div className="timeline-grid congress-grid">
         {congresses.map((congress) => (
           <section className="timeline-lane congress-column" key={congress}>
-            <h2>Congress {congress}</h2>
+            <Heading size="5" mb="2">Congress {congress}</Heading>
             <ChamberSection title="House" members={houseByCongress.get(congress) ?? []} />
             <ChamberSection title="Senate" members={senateByCongress.get(congress) ?? []} />
           </section>
         ))}
       </div>
-    </section>
+    </Flex>
   );
 }

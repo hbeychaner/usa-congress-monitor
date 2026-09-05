@@ -1,3 +1,4 @@
+import { Badge, Button, Card, DataList, Flex, Grid, Heading, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -26,8 +27,16 @@ export function BillDetailPage() {
         fetchBill(billId).then(setResponse).catch((err: Error) => setError(err.message));
     }, [billId]);
 
-    if (error) return <section className="panel"><h1>Bill unavailable</h1><p>{error}</p><Link to="/bills">Back to bills</Link></section>;
-    if (!response) return <section className="panel"><p>Loading bill...</p></section>;
+    if (error) {
+        return (
+            <Card size="3">
+                <Heading size="5" mb="1">Bill unavailable</Heading>
+                <Text as="p">{error}</Text>
+                <Link to="/bills">Back to bills</Link>
+            </Card>
+        );
+    }
+    if (!response) return <Card size="3"><Text as="p">Loading bill...</Text></Card>;
 
     const bill = response.bill;
     const action = bill.latest_action as RecordValue | null;
@@ -36,37 +45,93 @@ export function BillDetailPage() {
     const relationshipCounts = bill.relationship_counts ?? {};
 
     return (
-        <section className="bill-detail-page">
-            <Link to="/bills" className="back-link">Back to bills</Link>
-            <header className="bill-hero">
-                <div>
-                    <p className="eyebrow">{bill.bill_type ?? 'Bill'} {bill.number ?? ''} · Congress {bill.congress ?? 'Unknown'}</p>
-                    <h1>{bill.title}</h1>
-                    <p className="bill-deck">{bill.origin_chamber ?? 'Chamber not recorded'} · Introduced {formatDate(bill.introduced_date)}</p>
-                </div>
-                <a className="button" href={`https://www.congress.gov/bill/${bill.congress}/${(bill.bill_type ?? '').toLowerCase()}/${bill.number}`} target="_blank" rel="noreferrer">View on Congress.gov</a>
-            </header>
+        <Flex direction="column" gap="5">
+            <Link to="/bills">Back to bills</Link>
+            <Flex justify="between" align="start" wrap="wrap" gap="3">
+                <Flex direction="column" gap="1">
+                    <Text size="1" color="gray">{bill.bill_type ?? 'Bill'} {bill.number ?? ''} · Congress {bill.congress ?? 'Unknown'}</Text>
+                    <Heading size="7">{bill.title}</Heading>
+                    <Text color="gray">{bill.origin_chamber ?? 'Chamber not recorded'} · Introduced {formatDate(bill.introduced_date)}</Text>
+                </Flex>
+                <Button asChild>
+                    <a href={`https://www.congress.gov/bill/${bill.congress}/${(bill.bill_type ?? '').toLowerCase()}/${bill.number}`} target="_blank" rel="noreferrer">View on Congress.gov</a>
+                </Button>
+            </Flex>
 
-            <div className="bill-detail-grid">
-                <div className="bill-main-column">
-                    <section className="panel">
-                        <h2>Latest action</h2>
-                        {action ? <div className="action-callout"><strong>{formatDate(String(action.action_date ?? ''))}</strong><span>{String(action.text ?? 'Action text not recorded')}</span></div> : <p>No action is recorded for this bill.</p>}
-                    </section>
-                    <section className="panel">
-                        <h2>Policy and subjects</h2>
-                        {bill.policy_area ? <p className="chip-row"><span className="chip">{bill.policy_area}</span></p> : <p>Policy area not recorded.</p>}
-                        {Array.isArray(subjects) && subjects.length > 0 ? <ul className="detail-list">{subjects.map((subject, index) => <li key={`${String(subject.name ?? subject.title ?? index)}`}>{String(subject.name ?? subject.title ?? 'Unnamed subject')}</li>)}</ul> : <p>Legislative subjects are not expanded in this record.</p>}
-                    </section>
-                    {bill.full_text ? <details className="panel bill-text"><summary>Bill text</summary><pre>{bill.full_text}</pre></details> : null}
-                </div>
+            <Grid columns={{ initial: '1', md: '3' }} gap="4">
+                <Flex direction="column" gap="4" style={{ gridColumn: 'span 2' }}>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Latest action</Heading>
+                        {action ? (
+                            <Flex direction="column" gap="1">
+                                <Text weight="bold">{formatDate(String(action.action_date ?? ''))}</Text>
+                                <Text color="gray">{String(action.text ?? 'Action text not recorded')}</Text>
+                            </Flex>
+                        ) : <Text as="p" color="gray">No action is recorded for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Policy and subjects</Heading>
+                        {bill.policy_area ? <Badge mb="2">{bill.policy_area}</Badge> : <Text as="p" color="gray">Policy area not recorded.</Text>}
+                        {Array.isArray(subjects) && subjects.length > 0 ? (
+                            <Flex direction="column" gap="1" mt="2">
+                                {subjects.map((subject, index) => (
+                                    <Text as="p" key={`${String(subject.name ?? subject.title ?? index)}`}>
+                                        {String(subject.name ?? subject.title ?? 'Unnamed subject')}
+                                    </Text>
+                                ))}
+                            </Flex>
+                        ) : <Text as="p" color="gray">Legislative subjects are not expanded in this record.</Text>}
+                    </Card>
+                    {bill.full_text ? (
+                        <Card size="3" asChild>
+                            <details>
+                                <summary><Text weight="medium">Bill text</Text></summary>
+                                <Text as="p" mt="2" style={{ whiteSpace: 'pre-wrap' }}>{bill.full_text}</Text>
+                            </details>
+                        </Card>
+                    ) : null}
+                </Flex>
 
-                <aside className="bill-sidebar">
-                    <section className="panel"><h2>Bill record</h2><dl className="metadata-list"><dt>Type</dt><dd>{bill.bill_type ?? 'Not recorded'}</dd><dt>Number</dt><dd>{bill.number ?? 'Not recorded'}</dd><dt>Origin chamber</dt><dd>{bill.origin_chamber ?? 'Not recorded'}</dd><dt>Last updated</dt><dd>{formatDate(bill.update_date)}</dd></dl></section>
-                    <section className="panel"><h2>Sponsors</h2>{sponsors.length ? <ul className="detail-list">{sponsors.map((sponsor) => <li key={String(sponsor.id ?? displayName(sponsor))}><strong>{displayName(sponsor)}</strong>{sponsor.party || sponsor.state ? <span>{[sponsor.party, sponsor.state, sponsor.district ? `District ${sponsor.district}` : ''].filter(Boolean).join(' · ')}</span> : null}</li>)}</ul> : <p>No sponsors are indexed for this bill.</p>}</section>
-                    <section className="panel"><h2>Available records</h2>{Object.keys(relationshipCounts).length ? <ul className="metadata-list">{Object.entries(relationshipCounts).map(([name, count]) => <li key={name}><span>{name.replace(/_/g, ' ')}</span><strong>{count}</strong></li>)}</ul> : <p>No related record counts are available.</p>}</section>
-                </aside>
-            </div>
-        </section>
+                <Flex direction="column" gap="4">
+                    <Card size="3">
+                        <Heading size="4" mb="2">Bill record</Heading>
+                        <DataList.Root>
+                            <DataList.Item><DataList.Label>Type</DataList.Label><DataList.Value>{bill.bill_type ?? 'Not recorded'}</DataList.Value></DataList.Item>
+                            <DataList.Item><DataList.Label>Number</DataList.Label><DataList.Value>{bill.number ?? 'Not recorded'}</DataList.Value></DataList.Item>
+                            <DataList.Item><DataList.Label>Origin chamber</DataList.Label><DataList.Value>{bill.origin_chamber ?? 'Not recorded'}</DataList.Value></DataList.Item>
+                            <DataList.Item><DataList.Label>Last updated</DataList.Label><DataList.Value>{formatDate(bill.update_date)}</DataList.Value></DataList.Item>
+                        </DataList.Root>
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Sponsors</Heading>
+                        {sponsors.length ? (
+                            <Flex direction="column" gap="2">
+                                {sponsors.map((sponsor) => (
+                                    <Flex direction="column" key={String(sponsor.id ?? displayName(sponsor))}>
+                                        <Text weight="bold">{displayName(sponsor)}</Text>
+                                        {sponsor.party || sponsor.state ? (
+                                            <Text size="1" color="gray">{[sponsor.party, sponsor.state, sponsor.district ? `District ${sponsor.district}` : ''].filter(Boolean).join(' · ')}</Text>
+                                        ) : null}
+                                    </Flex>
+                                ))}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No sponsors are indexed for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Available records</Heading>
+                        {Object.keys(relationshipCounts).length ? (
+                            <DataList.Root>
+                                {Object.entries(relationshipCounts).map(([name, count]) => (
+                                    <DataList.Item key={name}>
+                                        <DataList.Label>{name.replace(/_/g, ' ')}</DataList.Label>
+                                        <DataList.Value>{count}</DataList.Value>
+                                    </DataList.Item>
+                                ))}
+                            </DataList.Root>
+                        ) : <Text as="p" color="gray">No related record counts are available.</Text>}
+                    </Card>
+                </Flex>
+            </Grid>
+        </Flex>
     );
 }

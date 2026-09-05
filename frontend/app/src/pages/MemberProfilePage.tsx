@@ -1,10 +1,11 @@
+import { Avatar, Badge, Card, Flex, Heading, Progress, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchMemberProfile, type MemberProfileResponse } from '../api/members';
 
-const PARTY_BADGES: Record<string, string> = {
-  Democratic: 'https://img.shields.io/badge/D-Democratic-1e5fa8?style=flat-square',
-  Republican: 'https://img.shields.io/badge/R-Republican-b33a3a?style=flat-square',
+const PARTY_COLORS: Record<string, 'blue' | 'red' | 'gray'> = {
+  Democratic: 'blue',
+  Republican: 'red',
 };
 
 export function MemberProfilePage() {
@@ -12,7 +13,6 @@ export function MemberProfilePage() {
   const [profile, setProfile] = useState<MemberProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [portraitFailed, setPortraitFailed] = useState(false);
 
   useEffect(() => {
     fetchMemberProfile(bioguideId)
@@ -22,11 +22,11 @@ export function MemberProfilePage() {
   }, [bioguideId]);
 
   if (loading) {
-    return <p>Loading member profile...</p>;
+    return <Text as="p">Loading member profile...</Text>;
   }
 
   if (error || !profile) {
-    return <p>Failed to load member profile: {error ?? 'Unknown error'}</p>;
+    return <Text as="p">Failed to load member profile: {error ?? 'Unknown error'}</Text>;
   }
 
   const activityByType = profile.recent_activity.reduce<Record<string, number>>((acc, item) => {
@@ -35,83 +35,71 @@ export function MemberProfilePage() {
   }, {});
 
   return (
-    <section className="member-page">
-      <div className="member-hero-card">
-        {profile.member.image_url && !portraitFailed ? (
-          <img
-            className="member-portrait"
-            src={profile.member.image_url}
-            alt={`${profile.member.display_name} portrait`}
-            onError={() => setPortraitFailed(true)}
+    <Flex direction="column" gap="5">
+      <Card size="4">
+        <Flex gap="4" align="center" wrap="wrap">
+          <Avatar
+            size="7"
+            radius="full"
+            src={profile.member.image_url ?? undefined}
+            fallback={profile.member.display_name.charAt(0)}
           />
-        ) : null}
-        <div className="member-hero-content">
-          <h1>{profile.member.display_name}</h1>
-          <p className="member-subtitle">
-            {profile.member.chamber ?? 'Chamber unavailable'} · {profile.member.state}
-          </p>
-          <div className="member-chips">
-            {PARTY_BADGES[profile.member.party] ? (
-              <img
-                className="party-badge"
-                src={PARTY_BADGES[profile.member.party]}
-                alt={`${profile.member.party} Party`}
-              />
-            ) : <span className="chip">{profile.member.party}</span>}
-            {profile.member.district != null ? <span className="chip">District: {profile.member.district}</span> : null}
-            {profile.member.term_start_year != null ? (
-              <span className="term-timeline" aria-label={`Term from ${profile.member.term_start_year}${profile.member.term_end_year ? ` to ${profile.member.term_end_year}` : ''}`}>
-                <span className="term-timeline-year">{profile.member.term_start_year}</span>
-                <span className="term-timeline-track" aria-hidden="true" />
-                <span className="term-timeline-year">{profile.member.term_end_year ?? 'present'}</span>
-              </span>
-            ) : null}
-            <span className="chip">Bioguide: {profile.member.bioguide_id}</span>
-          </div>
-        </div>
-      </div>
+          <Flex direction="column" gap="2">
+            <Heading size="7">{profile.member.display_name}</Heading>
+            <Text color="gray">{profile.member.chamber ?? 'Chamber unavailable'} · {profile.member.state}</Text>
+            <Flex gap="2" wrap="wrap" align="center">
+              <Badge color={PARTY_COLORS[profile.member.party] ?? 'gray'}>{profile.member.party}</Badge>
+              {profile.member.district != null ? <Badge variant="soft">District: {profile.member.district}</Badge> : null}
+              {profile.member.term_start_year != null ? (
+                <Badge variant="soft">
+                  Term: {profile.member.term_start_year}–{profile.member.term_end_year ?? 'present'}
+                </Badge>
+              ) : null}
+              <Badge variant="soft">Bioguide: {profile.member.bioguide_id}</Badge>
+            </Flex>
+          </Flex>
+        </Flex>
+      </Card>
 
-      <div className="panel">
-        <h2>Activity Breakdown</h2>
-        <div className="chip-row">
+      <Card size="3">
+        <Heading size="4" mb="2">Activity Breakdown</Heading>
+        <Flex gap="2" wrap="wrap">
           {Object.entries(activityByType).map(([activityType, count]) => (
-            <span key={activityType} className="chip">
-              {activityType}: {count}
-            </span>
+            <Badge key={activityType} variant="soft">{activityType}: {count}</Badge>
           ))}
-        </div>
-      </div>
+        </Flex>
+      </Card>
 
-      <div className="panel">
-        <h2>Recent Activity</h2>
+      <Card size="3">
+        <Heading size="4" mb="2">Recent Activity</Heading>
         {profile.recent_activity.length > 0 ? (
-          <ul>
+          <Flex direction="column" gap="2">
             {profile.recent_activity.map((item) => (
-              <li key={`${item.bill_id}:${item.activity_type}`}>
-                <strong>{item.activity_type}</strong>: {item.title} (
+              <Text as="p" key={`${item.bill_id}:${item.activity_type}`}>
+                <Text weight="bold">{item.activity_type}</Text>: {item.title} (
                 <Link to={`/bills/${encodeURIComponent(item.bill_id)}`}>{item.bill_id}</Link>)
-              </li>
+              </Text>
             ))}
-          </ul>
-        ) : <p>No indexed bill activity for this member.</p>}
-      </div>
+          </Flex>
+        ) : <Text as="p" color="gray">No indexed bill activity for this member.</Text>}
+      </Card>
 
-      <div className="panel">
-        <h2>Topic Profile</h2>
-        {profile.topics.length > 0 ? <ul className="topic-list">
-          {profile.topics.map((topic) => (
-            <li key={topic.label}>
-              <div className="topic-row">
-                <span>{topic.label}</span>
-                <strong>{Math.round(topic.weight * 100)}%</strong>
-              </div>
-              <div className="topic-bar">
-                <div className="topic-bar-fill" style={{ width: `${Math.round(topic.weight * 100)}%` }} />
-              </div>
-            </li>
-          ))}
-        </ul> : <p>No indexed topic associations for this member.</p>}
-      </div>
-    </section>
+      <Card size="3">
+        <Heading size="4" mb="2">Topic Profile</Heading>
+        {profile.topics.length > 0 ? (
+          <Flex direction="column" gap="3">
+            {profile.topics.map((topic) => (
+              <Flex direction="column" gap="1" key={topic.label}>
+                <Flex justify="between">
+                  <Text>{topic.label}</Text>
+                  <Text weight="bold">{Math.round(topic.weight * 100)}%</Text>
+                </Flex>
+                <Progress value={Math.round(topic.weight * 100)} />
+              </Flex>
+            ))}
+          </Flex>
+        ) : <Text as="p" color="gray">No indexed topic associations for this member.</Text>}
+      </Card>
+    </Flex>
   );
 }

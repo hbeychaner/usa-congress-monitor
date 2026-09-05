@@ -1,29 +1,31 @@
+import { Card, Flex, Grid, Heading, Text } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
+
+const DESTINATIONS = [
+  { to: '/states', title: 'Map View', description: 'Browse states and view their current congressional delegation.' },
+  { to: '/bills', title: 'Bill Activity', description: 'Browse recently updated bills from OpenSearch.' },
+  { to: '/topics', title: 'Topic Explorer', description: 'Explore indexed topic associations.' },
+  { to: '/search', title: 'Global Search', description: 'Run typed member/state/bill queries with backend relevance scoring.' },
+];
 
 export function HomePage() {
   return (
-    <section className="home-page">
-      <h1>Congress Tracker</h1>
-      <p>Search the congressional record, browse states, and inspect members.</p>
+    <Flex direction="column" gap="5">
+      <Flex direction="column" gap="2">
+        <Heading size="8">Congress Tracker</Heading>
+        <Text color="gray">Search the congressional record, browse states, and inspect members.</Text>
+      </Flex>
 
-      <div className="card-grid">
-        <Link className="card" to="/states">
-          <h2>Map View</h2>
-          <p>Browse states and view their current congressional delegation.</p>
-        </Link>
-        <Link className="card" to="/bills">
-          <h2>Bill Activity</h2>
-          <p>Browse recently updated bills from OpenSearch.</p>
-        </Link>
-        <Link className="card" to="/topics">
-          <h2>Topic Explorer</h2>
-          <p>Explore indexed topic associations.</p>
-        </Link>
-        <Link className="card" to="/search">
-          <h2>Global Search</h2>
-          <p>Run typed member/state/bill queries with backend relevance scoring.</p>
-        </Link>
-      </div>
-    </section>
+      <Grid columns={{ initial: '1', sm: '2' }} gap="4">
+        {DESTINATIONS.map((destination) => (
+          <Card key={destination.to} asChild size="3">
+            <Link to={destination.to}>
+              <Heading size="4" mb="1">{destination.title}</Heading>
+              <Text color="gray">{destination.description}</Text>
+            </Link>
+          </Card>
+        ))}
+      </Grid>
+    </Flex>
   );
 }
