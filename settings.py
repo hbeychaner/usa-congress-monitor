@@ -42,6 +42,14 @@ CELERY_RETRY_MAX_TRANSIENT = int(os.getenv("CELERY_RETRY_MAX_TRANSIENT", "24"))
 CELERY_RETRY_BACKOFF_MAX = int(os.getenv("CELERY_RETRY_BACKOFF_MAX", "3600"))
 CELERY_TASK_SOFT_TIME_LIMIT = int(os.getenv("CELERY_TASK_SOFT_TIME_LIMIT", "3600"))
 CELERY_TASK_TIME_LIMIT = int(os.getenv("CELERY_TASK_TIME_LIMIT", "3900"))
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:5183,http://localhost:5173",
+    ).split(",")
+    if origin.strip()
+]
 # When true, the client will raise an error if response fields are
 # present in the API payload but not represented in our Pydantic models.
 # Set via environment variable to one of: 1,true,yes
