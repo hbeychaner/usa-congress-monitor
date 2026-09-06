@@ -109,10 +109,12 @@ export function StateDetailPage() {
 
       <div className="timeline-grid congress-grid">
         {congresses.map((congress) => (
-          <section className="timeline-lane congress-column" key={congress}>
+          <section className="timeline-lane" key={congress}>
             <Heading size="5" mb="2">Congress {congress}</Heading>
-            <ChamberSection title="House" members={houseByCongress.get(congress) ?? []} />
-            <ChamberSection title="Senate" members={senateByCongress.get(congress) ?? []} />
+            <div className="congress-column">
+              <ChamberSection title="House" members={houseByCongress.get(congress) ?? []} />
+              <ChamberSection title="Senate" members={senateByCongress.get(congress) ?? []} />
+            </div>
           </section>
         ))}
       </div>

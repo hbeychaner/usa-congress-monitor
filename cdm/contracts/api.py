@@ -125,6 +125,34 @@ class BillDetailResponse(BaseModel):
     bill: BillDetail
 
 
+class VotePartyTotals(BaseModel):
+    yea: int = 0
+    nay: int = 0
+    present: int = 0
+    not_voting: int = 0
+
+
+class VoteSummary(BaseModel):
+    vote_id: str
+    congress: int | None = None
+    session_number: int | None = None
+    roll_call_number: int | None = None
+    chamber: str = "House"
+    vote_type: str | None = None
+    result: str | None = None
+    question: str | None = None
+    date: str | None = None
+    totals: VotePartyTotals
+    amendment_number: int | None = None
+    url: str | None = None
+
+
+class BillVotesResponse(BaseModel):
+    bill_id: str
+    votes: list[VoteSummary]
+    total: int
+
+
 class IngestProgressJob(BaseModel):
     job_id: str
     status: str

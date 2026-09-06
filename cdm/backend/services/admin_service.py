@@ -149,9 +149,7 @@ def _count_rows(db_path: Path, statement) -> int:
     engine = create_engine(f"sqlite:///{db_path}")
     with engine.connect() as conn:
         row = conn.execute(statement).scalar_one_or_none()
-    if not row:
-        return 0
-    return int(row[0] or 0)
+    return int(row or 0)
 
 
 def _hydrated_count(job: _ActiveJob) -> int:

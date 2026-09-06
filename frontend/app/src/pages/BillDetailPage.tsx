@@ -2,7 +2,7 @@ import { Badge, Button, Card, DataList, Flex, Grid, Heading, Text } from '@radix
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { fetchBill, type BillDetailResponse } from '../api/bills';
+import { fetchBill, fetchBillVotes, type BillDetailResponse, type BillVotesResponse } from '../api/bills';
 
 type RecordValue = Record<string, unknown>;
 
@@ -20,11 +20,17 @@ export function BillDetailPage() {
     const { billId = '' } = useParams();
     const [response, setResponse] = useState<BillDetailResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [votesResponse, setVotesResponse] = useState<BillVotesResponse | null>(null);
 
     useEffect(() => {
         setResponse(null);
         setError(null);
         fetchBill(billId).then(setResponse).catch((err: Error) => setError(err.message));
+    }, [billId]);
+
+    useEffect(() => {
+        setVotesResponse(null);
+        fetchBillVotes(billId).then(setVotesResponse).catch(() => setVotesResponse(null));
     }, [billId]);
 
     if (error) {
@@ -90,6 +96,30 @@ export function BillDetailPage() {
                             </details>
                         </Card>
                     ) : null}
+                    <Card size="3">
+                        <Heading size="4" mb="2">Roll call votes</Heading>
+                        {votesResponse && votesResponse.votes.length > 0 ? (
+                            <Flex direction="column" gap="3">
+                                {votesResponse.votes.map((vote) => (
+                                    <Flex direction="column" gap="1" key={vote.vote_id}>
+                                        <Flex justify="between" align="center" wrap="wrap" gap="2">
+                                            <Text weight="bold">{vote.question ?? 'Roll call vote'}</Text>
+                                            {vote.result ? <Badge color={vote.result === 'Passed' ? 'green' : 'red'}>{vote.result}</Badge> : null}
+                                        </Flex>
+                                        <Text size="1" color="gray">
+                                            {formatDate(vote.date)} · {vote.chamber} Roll Call {vote.roll_call_number ?? 'Unknown'} · {vote.vote_type ?? 'Vote'}
+                                        </Text>
+                                        <Text size="2">
+                                            Yea {vote.totals.yea} · Nay {vote.totals.nay} · Present {vote.totals.present} · Not Voting {vote.totals.not_voting}
+                                        </Text>
+                                        {vote.url ? (
+                                            <Text size="1"><a href={vote.url} target="_blank" rel="noreferrer">View vote details</a></Text>
+                                        ) : null}
+                                    </Flex>
+                                ))}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No recorded votes are indexed for this bill.</Text>}
+                    </Card>
                 </Flex>
 
                 <Flex direction="column" gap="4">

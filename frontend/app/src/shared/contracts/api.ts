@@ -174,6 +174,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/bills/{bill_id}/votes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Bill Votes */
+        get: operations["bill_votes_api_v1_bills__bill_id__votes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -290,6 +307,15 @@ export interface components {
             chamber?: string | null;
             /** Updated At */
             updated_at?: string | null;
+        };
+        /** BillVotesResponse */
+        BillVotesResponse: {
+            /** Bill Id */
+            bill_id: string;
+            /** Votes */
+            votes: components["schemas"]["VoteSummary"][];
+            /** Total */
+            total: number;
         };
         /** BillsResponse */
         BillsResponse: {
@@ -579,6 +605,58 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VotePartyTotals */
+        VotePartyTotals: {
+            /**
+             * Yea
+             * @default 0
+             */
+            yea: number;
+            /**
+             * Nay
+             * @default 0
+             */
+            nay: number;
+            /**
+             * Present
+             * @default 0
+             */
+            present: number;
+            /**
+             * Not Voting
+             * @default 0
+             */
+            not_voting: number;
+        };
+        /** VoteSummary */
+        VoteSummary: {
+            /** Vote Id */
+            vote_id: string;
+            /** Congress */
+            congress?: number | null;
+            /** Session Number */
+            session_number?: number | null;
+            /** Roll Call Number */
+            roll_call_number?: number | null;
+            /**
+             * Chamber
+             * @default House
+             */
+            chamber: string;
+            /** Vote Type */
+            vote_type?: string | null;
+            /** Result */
+            result?: string | null;
+            /** Question */
+            question?: string | null;
+            /** Date */
+            date?: string | null;
+            totals: components["schemas"]["VotePartyTotals"];
+            /** Amendment Number */
+            amendment_number?: number | null;
+            /** Url */
+            url?: string | null;
         };
     };
     responses: never;
@@ -870,6 +948,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BillDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bill_votes_api_v1_bills__bill_id__votes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                bill_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillVotesResponse"];
                 };
             };
             /** @description Validation Error */

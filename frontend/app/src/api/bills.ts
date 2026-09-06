@@ -17,6 +17,7 @@ export type BillsResponse = {
 };
 
 export type BillDetailResponse = components['schemas']['BillDetailResponse'];
+export type BillVotesResponse = components['schemas']['BillVotesResponse'];
 
 export type BillFilters = {
   query?: string;
@@ -36,4 +37,8 @@ export function fetchRecentBills(limit = 50, page = 1, filters: BillFilters = {}
 
 export function fetchBill(billId: string): Promise<BillDetailResponse> {
   return apiGet<BillDetailResponse>(`/api/v1/bills/${encodeURIComponent(billId)}`);
+}
+
+export function fetchBillVotes(billId: string): Promise<BillVotesResponse> {
+  return apiGet<BillVotesResponse>(`/api/v1/bills/${encodeURIComponent(billId)}/votes`);
 }
