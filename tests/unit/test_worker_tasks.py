@@ -5,6 +5,11 @@ from cdm.jobs.store import JobKind, JobStatus
 from cdm.workers import tasks
 
 
+def test_denormalized_summaries_are_not_queued_for_direct_indexing():
+    assert not tasks._should_queue_index_job("summaries")
+    assert tasks._should_queue_index_job("bill")
+
+
 class FakeLock:
     def __init__(self, acquired):
         self.acquired = acquired

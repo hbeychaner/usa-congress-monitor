@@ -30,6 +30,7 @@ def test_network_errors_are_transient():
 def test_recovery_only_targets_transient_error_messages():
     assert _is_retryable_error("server error: 500")
     assert _is_retryable_error("server error: 429")
+    assert _is_retryable_error("Connection closed by server.")
     assert not _is_retryable_error("invalid model field")
 
 

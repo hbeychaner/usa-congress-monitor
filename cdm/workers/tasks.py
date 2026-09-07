@@ -72,6 +72,13 @@ def _job_id(kind: str, payload: dict[str, Any]) -> str:
     return f"{kind}:{digest}"
 
 
+_NON_INDEXED_RESOURCES = frozenset({"summaries"})
+
+
+def _should_queue_index_job(resource: str) -> bool:
+    return resource not in _NON_INDEXED_RESOURCES
+
+
 def submit_job(
     kind: str,
     payload: dict[str, Any],
@@ -145,7 +152,12 @@ def _is_retryable_error(error: str | None) -> bool:
         "HTTP 429",
     )) or any(
         marker in error.lower()
-        for marker in ("connectionerror", "connection aborted", "timed out")
+        for marker in (
+            "connectionerror",
+            "connection aborted",
+            "connection closed by server",
+            "timed out",
+        )
     )
 
 
@@ -232,7 +244,7 @@ def run_ingest_job(self, job_id: str) -> dict:
         index_jobs = []
         if payload.get("index", True):
             for result in results:
-                if result.published_count:
+                if result.published_count and _should_queue_index_job(result.resource.value):
                     index_payload = {
                         "stream": RedisRecordStream.stream_name(
                             job_id, result.resource.value
