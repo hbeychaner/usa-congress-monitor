@@ -139,6 +139,8 @@ def _is_transient(exc: Exception) -> bool:
         return response is not None and (
             response.status_code == 429 or response.status_code >= 500
         )
+    if "database is locked" in str(exc).lower():
+        return True
     return isinstance(exc, (requests.ConnectionError, requests.Timeout))
 
 
@@ -156,6 +158,7 @@ def _is_retryable_error(error: str | None) -> bool:
             "connectionerror",
             "connection aborted",
             "connection closed by server",
+            "database is locked",
             "timed out",
         )
     )

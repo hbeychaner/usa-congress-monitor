@@ -264,6 +264,19 @@ def test_manifest_store_upserts_package_state(tmp_path):
     assert record["package_id"] == "BILLSTATUS-118hr1"
 
 
+def test_manifest_store_quarantines_malformed_database(tmp_path):
+    path = tmp_path / "govinfo.sqlite3"
+    path.write_bytes(b"not a sqlite database")
+
+    store = GovInfoManifestStore(path)
+    store.upsert(package(), status="complete")
+
+    record = store.get(package())
+    assert record is not None
+    assert record["status"] == "complete"
+    assert list(tmp_path.glob("govinfo.sqlite3.corrupt-*"))
+
+
 def test_manifest_rows_support_complete_coverage_summary(tmp_path):
     packages = [
         package(),

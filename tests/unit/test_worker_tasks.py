@@ -34,16 +34,17 @@ class FakeRedis:
 
 
 class FakeStore:
-    def __init__(self, jobs=None, queued=None):
+    def __init__(self, jobs=None, queued=None, active=None):
         self.requeued = []
         self._jobs = jobs or []
         self._queued = queued or []
+        self._active = active or []
 
     def failed(self):
         return []
 
     def stale_active(self, cutoff):
-        return []
+        return self._active
 
     def stale_queued(self, kinds, cutoff, limit):
         return [job for job in self._queued if job["kind"] in kinds][:limit]
@@ -153,3 +154,78 @@ def test_recovery_caps_orphaned_queued_jobs_per_tick(monkeypatch):
 
     assert len(result["recovered"]) == tasks._ORPHAN_RECOVERY_BATCH_LIMIT
     assert len(dispatched) == tasks._ORPHAN_RECOVERY_BATCH_LIMIT
+
+
+def test_recovery_requeues_stale_active_job(monkeypatch):
+    lock = FakeLock(acquired=True)
+    job = {
+        "id": "ingest:stale-running",
+        "kind": JobKind.INGEST.value,
+        "status": JobStatus.RUNNING.value,
+        "payload": {},
+    }
+    store = FakeStore(active=[job])
+    dispatched = []
+    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
+    monkeypatch.setattr(tasks, "_store", lambda: store)
+    monkeypatch.setattr(
+        tasks.celery_app,
+        "send_task",
+        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    )
+
+    result = cast(Any, tasks.recover_failed_ingest_jobs).run()
+
+    assert result == {"recovered": [job["id"]]}
+    assert dispatched == [
+        (
+            "cdm.workers.tasks.run_ingest_job",
+            [job["id"]],
+            tasks.CELERY_INGEST_QUEUE,
+        )
+    ]
+
+
+def test_govinfo_batch_fans_out_package_jobs(monkeypatch):
+    package_ids = ["govinfo_bulk:one", "govinfo_bulk:two"]
+
+    class BatchStore:
+        def __init__(self):
+            self.succeeded = []
+
+        def mark_running(self, job_id):
+            assert job_id == "govinfo_bulk_batch:one"
+            return {
+                "id": job_id,
+                "payload": {"job_ids": package_ids},
+            }
+
+        def mark_succeeded(self, job_id):
+            self.succeeded.append(job_id)
+
+    store = BatchStore()
+    dispatched = []
+    monkeypatch.setattr(tasks, "_store", lambda: store)
+    monkeypatch.setattr(
+        tasks.celery_app,
+        "send_task",
+        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    )
+
+    result = cast(Any, tasks.run_govinfo_bulk_batch).run(
+        "govinfo_bulk_batch:one"
+    )
+
+    assert result == {
+        "job_id": "govinfo_bulk_batch:one",
+        "packages_dispatched": package_ids,
+    }
+    assert store.succeeded == ["govinfo_bulk_batch:one"]
+    assert dispatched == [
+        (
+            "cdm.workers.tasks.run_govinfo_bulk_job",
+            [package_id],
+            tasks.CELERY_INGEST_QUEUE,
+        )
+        for package_id in package_ids
+    ]

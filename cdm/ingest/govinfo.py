@@ -18,6 +18,7 @@ from urllib.parse import urljoin
 import requests
 from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine, select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+from sqlalchemy.exc import DatabaseError
 
 
 class GovInfoHttpSession(Protocol):
@@ -69,7 +70,27 @@ class GovInfoManifestStore:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.engine = create_engine(f"sqlite:///{self.path}")
-        _METADATA.create_all(self.engine)
+        try:
+            _METADATA.create_all(self.engine)
+        except DatabaseError as exc:
+            error_text = str(exc).lower()
+            if not any(
+                marker in error_text
+                for marker in ("malformed", "file is not a database")
+            ):
+                raise
+            self.engine.dispose()
+            timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+            backup = self.path.with_name(f"{self.path.name}.corrupt-{timestamp}")
+            suffix = 1
+            while backup.exists():
+                backup = self.path.with_name(
+                    f"{self.path.name}.corrupt-{timestamp}-{suffix}"
+                )
+                suffix += 1
+            self.path.replace(backup)
+            self.engine = create_engine(f"sqlite:///{self.path}")
+            _METADATA.create_all(self.engine)
 
     def upsert(
         self,

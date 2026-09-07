@@ -27,6 +27,12 @@ def _parse_timestamp(value: str) -> datetime:
 
 def _failure_category(error: str | None) -> str:
     text = (error or "").lower()
+    if "summaries are denormalized" in text:
+        return "expected_non_indexed"
+    if "indexed 0 records" in text:
+        return "archive_recovery"
+    if "disk i/o error" in text:
+        return "manual_review"
     if any(
         marker in text
         for marker in (
@@ -58,6 +64,10 @@ def _job_snapshot(store: JobStore, window_minutes: int) -> dict[str, Any]:
         for job in jobs
         if job["status"] == "failed"
     )
+    failure_categories = Counter()
+    for (kind, category), count in failures.items():
+        del kind
+        failure_categories[category] += count
     latest_finished = max(
         (job["finished_at"] for job in jobs if job.get("finished_at")),
         default=None,
@@ -77,6 +87,9 @@ def _job_snapshot(store: JobStore, window_minutes: int) -> dict[str, Any]:
             {"kind": kind, "category": category, "count": count}
             for (kind, category), count in failures.most_common(20)
         ],
+        "failure_categories": dict(failure_categories.most_common()),
+        "actionable_failure_count": sum(failure_categories.values())
+        - failure_categories["expected_non_indexed"],
     }
 
 
@@ -148,7 +161,7 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
         report["warnings"].append(f"{backlog:,} queued jobs remain")
     if jobs.get("failures"):
         report["warnings"].append(
-            f"{sum(item['count'] for item in jobs['failures']):,} failed jobs remain"
+            f"{jobs.get('actionable_failure_count', 0):,} actionable failed jobs remain"
         )
     return report
 

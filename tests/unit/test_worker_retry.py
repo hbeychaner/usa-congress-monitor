@@ -25,12 +25,14 @@ def test_client_errors_are_terminal():
 def test_network_errors_are_transient():
     assert _is_transient(requests.Timeout("timed out"))
     assert _is_transient(requests.ConnectionError("disconnected"))
+    assert _is_transient(RuntimeError("database is locked"))
 
 
 def test_recovery_only_targets_transient_error_messages():
     assert _is_retryable_error("server error: 500")
     assert _is_retryable_error("server error: 429")
     assert _is_retryable_error("Connection closed by server.")
+    assert _is_retryable_error("sqlite3.OperationalError: database is locked")
     assert not _is_retryable_error("invalid model field")
 
 
