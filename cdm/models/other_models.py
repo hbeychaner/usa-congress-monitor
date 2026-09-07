@@ -8,6 +8,7 @@ from datetime import datetime
 from enum import StrEnum
 from threading import Lock
 from typing import Annotated, Optional
+from urllib.parse import urlparse
 
 from pydantic import AliasChoices, BaseModel, Field, HttpUrl, model_validator
 
@@ -2226,6 +2227,19 @@ class TreatyListItem(EntityBase, RecordTypeBase):
 
 class MemberListItem(EntityBase, RecordTypeBase):
     """List-level member entry with name, party, and term data."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def _populate_bioguide_id_from_url(cls, values):
+        if isinstance(values, dict) and not (
+            values.get("bioguideId") or values.get("bioguide_id")
+        ):
+            url = values.get("url")
+            if url:
+                path_parts = [part for part in urlparse(str(url)).path.split("/") if part]
+                if len(path_parts) >= 2 and path_parts[-2].lower() == "member":
+                    values["bioguideId"] = path_parts[-1]
+        return values
 
     recordType: Annotated[
         str, Field(description="Which knowledgebase index this record belongs to.")

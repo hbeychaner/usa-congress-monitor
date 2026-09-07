@@ -10,6 +10,14 @@ def test_build_id_member_bioguide():
     assert m.build_id() == "member:A123"
 
 
+def test_member_list_item_recovers_bioguide_from_url():
+    member = MemberListItem(
+        url="https://api.congress.gov/v3/member/G000607?format=json"
+    )
+
+    assert member.bioguide_id == "G000607"
+
+
 def test_build_id_bill_composition():
     b = BillListItem(congress=110, type="hconres", number="10")
     assert b.build_id() == "bill:110:hconres:10"
