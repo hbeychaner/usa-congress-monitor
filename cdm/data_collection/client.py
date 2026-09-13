@@ -8,7 +8,7 @@ returning mixed types or raw byte fallbacks.
 import importlib
 import inspect
 import time
-from collections.abc import Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping
 from datetime import UTC
 from email.utils import parsedate_to_datetime
 from typing import cast
@@ -302,7 +302,12 @@ class CDGClient:
         return self.coerce_records(model_cls, records)
 
     def fetch_one(
-        self, spec: EndpointSpec, runtime_params: dict[str, Json]
+        self,
+        spec: EndpointSpec,
+        runtime_params: dict[str, Json],
+        *,
+        validation_failure_sink: Callable[[dict[str, Json], ValidationError], None]
+        | None = None,
     ) -> BaseModel:
         """Fetch a single-item endpoint and return one coerced model instance.
 
@@ -313,7 +318,11 @@ class CDGClient:
         if not records:
             raise ValueError("no item found in response")
         model_cls = self._resolve_response_model(spec)
-        insts = self.coerce_records(model_cls, records)
+        insts = self.coerce_records(
+            model_cls,
+            records,
+            validation_failure_sink=validation_failure_sink,
+        )
         return insts[0]
 
     def resolve_runtime_params_from_record(
@@ -445,6 +454,8 @@ class CDGClient:
         model_cls: type[BaseModel],
         records: list[dict[str, Json]],
         spec=None,
+        validation_failure_sink: Callable[[dict[str, Json], ValidationError], None]
+        | None = None,
     ) -> list[BaseModel]:
         """Coerce mapping records into instances of `model_cls`.
 
@@ -454,6 +465,7 @@ class CDGClient:
         for r in records:
             if not isinstance(r, dict):
                 raise TypeError("record is not a mapping")
+            raw_record = dict(r)
             # Normalize common shape differences to keep model input stable.
             # Specifically, coerce various `notes` shapes into a list of
             # note dicts: {"notes": [{"text": "..."}, ...]}
@@ -502,6 +514,8 @@ class CDGClient:
             try:
                 inst = model_cls.model_validate(r)
             except ValidationError as exc:
+                if validation_failure_sink is not None:
+                    validation_failure_sink(raw_record, exc)
                 logger.exception("failed to validate record against %s", model_cls)
                 raise ValueError(f"failed to validate record: {exc}") from exc
             # Allow model instances to provide their own canonical id via

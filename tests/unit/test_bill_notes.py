@@ -25,3 +25,21 @@ def test_bill_accepts_list_shaped_notes():
     assert isinstance(notes, list)
     assert len(notes) == 1
     assert getattr(notes[0], "text", None) == "For further action, see S.2739."
+
+
+def test_bill_accepts_missing_latest_action():
+    data = {
+        "congress": 119,
+        "laws": [],
+        "number": "10",
+        "originChamber": "House",
+        "originChamberCode": "H",
+        "title": "Test title",
+        "type": "HR",
+        "updateDate": "2025-06-06T14:17:56Z",
+        "updateDateIncludingText": "2025-06-06T14:18:51Z",
+    }
+
+    inst = Bill.model_validate(data)
+
+    assert inst.latest_action is None

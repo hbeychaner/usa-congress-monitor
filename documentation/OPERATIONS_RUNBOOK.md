@@ -25,15 +25,20 @@ uv run python -c 'from sqlalchemy import text; from cdm.jobs.store import JobSto
 
 ## Restart
 
-Stop workers and Beat before changing the ledger or restoring a backup. Start
-the local dependencies first, then the workers:
+Stop workers and Beat before changing the ledger or restoring a backup. On
+macOS, use the launchd-managed services:
 
 ```sh
-make local
-make worker MONITOR=0
-make worker-index
-make beat
+make services
+make ingest-service-status
+make health-check
 ```
+
+`make services` starts the local containers and installs the launchd-supervised
+ingest, index, and Beat agents. The agents restart after process failure and
+resume after login or wake. Do not also run `make worker`, `make worker-index`,
+or `make beat` for the same queues. On Linux, use the corresponding foreground
+commands under a process manager.
 
 For the full container stack:
 
@@ -44,7 +49,10 @@ make health-check
 
 After restart, confirm that only one ingest worker, one index worker, and one
 Beat scheduler are active. Duplicate workers can cause unnecessary redelivery
-and database contention.
+and database contention. RabbitMQ uses the repository configuration in
+`elastic-start-local/config/rabbitmq.conf`; its seven-day consumer timeout
+allows a long-running task to survive extended laptop sleep while retaining
+protection against permanently abandoned consumers.
 
 ## Recovery
 
@@ -72,7 +80,8 @@ whose stream entries have already been acknowledged.
 
 Rollback is a maintenance operation:
 
-1. Stop ingest workers, index workers, and Beat.
+1. Stop the launchd agents with `make ingest-service-uninstall` on macOS, or
+	stop the process-manager services on Linux.
 2. Preserve the current ledger and record the reason for rollback.
 3. Verify the intended backup with `PRAGMA integrity_check`.
 4. Restore the backup only after the verification succeeds.

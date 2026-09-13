@@ -77,12 +77,16 @@ checkpoints prevent completed work from being repeated unnecessarily.
 Local commands:
 
 ```bash
-make worker  # macOS-safe solo pool
-make beat
+make services                # macOS: containers plus launchd agents
+make ingest-service-status   # inspect ingest, index, and Beat agents
 ```
 
-For Linux production workers, omit `--pool=solo` and choose concurrency based
-on API rate limits and OpenSearch capacity.
+The macOS launchd installer manages separate ingest, index, and Beat agents with
+`RunAtLoad` and `KeepAlive`. The ingest agent uses the long task limits required
+for historical recovery jobs; all three agents reconnect after broker or process
+failure. Do not run duplicate foreground workers or Beat alongside these agents.
+For Linux production workers, use a process manager and choose concurrency
+based on API rate limits and OpenSearch capacity.
 
 ### GovInfo coverage audits
 

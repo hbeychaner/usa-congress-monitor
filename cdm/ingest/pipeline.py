@@ -68,6 +68,7 @@ class PipelineConfig:
     rate_limiter: TokenBucket | None = None
     record_sink: Callable[[str, dict], None] | None = None
     record_archive_sink: Callable[[str, dict], None] | None = None
+    validation_failure_sink: Callable[[str, dict, str, str | None], None] | None = None
     progress_sink: Callable[[str, CoverageStage, dict], None] | None = None
     # API auth
     api_key: str | None = None
@@ -192,6 +193,7 @@ class Pipeline:
                 rate_limiter=self.config.rate_limiter,
                 record_sink=self.config.record_sink,
                 record_archive_sink=self.config.record_archive_sink,
+                validation_failure_sink=self.config.validation_failure_sink,
                 progress_sink=self.config.progress_sink,
             )
             counts = runner.run()

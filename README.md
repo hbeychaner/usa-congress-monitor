@@ -18,12 +18,13 @@ Requirements: Python 3.13+, `uv`, Docker Desktop, and a Congress.gov API key.
 uv sync --all-extras
 # Create .env with CONGRESS_API_KEY and local service settings
 make local
-make worker
-make beat
+make ingest-service-install
 ```
 
-For unattended local operation, use `make start`. It starts OpenSearch,
-Redis, and RabbitMQ, then opens a Celery worker and beat scheduler. Beat runs
+For unattended macOS operation, use `make services`. It starts OpenSearch,
+Redis, and RabbitMQ, then installs launchd-supervised ingest, indexing, and Beat
+agents. The agents restart after process failure and resume after login or wake;
+they do not require an open Terminal window. Beat runs
 the normal daily overlap and, every 24 hours, checks durable coverage windows
 for date-capable endpoints. When a successful endpoint window is more than 24
 hours behind UTC, it queues an idempotent gap job with indexing enabled. The
@@ -40,8 +41,11 @@ Static endpoints are not gap-scheduled because their APIs do not expose a
 reliable time cursor; they remain covered by the historical/static ingest
 plan.
 
-`make worker` uses Celery's `solo` pool for macOS local development. Linux
-deployments can use the default prefork pool with multiple processes.
+On macOS, use `make ingest-service-install` for unattended operation and
+`make ingest-service-status` to inspect all three agents. Use `make worker`,
+`make worker-index`, and `make beat` only for foreground development or
+diagnostics. Linux deployments can use the foreground commands or a process
+manager with the default prefork pool.
 
 ## Run A Backfill
 
@@ -67,11 +71,11 @@ the resource catalog is the source of truth for this behavior.
 
 ## Queue A Full Ingest
 
-Start a worker, run the bounded smoke job, then queue the complete historical
-plan:
+Start the supervised services, run the bounded smoke job, then queue the
+complete historical plan:
 
 ```bash
-make worker
+make services
 uv run python scripts/queue_full_ingest.py --smoke
 uv run python scripts/queue_full_ingest.py
 ```
@@ -142,17 +146,15 @@ at `http://localhost:8000`, frontend dev server at `http://localhost:5173`.
 ### Start everything (native processes, macOS)
 
 ```bash
-make local        # OpenSearch/Elastic + Redis + RabbitMQ containers
-make worker        # ingest worker (foreground; opens progress monitor)
-make worker-index  # index worker, run in a second terminal
-make beat          # Celery beat scheduler, run in a third terminal
-make backend-api   # FastAPI backend (optional, only if using the web UI)
-make frontend-dev  # Vite dev server (optional, only if using the web UI)
+make services                 # containers plus launchd-supervised Celery agents
+make ingest-service-status    # verify ingest, index, and Beat agents
+make backend-api              # FastAPI backend (optional, only if using the web UI)
+make frontend-dev             # Vite dev server (optional, only if using the web UI)
 ```
 
-`make services` starts the containers plus worker/index-worker/beat together,
-each in its own Terminal window (macOS) or backgrounded with logs under
-`logs/` (other platforms).
+`make services` uses launchd on macOS, so do not also run the foreground worker,
+index worker, or Beat commands for the same queues. On other platforms it
+starts those processes in the background with logs under `logs/`.
 
 ### Start everything (containerized full stack)
 
@@ -174,25 +176,28 @@ celery -A cdm.workers.celery_app:celery_app status   # confirm workers are onlin
 
 ### Restart
 
-Native processes: stop the specific process (see below) and re-run the
-corresponding `make` target. Containers only need a restart if their image or
-compose file changed:
+On macOS, restart the supervised agents with `make ingest-service-install`.
+Containers only need a restart if their image or Compose file changed:
 
 ```bash
 make local-stop && make local     # restart infra containers, keep volumes
 make stack-down && make stack-up  # restart the full containerized stack
 ```
 
-Celery worker/beat processes do not need the broker restarted; killing and
-re-running `make worker` / `make worker-index` / `make beat` is enough after a
-code change.
+The local RabbitMQ configuration allows long-running tasks to survive extended
+laptop sleep without expiring their delivery acknowledgements. If RabbitMQ is
+recreated after a Compose change, launchd reconnects the Celery agents; verify
+with `make ingest-service-status` and `make health-check`.
 
 ### Kill
 
 ```bash
-# Native Celery worker/beat processes
+# Native Celery worker/beat processes (foreground development only)
 pkill -f "celery -A cdm.workers.celery_app:celery_app worker"
 pkill -f "celery -A cdm.workers.celery_app:celery_app beat"
+
+# macOS launchd-supervised agents
+make ingest-service-uninstall
 
 # Native backend/frontend dev servers
 pkill -f "uvicorn cdm.backend.app:app"
@@ -209,8 +214,9 @@ make stack-down
 ```
 
 Always stop old worker/beat processes before starting new ones after a code
-change to `cdm/workers/`; running two generations of Beat at once will
-duplicate scheduled/recovered jobs against the same RabbitMQ queues.
+change to `cdm/workers/`. On macOS, use the launchd commands above rather than
+starting a second generation in a Terminal; duplicate Beat schedulers can
+enqueue duplicate scheduled/recovered jobs.
 
 ## Tests
 

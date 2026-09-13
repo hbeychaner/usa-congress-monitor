@@ -4,6 +4,7 @@ export type IngestProgressJob = {
     job_id: string;
     status: string;
     resource: string;
+    congress: number | null;
     from_date: string | null;
     to_date: string | null;
     fetch_items: boolean;
@@ -19,6 +20,8 @@ export type IngestProgressResponse = {
     target: number;
     remaining: number;
     active_jobs: number;
+    activity: 'continuing' | 'stalled' | 'waiting' | 'queued' | 'idle';
+    last_progress_at: string | null;
     jobs: IngestProgressJob[];
 };
 

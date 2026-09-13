@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -52,6 +53,15 @@ _RECORDS_TABLE = Table(
     Column("resource", String),
     Column("payload", String),
 )
+_INGEST_WINDOWS_TABLE = Table(
+    "ingest_windows",
+    MetaData(),
+    Column("job_id", String),
+    Column("resource", String),
+    Column("last_progress_at", String),
+)
+
+_PROGRESS_STALE_AFTER_SECONDS = 120
 
 
 @dataclass
@@ -59,6 +69,7 @@ class _ActiveJob:
     job_id: str
     status: str
     resource: str
+    congress: int | None
     outdir: Path
     from_date: str | None
     to_date: str | None
@@ -100,6 +111,7 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
                     job_id=str(row["id"]),
                     status=str(row["status"]),
                     resource="GovInfo batch",
+                    congress=None,
                     outdir=Path("."),
                     from_date=None,
                     to_date=None,
@@ -115,6 +127,7 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
                     job_id=str(row["id"]),
                     status=str(row["status"]),
                     resource=f"GovInfo package {package_id}",
+                    congress=None,
                     outdir=Path(str(payload.get("outdir", "."))),
                     from_date=None,
                     to_date=None,
@@ -133,6 +146,11 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
                 job_id=str(row["id"]),
                 status=str(row["status"]),
                 resource=resource,
+                congress=(
+                    int(payload["congress"])
+                    if payload.get("congress") is not None
+                    else None
+                ),
                 outdir=Path(str(payload.get("outdir", "data/full_history")))
                 / str(row["id"]),
                 from_date=payload.get("from_date"),
@@ -206,6 +224,34 @@ def _fetch_bill_total(
         return None
 
 
+def _latest_progress_at(conn: Connection, job: _ActiveJob) -> str | None:
+    if job.package_ids:
+        return None
+    return conn.execute(
+        select(func.max(_INGEST_WINDOWS_TABLE.c.last_progress_at)).where(
+            (_INGEST_WINDOWS_TABLE.c.job_id == job.job_id)
+            & (_INGEST_WINDOWS_TABLE.c.resource == job.resource)
+        )
+    ).scalar_one_or_none()
+
+
+def _job_activity(status: str, last_progress_at: str | None) -> str:
+    if status in {"queued", "retrying"}:
+        return "queued"
+    if status != "running":
+        return "idle"
+    if not last_progress_at:
+        return "waiting"
+    try:
+        heartbeat = datetime.fromisoformat(last_progress_at)
+        if heartbeat.tzinfo is None:
+            heartbeat = heartbeat.replace(tzinfo=UTC)
+        age = (datetime.now(UTC) - heartbeat).total_seconds()
+    except ValueError:
+        return "waiting"
+    return "continuing" if age <= _PROGRESS_STALE_AFTER_SECONDS else "stalled"
+
+
 def get_ingest_progress() -> IngestProgressResponse:
     api_total_cache: dict[tuple[str | None, str | None], int | None] = {}
 
@@ -216,8 +262,21 @@ def get_ingest_progress() -> IngestProgressResponse:
     total_hydrated = 0
     total_discovered = 0
     total_target = 0
+    job_activities: list[str] = []
+    latest_progress_at: str | None = None
+
+    with _connect_jobs() as conn:
+        progress_heartbeats = {
+            job.job_id: _latest_progress_at(conn, job) for job in active_jobs
+        }
 
     for job in active_jobs:
+        job_progress_at = progress_heartbeats[job.job_id]
+        job_activities.append(_job_activity(job.status, job_progress_at))
+        if job_progress_at and (
+            latest_progress_at is None or job_progress_at > latest_progress_at
+        ):
+            latest_progress_at = job_progress_at
         if job.package_ids:
             status_query = (
                 select(_JOBS_TABLE.c.status, func.count())
@@ -256,6 +315,7 @@ def get_ingest_progress() -> IngestProgressResponse:
                 job_id=job.job_id,
                 status=job.status,
                 resource=job.resource,
+                congress=job.congress,
                 from_date=job.from_date,
                 to_date=job.to_date,
                 fetch_items=job.fetch_items,
@@ -272,6 +332,18 @@ def get_ingest_progress() -> IngestProgressResponse:
         target=total_target,
         remaining=max(0, total_target - total_hydrated),
         active_jobs=len(jobs),
+        activity=(
+            "continuing"
+            if "continuing" in job_activities
+            else "stalled"
+            if "stalled" in job_activities
+            else "waiting"
+            if "waiting" in job_activities
+            else "queued"
+            if "queued" in job_activities
+            else "idle"
+        ),
+        last_progress_at=latest_progress_at,
         jobs=jobs,
     )
 

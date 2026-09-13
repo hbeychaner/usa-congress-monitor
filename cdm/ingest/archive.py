@@ -6,6 +6,7 @@ import hashlib
 import json
 import threading
 import zlib
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -47,6 +48,17 @@ _CACHED_RECORDS = Table(
         nullable=True,
     ),
     Column("payload", BLOB, nullable=False),
+)
+_QUARANTINED_RECORDS = Table(
+    "quarantined_records",
+    MetaData(),
+    Column("failure_id", String, primary_key=True),
+    Column("resource", String, nullable=False),
+    Column("record_id", String, nullable=True),
+    Column("source_url", String, nullable=True),
+    Column("payload", BLOB, nullable=False),
+    Column("error", String, nullable=False),
+    Column("captured_at", String, nullable=False),
 )
 
 
@@ -248,6 +260,74 @@ class SQLiteListCache:
                 )
                 seen_ids.add(record_id)
         return models
+
+
+class SQLiteQuarantineArchive:
+    """Store raw payloads that failed model validation for later replay."""
+
+    def __init__(self, root: Path) -> None:
+        self.root = root
+        self.path = root / "quarantine.sqlite3"
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = threading.Lock()
+        self.engine = _archive_engine(self.path)
+        _QUARANTINED_RECORDS.metadata.create_all(self.engine)
+
+    def write(
+        self,
+        resource: str,
+        record: dict[str, Any],
+        *,
+        error: str,
+        source_url: str | None = None,
+        record_id: str | None = None,
+    ) -> None:
+        encoded = json.dumps(record, ensure_ascii=True, separators=(",", ":"))
+        payload = zlib.compress(encoded.encode(), level=6)
+        stable_id = record_id or SQLiteRecordArchive._record_id(record)
+        failure_id = hashlib.sha256(
+            f"{resource}:{stable_id}:{error}".encode()
+        ).hexdigest()
+        with self._lock, self.engine.begin() as connection:
+            connection.execute(
+                sqlite_insert(_QUARANTINED_RECORDS)
+                .prefix_with("OR IGNORE")
+                .values(
+                    failure_id=failure_id,
+                    resource=resource,
+                    record_id=stable_id,
+                    source_url=source_url,
+                    payload=payload,
+                    error=error,
+                    captured_at=datetime.now(UTC).isoformat(),
+                )
+            )
+
+    def records(self, resource: str | None = None) -> list[dict[str, Any]]:
+        """Return quarantined payloads and validation metadata for replay."""
+        statement = select(
+            _QUARANTINED_RECORDS.c.resource,
+            _QUARANTINED_RECORDS.c.record_id,
+            _QUARANTINED_RECORDS.c.source_url,
+            _QUARANTINED_RECORDS.c.payload,
+            _QUARANTINED_RECORDS.c.error,
+            _QUARANTINED_RECORDS.c.captured_at,
+        ).order_by(_QUARANTINED_RECORDS.c.failure_id)
+        if resource is not None:
+            statement = statement.where(_QUARANTINED_RECORDS.c.resource == resource)
+        with self.engine.connect() as connection:
+            rows = connection.execute(statement)
+            return [
+                {
+                    "resource": row.resource,
+                    "record_id": row.record_id,
+                    "source_url": row.source_url,
+                    "payload": json.loads(zlib.decompress(row.payload)),
+                    "error": row.error,
+                    "captured_at": row.captured_at,
+                }
+                for row in rows
+            ]
 
 
 # Compatibility name for integrations that imported the old archive class.

@@ -1,14 +1,7 @@
-import { Badge, Callout, Card, Flex, Grid, Heading, Progress, Select, Table, Text } from '@radix-ui/themes';
+import { Badge, Callout, Card, Flex, Grid, Heading, Select, Table, Text } from '@radix-ui/themes';
 import { useEffect, useMemo, useState } from 'react';
 
-import { fetchAdminIngestSnapshot, fetchIngestProgress, type AdminIngestSnapshot, type IngestProgressResponse } from '../api/admin';
-
-function formatPct(done: number, total: number): string {
-    if (total <= 0) {
-        return '0.0';
-    }
-    return ((done / total) * 100).toFixed(1);
-}
+import { fetchIngestProgress, type IngestProgressResponse } from '../api/admin';
 
 function formatDate(date: string | null): string {
     if (!date) {
@@ -19,7 +12,6 @@ function formatDate(date: string | null): string {
 
 export function AdminIngestPage() {
     const [data, setData] = useState<IngestProgressResponse | null>(null);
-    const [snapshot, setSnapshot] = useState<AdminIngestSnapshot | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -30,17 +22,13 @@ export function AdminIngestPage() {
 
         async function load() {
             try {
-                const [progress, status] = await Promise.all([
-                    fetchIngestProgress(),
-                    fetchAdminIngestSnapshot(),
-                ]);
+                const progress = await fetchIngestProgress();
                 if (cancelled) {
                     return;
                 }
 
                 const now = Date.now();
                 setData(progress);
-                setSnapshot(status);
                 setLastUpdated(new Date(now));
                 setError(null);
             } catch (err) {
@@ -63,20 +51,6 @@ export function AdminIngestPage() {
         };
     }, []);
 
-    const pipelineProgress = useMemo(() => {
-        if (!snapshot) {
-            return null;
-        }
-        const packageJobs = snapshot.govinfo_jobs;
-        const indexJobs = snapshot.index_jobs;
-        const jobTotal = (jobs: typeof packageJobs) => Object.values(jobs).reduce((sum, count) => sum + count, 0);
-        return {
-            packages: { completed: packageJobs.succeeded, target: jobTotal(packageJobs), queued: packageJobs.queued, running: packageJobs.running },
-            indexing: { completed: indexJobs.succeeded, target: jobTotal(indexJobs), queued: indexJobs.queued, running: indexJobs.running },
-            coverage: { completed: snapshot.govinfo.available, target: snapshot.govinfo.expected, queued: snapshot.govinfo.pending, running: 0 },
-        };
-    }, [snapshot]);
-
     const filteredJobs = useMemo(() => {
         if (!data || !statusFilter) {
             return data?.jobs ?? [];
@@ -88,7 +62,7 @@ export function AdminIngestPage() {
         <Flex direction="column" gap="5">
             <Flex direction="column" gap="2">
                 <Heading size="7">Ingest Admin</Heading>
-                <Text color="gray">Live acquisition and indexing state. Auto-refreshes every 10 seconds.</Text>
+                <Text color="gray">Live Congress API acquisition state. Auto-refreshes every 10 seconds.</Text>
             </Flex>
 
             <Card size="3">
@@ -106,68 +80,35 @@ export function AdminIngestPage() {
 
             {loading && !data ? <Card size="3"><Text as="p">Loading ingest progress...</Text></Card> : null}
 
-            {data && pipelineProgress ? (
+            {data ? (
                 <>
-                    {snapshot ? (
-                        <Grid columns={{ initial: '1', md: '3' }} gap="4">
-                            <Card size="3">
-                                <Flex direction="column" gap="1">
-                                    <Text size="1" color="gray">118th Congress</Text>
-                                    <Heading size="4">{snapshot.ready_for_reconciliation ? 'Ready for reconciliation' : 'Acquisition in progress'}</Heading>
-                                    <Badge color={snapshot.ready_for_reconciliation ? 'green' : 'amber'} variant="soft" style={{ width: 'fit-content' }}>
-                                        {snapshot.ready_for_reconciliation ? 'Ready' : 'Blocked'}
-                                    </Badge>
-                                    <Text color="gray">{snapshot.govinfo.pending.toLocaleString()} packages remain before the complete-coverage gate opens.</Text>
-                                </Flex>
-                            </Card>
-                            <Card size="3">
-                                <Flex direction="column" gap="1">
-                                    <Text size="1" color="gray">GovInfo coverage</Text>
-                                    <Heading size="5">{snapshot.govinfo.available.toLocaleString()} / {snapshot.govinfo.expected.toLocaleString()}</Heading>
-                                    <Text color="gray">{snapshot.govinfo.failed + snapshot.govinfo.not_available} classified gaps · {snapshot.govinfo.pending.toLocaleString()} pending</Text>
-                                </Flex>
-                            </Card>
-                            <Card size="3">
-                                <Flex direction="column" gap="1">
-                                    <Text size="1" color="gray">Staging index</Text>
-                                    <Heading size="5">{snapshot.staging.documents.toLocaleString()} documents</Heading>
-                                    <Text color="gray">{snapshot.staging.exists ? snapshot.staging.index : 'Not created'} · {snapshot.staging.connected ? 'OpenSearch connected' : 'OpenSearch unavailable'}</Text>
-                                </Flex>
-                            </Card>
-                        </Grid>
-                    ) : null}
-
-                    {snapshot ? (
-                        <Card size="3">
-                            <Heading size="4" mb="3">Pipeline Status</Heading>
-                            <Grid columns={{ initial: '1', sm: '2', md: '3' }} gap="4">
-                                <Flex direction="column"><Text size="1" color="gray">GovInfo packages</Text><Text weight="bold">{snapshot.govinfo_jobs.queued.toLocaleString()} queued · {snapshot.govinfo_jobs.running} running</Text></Flex>
-                                <Flex direction="column"><Text size="1" color="gray">GovInfo batches</Text><Text weight="bold">{snapshot.govinfo_batch_jobs.queued.toLocaleString()} queued · {snapshot.govinfo_batch_jobs.running} running</Text></Flex>
-                                <Flex direction="column"><Text size="1" color="gray">Index jobs</Text><Text weight="bold">{snapshot.index_jobs.queued.toLocaleString()} queued · {snapshot.index_jobs.failed} failed</Text></Flex>
-                                <Flex direction="column"><Text size="1" color="gray">Reconciliation</Text><Text weight="bold">{snapshot.reconcile_jobs.succeeded} complete · {snapshot.reconcile_jobs.running} running</Text></Flex>
-                                <Flex direction="column"><Text size="1" color="gray">Production read alias</Text><Text weight="bold">{snapshot.staging.production_alias_target ?? 'Unavailable'}</Text></Flex>
-                            </Grid>
-                        </Card>
-                    ) : null}
-
                     <Card size="3">
-                        <Heading size="4" mb="1">Pipeline Progress</Heading>
-                        <Text as="p" color="gray" mb="3">These bars measure the complete durable workload. Batch jobs below only describe how package work was dispatched.</Text>
                         <Flex direction="column" gap="4">
-                            {([
-                                ['GovInfo packages', pipelineProgress.packages, 'Package jobs succeeded'],
-                                ['OpenSearch indexing', pipelineProgress.indexing, 'Index jobs succeeded'],
-                                ['GovInfo coverage', pipelineProgress.coverage, 'Live package-job state'],
-                            ] as const).map(([label, progress, description]) => {
-                                const percentage = formatPct(progress.completed, progress.target);
-                                return (
-                                    <Flex direction="column" gap="1" key={label}>
-                                        <Text weight="medium">{label}</Text>
-                                        <Progress value={Math.min(100, Number(percentage))} aria-label={`${label} completion`} />
-                                        <Text size="1" color="gray">{progress.completed.toLocaleString()} / {progress.target.toLocaleString()} ({percentage}%) · {progress.queued.toLocaleString()} queued · {progress.running.toLocaleString()} running · {description}</Text>
-                                    </Flex>
-                                );
-                            })}
+                            <Flex direction="column" gap="1">
+                                <Text size="1" color="gray">Overall ingest activity</Text>
+                                <Flex align="center" gap="3" wrap="wrap">
+                                    <Heading size="4">
+                                        {data.activity === 'continuing'
+                                            ? 'Ingest continuing'
+                                            : data.activity === 'stalled'
+                                                ? 'Ingest stalled'
+                                                : data.activity === 'queued'
+                                                    ? 'Ingest queued'
+                                                    : data.activity === 'waiting'
+                                                        ? 'Ingest waiting'
+                                                        : 'No ingest active'}
+                                    </Heading>
+                                    <Badge color={data.activity === 'continuing' ? 'green' : data.activity === 'idle' ? 'gray' : 'amber'} variant="soft">
+                                        {data.last_progress_at ? `Last progress ${new Date(data.last_progress_at).toLocaleTimeString()}` : 'No progress heartbeat yet'}
+                                    </Badge>
+                                </Flex>
+                            </Flex>
+                            <Grid columns={{ initial: '2', sm: '4' }} gap="4">
+                                <Flex direction="column"><Text size="1" color="gray">Hydrated</Text><Heading size="5">{data.hydrated.toLocaleString()}</Heading></Flex>
+                                <Flex direction="column"><Text size="1" color="gray">Discovered</Text><Heading size="5">{data.discovered.toLocaleString()}</Heading></Flex>
+                                <Flex direction="column"><Text size="1" color="gray">Target</Text><Heading size="5">{data.target.toLocaleString()}</Heading></Flex>
+                                <Flex direction="column"><Text size="1" color="gray">Remaining</Text><Heading size="5">{data.remaining.toLocaleString()}</Heading></Flex>
+                            </Grid>
                         </Flex>
                     </Card>
 

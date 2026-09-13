@@ -48,6 +48,35 @@ def test_job_store_requeues_failed_job(tmp_path):
     assert requeued["status"] == "queued"
 
 
+def test_job_store_cancels_job_and_ingest_window(tmp_path):
+    store = JobStore(tmp_path / "jobs.sqlite3")
+    job = store.create(
+        "ingest",
+        "ingest:cancel",
+        {"resources": ["bill"], "from_date": "2026-01-01"},
+    )
+    store.mark_running(job["id"])
+
+    cancelled = store.cancel(job["id"], "superseded by canonical Congress-scoped run")
+
+    assert cancelled["status"] == "cancelled"
+    assert cancelled["last_error"] == "superseded by canonical Congress-scoped run"
+    assert store.coverage("bill")[0]["status"] == "cancelled"
+
+
+def test_job_store_terminal_updates_do_not_overwrite_cancelled_job(tmp_path):
+    store = JobStore(tmp_path / "jobs.sqlite3")
+    job = store.create("index", "index:cancelled", {"resource": "bill"})
+    store.cancel(job["id"], "superseded")
+
+    store.mark_succeeded(job["id"])
+    store.mark_failed(job["id"], "late worker error")
+
+    cancelled = store.get(job["id"])
+    assert cancelled["status"] == "cancelled"
+    assert cancelled["last_error"] == "superseded"
+
+
 def test_job_store_requeue_refreshes_already_queued_job(tmp_path):
     store = JobStore(tmp_path / "jobs.sqlite3")
     job = store.create("index", "index:refresh", {"resource": "bill"})

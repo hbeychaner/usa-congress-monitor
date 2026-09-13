@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-13
+
+### Added
+
+- Added macOS launchd supervision for the ingest worker, OpenSearch index
+  worker, and Celery Beat. `make services` now installs and starts all three
+  agents, while `make ingest-service-status` reports their state.
+- Added persistent RabbitMQ configuration with a seven-day consumer
+  acknowledgement timeout so historical tasks can survive extended laptop
+  sleep and resume through durable job/archive recovery.
+
+### Changed
+
+- Updated the README and operations documentation to distinguish unattended
+  launchd operation from foreground development commands and to prevent
+  duplicate workers or Beat schedulers.
+- Moved ingest activity classification and heartbeat timestamps into the
+  backend's durable progress response, simplifying the admin page to display
+  worker-owned state.
+
+### Fixed
+
+- Hardened job claiming, terminal-state protection, stale-job recovery, and
+  archive/checkpoint resumption so interrupted workers do not overwrite
+  cancelled jobs or repeat completed records.
+- Accepted nullable or missing fields present in real Congress.gov bill
+  payloads and corrected the OpenSearch mapping for structured
+  `actions.source_system` values.
+
 ## 2026-09-04
 
 ### Fixed

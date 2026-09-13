@@ -13,7 +13,7 @@ from celery.exceptions import MaxRetriesExceededError
 from kombu.exceptions import OperationalError
 from redis import Redis
 
-from cdm.ingest.archive import JsonlRecordArchive
+from cdm.ingest.archive import JsonlRecordArchive, SQLiteQuarantineArchive
 from cdm.ingest.govinfo import (
     GovInfoBillsParser,
     GovInfoBillStatusParser,
@@ -197,6 +197,7 @@ def run_ingest_job(self, job_id: str) -> dict:
         redis_client = _redis()
         job_outdir = Path(payload["outdir"]) / job_id
         archive = JsonlRecordArchive(job_outdir, int(job["attempts"]))
+        quarantine = SQLiteQuarantineArchive(job_outdir)
 
         def publish_record(resource: str, record: dict) -> None:
             stream = RedisRecordStream(
@@ -209,6 +210,20 @@ def run_ingest_job(self, job_id: str) -> dict:
         def update_progress(resource: str, stage: CoverageStage, values: dict) -> None:
             del stage
             store.update_coverage(job_id, resource, **values)
+
+        def quarantine_validation_failure(
+            resource: str,
+            record: dict,
+            error: str,
+            source_url: str | None,
+        ) -> None:
+            quarantine.write(
+                resource,
+                record,
+                error=error,
+                source_url=source_url,
+                record_id=str(record.get("id")) if record.get("id") else None,
+            )
 
         resources = payload.get("resources")
         config = PipelineConfig(
@@ -227,6 +242,7 @@ def run_ingest_job(self, job_id: str) -> dict:
             skip_errors=False,
             record_sink=publish_record,
             record_archive_sink=archive.write,
+            validation_failure_sink=quarantine_validation_failure,
             progress_sink=update_progress,
         )
         selected = None

@@ -36,6 +36,18 @@ def test_consolidated_discriminators_are_mapped():
     assert "record_subtype" in properties
 
 
+def test_action_source_system_is_mapped_as_an_object():
+    properties = load_definitions()["legislation"]["mappings"]["properties"]
+    source_system = properties["actions"]["properties"]["source_system"]
+
+    assert source_system["type"] == "object"
+    assert source_system["dynamic"] is False
+    assert source_system["properties"] == {
+        "name": {"type": "keyword"},
+        "code": {"type": "integer"},
+    }
+
+
 def test_mapping_file_is_valid_yaml():
     definitions = load_definitions()
     assert isinstance(definitions, dict)

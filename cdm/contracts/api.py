@@ -157,6 +157,7 @@ class IngestProgressJob(BaseModel):
     job_id: str
     status: str
     resource: str
+    congress: int | None = None
     from_date: str | None = None
     to_date: str | None = None
     fetch_items: bool
@@ -172,6 +173,10 @@ class IngestProgressResponse(BaseModel):
     target: int
     remaining: int
     active_jobs: int
+    activity: str = Field(description="Overall ingest activity state.")
+    last_progress_at: str | None = Field(
+        default=None, description="Most recent durable ingest progress heartbeat."
+    )
     jobs: list[IngestProgressJob]
 
 

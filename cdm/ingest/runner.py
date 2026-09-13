@@ -212,6 +212,9 @@ class IngestRunner:
     record_archive_sink: Callable[[str, dict], None] | None = field(
         default=None, repr=False
     )
+    validation_failure_sink: Callable[[str, dict, str, str | None], None] | None = field(
+        default=None, repr=False
+    )
     # Guardrail for API pages that consistently return HTTP 5xx at a fixed offset.
     # We skip a bounded number of poisoned offsets and continue the ingest.
     max_skipped_list_pages: int = 0
@@ -288,6 +291,24 @@ class IngestRunner:
             item_spec, meta_mapping
         )
 
+        def quarantine(raw_record, error) -> None:
+            if self.validation_failure_sink is not None:
+                self.validation_failure_sink(
+                    self.resource.value,
+                    raw_record,
+                    str(error),
+                    str(meta_mapping.get("url")) if meta_mapping.get("url") else None,
+                )
+
+        def coerce_with_quarantine(model_cls, records):
+            if self.validation_failure_sink is None:
+                return client.coerce_records(model_cls, records)
+            return client.coerce_records(
+                model_cls,
+                records,
+                validation_failure_sink=quarantine,
+            )
+
         if self.resource is Resource.BILL and meta_mapping.get("introduced_date"):
             response = client.request_for_spec(item_spec, runtime_params)
             version_records = client._extract_records_from_response(item_spec, response)
@@ -309,21 +330,28 @@ class IngestRunner:
                 detail_records = client._extract_records_from_response(
                     item_spec, detail_response
                 )
-                detail_models = client.coerce_records(
+                detail_models = coerce_with_quarantine(
                     client._resolve_response_model(item_spec), detail_records
                 )
                 if not detail_models:
                     raise ValueError("bill version detail response contained no item")
                 item = detail_models[0]
             else:
-                detail_models = client.coerce_records(
+                detail_models = coerce_with_quarantine(
                     client._resolve_response_model(item_spec), version_records
                 )
                 if not detail_models:
                     raise ValueError("bill detail response contained no item")
                 item = detail_models[0]
         else:
-            item = client.fetch_one(item_spec, runtime_params)
+            if self.validation_failure_sink is None:
+                item = client.fetch_one(item_spec, runtime_params)
+            else:
+                item = client.fetch_one(
+                    item_spec,
+                    runtime_params,
+                    validation_failure_sink=quarantine,
+                )
         hydration_sources: list[str] = []
         if self.resource is Resource.BILL:
             hydrate_details = getattr(item, "add_bill_details", None)
@@ -563,7 +591,28 @@ class IngestRunner:
             logger.info("Parsed response; extracted %d records", len(records))
             if not records:
                 break
-            page_models = client.coerce_records(list_model_cls, records, spec=list_spec)
+            def quarantine_list_record(raw_record, error) -> None:
+                if self.validation_failure_sink is not None:
+                    self.validation_failure_sink(
+                        self.resource.value,
+                        raw_record,
+                        str(error),
+                        list_url,
+                    )
+
+            if self.validation_failure_sink is None:
+                page_models = client.coerce_records(
+                    list_model_cls,
+                    records,
+                    spec=list_spec,
+                )
+            else:
+                page_models = client.coerce_records(
+                    list_model_cls,
+                    records,
+                    spec=list_spec,
+                    validation_failure_sink=quarantine_list_record,
+                )
             unique_page_models = []
             for model in page_models:
                 model_key = self._model_identity(model)

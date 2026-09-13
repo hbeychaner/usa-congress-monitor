@@ -76,6 +76,23 @@ def test_coerce_records_validation_error():
         c.coerce_records(DummyModel, [{}, {"id": 2}])
 
 
+def test_coerce_records_reports_raw_validation_payload():
+    c = CDGClient(api_key="")
+    failures = []
+
+    with pytest.raises(ValueError):
+        c.coerce_records(
+            DummyModel,
+            [{"id": "not-an-int"}],
+            validation_failure_sink=lambda record, error: failures.append(
+                (record, str(error))
+            ),
+        )
+
+    assert failures[0][0] == {"id": "not-an-int"}
+    assert "validation error" in failures[0][1]
+
+
 def test_request_retries_rate_limit_response(monkeypatch):
     client = CDGClient(api_key="")
 

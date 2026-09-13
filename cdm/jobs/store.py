@@ -312,7 +312,10 @@ class JobStore:
         with self._transaction_lock(), self.engine.begin() as connection:
             connection.execute(
                 update(_JOBS)
-                .where(_JOBS.c.id == job_id)
+                .where(
+                    (_JOBS.c.id == job_id)
+                    & (_JOBS.c.status == JobStatus.RUNNING.value)
+                )
                 .values(
                     status=JobStatus.SUCCEEDED.value,
                     updated_at=now,
@@ -335,7 +338,10 @@ class JobStore:
         with self._transaction_lock(), self.engine.begin() as connection:
             connection.execute(
                 update(_JOBS)
-                .where(_JOBS.c.id == job_id)
+                .where(
+                    (_JOBS.c.id == job_id)
+                    & (_JOBS.c.status == JobStatus.RUNNING.value)
+                )
                 .values(
                     status=JobStatus.FAILED.value,
                     last_error=error,
@@ -348,6 +354,39 @@ class JobStore:
                 .values(
                     status=JobStatus.FAILED.value,
                     last_error=error,
+                    last_progress_at=now,
+                )
+            )
+        return self.get(job_id)
+
+    def cancel(self, job_id: str, reason: str) -> dict:
+        """Cancel a queued or running job while preserving an audit reason."""
+        now = _now()
+        with self._transaction_lock(), self.engine.begin() as connection:
+            connection.execute(
+                update(_JOBS)
+                .where(_JOBS.c.id == job_id)
+                .where(
+                    _JOBS.c.status.in_([
+                        JobStatus.QUEUED.value,
+                        JobStatus.RUNNING.value,
+                        JobStatus.RETRYING.value,
+                        JobStatus.FAILED.value,
+                    ])
+                )
+                .values(
+                    status=JobStatus.CANCELLED.value,
+                    last_error=reason,
+                    updated_at=now,
+                    finished_at=now,
+                )
+            )
+            connection.execute(
+                update(_INGEST_WINDOWS)
+                .where(_INGEST_WINDOWS.c.job_id == job_id)
+                .values(
+                    status=JobStatus.CANCELLED.value,
+                    last_error=reason,
                     last_progress_at=now,
                 )
             )

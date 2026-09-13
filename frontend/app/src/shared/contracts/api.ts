@@ -403,6 +403,8 @@ export interface components {
             status: string;
             /** Resource */
             resource: string;
+            /** Congress */
+            congress?: number | null;
             /** From Date */
             from_date?: string | null;
             /** To Date */
@@ -430,6 +432,16 @@ export interface components {
             remaining: number;
             /** Active Jobs */
             active_jobs: number;
+            /**
+             * Activity
+             * @description Overall ingest activity state.
+             */
+            activity: string;
+            /**
+             * Last Progress At
+             * @description Most recent durable ingest progress heartbeat.
+             */
+            last_progress_at?: string | null;
             /** Jobs */
             jobs: components["schemas"]["IngestProgressJob"][];
         };

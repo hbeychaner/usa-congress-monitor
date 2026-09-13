@@ -103,7 +103,12 @@ legislation:
         properties:
           action_date: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
           action_code: { type: keyword }
-          source_system: { type: keyword }
+          source_system:
+            type: object
+            dynamic: false
+            properties:
+              name: { type: keyword }
+              code: { type: integer }
           type: { type: keyword }
           text:
             type: text

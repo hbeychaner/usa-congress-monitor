@@ -5,7 +5,7 @@ Each model includes per-field descriptions that explain what each attribute answ
 
 import logging
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import datetime, time
 from enum import StrEnum
 from typing import Annotated, Any, Optional, Protocol, Union
 
@@ -266,7 +266,13 @@ class AmendmentType(StrEnum):
 class TextVersion(BaseModel):
     """Text version for a bill or amendment, including formats and publish date."""
 
-    date: Annotated[datetime, Field(description="When the text version was published.")]
+    date: Annotated[
+        datetime | None,
+        Field(
+            default=None,
+            description="When the text version was published, when supplied.",
+        ),
+    ] = None
     formats: Annotated[
         list[Format], Field(description="Which formats are available for this text.")
     ]
@@ -368,6 +374,7 @@ class IdentifyingEntity(StrEnum):
     HOUSE = "House"
     SENATE = "Senate"
     CRS = "CRS"  # Congressional Research Service
+    LIBRARY_OF_CONGRESS = "Library of Congress"
 
 
 class RelationshipDetail(BaseModel):
@@ -630,21 +637,21 @@ class CommitteeMetadata(BaseModel):
     """List-level committee metadata used in related records."""
 
     activities: Annotated[
-        list[Activity],
+        list[Activity] | None,
         Field(description="Which activities are recorded for the committee."),
-    ]
+    ] = None
     chamber: Annotated[
-        str, Field(description="Which chamber the committee belongs to.")
-    ]
+        str | None, Field(description="Which chamber the committee belongs to.")
+    ] = None
     name: Annotated[str, Field(description="What the committee name is.")]
     system_code: Annotated[
-        str, Field(alias="systemCode", description="What the committee system code is.")
-    ]
-    type: Annotated[str, Field(description="What type of committee this is.")]
+        str | None,
+        Field(alias="systemCode", description="What the committee system code is."),
+    ] = None
+    type: Annotated[str | None, Field(description="What type of committee this is.")] = None
     url: Annotated[
-        HttpUrl, Field(description="Where to retrieve the committee in the API.")
-    ]
-
+        HttpUrl | None, Field(description="Where to retrieve the committee in the API.")
+    ] = None
 
 class RecordedVote(BaseModel):
     """Recorded vote metadata tied to actions or roll calls."""
@@ -685,7 +692,7 @@ class Action(BaseModel):
         Field(description="Which committees are associated with the action."),
     ] = Field(default_factory=list)
     action_time: Annotated[
-        datetime | None,
+        datetime | time | None,
         Field(alias="actionTime", description="What time the action occurred."),
     ] = None
     recorded_votes: Annotated[
@@ -695,6 +702,16 @@ class Action(BaseModel):
             description="Which recorded votes are tied to the action.",
         ),
     ] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _combine_time_only_action_time(self):
+        if isinstance(self.action_time, time) and self.action_date:
+            self.action_time = datetime.combine(
+                self.action_date.date(),
+                self.action_time,
+                tzinfo=self.action_date.tzinfo,
+            )
+        return self
 
 
 class AmendmentMetadata(BaseModel):
@@ -764,8 +781,9 @@ class Subjects(BaseModel):
         ),
     ] = []
     policy_area: Annotated[
-        PolicyArea, Field(alias="policyArea", description="What the policy area is.")
-    ]
+        PolicyArea | None,
+        Field(alias="policyArea", description="What the policy area is."),
+    ] = None
 
 
 class BillMetadata(EntityBase):
@@ -1127,9 +1145,13 @@ class Bill(EntityBase):
         Field(alias="introducedDate", description="When the bill was introduced."),
     ] = None
     latest_action: Annotated[
-        LatestAction,
-        Field(alias="latestAction", description="What the latest action is."),
-    ]
+        LatestAction | None,
+        Field(
+            default=None,
+            alias="latestAction",
+            description="What the latest action is, when supplied.",
+        ),
+    ] = None
     laws: Annotated[
         list[LawMetadata],
         Field(alias="laws", description="Which laws are associated with the bill."),

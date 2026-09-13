@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # Makefile for local development tasks (start OpenSearch, manage deps)
 
-.PHONY: start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-monitor beat status health-check backend-api frontend-dev help
+.PHONY: start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
 
 # Detect docker compose command at make-parse time (prefer `docker compose`)
 DOCKER_COMPOSE_CMD_DETECTED := $(if $(shell docker compose version >/dev/null 2>&1 && echo ok),docker compose,$(if $(shell command -v docker-compose >/dev/null 2>&1 && echo ok),docker-compose,))
@@ -16,17 +16,14 @@ local:
 	@echo "OpenSearch stack started."
 
 services: local
-	@echo "Starting Celery worker and 24-hour coverage scheduler..."
-	@if [ "$$(uname)" = "Darwin" ] && command -v osascript >/dev/null 2>&1; then \
-		osascript -e 'tell application "Terminal" to do script "cd \"$(CURDIR)\" && MONITOR=0 uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=ingest@%h --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest"'; \
-		osascript -e 'tell application "Terminal" to do script "cd \"$(CURDIR)\" && uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=index@%h --pool=prefork --concurrency=4 --max-tasks-per-child=1 --loglevel=INFO --queues=congress-index"'; \
-		osascript -e 'tell application "Terminal" to do script "cd \"$(CURDIR)\" && uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO"'; \
-		echo "Worker and beat started in separate Terminal windows."; \
+	@echo "Starting Celery workers and 24-hour coverage scheduler..."
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		$(MAKE) ingest-service-install; \
 	else \
 		mkdir -p logs; nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=ingest@%h --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest > logs/worker-ingest.log 2>&1 & \
 		nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=index@%h --pool=prefork --concurrency=4 --max-tasks-per-child=1 --loglevel=INFO --queues=congress-index > logs/worker-index.log 2>&1 & \
 		nohup uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO > logs/beat.log 2>&1 & \
-		echo "Worker and beat started; logs are in logs/worker.log and logs/beat.log."; \
+		echo "Worker and beat started; logs are in logs/worker-ingest.log, logs/worker-index.log, and logs/beat.log."; \
 	fi
 
 status:
@@ -130,6 +127,15 @@ worker-monitor:
 beat:
 	uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO
 
+ingest-service-install:
+	@sh scripts/ingest_launch_agent.sh install
+
+ingest-service-uninstall:
+	@sh scripts/ingest_launch_agent.sh uninstall
+
+ingest-service-status:
+	@sh scripts/ingest_launch_agent.sh status
+
 backend-api:
 	uv run uvicorn cdm.backend.app:app --host 0.0.0.0 --port 8000 --reload
 
@@ -149,6 +155,9 @@ help:
 	@printf "  worker      - Start Celery worker and auto-open aggregate ingest monitor (MONITOR=0 disables)\n"
 	@printf "  worker-monitor - Run aggregate ingest progress monitor\n"
 	@printf "  beat        - Start the daily Celery scheduler\n"
+	@printf "  ingest-service-install - Install auto-restarting macOS ingest, index, and beat agents\n"
+	@printf "  ingest-service-uninstall - Remove the macOS Celery launch agents\n"
+	@printf "  ingest-service-status - Show macOS Celery launch agent status\n"
 	@printf "  services    - Start OpenSearch, Redis, RabbitMQ, worker, and beat\n"
 	@printf "  status      - Show durable job states and ingest coverage\n"
 	@printf "  health-check- Check SQLite, Celery, Redis, OpenSearch, backlog, and failures\n"
