@@ -334,9 +334,13 @@ def test_retention_prunes_old_terminal_jobs_and_artifacts(tmp_path, monkeypatch)
     store.mark_failed(failed["id"], "boom")
     _backdate(store, failed["id"], old)
 
+    active = store.create("ingest", "ingest:active", {"outdir": "data/daily"})
+    store.mark_running(active["id"])
+
     redis = FakeRetentionRedis([
         f"congress:ingest:{aged['id']}:bill",
         f"congress:ingest:{recent['id']}:bill",
+        f"congress:ingest:{active['id']}:bill",
         "congress:ingest:ghost-job:bill",
     ])
     monkeypatch.setattr(tasks, "_store", lambda: store)
@@ -347,10 +351,10 @@ def test_retention_prunes_old_terminal_jobs_and_artifacts(tmp_path, monkeypatch)
     assert result["pruned_jobs"] == 1
     assert result["archives_deleted"] == 1
     assert not archive_dir.exists()
-    # Pruned job stream and the orphaned ghost stream are removed; the
-    # recent job's stream is kept.
+    # Streams of terminal jobs and orphans go; the active job's stream stays.
     assert sorted(redis.deleted) == sorted([
         f"congress:ingest:{aged['id']}:bill",
+        f"congress:ingest:{recent['id']}:bill",
         "congress:ingest:ghost-job:bill",
     ])
     with pytest.raises(KeyError):

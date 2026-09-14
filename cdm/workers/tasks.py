@@ -753,17 +753,22 @@ def run_retention_maintenance() -> dict:
     pruned = store.prune_terminal_jobs(older_than=cutoff, exclude_ids=protected)
     pruned_ids = {job["id"] for job in pruned}
 
-    # Delete streams for pruned jobs plus orphans whose job row is already
-    # gone (a stream is always created after its ledger row).
+    # Streams are only a transport between ingest and indexing; once the
+    # source job is terminal (and no unfinished index job references it) the
+    # per-job archive is the durable replay source, so delete streams
+    # immediately instead of waiting out the ledger retention window.
     redis_client = _redis()
     existing_ids = store.all_ids()
+    terminal_ids = store.ids_with_status(
+        (JobStatus.SUCCEEDED.value, JobStatus.CANCELLED.value)
+    )
     streams_deleted = 0
     for key in redis_client.scan_iter(match=f"{_STREAM_PREFIX}*", count=1000):
         name = key.decode() if isinstance(key, bytes) else str(key)
         source_id = _stream_source_job_id(name)
         if source_id is None or source_id in protected:
             continue
-        if source_id in pruned_ids:
+        if source_id in pruned_ids or source_id in terminal_ids:
             redis_client.delete(key)
             streams_deleted += 1
         elif source_id not in existing_ids:

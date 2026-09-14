@@ -564,6 +564,14 @@ class JobStore:
         with self.engine.connect() as connection:
             return set(connection.execute(select(_JOBS.c.id)).scalars())
 
+    def ids_with_status(self, statuses: tuple[str, ...]) -> set[str]:
+        with self.engine.connect() as connection:
+            return set(
+                connection.execute(
+                    select(_JOBS.c.id).where(_JOBS.c.status.in_(list(statuses)))
+                ).scalars()
+            )
+
     def stale_active(self, cutoff: str) -> list[dict]:
         """Return RUNNING/RETRYING jobs stranded past ``cutoff`` (e.g. a worker crash)."""
         statement = (
