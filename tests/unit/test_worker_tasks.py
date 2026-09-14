@@ -1,6 +1,8 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any, cast
 
+import pytest
+
 from cdm.jobs.store import JobKind, JobStatus
 from cdm.workers import tasks
 
@@ -265,3 +267,168 @@ def test_govinfo_batch_fans_out_package_jobs(monkeypatch):
         )
         for package_id in package_ids
     ]
+
+
+def test_stream_source_job_id_handles_colons_in_job_ids():
+    assert (
+        tasks._stream_source_job_id(
+            "congress:ingest:manual-recovery:historical-bill:congress-116:20260907-v1:bill"
+        )
+        == "manual-recovery:historical-bill:congress-116:20260907-v1"
+    )
+    assert (
+        tasks._stream_source_job_id("congress:ingest:govinfo_bulk:abc123:bill_text")
+        == "govinfo_bulk:abc123"
+    )
+    assert tasks._stream_source_job_id("other:prefix:x") is None
+
+
+class FakeRetentionRedis:
+    def __init__(self, streams):
+        self.streams = set(streams)
+        self.deleted = []
+
+    def scan_iter(self, match=None, count=None):
+        yield from [name.encode() for name in sorted(self.streams)]
+
+    def delete(self, key):
+        name = key.decode() if isinstance(key, bytes) else key
+        self.streams.discard(name)
+        self.deleted.append(name)
+
+
+def _backdate(store, job_id, timestamp):
+    from sqlalchemy import update
+
+    from cdm.jobs.store import _JOBS
+
+    with store.engine.begin() as connection:
+        connection.execute(
+            update(_JOBS).where(_JOBS.c.id == job_id).values(updated_at=timestamp)
+        )
+
+
+def test_retention_prunes_old_terminal_jobs_and_artifacts(tmp_path, monkeypatch):
+    from cdm.jobs.store import JobStore
+
+    monkeypatch.chdir(tmp_path)
+    store = JobStore(tmp_path / "data" / "jobs.sqlite3")
+    old = (datetime.now(UTC) - timedelta(days=45)).isoformat()
+
+    aged = store.create(
+        "ingest", "ingest:aged", {"resources": ["bill"], "outdir": "data/daily"}
+    )
+    store.mark_running(aged["id"])
+    store.mark_succeeded(aged["id"])
+    _backdate(store, aged["id"], old)
+    archive_dir = tmp_path / "data" / "daily" / aged["id"]
+    archive_dir.mkdir(parents=True)
+    (archive_dir / "records.sqlite3").write_bytes(b"x")
+
+    recent = store.create("ingest", "ingest:recent", {"outdir": "data/daily"})
+    store.mark_running(recent["id"])
+    store.mark_succeeded(recent["id"])
+
+    failed = store.create("ingest", "ingest:failed", {"outdir": "data/daily"})
+    store.mark_running(failed["id"])
+    store.mark_failed(failed["id"], "boom")
+    _backdate(store, failed["id"], old)
+
+    redis = FakeRetentionRedis([
+        f"congress:ingest:{aged['id']}:bill",
+        f"congress:ingest:{recent['id']}:bill",
+        "congress:ingest:ghost-job:bill",
+    ])
+    monkeypatch.setattr(tasks, "_store", lambda: store)
+    monkeypatch.setattr(tasks, "_redis", lambda: redis)
+
+    result = cast(Any, tasks.run_retention_maintenance).run()
+
+    assert result["pruned_jobs"] == 1
+    assert result["archives_deleted"] == 1
+    assert not archive_dir.exists()
+    # Pruned job stream and the orphaned ghost stream are removed; the
+    # recent job's stream is kept.
+    assert sorted(redis.deleted) == sorted([
+        f"congress:ingest:{aged['id']}:bill",
+        "congress:ingest:ghost-job:bill",
+    ])
+    with pytest.raises(KeyError):
+        store.get(aged["id"])
+    assert store.get(recent["id"])["status"] == "succeeded"
+    assert store.get(failed["id"])["status"] == "failed"
+    # Coverage history survives pruning.
+    assert any(row["job_id"] == aged["id"] for row in store.coverage("bill"))
+
+
+def test_retention_protects_jobs_referenced_by_unfinished_index_jobs(
+    tmp_path, monkeypatch
+):
+    from cdm.jobs.store import JobStore
+
+    monkeypatch.chdir(tmp_path)
+    store = JobStore(tmp_path / "data" / "jobs.sqlite3")
+    old = (datetime.now(UTC) - timedelta(days=45)).isoformat()
+
+    source = store.create("ingest", "ingest:source", {"outdir": "data/daily"})
+    store.mark_running(source["id"])
+    store.mark_succeeded(source["id"])
+    _backdate(store, source["id"], old)
+
+    index_job = store.create(
+        "index",
+        "index:pending",
+        {"stream": f"congress:ingest:{source['id']}:bill", "resource": "bill"},
+    )
+    store.mark_running(index_job["id"])
+    store.mark_failed(index_job["id"], "Indexed 0 records, expected 10")
+
+    redis = FakeRetentionRedis([f"congress:ingest:{source['id']}:bill"])
+    monkeypatch.setattr(tasks, "_store", lambda: store)
+    monkeypatch.setattr(tasks, "_redis", lambda: redis)
+
+    result = cast(Any, tasks.run_retention_maintenance).run()
+
+    assert result["pruned_jobs"] == 0
+    assert redis.deleted == []
+    assert store.get(source["id"])["status"] == "succeeded"
+
+
+def test_index_job_archive_fallback_replays_missing_stream(tmp_path, monkeypatch):
+    from cdm.ingest.archive import SQLiteRecordArchive
+
+    archive = SQLiteRecordArchive(tmp_path, 0)
+    archive.write("bill", {"id": "bill:119:hr:1", "title": "One"})
+    archive.write("bill", {"id": "bill:119:hr:2", "title": "Two"})
+
+    upserts = []
+    monkeypatch.setattr(
+        "cdm.store.indexer.to_document",
+        lambda record, resource, preserve_raw=False, ingest_metadata=None: record,
+    )
+    monkeypatch.setattr(
+        "cdm.store.mapping_validation.validate_document", lambda doc, resource: None
+    )
+
+    def fake_bulk_upsert(client, resource, documents, target_index=None, replace=False):
+        upserts.extend(documents)
+        return {"updated": len(documents), "errors": False}
+
+    monkeypatch.setattr("cdm.store.opensearch.bulk_upsert", fake_bulk_upsert)
+
+    payload = {
+        "resource": "bill",
+        "archive_root": str(tmp_path),
+        "batch_size": 1,
+        "stream": "congress:ingest:job:bill",
+    }
+    replayed = tasks._replay_archive_into_index(object(), payload)
+
+    assert replayed == 2
+    assert {doc["id"] for doc in upserts} == {"bill:119:hr:1", "bill:119:hr:2"}
+
+
+def test_index_job_archive_fallback_skips_when_archive_missing(tmp_path):
+    payload = {"resource": "bill", "archive_root": str(tmp_path / "nope")}
+    assert tasks._replay_archive_into_index(object(), payload) == 0
+    assert tasks._replay_archive_into_index(object(), {"resource": "bill"}) == 0

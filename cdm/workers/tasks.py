@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import time
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -47,6 +48,7 @@ from settings import (
     REDIS_CONSUMER_GROUP,
     REDIS_STREAM_MAXLEN,
     REDIS_URL,
+    RETENTION_DAYS,
 )
 
 
@@ -450,14 +452,57 @@ def run_index_job(self, job_id: str) -> dict:
                 f"{payload['stream']}"
             )
         if expected_count is not None and result["indexed"] < int(expected_count):
-            raise RuntimeError(
-                f"Indexed {result['indexed']} records, expected at least {expected_count}: "
-                f"{payload['stream']}"
-            )
+            # The stream may have been trimmed or lost (Redis restart, maxlen
+            # eviction); the durable per-job archive is the fallback source.
+            replayed = _replay_archive_into_index(client, payload)
+            result["replayed_from_archive"] = replayed
+            if result["indexed"] + replayed < int(expected_count):
+                raise RuntimeError(
+                    f"Indexed {result['indexed']} records "
+                    f"(+{replayed} archive replays), expected at least "
+                    f"{expected_count}: {payload['stream']}"
+                )
         store.mark_succeeded(job_id)
         return result
     except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
         _retry(self, job_id, exc)
+
+
+def _replay_archive_into_index(client, payload: dict) -> int:
+    """Bulk-upsert archived records for an index job whose stream is gone."""
+    archive_root = payload.get("archive_root")
+    if not archive_root or not (Path(archive_root) / "records.sqlite3").exists():
+        return 0
+    from cdm.store.indexer import to_document
+    from cdm.store.mapping_validation import validate_document
+    from cdm.store.opensearch import bulk_upsert
+
+    resource = payload["resource"]
+    records = JsonlRecordArchive(Path(archive_root), 0).records(resource)
+    batch_size = int(payload.get("batch_size", 500))
+    preserve_raw = bool(payload.get("preserve_raw", False))
+    replayed = 0
+    for start in range(0, len(records), batch_size):
+        documents = [
+            to_document(record, resource, preserve_raw=preserve_raw)
+            for record in records[start : start + batch_size]
+        ]
+        for document in documents:
+            validate_document(document, resource)
+        result = bulk_upsert(
+            client,
+            resource,
+            documents,
+            target_index=payload.get("target_index"),
+            replace=bool(payload.get("replace", False)),
+        )
+        if result.get("errors"):
+            raise RuntimeError(
+                "OpenSearch bulk indexing failed during archive replay for "
+                f"{archive_root}: {result.get('error_details', [])}"
+            )
+        replayed += len(documents)
+    return replayed
 
 
 @celery_app.task(bind=True, name="cdm.workers.tasks.run_reconciliation_job")
@@ -673,3 +718,83 @@ def recover_failed_ingest_jobs() -> dict:
         return {"recovered": recovered}
     finally:
         recovery_lock.release()
+
+
+_STREAM_PREFIX = "congress:ingest:"
+
+
+def _stream_source_job_id(stream_name: str) -> str | None:
+    """Extract the ingest job id from ``congress:ingest:<job_id>:<resource>``."""
+    if not stream_name.startswith(_STREAM_PREFIX):
+        return None
+    remainder = stream_name[len(_STREAM_PREFIX):]
+    job_id, _, _resource = remainder.rpartition(":")
+    return job_id or None
+
+
+@celery_app.task(name="cdm.workers.tasks.run_retention_maintenance")
+def run_retention_maintenance() -> dict:
+    """Prune old terminal jobs and their Redis streams and archive directories.
+
+    Coverage history (``ingest_windows``) is preserved so gap scheduling and
+    future historical backfills still see what was ingested. Jobs whose
+    streams or archives are still referenced by an unfinished index job are
+    protected until that index job resolves.
+    """
+    store = _store()
+    cutoff = (datetime.now(UTC) - timedelta(days=RETENTION_DAYS)).isoformat()
+
+    protected: set[str] = set()
+    for job in store.unfinished(JobKind.INDEX.value):
+        source_id = _stream_source_job_id(str(job["payload"].get("stream", "")))
+        if source_id:
+            protected.add(source_id)
+
+    pruned = store.prune_terminal_jobs(older_than=cutoff, exclude_ids=protected)
+    pruned_ids = {job["id"] for job in pruned}
+
+    # Delete streams for pruned jobs plus orphans whose job row is already
+    # gone (a stream is always created after its ledger row).
+    redis_client = _redis()
+    existing_ids = store.all_ids()
+    streams_deleted = 0
+    for key in redis_client.scan_iter(match=f"{_STREAM_PREFIX}*", count=1000):
+        name = key.decode() if isinstance(key, bytes) else str(key)
+        source_id = _stream_source_job_id(name)
+        if source_id is None or source_id in protected:
+            continue
+        if source_id in pruned_ids:
+            redis_client.delete(key)
+            streams_deleted += 1
+        elif source_id not in existing_ids:
+            # Re-check the ledger: a job created after the snapshot must not
+            # have its fresh stream deleted as an orphan.
+            try:
+                store.get(source_id)
+            except KeyError:
+                redis_client.delete(key)
+                streams_deleted += 1
+
+    # Remove per-job archive directories for pruned ingest jobs; they were the
+    # resume/replay source and are no longer needed once indexing is settled.
+    data_root = Path("data").resolve()
+    archives_deleted = 0
+    for job in pruned:
+        if job["kind"] != JobKind.INGEST.value:
+            continue
+        outdir = job["payload"].get("outdir")
+        if not outdir:
+            continue
+        job_dir = (Path(outdir) / job["id"]).resolve()
+        if job_dir.is_dir() and job_dir.is_relative_to(data_root):
+            shutil.rmtree(job_dir, ignore_errors=True)
+            archives_deleted += 1
+
+    vacuumed = store.vacuum() if pruned else False
+    return {
+        "pruned_jobs": len(pruned),
+        "streams_deleted": streams_deleted,
+        "archives_deleted": archives_deleted,
+        "vacuumed": vacuumed,
+        "protected": sorted(protected),
+    }

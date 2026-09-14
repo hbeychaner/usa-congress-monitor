@@ -42,6 +42,9 @@ CELERY_RETRY_MAX_TRANSIENT = int(os.getenv("CELERY_RETRY_MAX_TRANSIENT", "24"))
 CELERY_RETRY_BACKOFF_MAX = int(os.getenv("CELERY_RETRY_BACKOFF_MAX", "3600"))
 CELERY_TASK_SOFT_TIME_LIMIT = int(os.getenv("CELERY_TASK_SOFT_TIME_LIMIT", "3600"))
 CELERY_TASK_TIME_LIMIT = int(os.getenv("CELERY_TASK_TIME_LIMIT", "3900"))
+# Terminal jobs (succeeded/cancelled) older than this are pruned from the
+# ledger along with their Redis streams and local archive directories.
+RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "30"))
 CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv(

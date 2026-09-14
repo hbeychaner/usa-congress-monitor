@@ -4,6 +4,17 @@
 
 ### Added
 
+- Added a daily retention maintenance task: prunes succeeded/cancelled jobs
+  older than `RETENTION_DAYS` (default 30) from the ledger, deletes their
+  Redis record streams and per-job archive directories, removes orphaned
+  streams, and vacuums SQLite. Coverage history (`ingest_windows`) is always
+  preserved so gap scheduling and future historical backfills are unaffected,
+  and jobs referenced by unfinished index jobs are protected until those
+  resolve.
+- Index jobs now fall back to replaying the durable per-job archive when the
+  Redis stream no longer holds the expected records (Redis restart or maxlen
+  eviction), healing the "Indexed 0 records, expected N" failure class
+  automatically.
 - Cancelling a job now stops its in-flight run: the ingest progress callback
   polls the job ledger about once a minute and raises `IngestCancelledError`,
   which propagates through the item-fetch pool and ends the task without a

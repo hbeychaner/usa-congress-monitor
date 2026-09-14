@@ -478,6 +478,53 @@ class JobStore:
             )
         return self.get(job_id)
 
+    def prune_terminal_jobs(
+        self,
+        *,
+        older_than: str,
+        exclude_ids: set[str] | None = None,
+    ) -> list[dict]:
+        """Delete SUCCEEDED/CANCELLED jobs updated before ``older_than``.
+
+        ``ingest_windows`` rows are intentionally preserved: they are the
+        durable coverage history that gap scheduling extends from. Returns
+        ``{id, kind, payload}`` for each pruned job so callers can clean up
+        associated Redis streams and archive directories.
+        """
+        excluded = exclude_ids or set()
+        with self._transaction_lock(), self.engine.begin() as connection:
+            rows = connection.execute(
+                select(_JOBS.c.id, _JOBS.c.kind, _JOBS.c.payload)
+                .where(
+                    _JOBS.c.status.in_([
+                        JobStatus.SUCCEEDED.value,
+                        JobStatus.CANCELLED.value,
+                    ])
+                )
+                .where(_JOBS.c.updated_at < older_than)
+            ).all()
+            pruned = [
+                {"id": row.id, "kind": row.kind, "payload": json.loads(row.payload)}
+                for row in rows
+                if row.id not in excluded
+            ]
+            if pruned:
+                ids = [job["id"] for job in pruned]
+                # SQLite caps bound parameters; delete in chunks.
+                for start in range(0, len(ids), 500):
+                    chunk = ids[start : start + 500]
+                    connection.execute(_JOBS.delete().where(_JOBS.c.id.in_(chunk)))
+        return pruned
+
+    def vacuum(self) -> bool:
+        """Reclaim ledger disk space; returns False if busy (safe to skip)."""
+        try:
+            with self.engine.connect() as connection:
+                connection.exec_driver_sql("VACUUM")
+            return True
+        except Exception:  # noqa: BLE001 - VACUUM is opportunistic maintenance.
+            return False
+
     def _fetch(self, statement: Any) -> list[dict]:
         """Execute a ``select(_JOBS)`` statement and decode payloads in one round trip.
 
@@ -498,6 +545,24 @@ class JobStore:
             statement = statement.where(_JOBS.c.kind == kind)
         statement = statement.order_by(_JOBS.c.updated_at)
         return self._fetch(statement)
+
+    def unfinished(self, kind: str | None = None) -> list[dict]:
+        """Return jobs that are not in a successful/cancelled terminal state."""
+        statement = select(_JOBS).where(
+            _JOBS.c.status.in_([
+                JobStatus.QUEUED.value,
+                JobStatus.RUNNING.value,
+                JobStatus.RETRYING.value,
+                JobStatus.FAILED.value,
+            ])
+        )
+        if kind:
+            statement = statement.where(_JOBS.c.kind == kind)
+        return self._fetch(statement)
+
+    def all_ids(self) -> set[str]:
+        with self.engine.connect() as connection:
+            return set(connection.execute(select(_JOBS.c.id)).scalars())
 
     def stale_active(self, cutoff: str) -> list[dict]:
         """Return RUNNING/RETRYING jobs stranded past ``cutoff`` (e.g. a worker crash)."""

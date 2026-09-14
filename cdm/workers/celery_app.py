@@ -24,6 +24,7 @@ celery_app.conf.update(
         "cdm.workers.tasks.schedule_daily_ingest": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.schedule_coverage_gaps": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.recover_failed_ingest_jobs": {"queue": CELERY_INGEST_QUEUE},
+        "cdm.workers.tasks.run_retention_maintenance": {"queue": CELERY_INGEST_QUEUE},
     },
     task_queues=None,
     worker_prefetch_multiplier=max(1, RABBITMQ_PREFETCH // 100),
@@ -45,6 +46,10 @@ celery_app.conf.update(
         "recover-failed-ingest-jobs": {
             "task": "cdm.workers.tasks.recover_failed_ingest_jobs",
             "schedule": crontab(minute="*/10"),
+        },
+        "retention-maintenance": {
+            "task": "cdm.workers.tasks.run_retention_maintenance",
+            "schedule": crontab(hour=3, minute=30),
         },
     },
 )
