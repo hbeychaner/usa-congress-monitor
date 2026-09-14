@@ -39,6 +39,31 @@ def _prefixed(name: str) -> str:
     return index_name(name)
 
 
+def _inject_lemma_siblings(properties: dict) -> None:
+    """Add a ``{field}_lemma`` sibling for every text field with a ``.lemma``
+    multi-field.
+
+    Multi-fields always index the parent field's own value, so spaCy-generated
+    lemmas need a real sibling field populated at document-build time.
+    """
+    for name in list(properties):
+        definition = properties[name]
+        if not isinstance(definition, dict):
+            continue
+        nested = definition.get("properties")
+        if isinstance(nested, dict):
+            _inject_lemma_siblings(nested)
+        fields = definition.get("fields")
+        if (
+            definition.get("type") == "text"
+            and isinstance(fields, dict)
+            and "lemma" in fields
+        ):
+            properties.setdefault(
+                f"{name}_lemma", {"type": "text", "analyzer": "whitespace"}
+            )
+
+
 @lru_cache(maxsize=1)
 def load_definitions() -> dict[str, dict]:
     """Parse the mappings YAML and return ``{name: {settings, mappings}}`` dict.
@@ -48,7 +73,39 @@ def load_definitions() -> dict[str, dict]:
     per-document mapping validation invoke this on every indexed record.
     """
     raw = yaml.safe_load(_MAPPINGS_YAML.read_text())
-    return {k: v for k, v in raw.items() if isinstance(v, dict)}
+    definitions = {k: v for k, v in raw.items() if isinstance(v, dict)}
+    for definition in definitions.values():
+        properties = definition.get("mappings", {}).get("properties")
+        if isinstance(properties, dict):
+            _inject_lemma_siblings(properties)
+    return definitions
+
+
+@lru_cache(maxsize=None)
+def lemma_field_paths(name: str) -> tuple[tuple[str, ...], ...]:
+    """Dotted paths of text fields in index *name* that carry lemma siblings."""
+    definition = load_definitions().get(name)
+    if definition is None:
+        return ()
+    paths: list[tuple[str, ...]] = []
+
+    def walk(properties: dict, prefix: tuple[str, ...]) -> None:
+        for field_name, field in properties.items():
+            if not isinstance(field, dict):
+                continue
+            fields = field.get("fields")
+            if (
+                field.get("type") == "text"
+                and isinstance(fields, dict)
+                and "lemma" in fields
+            ):
+                paths.append(prefix + (field_name,))
+            nested = field.get("properties")
+            if isinstance(nested, dict):
+                walk(nested, prefix + (field_name,))
+
+    walk(definition.get("mappings", {}).get("properties", {}), ())
+    return tuple(paths)
 
 
 class IndexManager:

@@ -2,6 +2,17 @@
 
 ## 2026-09-14
 
+### Added
+
+- spaCy lemmatization (`en_core_web_md`) for search: the mappings loader now
+  injects a `{field}_lemma` sibling (whitespace analyzer) for every text field
+  declaring a `.lemma` multi-field, `to_document` populates the siblings at
+  index time (including nested fields like `actions.text`), and bill/member
+  search queries lemmatize the user query and match the new fields. Query-time
+  lemmatization degrades gracefully when the model is unavailable; index-time
+  lemmatization fails loudly. Mapping additions were pushed in place to all 19
+  live indices (existing docs gain lemmas as they are re-indexed).
+
 ### Fixed
 
 - `IndexManager.ensure_aliases` (invoked by every index-job `create(...,

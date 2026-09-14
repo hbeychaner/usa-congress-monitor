@@ -66,7 +66,7 @@ def test_every_text_field_has_whitespace_analyzed_lemma_multifield():
 
     assert text_fields
     for index_name, field_name, field in text_fields:
-        if field.get("index") is False:
+        if field.get("index") is False or field_name.endswith("_lemma"):
             continue
         assert field.get("fields", {}).get("lemma") == {
             "type": "text",
@@ -75,3 +75,42 @@ def test_every_text_field_has_whitespace_analyzed_lemma_multifield():
             index_name,
             field_name,
         )
+
+
+def _lemma_multifield_parents(properties):
+    for name, definition in properties.items():
+        if not isinstance(definition, dict):
+            continue
+        if (
+            definition.get("type") == "text"
+            and "lemma" in definition.get("fields", {})
+        ):
+            yield name, properties
+        nested = definition.get("properties")
+        if isinstance(nested, dict):
+            yield from _lemma_multifield_parents(nested)
+
+
+def test_loader_injects_lemma_sibling_for_every_lemma_multifield():
+    definitions = load_definitions()
+
+    checked = 0
+    for definition in definitions.values():
+        properties = definition.get("mappings", {}).get("properties", {})
+        for field_name, parent in _lemma_multifield_parents(properties):
+            checked += 1
+            assert parent.get(f"{field_name}_lemma") == {
+                "type": "text",
+                "analyzer": "whitespace",
+            }, field_name
+    assert checked
+
+
+def test_lemma_field_paths_cover_nested_and_top_level_fields():
+    from cdm.store.index_manager import lemma_field_paths
+
+    paths = lemma_field_paths("legislation")
+
+    assert ("title",) in paths
+    assert ("actions", "text") in paths
+    assert lemma_field_paths("unknown-index") == ()

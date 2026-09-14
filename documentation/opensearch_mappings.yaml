@@ -8,9 +8,11 @@
 #                  (handles "2025-01-01T00:00:00Z" and bare "2025-01-02")
 #   dynamic      : false  — unmapped fields silently dropped;
 #                  flip to "strict" once schema stabilises
-#   text+keyword : searchable text fields carry .keyword and .lemma sub-fields;
-#                  .lemma is text analyzed with the built-in whitespace analyzer
-#                  and stores future spaCy-generated lemma arrays for search
+#   text+keyword : searchable text fields carry .keyword and .lemma sub-fields.
+#                  For every text field with a .lemma multi-field, the loader
+#                  (cdm.store.index_manager.load_definitions) injects a sibling
+#                  "{field}_lemma" text field (whitespace analyzer) that stores
+#                  spaCy-generated lemmas populated at document-build time.
 #
 # Index consolidations (20 raw resources → 15 primary + 2 bridge indices)
 # ─────────────────────────────────────────────────────────────────────────

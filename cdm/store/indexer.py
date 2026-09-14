@@ -9,7 +9,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from cdm.data_collection.id_utils import parse_url_to_id
+from cdm.store.index_manager import lemma_field_paths
 from cdm.store.opensearch import resource_target
+from cdm.utils.lemmatize import lemmatize_texts
 
 
 def _bioguide_ids(value: object) -> list[str]:
@@ -21,6 +23,39 @@ def _bioguide_ids(value: object) -> list[str]:
         if isinstance(member, dict)
         and (member.get("bioguide_id") or member.get("bioguideId"))
     ]
+
+
+def _collect_lemma_targets(
+    container: object,
+    path: tuple[str, ...],
+    targets: list[tuple[dict, str, str]],
+) -> None:
+    if isinstance(container, list):
+        for item in container:
+            _collect_lemma_targets(item, path, targets)
+        return
+    if not isinstance(container, dict):
+        return
+    head, rest = path[0], path[1:]
+    if not rest:
+        value = container.get(head)
+        if isinstance(value, str) and value.strip():
+            targets.append((container, head, value))
+        return
+    _collect_lemma_targets(container.get(head), rest, targets)
+
+
+def _apply_lemmas(doc: dict, target: str) -> None:
+    """Populate ``{field}_lemma`` siblings for the spec-declared lemma fields."""
+    targets: list[tuple[dict, str, str]] = []
+    for path in lemma_field_paths(target):
+        _collect_lemma_targets(doc, path, targets)
+    if not targets:
+        return
+    lemmas = lemmatize_texts([text for _, _, text in targets])
+    for (container, field, _), lemma in zip(targets, lemmas):
+        if lemma:
+            container[f"{field}_lemma"] = lemma
 
 
 def to_document(
@@ -67,6 +102,9 @@ def to_document(
 
     if preserve_raw and raw_record is not None:
         doc["_raw"] = dict(raw_record)
+
+    target, _ = resource_target(resource)
+    _apply_lemmas(doc, target)
 
     doc.setdefault("_resource", resource)
     return doc

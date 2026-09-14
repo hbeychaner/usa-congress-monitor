@@ -7,6 +7,7 @@ from cdm.backend.services.state_service import list_states
 from cdm.contracts.api import SearchResponse, SearchResultItem
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
+from cdm.utils.lemmatize import try_lemmatize_query
 
 SUPPORTED_TYPES = {"member", "state", "bill"}
 logger = logging.getLogger(__name__)
@@ -41,35 +42,39 @@ def _state_results(query: str, limit: int) -> list[SearchResultItem]:
 
 
 def _member_query(query: str, size: int) -> dict[str, Any]:
+    should: list[dict[str, Any]] = [
+        {"term": {"bioguide_id": {"value": query.upper(), "boost": 6}}},
+        {"term": {"state_code": {"value": query.upper(), "boost": 4}}},
+        {"match_phrase_prefix": {"name": {"query": query, "boost": 4}}},
+        {"match_phrase_prefix": {"full_name": {"query": query, "boost": 4}}},
+        {"match_phrase_prefix": {"direct_order_name": {"query": query, "boost": 4}}},
+        {
+            "multi_match": {
+                "query": query,
+                "fields": [
+                    "name^3",
+                    "full_name^3",
+                    "direct_order_name^3",
+                    "inverted_order_name^2",
+                    "first_name^2",
+                    "last_name^2",
+                    "party_name^1.5",
+                    "party^1.5",
+                    "state^1.5",
+                ],
+                "fuzziness": "AUTO",
+            }
+        },
+        {"term": {"state": {"value": query.upper(), "boost": 2}}},
+    ]
+    lemma_query = try_lemmatize_query(query)
+    if lemma_query:
+        should.append({"match": {"name_lemma": {"query": lemma_query, "boost": 2}}})
     return {
         "size": size,
         "query": {
             "bool": {
-                "should": [
-                    {"term": {"bioguide_id": {"value": query.upper(), "boost": 6}}},
-                    {"term": {"state_code": {"value": query.upper(), "boost": 4}}},
-                    {"match_phrase_prefix": {"name": {"query": query, "boost": 4}}},
-                    {"match_phrase_prefix": {"full_name": {"query": query, "boost": 4}}},
-                    {"match_phrase_prefix": {"direct_order_name": {"query": query, "boost": 4}}},
-                    {
-                        "multi_match": {
-                            "query": query,
-                            "fields": [
-                                "name^3",
-                                "full_name^3",
-                                "direct_order_name^3",
-                                "inverted_order_name^2",
-                                "first_name^2",
-                                "last_name^2",
-                                "party_name^1.5",
-                                "party^1.5",
-                                "state^1.5",
-                            ],
-                            "fuzziness": "AUTO",
-                        }
-                    },
-                    {"term": {"state": {"value": query.upper(), "boost": 2}}},
-                ],
+                "should": should,
                 "minimum_should_match": 1,
             }
         },
@@ -78,27 +83,38 @@ def _member_query(query: str, size: int) -> dict[str, Any]:
 
 
 def _bill_query(query: str, size: int) -> dict[str, Any]:
+    should: list[dict[str, Any]] = [
+        {"term": {"id": {"value": query.lower(), "boost": 6}}},
+        {"term": {"number": {"value": query, "boost": 4}}},
+        {"match_phrase_prefix": {"title": {"query": query, "boost": 3}}},
+        {
+            "multi_match": {
+                "query": query,
+                "fields": [
+                    "title^3",
+                    "latest_action_text^2",
+                    "latest_action.text^2",
+                    "actions.text",
+                ],
+                "fuzziness": "AUTO",
+            }
+        },
+    ]
+    lemma_query = try_lemmatize_query(query)
+    if lemma_query:
+        should.append(
+            {
+                "multi_match": {
+                    "query": lemma_query,
+                    "fields": ["title_lemma^2", "latest_action_text_lemma"],
+                }
+            }
+        )
     return {
         "size": size,
         "query": {
             "bool": {
-                "should": [
-                    {"term": {"id": {"value": query.lower(), "boost": 6}}},
-                    {"term": {"number": {"value": query, "boost": 4}}},
-                    {"match_phrase_prefix": {"title": {"query": query, "boost": 3}}},
-                    {
-                        "multi_match": {
-                            "query": query,
-                            "fields": [
-                                "title^3",
-                                "latest_action_text^2",
-                                "latest_action.text^2",
-                                "actions.text",
-                            ],
-                            "fuzziness": "AUTO",
-                        }
-                    },
-                ],
+                "should": should,
                 "minimum_should_match": 1,
             }
         },

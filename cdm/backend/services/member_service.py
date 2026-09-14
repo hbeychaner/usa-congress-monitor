@@ -4,6 +4,7 @@ from typing import Any
 from cdm.contracts.api import MemberProfileResponse, MembersResponse, MemberSummary
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
+from cdm.utils.lemmatize import try_lemmatize_query
 
 
 def _terms(source: dict[str, Any]) -> list[dict[str, Any]]:
@@ -106,13 +107,21 @@ def list_members(
         filters.append({"match": {"terms.item.chamber": chamber_name}})
     query_body: dict[str, Any] = {"bool": {"filter": filters}}
     if query and query.strip():
-        query_body["bool"]["must"] = [
+        text_should: list[dict[str, Any]] = [
             {
                 "multi_match": {
                     "query": query.strip(),
                     "fields": ["name^3", "full_name^3", "bioguide_id", "state"],
                 }
             }
+        ]
+        lemma_query = try_lemmatize_query(query.strip())
+        if lemma_query:
+            text_should.append(
+                {"match": {"name_lemma": {"query": lemma_query, "boost": 2}}}
+            )
+        query_body["bool"]["must"] = [
+            {"bool": {"should": text_should, "minimum_should_match": 1}}
         ]
     response = get_opensearch_client().search(
         index=read_alias("member"),

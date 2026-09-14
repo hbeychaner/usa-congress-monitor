@@ -7,6 +7,7 @@ from typing import Any
 from cdm.contracts.api import BillDetail, BillDetailResponse, BillsResponse, BillSummary
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
+from cdm.utils.lemmatize import try_lemmatize_query
 
 
 def list_recent_bills(
@@ -28,7 +29,7 @@ def list_recent_bills(
         filters.append({"term": {"origin_chamber": chamber}})
     search_query: dict[str, Any] = {"bool": {"filter": filters}}
     if query and query.strip():
-        search_query["bool"]["must"] = [
+        text_should: list[dict[str, Any]] = [
             {
                 "multi_match": {
                     "query": query.strip(),
@@ -40,6 +41,14 @@ def list_recent_bills(
                     ],
                 }
             }
+        ]
+        lemma_query = try_lemmatize_query(query.strip())
+        if lemma_query:
+            text_should.append(
+                {"match": {"title_lemma": {"query": lemma_query, "boost": 2}}}
+            )
+        search_query["bool"]["must"] = [
+            {"bool": {"should": text_should, "minimum_should_match": 1}}
         ]
     response = client.search(
         index=read_alias("bill"),

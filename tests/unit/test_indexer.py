@@ -1,5 +1,16 @@
+import pytest
+
+import cdm.store.indexer as indexer_module
 from cdm.ingest.archive import SQLiteRecordArchive
 from cdm.store.indexer import to_document
+
+
+@pytest.fixture(autouse=True)
+def stub_lemmatizer(monkeypatch):
+    """Keep unit tests fast and deterministic: no spaCy model loads."""
+    monkeypatch.setattr(
+        indexer_module, "lemmatize_texts", lambda texts: ["" for _ in texts]
+    )
 
 
 def test_to_document_adds_resource_without_mutating_record():
@@ -76,6 +87,35 @@ def test_to_document_preserves_bill_detail_hydration_report():
     document = to_document({"id": "bill:118:hr:1", "detail_hydration": report}, "bill")
 
     assert document["detail_hydration"] == report
+
+
+def test_to_document_populates_lemma_siblings_for_spec_fields(monkeypatch):
+    monkeypatch.setattr(
+        indexer_module,
+        "lemmatize_texts",
+        lambda texts: [f"lemma({text})" for text in texts],
+    )
+
+    document = to_document(
+        {
+            "id": "bill:118:hr:1",
+            "title": "Border Acts",
+            "latest_action_text": "Referred to committees",
+            "actions": [{"text": "Passed House"}, {"text": ""}],
+        },
+        "bill",
+    )
+
+    assert document["title_lemma"] == "lemma(Border Acts)"
+    assert document["latest_action_text_lemma"] == "lemma(Referred to committees)"
+    assert document["actions"][0]["text_lemma"] == "lemma(Passed House)"
+    assert "text_lemma" not in document["actions"][1]
+
+
+def test_to_document_skips_lemma_fields_when_lemmatizer_returns_empty():
+    document = to_document({"id": "bill:118:hr:1", "title": "Border Acts"}, "bill")
+
+    assert "title_lemma" not in document
 
 
 def test_to_document_extracts_bill_source_provenance():
