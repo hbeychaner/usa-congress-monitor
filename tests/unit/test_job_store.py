@@ -77,6 +77,23 @@ def test_job_store_terminal_updates_do_not_overwrite_cancelled_job(tmp_path):
     assert cancelled["last_error"] == "superseded"
 
 
+def test_job_store_terminal_updates_do_not_overwrite_cancelled_window(tmp_path):
+    store = JobStore(tmp_path / "jobs.sqlite3")
+    job = store.create(
+        "ingest",
+        "ingest:cancel-window",
+        {"resources": ["bill"], "from_date": "2026-01-01"},
+    )
+    store.mark_running(job["id"])
+    store.cancel(job["id"], "superseded")
+
+    # A late in-flight attempt finishing must not resurrect the window.
+    store.mark_succeeded(job["id"])
+    assert store.coverage("bill")[0]["status"] == "cancelled"
+    store.mark_failed(job["id"], "late worker error")
+    assert store.coverage("bill")[0]["status"] == "cancelled"
+
+
 def test_job_store_requeue_refreshes_already_queued_job(tmp_path):
     store = JobStore(tmp_path / "jobs.sqlite3")
     job = store.create("index", "index:refresh", {"resource": "bill"})

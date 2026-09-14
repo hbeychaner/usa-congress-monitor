@@ -61,6 +61,14 @@ class FatalIngestError(RuntimeError):
     """
 
 
+class IngestCancelledError(Exception):
+    """Raised by a progress sink to stop a run whose job was cancelled.
+
+    Propagates through the item-fetch pool instead of being counted as an
+    ordinary per-item failure, so cancellation halts the run promptly.
+    """
+
+
 class IngestCounts(TypedDict):
     """Counts and records returned by an ingest run."""
 
@@ -803,6 +811,9 @@ class IngestRunner:
                     getattr(meta, "url", "?"),
                     exc,
                 )
+            except IngestCancelledError:
+                abort_event.set()
+                raise
             except Exception as exc:  # noqa: BLE001 - continue after ordinary item failures.
                 with counters_lock:
                     failures[0] += 1

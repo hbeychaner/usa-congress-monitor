@@ -325,6 +325,9 @@ class JobStore:
             connection.execute(
                 update(_INGEST_WINDOWS)
                 .where(_INGEST_WINDOWS.c.job_id == job_id)
+                # A cancelled window must stay cancelled even if an in-flight
+                # attempt finishes after the cancel was recorded.
+                .where(_INGEST_WINDOWS.c.status != JobStatus.CANCELLED.value)
                 .values(
                     status=JobStatus.SUCCEEDED.value,
                     completed_at=now,
@@ -351,6 +354,7 @@ class JobStore:
             connection.execute(
                 update(_INGEST_WINDOWS)
                 .where(_INGEST_WINDOWS.c.job_id == job_id)
+                .where(_INGEST_WINDOWS.c.status != JobStatus.CANCELLED.value)
                 .values(
                     status=JobStatus.FAILED.value,
                     last_error=error,

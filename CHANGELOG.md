@@ -2,8 +2,21 @@
 
 ## 2026-09-14
 
+### Added
+
+- Cancelling a job now stops its in-flight run: the ingest progress callback
+  polls the job ledger about once a minute and raises `IngestCancelledError`,
+  which propagates through the item-fetch pool and ends the task without a
+  retry instead of burning API budget until the soft time limit.
+
 ### Fixed
 
+- Terminal job-store updates (`mark_succeeded`/`mark_failed`) no longer
+  overwrite an ingest window that was cancelled while an attempt was still
+  in flight; cancelled coverage windows stay cancelled.
+- Cancelled the redundant `2022-11-06 → 2023-11-05` date-window job whose
+  coverage fully overlaps the Congress 117/118 congress-scoped historical
+  jobs, freeing shared API budget.
 - Fixed historical ingest resume never skipping archived items: list-cache
   payloads are snake_case model dumps but were validated without `by_name`,
   silently dropping alias-only fields such as `introduced_date` and

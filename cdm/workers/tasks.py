@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, NoReturn
@@ -26,6 +27,7 @@ from cdm.ingest.pipeline import Pipeline, PipelineConfig
 from cdm.ingest.reconciliation import replay_govinfo_archives
 from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.ingest.resource_config import congress_scoped, date_windowed
+from cdm.ingest.runner import IngestCancelledError
 from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
 from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
@@ -50,6 +52,10 @@ from settings import (
 
 def _store() -> JobStore:
     return JobStore(JOB_DB_PATH)
+
+
+# Seconds between ledger status polls inside the ingest progress callback.
+_CANCEL_POLL_INTERVAL = 60.0
 
 
 def _redis() -> Redis:
@@ -201,6 +207,7 @@ def run_ingest_job(self, job_id: str) -> dict:
         job_outdir = Path(payload["outdir"]) / job_id
         archive = JsonlRecordArchive(job_outdir, int(job["attempts"]))
         quarantine = SQLiteQuarantineArchive(job_outdir)
+        last_cancel_check = [time.monotonic()]
 
         def publish_record(resource: str, record: dict) -> None:
             stream = RedisRecordStream(
@@ -213,6 +220,12 @@ def run_ingest_job(self, job_id: str) -> dict:
         def update_progress(resource: str, stage: CoverageStage, values: dict) -> None:
             del stage
             store.update_coverage(job_id, resource, **values)
+            now = time.monotonic()
+            if now - last_cancel_check[0] >= _CANCEL_POLL_INTERVAL:
+                last_cancel_check[0] = now
+                current = store.get(job_id)
+                if current and current["status"] == JobStatus.CANCELLED.value:
+                    raise IngestCancelledError(job_id)
 
         def quarantine_validation_failure(
             resource: str,
@@ -281,6 +294,9 @@ def run_ingest_job(self, job_id: str) -> dict:
                     index_jobs.append(submit_job("index", index_payload)["id"])
         store.mark_succeeded(job_id)
         return {"job_id": job_id, "index_jobs": index_jobs}
+    except IngestCancelledError:
+        # Ledger already reflects the cancel; stop work without retrying.
+        return {"job_id": job_id, "cancelled": True}
     except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
         _retry(self, job_id, exc)
 
