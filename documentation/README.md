@@ -57,6 +57,11 @@ date-windowed and valid Congress-scoped resources, and excludes static/global
 endpoints. The overlap catches late API updates; canonical IDs and OpenSearch
 upserts make it idempotent.
 
+The recovery task also redispatches ingest jobs that have remained queued in
+SQLite for more than 24 hours without a broker delivery. This repairs a lost
+handoff after a worker or RabbitMQ interruption while avoiding duplicate
+redispatch of normally queued historical work.
+
 ### Historical backfills
 
 Use the submission CLI for backfills rather than invoking worker internals:

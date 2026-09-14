@@ -559,6 +559,7 @@ def daily_ingest_payload(today) -> dict:
 # turn recovery into a duplicate-message storm.
 _CRASH_RECOVERY_CUTOFF_MINUTES = 15
 _ORPHAN_RECOVERY_CUTOFF_MINUTES = 60
+_INGEST_ORPHAN_RECOVERY_CUTOFF_MINUTES = 24 * 60
 _ORPHAN_RECOVERY_BATCH_LIMIT = 25
 _ORPHAN_RECOVERABLE_KINDS = (
     JobKind.GOVINFO_BULK.value,
@@ -572,9 +573,10 @@ def recover_failed_ingest_jobs() -> dict:
     """Requeue jobs stranded by a worker crash and redispatch rare orphaned jobs.
 
     Crash recovery (RUNNING/RETRYING jobs whose worker died) runs every tick.
-    Redispatching QUEUED jobs is capped and uses a much longer staleness
-    window since a normal queued job already has a message sitting in the
-    broker; redispatching it repeatedly would just duplicate that message.
+    Redispatching QUEUED jobs is capped and uses a staleness window since a
+    normal queued job already has a message sitting in the broker. Ingest jobs
+    use a longer window because historical jobs can legitimately wait for a
+    day; this still repairs rows whose broker delivery was lost.
     """
     redis_client = _redis()
     recovery_lock = redis_client.lock(
@@ -596,6 +598,11 @@ def recover_failed_ingest_jobs() -> dict:
             *store.stale_active(crash_cutoff),
             *store.stale_queued(
                 _ORPHAN_RECOVERABLE_KINDS, orphan_cutoff, _ORPHAN_RECOVERY_BATCH_LIMIT
+            ),
+            *store.stale_queued(
+                (JobKind.INGEST.value,),
+                (now - timedelta(minutes=_INGEST_ORPHAN_RECOVERY_CUTOFF_MINUTES)).isoformat(),
+                _ORPHAN_RECOVERY_BATCH_LIMIT,
             ),
         ]
         batched_package_ids = {

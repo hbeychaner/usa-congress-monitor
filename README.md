@@ -126,8 +126,10 @@ excluded because their endpoints do not provide a safe incremental filter.
 
 Transient HTTP, timeout, and connection failures retry with capped exponential
 backoff. A recovery task runs every 10 minutes and requeues transient failures
-left by older workers or interrupted deliveries. Celery late acknowledgements
-and worker-loss requeue protect jobs during process failure.
+left by older workers or interrupted deliveries. It also repairs ingest jobs
+that remain queued in SQLite for more than 24 hours without a broker delivery.
+Celery late acknowledgements and worker-loss requeue protect jobs during
+process failure.
 
 The migration utility is restart-safe and deletes legacy sources only after
 successful verification:

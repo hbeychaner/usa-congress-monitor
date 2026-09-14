@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-14
+
+### Fixed
+
+- Automatic recovery now redispatches ingest jobs that remain queued in SQLite
+  for more than 24 hours without a broker delivery, repairing the stranded-job
+  state caused by interrupted worker or RabbitMQ handoffs.
+
 ## 2026-09-13
 
 ### Added

@@ -127,6 +127,37 @@ def test_recovery_requeues_stale_queued_govinfo_package(monkeypatch):
     ]
 
 
+def test_recovery_requeues_stale_queued_ingest_job(monkeypatch):
+    lock = FakeLock(acquired=True)
+    job = {
+        "id": "ingest:stale-queued",
+        "kind": JobKind.INGEST.value,
+        "status": JobStatus.QUEUED.value,
+        "updated_at": (datetime.now(UTC) - timedelta(days=2)).isoformat(),
+        "payload": {},
+    }
+    store = FakeStore(queued=[job])
+    dispatched = []
+    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
+    monkeypatch.setattr(tasks, "_store", lambda: store)
+    monkeypatch.setattr(
+        tasks.celery_app,
+        "send_task",
+        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    )
+
+    result = cast(Any, tasks.recover_failed_ingest_jobs).run()
+
+    assert result == {"recovered": [job["id"]]}
+    assert dispatched == [
+        (
+            "cdm.workers.tasks.run_ingest_job",
+            [job["id"]],
+            tasks.CELERY_INGEST_QUEUE,
+        )
+    ]
+
+
 def test_recovery_caps_orphaned_queued_jobs_per_tick(monkeypatch):
     lock = FakeLock(acquired=True)
     stale = (datetime.now(UTC) - timedelta(minutes=90)).isoformat()
