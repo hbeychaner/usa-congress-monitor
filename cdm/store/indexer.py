@@ -86,6 +86,10 @@ def to_document(
     if reference_id:
         doc["reference_id"] = str(reference_id)
 
+    if resource == "amendment":
+        doc["sponsor_bioguide_ids"] = _bioguide_ids(doc.get("sponsors"))
+        doc["cosponsor_bioguide_ids"] = _bioguide_ids(doc.get("cosponsors"))
+
     if resource == "bill":
         doc["sponsor_bioguide_ids"] = _bioguide_ids(doc.get("sponsors"))
         doc["cosponsor_bioguide_ids"] = _bioguide_ids(doc.get("cosponsors"))

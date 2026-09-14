@@ -310,6 +310,8 @@ amendment:
 
       # ── sponsor (populated after item fetch) ──
       sponsor_bioguide_id:  { type: keyword }
+      sponsor_bioguide_ids: { type: keyword }      # flattened from sponsors[] at index time
+      cosponsor_bioguide_ids: { type: keyword }    # flattened from cosponsors[] at index time
       sponsor_name:
         type: text
         fields:
@@ -320,6 +322,15 @@ amendment:
         type: text
         fields:
           lemma:      { type: text, analyzer: whitespace }
+
+      purpose:
+        type: text
+        fields:
+          lemma:      { type: text, analyzer: whitespace }
+
+      submitted_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
 
       update_date:
         type: date

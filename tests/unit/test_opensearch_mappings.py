@@ -81,10 +81,7 @@ def _lemma_multifield_parents(properties):
     for name, definition in properties.items():
         if not isinstance(definition, dict):
             continue
-        if (
-            definition.get("type") == "text"
-            and "lemma" in definition.get("fields", {})
-        ):
+        if definition.get("type") == "text" and "lemma" in definition.get("fields", {}):
             yield name, properties
         nested = definition.get("properties")
         if isinstance(nested, dict):

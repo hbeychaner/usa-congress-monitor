@@ -4,6 +4,13 @@
 
 ### Added
 
+- Unified member activity: amendments now index flattened
+  `sponsor_bioguide_ids` / `cosponsor_bioguide_ids` (plus newly mapped
+  `purpose` and `submitted_date`), and all 128,750 existing amendment docs were
+  backfilled in place. New `GET /api/v1/members/{bioguide_id}/activity`
+  endpoint merges bill and amendment activity (sponsor/cosponsor detection,
+  per-type counts, type filter, pagination), and the member profile page gained
+  an "All Activity" section with document-type filter and paging.
 - spaCy lemmatization (`en_core_web_md`) for search: the mappings loader now
   injects a `{field}_lemma` sibling (whitespace analyzer) for every text field
   declaring a `.lemma` multi-field, `to_document` populates the siblings at

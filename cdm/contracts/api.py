@@ -69,6 +69,24 @@ class MemberProfileResponse(BaseModel):
     topics: list[TopicItem]
 
 
+class MemberActivityItem(BaseModel):
+    id: str
+    document_type: str  # "bill" | "amendment" (extensible: "vote", ...)
+    activity_type: str  # "Sponsor" | "Cosponsor"
+    title: str
+    date: str | None = None
+    congress: int | None = None
+    bill_id: str | None = None
+
+
+class MemberActivityResponse(BaseModel):
+    items: list[MemberActivityItem]
+    total: int
+    counts: dict[str, int]
+    page: int = 1
+    limit: int = 25
+
+
 class SearchResultItem(BaseModel):
     id: str
     result_type: str

@@ -3,6 +3,8 @@ import type { components } from '../shared/contracts/api';
 
 export type MemberProfileResponse = components['schemas']['MemberProfileResponse'];
 export type MemberSummary = components['schemas']['MemberSummary'];
+export type MemberActivityResponse = components['schemas']['MemberActivityResponse'];
+export type MemberActivityItem = components['schemas']['MemberActivityItem'];
 export type MembersResponse = {
     members: MemberSummary[];
     total: number;
@@ -28,4 +30,17 @@ export function fetchMembers(page = 1, limit = 50, filters: MemberFilters = {}):
 
 export function fetchMemberProfile(bioguideId: string): Promise<MemberProfileResponse> {
     return apiGet<MemberProfileResponse>(`/api/v1/members/${bioguideId}`);
+}
+
+export function fetchMemberActivity(
+    bioguideId: string,
+    page = 1,
+    limit = 25,
+    types?: string,
+): Promise<MemberActivityResponse> {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (types) params.set('types', types);
+    return apiGet<MemberActivityResponse>(
+        `/api/v1/members/${bioguideId}/activity?${params.toString()}`,
+    );
 }

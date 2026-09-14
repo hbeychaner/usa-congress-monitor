@@ -123,6 +123,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/members/{bioguide_id}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Member Activity */
+        get: operations["get_member_activity_api_v1_members__bioguide_id__activity_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/search": {
         parameters: {
             query?: never;
@@ -472,6 +489,44 @@ export interface components {
              * @default 0
              */
             failed: number;
+        };
+        /** MemberActivityItem */
+        MemberActivityItem: {
+            /** Id */
+            id: string;
+            /** Document Type */
+            document_type: string;
+            /** Activity Type */
+            activity_type: string;
+            /** Title */
+            title: string;
+            /** Date */
+            date?: string | null;
+            /** Congress */
+            congress?: number | null;
+            /** Bill Id */
+            bill_id?: string | null;
+        };
+        /** MemberActivityResponse */
+        MemberActivityResponse: {
+            /** Items */
+            items: components["schemas"]["MemberActivityItem"][];
+            /** Total */
+            total: number;
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /**
+             * Page
+             * @default 1
+             */
+            page: number;
+            /**
+             * Limit
+             * @default 25
+             */
+            limit: number;
         };
         /** MemberProfileResponse */
         MemberProfileResponse: {
@@ -860,6 +915,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberProfileResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_member_activity_api_v1_members__bioguide_id__activity_get: {
+        parameters: {
+            query?: {
+                /** @description Comma-separated document types */
+                types?: string | null;
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                bioguide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberActivityResponse"];
                 };
             };
             /** @description Validation Error */

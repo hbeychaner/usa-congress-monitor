@@ -1,7 +1,13 @@
 from datetime import UTC, datetime
 from typing import Any
 
-from cdm.contracts.api import MemberProfileResponse, MembersResponse, MemberSummary
+from cdm.contracts.api import (
+    MemberActivityItem,
+    MemberActivityResponse,
+    MemberProfileResponse,
+    MembersResponse,
+    MemberSummary,
+)
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
 from cdm.utils.lemmatize import try_lemmatize_query
@@ -191,4 +197,131 @@ def get_member_profile(bioguide_id: str) -> MemberProfileResponse:
         member=_member_summary({**source, "name": display_name}, normalized_id),
         recent_activity=_recent_activity(normalized_id),
         topics=[],
+    )
+
+
+def _member_link_query(bioguide_id: str, extra_filters: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "bool": {
+            "filter": [
+                *extra_filters,
+                {
+                    "bool": {
+                        "should": [
+                            {"term": {"sponsor_bioguide_ids": bioguide_id}},
+                            {"term": {"cosponsor_bioguide_ids": bioguide_id}},
+                        ],
+                        "minimum_should_match": 1,
+                    }
+                },
+            ]
+        }
+    }
+
+
+def _activity_type(source: dict[str, Any], bioguide_id: str) -> str:
+    return "Sponsor" if bioguide_id in (source.get("sponsor_bioguide_ids") or []) else "Cosponsor"
+
+
+def _bill_activity_item(source: dict[str, Any], bioguide_id: str) -> MemberActivityItem:
+    bill_id = str(source.get("id") or "")
+    return MemberActivityItem(
+        id=bill_id,
+        document_type="bill",
+        activity_type=_activity_type(source, bioguide_id),
+        title=str(source.get("title") or "Untitled bill"),
+        date=source.get("latest_action_date") or source.get("update_date"),
+        congress=source.get("congress"),
+        bill_id=bill_id,
+    )
+
+
+def _amendment_activity_item(source: dict[str, Any], bioguide_id: str) -> MemberActivityItem:
+    amended_bill = source.get("amended_bill") or {}
+    label = f"{source.get('type') or 'Amendment'} {source.get('number') or ''}".strip()
+    detail = (
+        source.get("purpose")
+        or source.get("description")
+        or (f"to {amended_bill.get('title')}" if amended_bill.get("title") else "")
+    )
+    return MemberActivityItem(
+        id=str(source.get("id") or ""),
+        document_type="amendment",
+        activity_type=_activity_type(source, bioguide_id),
+        title=f"{label}: {detail}" if detail else label,
+        date=source.get("submitted_date") or source.get("update_date"),
+        congress=source.get("congress"),
+        bill_id=amended_bill.get("id") or source.get("amended_bill_id"),
+    )
+
+
+# One entry per activity source: (resource alias, extra filters, sort field, parser).
+_ACTIVITY_SOURCES: dict[str, dict[str, Any]] = {
+    "bill": {
+        "resource": "bill",
+        "filters": [{"term": {"source_type": "bill"}}],
+        "sort": "update_date",
+        "fields": [
+            "id", "title", "congress", "update_date", "latest_action_date",
+            "sponsor_bioguide_ids",
+        ],
+        "parse": _bill_activity_item,
+    },
+    "amendment": {
+        "resource": "amendment",
+        "filters": [],
+        "sort": "submitted_date",
+        "fields": [
+            "id", "type", "number", "congress", "purpose", "description",
+            "submitted_date", "update_date", "amended_bill", "amended_bill_id",
+            "sponsor_bioguide_ids",
+        ],
+        "parse": _amendment_activity_item,
+    },
+}
+
+
+def list_member_activity(
+    bioguide_id: str,
+    types: str | None = None,
+    page: int = 1,
+    limit: int = 25,
+) -> MemberActivityResponse:
+    """Merged, date-sorted member activity across all linked document types."""
+    normalized_id = bioguide_id.strip().upper()
+    selected = [t.strip().lower() for t in (types or "").split(",") if t.strip()]
+    selected = [t for t in selected if t in _ACTIVITY_SOURCES] or list(_ACTIVITY_SOURCES)
+
+    client = get_opensearch_client()
+    fetch_size = min(page * limit, 10_000)
+    items: list[MemberActivityItem] = []
+    counts: dict[str, int] = {}
+    for doc_type in selected:
+        spec = _ACTIVITY_SOURCES[doc_type]
+        response = client.search(
+            index=read_alias(spec["resource"]),
+            body={
+                "size": fetch_size,
+                "track_total_hits": True,
+                "_source": spec["fields"],
+                "query": _member_link_query(normalized_id, spec["filters"]),
+                "sort": [{spec["sort"]: {"order": "desc", "missing": "_last"}}],
+            },
+        )
+        hits = response.get("hits", {})
+        total = hits.get("total", 0)
+        counts[doc_type] = total.get("value", 0) if isinstance(total, dict) else int(total)
+        for hit in hits.get("hits", []):
+            item = spec["parse"](hit.get("_source", {}), normalized_id)
+            if item.id:
+                items.append(item)
+
+    items.sort(key=lambda item: item.date or "", reverse=True)
+    start = (page - 1) * limit
+    return MemberActivityResponse(
+        items=items[start : start + limit],
+        total=sum(counts.values()),
+        counts=counts,
+        page=page,
+        limit=limit,
     )
