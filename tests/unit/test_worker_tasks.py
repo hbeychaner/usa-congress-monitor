@@ -10,6 +10,11 @@ def test_denormalized_summaries_are_not_queued_for_direct_indexing():
     assert tasks._should_queue_index_job("bill")
 
 
+def test_soft_time_limit_failures_are_retryable():
+    assert tasks._is_retryable_error("SoftTimeLimitExceeded()")
+    assert not tasks._is_retryable_error("ValueError: bad payload")
+
+
 class FakeLock:
     def __init__(self, acquired):
         self.acquired = acquired

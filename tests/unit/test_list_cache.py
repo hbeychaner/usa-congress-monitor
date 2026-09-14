@@ -13,7 +13,7 @@ def test_list_cache_preserves_offsets_and_deduplicates(tmp_path):
 
     class Model:
         @classmethod
-        def model_validate(cls, value):
+        def model_validate(cls, value, **kwargs):
             return value
 
     assert cache.load(Model, 250) == [{"id": "bill:1", "title": "First"}]

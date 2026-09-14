@@ -256,7 +256,11 @@ class SQLiteListCache:
                 if record_id in seen_ids:
                     continue
                 models.append(
-                    model_cls.model_validate(json.loads(zlib.decompress(payload)))
+                    # Cached payloads are snake_case model dumps; without
+                    # by_name, alias-only fields silently reset to defaults.
+                    model_cls.model_validate(
+                        json.loads(zlib.decompress(payload)), by_name=True
+                    )
                 )
                 seen_ids.add(record_id)
         return models

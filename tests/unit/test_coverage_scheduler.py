@@ -65,6 +65,42 @@ def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
     ]
 
 
+def test_coverage_gap_payloads_handle_mixed_naive_and_aware_window_ends(monkeypatch):
+    now = datetime(2026, 8, 25, 12, tzinfo=UTC)
+    monkeypatch.setattr(
+        tasks,
+        "_store",
+        lambda: FakeStore(
+            {
+                "bill": [
+                    {
+                        "status": JobStatus.SUCCEEDED.value,
+                        "window_end": "2026-08-20T00:00:00",
+                    },
+                    {
+                        "status": JobStatus.SUCCEEDED.value,
+                        "window_end": "2026-08-23T11:59:59Z",
+                    },
+                ],
+            }
+        ),
+    )
+    monkeypatch.setattr(
+        tasks,
+        "date_windowed",
+        lambda: [
+            SimpleNamespace(
+                resource=SimpleNamespace(value="bill"), fetch_items_default=False
+            ),
+        ],
+    )
+
+    payloads = tasks.coverage_gap_payloads(now)
+
+    assert len(payloads) == 1
+    assert payloads[0]["from_date"] == "2026-08-23T11:59:59Z"
+
+
 def test_coverage_gap_payloads_ignore_incomplete_windows(monkeypatch):
     now = datetime(2026, 8, 25, 12, tzinfo=UTC)
     monkeypatch.setattr(

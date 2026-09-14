@@ -724,7 +724,7 @@ class IngestRunner:
             # models, the list identity (often a URL) differs from item IDs, so
             # check both the list identity and best-effort canonical item ID.
             model_key = self._model_identity(meta)
-            if model_key in seen_ids:
+            if model_key is not None and self._normalize_record_id(model_key) in seen_ids:
                 return True
             meta_data = meta.model_dump(mode="json")
             if self.resource is Resource.BILL and meta_data.get("introduced_date"):
@@ -734,7 +734,9 @@ class IngestRunner:
                 item_key = canonical_id(meta)
             except Exception:  # noqa: BLE001 - best effort dedupe only.
                 item_key = None
-            return bool(item_key and item_key in seen_ids)
+            return bool(
+                item_key and self._normalize_record_id(item_key) in seen_ids
+            )
 
         pending = [
             (idx, meta) for idx, meta in pending if not _meta_already_archived(meta)
@@ -758,11 +760,12 @@ class IngestRunner:
             try:
                 item_data = self._fetch_single_item(meta, item_spec, outdir)
                 item_id = item_data.get("id")
+                item_key = self._normalize_record_id(item_id) if item_id else None
                 with write_lock:
-                    if item_id and item_id in seen_ids:
+                    if item_key and item_key in seen_ids:
                         logger.debug("Skipping duplicate item id=%s", item_id)
                         return
-                    seen_ids.add(item_id or "")
+                    seen_ids.add(item_key or "")
                     records.append(item_data)
                     if self.record_archive_sink is not None:
                         self.record_archive_sink(self.resource.value, item_data)
@@ -830,6 +833,13 @@ class IngestRunner:
         )
 
     @staticmethod
+    def _normalize_record_id(record_id: str) -> str:
+        # Bill payloads serialize introduced_date as a datetime
+        # (…:2019-01-03T00:00:00) while list metadata uses a plain date
+        # (…:2019-01-03); normalize so resume dedupe matches both forms.
+        return record_id.removesuffix("T00:00:00")
+
+    @staticmethod
     def _load_archived_item_ids(outdir: Path | None) -> set[str]:
         if outdir is None:
             return set()
@@ -848,7 +858,9 @@ class IngestRunner:
                     engine = create_engine(f"sqlite:///{sqlite_path}")
                     with engine.connect() as connection:
                         rows = connection.execute(select(_ARCHIVE_RECORDS.c.record_id))
-                        ids.update(row[0] for row in rows)
+                        ids.update(
+                            IngestRunner._normalize_record_id(row[0]) for row in rows
+                        )
                 except (OSError, SQLAlchemyError):
                     logger.warning(
                         "Could not read SQLite archive for resume: %s", sqlite_path
@@ -864,6 +876,7 @@ class IngestRunner:
                                 continue
                             record_id = record.get("id")
                             if isinstance(record_id, str):
+                                record_id = IngestRunner._normalize_record_id(record_id)
                                 ids.add(record_id)
                                 if record_id.startswith("amendment:"):
                                     ids.add(
@@ -878,12 +891,16 @@ class IngestRunner:
     @staticmethod
     def _bill_signature(record: dict) -> tuple:
         latest = record.get("latest_action") or {}
+        action_date = latest.get("action_date") or latest.get("actionDate")
+        if isinstance(action_date, str):
+            # Normalize datetime vs date serializations (see _normalize_record_id).
+            action_date = action_date[:10]
         return (
             record.get("congress"),
             str(record.get("type", "")).lower(),
             str(record.get("number", "")),
             record.get("title"),
-            latest.get("action_date") or latest.get("actionDate"),
+            action_date,
             latest.get("text"),
         )
 
@@ -981,7 +998,9 @@ class IngestRunner:
                     page_offset = entry["offset"]
                     if next_offset != -1 and page_offset >= next_offset:
                         continue
-                    model = model_cls.model_validate(entry["record"])
+                    # Cached payloads are snake_case model dumps; without
+                    # by_name, alias-only fields silently reset to defaults.
+                    model = model_cls.model_validate(entry["record"], by_name=True)
                     identity = IngestRunner._model_identity(model)
                     if identity is not None and identity in seen_keys:
                         continue

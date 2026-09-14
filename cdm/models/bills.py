@@ -998,7 +998,9 @@ class Amendment(BaseModel):
                 ftype = getattr(fmt, "type", "")
                 if "Formatted" in ftype:
                     try:
-                        resp = client.session.get(str(getattr(fmt, "url", "")))
+                        resp = client.session.get(
+                            str(getattr(fmt, "url", "")), timeout=(10, 120)
+                        )
                         html = resp.text
                         soup = BeautifulSoup(html, "html.parser")
                         full_text = soup.get_text()
@@ -1231,7 +1233,9 @@ class Bill(EntityBase):
                 ftype = getattr(fmt, "type", "")
                 if ftype == "Formatted Text":
                     try:
-                        resp = client.session.get(str(getattr(fmt, "url", "")))
+                        resp = client.session.get(
+                            str(getattr(fmt, "url", "")), timeout=(10, 120)
+                        )
                         html = resp.text
                         soup = BeautifulSoup(html, "html.parser")
                         full_text = soup.get_text()

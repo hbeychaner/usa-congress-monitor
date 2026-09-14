@@ -4,6 +4,21 @@
 
 ### Fixed
 
+- Fixed historical ingest resume never skipping archived items: list-cache
+  payloads are snake_case model dumps but were validated without `by_name`,
+  silently dropping alias-only fields such as `introduced_date` and
+  `latest_action`; archive record ids also carried datetime suffixes that
+  never matched date-only list identities. Every retry refetched all items
+  from scratch, which is why large historical jobs repeatedly exhausted the
+  six-hour task limit.
+- Added HTTP timeouts to bill and amendment full-text fetches; a dead
+  connection previously blocked an ingest thread in a socket read
+  indefinitely, stalling historical jobs without failing them.
+- Made `SoftTimeLimitExceeded` failures retryable by automatic recovery. Now
+  that resume dedupe banks progress across attempts, timed-out historical
+  jobs converge instead of restarting from zero.
+- Fixed `schedule_coverage_gaps` crashing with a naive/aware datetime
+  comparison when completed coverage windows mixed timestamp formats.
 - Automatic recovery now redispatches ingest jobs that remain queued in SQLite
   for more than 24 hours without a broker delivery, repairing the stranded-job
   state caused by interrupted worker or RabbitMQ handoffs.

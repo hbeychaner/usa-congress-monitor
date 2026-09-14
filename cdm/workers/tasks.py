@@ -160,6 +160,9 @@ def _is_retryable_error(error: str | None) -> bool:
             "connection closed by server",
             "database is locked",
             "timed out",
+            # Resume dedupe banks progress across attempts, so a task that
+            # ran out of time budget is worth retrying from its archive.
+            "softtimelimitexceeded",
         )
     )
 
@@ -487,11 +490,14 @@ def coverage_gap_payloads(now: datetime | None = None) -> list[dict[str, Any]]:
         ]
         if not completed:
             continue
-        latest = max(
-            datetime.fromisoformat(str(row["window_end"])) for row in completed
-        )
-        if latest.tzinfo is None:
-            latest = latest.replace(tzinfo=UTC)
+        window_ends = []
+        for row in completed:
+            end = datetime.fromisoformat(str(row["window_end"]))
+            # Normalize before max(): mixing naive and aware datetimes raises.
+            if end.tzinfo is None:
+                end = end.replace(tzinfo=UTC)
+            window_ends.append(end)
+        latest = max(window_ends)
         if current - latest <= timedelta(hours=24):
             continue
         payloads.append({
