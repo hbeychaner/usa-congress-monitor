@@ -268,16 +268,17 @@ class IndexManager:
             current = self.client.indices.get_alias(name=alias)
         except NotFoundError:
             current = {}
-        actions = [
-            {"remove": {"index": current_index, "alias": alias}}
-            for current_index in current
-            if current_index != idx
-        ]
-        actions.append({"add": {"index": idx, "alias": alias}})
-        self.client.indices.update_aliases(body={"actions": actions})
+        # Never move an existing alias: routine index-creation paths must not
+        # steal aliases from a versioned index promoted by a deliberate
+        # migration (switch_aliases_to_versioned owns alias moves).
+        if current:
+            return
+        self.client.indices.update_aliases(
+            body={"actions": [{"add": {"index": idx, "alias": alias}}]}
+        )
 
     def ensure_aliases(self, name: str) -> None:
-        """Ensure both read and write aliases point at the logical index."""
+        """Create missing read/write aliases; existing aliases are never moved."""
         idx = _prefixed(name)
         aliases = (read_alias(name), write_alias(name))
         if self.dry_run:
@@ -290,13 +291,11 @@ class IndexManager:
                 current = self.client.indices.get_alias(name=alias)
             except NotFoundError:
                 current = {}
-            actions.extend(
-                {"remove": {"index": current_index, "alias": alias}}
-                for current_index in current
-                if current_index != idx
-            )
+            if current:
+                continue
             actions.append({"add": {"index": idx, "alias": alias}})
-        self.client.indices.update_aliases(body={"actions": actions})
+        if actions:
+            self.client.indices.update_aliases(body={"actions": actions})
 
     def switch_aliases_to_versioned(self, name: str, version: int = 2) -> dict:
         """Atomically move read and write aliases to a validated staging index."""

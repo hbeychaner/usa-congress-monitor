@@ -6,6 +6,7 @@ class FakeIndices:
         self.created = []
         self.aliases = []
         self.existing = set()
+        self.alias_names = set()
 
     def exists(self, index):
         return index in self.existing
@@ -19,6 +20,11 @@ class FakeIndices:
 
     def update_aliases(self, body):
         self.alias_update = body
+        for action in body["actions"]:
+            if "add" in action:
+                self.alias_names.add(action["add"]["alias"])
+            elif "remove" in action:
+                self.alias_names.discard(action["remove"]["alias"])
 
     def get(self, index):
         if index == "congress-*":
@@ -35,11 +41,9 @@ class FakeIndices:
     def get_alias(self, index=None, name=None, ignore=None):
         del ignore
         if name is not None:
-            return {
-                index: {"aliases": {name: {}}}
-                for index in self.existing
-                if index == "congress-legislation"
-            }
+            if name in self.alias_names:
+                return {"congress-legislation": {"aliases": {name: {}}}}
+            return {}
         if index == "congress-legislation-v2":
             return {index: {"aliases": {}}}
         return {"congress-legislation": {"aliases": {"congress-legislation-write": {}}}}
@@ -104,6 +108,20 @@ def test_create_adds_write_alias_for_logical_index():
             },
         ]
     }
+
+
+def test_create_with_existing_index_never_steals_existing_aliases():
+    client = FakeClient()
+    client.indices.existing.add("congress-legislation")
+    client.indices.alias_names = {
+        "congress-legislation-read",
+        "congress-legislation-write",
+    }
+
+    IndexManager(client).create("legislation", exists_ok=True)
+
+    assert client.indices.created == []
+    assert client.indices.alias_update is None
 
 
 def test_create_versioned_does_not_change_live_aliases():

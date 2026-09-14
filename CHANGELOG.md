@@ -2,6 +2,27 @@
 
 ## 2026-09-14
 
+### Fixed
+
+- `IndexManager.ensure_aliases` (invoked by every index-job `create(...,
+  exists_ok=True)`) no longer moves aliases that already exist — it only adds
+  missing ones. Previously any routine index job could silently steal the
+  read/write aliases back to the bare index, undoing a versioned migration's
+  alias flip.
+- Rebuilt `congress-legislation` from the canonical spec: the live index had
+  drifted to `actions.source_system: keyword` while the spec (and all
+  documents produced by ingest) use an object (`name`/`code`), causing
+  `document_parsing_exception` failures for every bill with actions. All
+  25,350 documents and both aliases were preserved; the two index jobs that
+  failed on the bad mapping were requeued and succeeded.
+- Pushed additive mapping updates (lemma multi-fields, `_meta.mapping_version`
+  stamps) in place to the 18 remaining indices; a full audit now reports zero
+  drift between live mappings and `documentation/opensearch_mappings.yaml`.
+- Replaced the four failed index jobs targeting the deleted
+  `congress-legislation-v118` staging index with live-alias replays (archive
+  fallback), all succeeded; cancelled the archiveless legacy bill index job as
+  superseded by the historical congress-scoped re-ingest.
+
 ### Added
 
 - Added a daily retention maintenance task: prunes succeeded/cancelled jobs
