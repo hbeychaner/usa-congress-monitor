@@ -1,0 +1,51 @@
+flowchart TB
+    %% Ingest → indexing → search data flow, including both bill sources
+    %% and the merge semantics that keep one document per bill.
+
+    subgraph sources["Sources"]
+        CDG["Congress.gov API<br/>(rate-limited, 4,800 req/hr)"]
+        GPO["GovInfo Bulk Data<br/>(unmetered XML)"]
+    end
+
+    subgraph scheduling["Scheduling & Jobs"]
+        BEAT["Celery Beat<br/>daily window + coverage gaps"]
+        CLI["Operator CLIs<br/>submit_ingest / queue_full_ingest / queue_govinfo_bulk"]
+        LEDGER[("SQLite job ledger<br/>idempotency, attempts, coverage windows")]
+        MQ[["RabbitMQ"]]
+    end
+
+    subgraph ingest["Ingest (Celery worker)"]
+        PIPE["API Pipeline<br/>list pages → item hydration<br/>(bills: sponsors, actions, subjects,<br/>summaries, text_versions, full_text)"]
+        GIP["GovInfo bulk jobs<br/>download → parse XML → snake_case records<br/>BILLSTATUS · BILLSUM · BILLS"]
+        ARCH[("SQLite record archives<br/>+ GovInfo manifest")]
+    end
+
+    STREAM[("Redis Streams<br/>durable handoff, consumer groups")]
+
+    subgraph indexing["Indexing (Celery worker)"]
+        TODOC["to_document()<br/>canonical ids (bill:c:type:n),<br/>lemmas, bioguide flattening"]
+        MERGE["bulk_upsert()<br/>bills: null-safe painless merge —<br/>skeletons never wipe hydrated fields;<br/>bill text: version-ranked merge<br/>onto the parent bill (ih→enr)"]
+    end
+
+    subgraph search["Search & Serve"]
+        ES[("Elasticsearch<br/>write/read aliases per index")]
+        API["FastAPI backend<br/>/api/v1 bills · members · search"]
+        FE["React web app"]
+    end
+
+    BEAT --> LEDGER
+    CLI --> LEDGER
+    LEDGER --> MQ
+    MQ --> PIPE
+    MQ --> GIP
+    CDG --> PIPE
+    GPO --> GIP
+    PIPE --> ARCH
+    GIP --> ARCH
+    PIPE --> STREAM
+    GIP --> STREAM
+    STREAM --> TODOC
+    TODOC --> MERGE
+    MERGE --> ES
+    ES --> API
+    API --> FE

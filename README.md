@@ -1,9 +1,12 @@
 # Congress Tracker
 
-Congress Tracker collects typed Congress.gov records, stores compressed,
-deduplicated SQLite archives, and indexes them into OpenSearch. The system
+Congress Tracker collects typed Congress.gov records and unmetered GovInfo
+bulk data, stores compressed, deduplicated SQLite archives, and indexes
+everything into a single canonical document per bill in OpenSearch. The system
 supports one-off runs, scheduled daily collection, and resumable historical
-backfills without staging large JSON or JSONL files.
+backfills without staging large JSON or JSONL files. A FastAPI backend and
+React web app serve search, bill detail (including inline full text), and
+member activity on top of the search store.
 
 Endpoint configuration uses centralized string enums for HTTP methods, parameter
 locations, pagination modes, ingest resources, and identifier sources. Their
@@ -91,6 +94,30 @@ dispatch is paced with `--batch-size` (default 50) and `--batch-delay` (default
 2.0s) — the loop pauses briefly every `batch-size` jobs. Pass `--batch-size 0`
 to disable pacing.
 
+## GovInfo Bulk Backfills (bills)
+
+Historical bill work should use GovInfo bulk data instead of the rate-limited
+API: the bulk endpoints are public, unauthenticated, and unmetered. Three
+collections are supported — BILLSTATUS (full metadata: sponsors, cosponsors,
+actions, committees, subjects, summaries, text versions, laws), BILLS
+(published text), and BILLSUM (summaries). Parsed records use the same
+snake_case field names as the API path, so they merge onto the same canonical
+`bill:{congress}:{type}:{number}` documents.
+
+```bash
+uv run python scripts/queue_govinfo_bulk.py --congress 118          # dry run
+uv run python scripts/queue_govinfo_bulk.py --congress 118 --queue  # merge into live alias
+```
+
+Pass `--staging-version N` to write into a versioned staging index instead of
+merging live. Downloads are manifest-tracked in SQLite and resumable; each
+package is an independently retryable durable job, dispatched in batches.
+Bill text from BILLS packages is merged onto the parent bill's `full_text`
+field with lifecycle version ranking (`ih` → `enr`; later stages win, and
+API-hydrated text is never overwritten). The Congress.gov API remains the
+source for daily incremental updates and resources GovInfo does not publish
+(amendments, members, nominations, treaties, hearings, votes).
+
 Each job writes fetched list pages to a compressed SQLite cache and item records
 to `data/full_history/<job-id>/<resource>/records.sqlite3`. Checkpoints advance
 only after a page is persisted, and canonical IDs make retries and overlapping
@@ -100,22 +127,32 @@ attempts, failures, and resumable archive state.
 ## System Flow
 
 ```text
-Celery Beat or submit_ingest.py
-    -> SQLite JobStore
-    -> RabbitMQ
-    -> Celery worker
-    -> Congress.gov -> Redis Stream
-    -> RedisIndexingRunner -> OpenSearch
+Celery Beat / operator CLIs
+    -> SQLite JobStore -> RabbitMQ -> Celery worker
+         ├─ Congress.gov API pipeline (list + item hydration)
+         └─ GovInfo bulk jobs (BILLSTATUS/BILLSUM/BILLS XML)
+    -> Redis Stream -> RedisIndexingRunner -> OpenSearch
+    -> FastAPI backend -> React web app
 ```
 
 Ingest publishes records directly to a durable Redis Stream. Indexing consumes
 through a Redis consumer group, transforms and validates records, sends bounded
 bulk upserts, and acknowledges entries only after a successful bulk response.
-Pending entries can be reclaimed after a worker failure.
+Pending entries can be reclaimed after a worker failure. Bill documents merge
+null-safely — list-page skeletons, API hydration, and GovInfo bulk records all
+converge on one canonical document per bill, with full text stored inline.
 
-The C4 container architecture is in
-[worker-architecture.mmd](worker-architecture.mmd),
-and operational details are in [documentation/README.md](documentation/README.md).
+Visual documentation (Mermaid, C4-style):
+
+| Diagram | Shows |
+|---|---|
+| [documentation/diagrams/system-context.mmd](documentation/diagrams/system-context.mmd) | System context: users, web app, backend, workers, external sources |
+| [documentation/diagrams/ingest-dataflow.mmd](documentation/diagrams/ingest-dataflow.mmd) | Data flow: sources → jobs → ingest → indexing (merge semantics) → search → serving |
+| [documentation/diagrams/backend-components.mmd](documentation/diagrams/backend-components.mmd) | Application components on the serving path (pages, routes, services) |
+| [documentation/diagrams/data-model.mmd](documentation/diagrams/data-model.mmd) | Indexed data models, join keys, and unique identifiers |
+| [worker-architecture.mmd](worker-architecture.mmd) | Worker and indexing containers (C4 container view) |
+
+Operational details are in [documentation/README.md](documentation/README.md).
 
 ## Autonomous Operation
 
@@ -130,13 +167,6 @@ left by older workers or interrupted deliveries. It also repairs ingest jobs
 that remain queued in SQLite for more than 24 hours without a broker delivery.
 Celery late acknowledgements and worker-loss requeue protect jobs during
 process failure.
-
-The migration utility is restart-safe and deletes legacy sources only after
-successful verification:
-
-```bash
-uv run python scripts/migrate_jsonl_to_sqlite.py data --delete-source
-```
 
 ## Operations: Start / Restart / Kill Everything
 
@@ -243,70 +273,12 @@ uv run python -m compileall -q cdm scripts tools
 
 ## Data Model
 
-The diagram below summarizes the core data models, their relationships, and
-the fields used as unique identifiers.
-
-flowchart TB
-    subgraph ref["Reference Anchors"]
-        CR["**congress_ref**\nid: congress:{N}"]
-        MEM["**member**\nid: member:{bioguide_id}"]
-    end
-
-    subgraph leg["Legislative"]
-        LEG["**legislation**\nid: bill:{congress}:{type}:{number}"]
-        AMD["**amendment**\nid: amendment:{congress}:{type}:{number}"]
-        HV["**house_vote**\nid: house-rollcall-vote:{congress}:{session}:{roll}"]
-        CREC["**congressional_record**\nrecord_subtype: bound|daily"]
-    end
-
-    subgraph com["Committee"]
-        COM["**committee**\nid: committee:{chamber}:{system_code}"]
-        CMTG["**committee_meeting**"]
-        CPRT["**committee_print**"]
-        CRPT["**committee_report**"]
-        HRG["**hearing**"]
-    end
-
-    subgraph exec["Executive / Other"]
-        NOM["**nomination**"]
-        TRE["**treaty**"]
-        COMM["**communication**\nchamber: House|Senate"]
-        HREQ["**house_requirement**"]
-    end
-
-    %% ── congress → congress_ref (shared by almost everything) ──────────────
-    LEG  -->|"congress (int)"| CR
-    AMD  -->|"congress (int)"| CR
-    HV   -->|"congress (int)"| CR
-    CREC -->|"congress (int)"| CR
-    COM  -->|"congress (int)"| CR
-    CMTG -->|"congress (int)"| CR
-    CPRT -->|"congress (int)"| CR
-    CRPT -->|"congress (int)"| CR
-    HRG  -->|"congress (int)"| CR
-    NOM  -->|"congress (int)"| CR
-    TRE  -->|"congress_received (int)"| CR
-    COMM -->|"congress (int)"| CR
-
-    %% ── legislation is the hub ──────────────────────────────────────────────
-    AMD  -->|"amended_bill_id = legislation.id"| LEG
-    HV   -->|"legislation_id = legislation.id"| LEG
-    CRPT -.->|"bill ref (item-level only)"| LEG
-
-    %% ── member links ────────────────────────────────────────────────────────
-    AMD  -->|"sponsor_bioguide_id = member.bioguide_id"| MEM
-    LEG  -.->|"sponsors / cosponsors (item-level only)"| MEM
-    NOM  -.->|"nominees (item-level only)"| MEM
-
-    %% ── committee is a second hub ───────────────────────────────────────────
-    COM  -->|"parent_system_code → system_code (self-join)"| COM
-    CMTG -.->|"system_code (item-level only)"| COM
-    CPRT -.->|"system_code (item-level only)"| COM
-    CRPT -.->|"system_code (item-level only)"| COM
-    HRG  -.->|"system_code (item-level only)"| COM
-
-    %% ── amendment voted on ──────────────────────────────────────────────────
-    HV   -->|"amendment_type + amendment_number"| AMD
+The core indexed models, their join keys, and unique identifiers are diagrammed
+in [documentation/diagrams/data-model.mmd](documentation/diagrams/data-model.mmd).
+`legislation` is the hub (amendments, votes, and reports join on its canonical
+id), `member` joins via flattened bioguide-id arrays, and nearly everything
+anchors to `congress_ref`. Bill full text lives inline on the legislation
+document -- there is no separate bill-text index.
 
 ## Planning & Notes
 

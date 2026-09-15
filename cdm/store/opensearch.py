@@ -51,6 +51,79 @@ def read_alias(resource: str) -> str:
     return f"{index_name(resource)}-read"
 
 
+# Later stages of the legislative text lifecycle rank higher.
+TEXT_VERSION_RANKS = {
+    "ih": 0,
+    "is": 0,
+    "rh": 1,
+    "rs": 1,
+    "rds": 1,
+    "rcs": 1,
+    "pcs": 1,
+    "eh": 2,
+    "es": 2,
+    "eas": 2,
+    "enr": 3,
+}
+
+# Applies a bill-text record to its parent bill: identity fields fill only
+# when absent, and full_text is replaced only by an equal-or-later version
+# (API-hydrated text, which carries no rank, is never overwritten).
+_TEXT_MERGE_SCRIPT = (
+    "for (entry in params.base.entrySet()) {"
+    " if (ctx._source[entry.getKey()] == null) {"
+    "  ctx._source[entry.getKey()] = entry.getValue();"
+    " }"
+    "}"
+    "def existing = ctx._source['full_text_version_rank'];"
+    "if (ctx._source['full_text'] == null"
+    "    || (existing != null && params.rank >= ((Number) existing).intValue())) {"
+    " ctx._source['full_text'] = params.full_text;"
+    " ctx._source['full_text_version_code'] = params.version_code;"
+    " ctx._source['full_text_version_rank'] = params.rank;"
+    "}"
+)
+
+
+def bill_text_parent_action(
+    doc: dict, index: str
+) -> dict[str, Any] | None:
+    """Return the parent-bill update action for a bill-text record."""
+    congress = doc.get("congress")
+    bill_type = str(doc.get("type") or "").lower()
+    number = doc.get("number")
+    full_text = doc.get("full_text")
+    if not (congress and bill_type and number and full_text):
+        return None
+    version_code = str(doc.get("version_code") or "").lower()
+    bill_id = f"bill:{congress}:{bill_type}:{number}"
+    base = {
+        "id": bill_id,
+        "congress": congress,
+        "type": bill_type,
+        "number": str(number),
+        "source_type": "bill",
+        "_resource": "bill",
+    }
+    return {
+        "_op_type": "update",
+        "_index": index,
+        "_id": bill_id,
+        "script": {
+            "lang": "painless",
+            "source": _TEXT_MERGE_SCRIPT,
+            "params": {
+                "base": base,
+                "rank": TEXT_VERSION_RANKS.get(version_code, 0),
+                "full_text": full_text,
+                "version_code": version_code,
+            },
+        },
+        "upsert": {},
+        "scripted_upsert": True,
+    }
+
+
 def bulk_upsert(
     client: Any,
     resource: str,
@@ -111,6 +184,10 @@ def bulk_upsert(
                 "upsert": doc,
                 "scripted_upsert": True,
             })
+        elif resource == "bill_text":
+            action = bill_text_parent_action(doc, index)
+            if action is not None:
+                actions.append(action)
         else:
             actions.append({
                 "_op_type": "update",

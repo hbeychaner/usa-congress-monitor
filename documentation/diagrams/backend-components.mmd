@@ -1,0 +1,29 @@
+C4Component
+    title Congress Tracker — application components (serving path)
+
+    Person(user, "User")
+    ContainerDb(search, "Search Store", "Elasticsearch", "Read aliases: congress-legislation-read, congress-member-read, …")
+
+    Container_Boundary(fe, "Web App (frontend/app)") {
+        Component(pages, "Pages", "React", "SearchPage, BillDetailPage, MemberProfilePage (activity feed), TopicsPage.")
+        Component(apiclient, "API Client", "TypeScript", "Typed fetchers generated from the backend OpenAPI contract.")
+    }
+
+    Container_Boundary(be, "Backend API (cdm/backend)") {
+        Component(routes, "Routes", "FastAPI routers", "/api/v1/bills, /members, /members/{id}/activity, /search, /topics.")
+        Component(billsvc, "bill_service", "Python", "Bill list/detail; full_text served inline from the bill document.")
+        Component(membersvc, "member_service", "Python", "Profiles + merged bill/amendment activity via bioguide-id links.")
+        Component(searchsvc, "search_service", "Python", "Cross-index query with lemma multi-fields.")
+        Component(osclient, "Search Client", "elasticsearch-py", "Shared client; alias-based routing per resource.")
+    }
+
+    Rel(user, pages, "Uses")
+    Rel(pages, apiclient, "Calls")
+    Rel(apiclient, routes, "HTTPS JSON")
+    Rel(routes, billsvc, "Delegates")
+    Rel(routes, membersvc, "Delegates")
+    Rel(routes, searchsvc, "Delegates")
+    Rel(billsvc, osclient, "Queries")
+    Rel(membersvc, osclient, "Queries")
+    Rel(searchsvc, osclient, "Queries")
+    Rel(osclient, search, "Search/Get via read aliases")

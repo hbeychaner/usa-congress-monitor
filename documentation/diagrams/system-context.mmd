@@ -1,0 +1,23 @@
+C4Context
+    title Congress Tracker — system context
+
+    Person(user, "User", "Explores bills, members, votes, and topics in the web app.")
+    Person(operator, "Operator", "Queues backfills, monitors jobs and coverage.")
+
+    System_Boundary(ct, "Congress Tracker") {
+        System(frontend, "Web App", "React + Vite SPA: search, bill detail, member profiles and activity.")
+        System(backend, "Backend API", "FastAPI: typed read endpoints over the search store.")
+        System(workers, "Ingest & Indexing Workers", "Celery workers, Beat scheduler, durable job ledger.")
+        SystemDb(search, "Search Store", "Elasticsearch/OpenSearch: legislation, amendment, member, vote, committee indices.")
+    }
+
+    System_Ext(congress, "Congress.gov API", "Rate-limited JSON API (4,800 req/hr budget). Lists + item detail for all resources.")
+    System_Ext(govinfo, "GovInfo Bulk Data", "Unmetered public XML: BILLSTATUS metadata, BILLS text, BILLSUM summaries.")
+
+    Rel(user, frontend, "Uses")
+    Rel(frontend, backend, "REST /api/v1", "JSON")
+    Rel(backend, search, "Queries read aliases")
+    Rel(operator, workers, "Submits jobs, checks status")
+    Rel(workers, congress, "Daily incremental + non-bill resources")
+    Rel(workers, govinfo, "Historical bill backfills (unmetered)")
+    Rel(workers, search, "Bulk upserts via write aliases")

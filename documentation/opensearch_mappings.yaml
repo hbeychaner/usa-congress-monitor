@@ -196,6 +196,8 @@ legislation:
           package_id: { type: keyword }
           source_url: { type: keyword }
       full_text: { type: text, index: false }
+      full_text_version_code: { type: keyword }   # lifecycle stage of full_text (ih…enr)
+      full_text_version_rank: { type: integer }
       notes:
         type: nested
         dynamic: false

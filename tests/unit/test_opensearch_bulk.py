@@ -31,6 +31,43 @@ def test_bulk_upsert_uses_mapped_write_alias_and_idempotent_actions(monkeypatch)
     assert "instanceof List" in action["script"]["source"]
 
 
+def test_bulk_upsert_merges_bill_text_onto_parent_bill(monkeypatch):
+    captured = {}
+
+    def fake_bulk(client, actions, raise_on_error):
+        captured["actions"] = list(actions)
+        return 1, []
+
+    monkeypatch.setattr("elasticsearch.helpers.bulk", fake_bulk)
+    bulk_upsert(
+        object(),
+        "bill_text",
+        [
+            {
+                "id": "bill-text:118:hr:1:enr",
+                "congress": 118,
+                "type": "hr",
+                "number": "1",
+                "version_code": "enr",
+                "full_text": "Section 1.",
+            },
+            # No text: produces no action.
+            {"id": "bill-text:118:hr:2:ih", "congress": 118, "type": "hr", "number": "2"},
+        ],
+    )
+
+    assert len(captured["actions"]) == 1
+    action = captured["actions"][0]
+    assert action["_id"] == "bill:118:hr:1"
+    assert action["scripted_upsert"] is True
+    params = action["script"]["params"]
+    assert params["rank"] == 3
+    assert params["full_text"] == "Section 1."
+    assert params["base"]["id"] == "bill:118:hr:1"
+    assert params["base"]["source_type"] == "bill"
+    assert "full_text_version_rank" in action["script"]["source"]
+
+
 def test_bulk_upsert_keeps_non_bill_actions_on_doc_upsert(monkeypatch):
     captured = {}
 

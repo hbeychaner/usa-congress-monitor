@@ -4,6 +4,19 @@
 
 ### Changed
 
+- Bill text now lives on the bill document: `bulk_upsert` converts GovInfo
+  BILLS records into version-ranked scripted updates on the parent
+  `bill:{congress}:{type}:{number}` document (later lifecycle stages win:
+  `ih` → `enr`; API-hydrated text is never overwritten). The 24 existing
+  `bill-text:*` child documents were merged onto their parents and deleted,
+  the backend's child-doc fallback was removed, and the legislation mapping
+  gained `full_text_version_code`/`full_text_version_rank` (pushed live).
+- Documentation refresh: new C4-style Mermaid diagrams under
+  `documentation/diagrams/` (system context, ingest→indexing→search data
+  flow, application components, data model); worker-architecture.mmd updated
+  for the GovInfo live-alias merge; README rewritten to cover the GovInfo
+  bulk backfill path and link the diagram set.
+
 - Bill backfill switched from the rate-limited Congress.gov API to GovInfo
   bulk data (unmetered): the GovInfo BILLSTATUS/BILLSUM parsers now emit
   snake_case fields matching the API hydration path and the legislation
