@@ -251,6 +251,7 @@ def run_ingest_job(self, job_id: str) -> dict:
             congress=payload.get("congress"),
             fetch_items=bool(payload.get("fetch_items", False)),
             force_item_fetch=bool(payload.get("force_item_fetch", False)),
+            item_resources=frozenset(payload.get("item_resources") or ()),
             max_pages=payload.get("max_pages"),
             max_items=payload.get("max_items"),
             list_page_size=int(payload.get("list_page_size", 250)),
@@ -281,7 +282,9 @@ def run_ingest_job(self, job_id: str) -> dict:
         index_jobs = []
         if payload.get("index", True):
             for result in results:
-                if result.published_count and _should_queue_index_job(result.resource.value):
+                if result.published_count and _should_queue_index_job(
+                    result.resource.value
+                ):
                     index_payload = {
                         "stream": RedisRecordStream.stream_name(
                             job_id, result.resource.value
@@ -577,6 +580,9 @@ def coverage_gap_payloads(now: datetime | None = None) -> list[dict[str, Any]]:
             # backfills (e.g. 1978 bills with a 2026 updateDate).
             "congress": (current.year - 1787) // 2,
             "fetch_items": config.fetch_items_default,
+            # Bills default to list-only; gap windows are small enough to
+            # hydrate full detail (actions, cosponsors, subjects, text).
+            "item_resources": ["bill"],
             "index": True,
             "concurrency": 4,
             "index_batch_size": 500,
@@ -615,6 +621,9 @@ def daily_ingest_payload(today) -> dict:
         "to_date": to_date,
         "congress": (today.year - 1787) // 2,
         "fetch_items": True,
+        # Bills default to list-only; daily windows are small enough to
+        # hydrate full detail (actions, cosponsors, subjects, text).
+        "item_resources": ["bill"],
         "index": True,
         "concurrency": 4,
         "index_batch_size": 500,
@@ -662,8 +671,12 @@ def recover_failed_ingest_jobs() -> dict:
         store = _store()
         recovered = []
         now = datetime.now(UTC)
-        crash_cutoff = (now - timedelta(minutes=_CRASH_RECOVERY_CUTOFF_MINUTES)).isoformat()
-        orphan_cutoff = (now - timedelta(minutes=_ORPHAN_RECOVERY_CUTOFF_MINUTES)).isoformat()
+        crash_cutoff = (
+            now - timedelta(minutes=_CRASH_RECOVERY_CUTOFF_MINUTES)
+        ).isoformat()
+        orphan_cutoff = (
+            now - timedelta(minutes=_ORPHAN_RECOVERY_CUTOFF_MINUTES)
+        ).isoformat()
         candidates = [
             *store.failed(),
             *store.stale_active(crash_cutoff),
@@ -672,7 +685,9 @@ def recover_failed_ingest_jobs() -> dict:
             ),
             *store.stale_queued(
                 (JobKind.INGEST.value,),
-                (now - timedelta(minutes=_INGEST_ORPHAN_RECOVERY_CUTOFF_MINUTES)).isoformat(),
+                (
+                    now - timedelta(minutes=_INGEST_ORPHAN_RECOVERY_CUTOFF_MINUTES)
+                ).isoformat(),
                 _ORPHAN_RECOVERY_BATCH_LIMIT,
             ),
         ]
@@ -731,7 +746,7 @@ def _stream_source_job_id(stream_name: str) -> str | None:
     """Extract the ingest job id from ``congress:ingest:<job_id>:<resource>``."""
     if not stream_name.startswith(_STREAM_PREFIX):
         return None
-    remainder = stream_name[len(_STREAM_PREFIX):]
+    remainder = stream_name[len(_STREAM_PREFIX) :]
     job_id, _, _resource = remainder.rpartition(":")
     return job_id or None
 
@@ -763,9 +778,10 @@ def run_retention_maintenance() -> dict:
     # immediately instead of waiting out the ledger retention window.
     redis_client = _redis()
     existing_ids = store.all_ids()
-    terminal_ids = store.ids_with_status(
-        (JobStatus.SUCCEEDED.value, JobStatus.CANCELLED.value)
-    )
+    terminal_ids = store.ids_with_status((
+        JobStatus.SUCCEEDED.value,
+        JobStatus.CANCELLED.value,
+    ))
     streams_deleted = 0
     for key in redis_client.scan_iter(match=f"{_STREAM_PREFIX}*", count=1000):
         name = key.decode() if isinstance(key, bytes) else str(key)

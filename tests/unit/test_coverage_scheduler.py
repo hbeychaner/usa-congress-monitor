@@ -18,22 +18,20 @@ def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
     monkeypatch.setattr(
         tasks,
         "_store",
-        lambda: FakeStore(
-            {
-                "bill": [
-                    {
-                        "status": JobStatus.SUCCEEDED.value,
-                        "window_end": "2026-08-23T11:59:59Z",
-                    }
-                ],
-                "member": [
-                    {
-                        "status": JobStatus.SUCCEEDED.value,
-                        "window_end": "2026-08-25T01:00:00Z",
-                    }
-                ],
-            }
-        ),
+        lambda: FakeStore({
+            "bill": [
+                {
+                    "status": JobStatus.SUCCEEDED.value,
+                    "window_end": "2026-08-23T11:59:59Z",
+                }
+            ],
+            "member": [
+                {
+                    "status": JobStatus.SUCCEEDED.value,
+                    "window_end": "2026-08-25T01:00:00Z",
+                }
+            ],
+        }),
     )
     monkeypatch.setattr(
         tasks,
@@ -58,6 +56,7 @@ def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
             "to_date": "2026-08-25T12:00:00Z",
             "congress": 119,
             "fetch_items": False,
+            "item_resources": ["bill"],
             "index": True,
             "concurrency": 4,
             "index_batch_size": 500,
@@ -71,20 +70,18 @@ def test_coverage_gap_payloads_handle_mixed_naive_and_aware_window_ends(monkeypa
     monkeypatch.setattr(
         tasks,
         "_store",
-        lambda: FakeStore(
-            {
-                "bill": [
-                    {
-                        "status": JobStatus.SUCCEEDED.value,
-                        "window_end": "2026-08-20T00:00:00",
-                    },
-                    {
-                        "status": JobStatus.SUCCEEDED.value,
-                        "window_end": "2026-08-23T11:59:59Z",
-                    },
-                ],
-            }
-        ),
+        lambda: FakeStore({
+            "bill": [
+                {
+                    "status": JobStatus.SUCCEEDED.value,
+                    "window_end": "2026-08-20T00:00:00",
+                },
+                {
+                    "status": JobStatus.SUCCEEDED.value,
+                    "window_end": "2026-08-23T11:59:59Z",
+                },
+            ],
+        }),
     )
     monkeypatch.setattr(
         tasks,
@@ -107,16 +104,14 @@ def test_coverage_gap_payloads_ignore_incomplete_windows(monkeypatch):
     monkeypatch.setattr(
         tasks,
         "_store",
-        lambda: FakeStore(
-            {
-                "bill": [
-                    {
-                        "status": JobStatus.RUNNING.value,
-                        "window_end": "2026-08-20T00:00:00Z",
-                    }
-                ]
-            }
-        ),
+        lambda: FakeStore({
+            "bill": [
+                {
+                    "status": JobStatus.RUNNING.value,
+                    "window_end": "2026-08-20T00:00:00Z",
+                }
+            ]
+        }),
     )
     monkeypatch.setattr(
         tasks,

@@ -46,3 +46,4 @@ def test_daily_payload_uses_overlapping_incremental_resources():
     assert payload["from_date"] == "2025-06-13T00:00:00Z"
     assert payload["to_date"] == "2025-06-15T23:59:59Z"
     assert payload["congress"] == 119
+    assert payload["item_resources"] == ["bill"]

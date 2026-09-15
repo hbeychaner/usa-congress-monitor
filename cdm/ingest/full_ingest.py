@@ -33,6 +33,9 @@ class FullIngestConfig:
     index_batch_size: int = 500
     fetch_items: bool = True
     force_item_fetch: bool = False
+    # Resources hydrated despite fetch_items_default=False (bills need item
+    # fetch for actions/cosponsors/subjects/text).
+    item_resources: tuple[str, ...] = ("bill",)
     preserve_raw: bool = False
 
     def __post_init__(self) -> None:
@@ -68,6 +71,7 @@ def _base_payload(config: FullIngestConfig) -> dict[str, Any]:
         "outdir": config.outdir,
         "fetch_items": config.fetch_items,
         "force_item_fetch": config.force_item_fetch,
+        "item_resources": list(config.item_resources),
         "concurrency": config.concurrency,
         "index": True,
         "index_batch_size": config.index_batch_size,
@@ -117,9 +121,7 @@ def plan_full_ingest(config: FullIngestConfig) -> list[FullIngestJob]:
                 "resources": [resource.value],
                 "congress": congress,
             }
-            jobs.append(
-                FullIngestJob(f"congress:{resource.value}:{congress}", payload)
-            )
+            jobs.append(FullIngestJob(f"congress:{resource.value}:{congress}", payload))
 
     return jobs
 

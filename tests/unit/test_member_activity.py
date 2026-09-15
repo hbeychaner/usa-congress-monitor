@@ -1,4 +1,4 @@
-import cdm.backend.services.member_service as member_service
+from cdm.backend.services import member_service
 from cdm.backend.services.member_service import list_member_activity
 
 
@@ -25,29 +25,32 @@ def _install(monkeypatch, responses):
 
 
 def test_list_member_activity_merges_types_sorted_by_date(monkeypatch):
-    client = _install(monkeypatch, {
-        "congress-legislation-read": [
-            {
-                "id": "bill:118:hr:1",
-                "title": "A Bill",
-                "congress": 118,
-                "update_date": "2024-01-10",
-                "sponsor_bioguide_ids": ["A000001"],
-            },
-        ],
-        "congress-amendment-read": [
-            {
-                "id": "amendment:118:samdt:5",
-                "type": "SAMDT",
-                "number": 5,
-                "congress": 118,
-                "purpose": "To fix things",
-                "submitted_date": "2024-03-01",
-                "amended_bill": {"id": "bill:118:s:2", "title": "Parent"},
-                "sponsor_bioguide_ids": [],
-            },
-        ],
-    })
+    client = _install(
+        monkeypatch,
+        {
+            "congress-legislation-read": [
+                {
+                    "id": "bill:118:hr:1",
+                    "title": "A Bill",
+                    "congress": 118,
+                    "update_date": "2024-01-10",
+                    "sponsor_bioguide_ids": ["A000001"],
+                },
+            ],
+            "congress-amendment-read": [
+                {
+                    "id": "amendment:118:samdt:5",
+                    "type": "SAMDT",
+                    "number": 5,
+                    "congress": 118,
+                    "purpose": "To fix things",
+                    "submitted_date": "2024-03-01",
+                    "amended_bill": {"id": "bill:118:s:2", "title": "Parent"},
+                    "sponsor_bioguide_ids": [],
+                },
+            ],
+        },
+    )
 
     response = list_member_activity("a000001", None, 1, 25)
 
@@ -83,7 +86,11 @@ def test_list_member_activity_type_filter_and_pagination(monkeypatch):
     assert page2.counts == {"amendment": 7}
     assert len(page2.items) == 3
     # sorted desc by date: page 2 of 3 -> items 4..6 (dates 04..02)
-    assert [item.date for item in page2.items] == ["2024-01-04", "2024-01-03", "2024-01-02"]
+    assert [item.date for item in page2.items] == [
+        "2024-01-04",
+        "2024-01-03",
+        "2024-01-02",
+    ]
 
 
 def test_list_member_activity_ignores_unknown_types(monkeypatch):

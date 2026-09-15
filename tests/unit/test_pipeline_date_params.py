@@ -33,3 +33,27 @@ def test_pipeline_passes_configured_date_parameter_names(monkeypatch, tmp_path):
     bill_config = RESOURCE_CONFIGS[Resource.BILL]
     assert captured["from_date_param"] == bill_config.from_date_param
     assert captured["to_date_param"] == bill_config.to_date_param
+
+
+def test_pipeline_item_resources_overrides_bill_list_only_default(
+    monkeypatch, tmp_path
+):
+    captured = {}
+
+    class RunnerStub:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+        def run(self):
+            return {"list_count": 0, "item_count": 0}
+
+    monkeypatch.setattr("cdm.ingest.pipeline.IngestRunner", RunnerStub)
+
+    base = {"outdir": Path(tmp_path), "fetch_items": True}
+    Pipeline(PipelineConfig(**base)).run([Resource.BILL])
+    assert captured["fetch_items"] is False  # fetch_items_default=False wins
+
+    Pipeline(PipelineConfig(**base, item_resources=frozenset({"bill"}))).run([
+        Resource.BILL
+    ])
+    assert captured["fetch_items"] is True

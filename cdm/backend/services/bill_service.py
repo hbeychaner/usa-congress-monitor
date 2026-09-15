@@ -44,9 +44,9 @@ def list_recent_bills(
         ]
         lemma_query = try_lemmatize_query(query.strip())
         if lemma_query:
-            text_should.append(
-                {"match": {"title_lemma": {"query": lemma_query, "boost": 2}}}
-            )
+            text_should.append({
+                "match": {"title_lemma": {"query": lemma_query, "boost": 2}}
+            })
         search_query["bool"]["must"] = [
             {"bool": {"should": text_should, "minimum_should_match": 1}}
         ]
@@ -84,6 +84,55 @@ def list_recent_bills(
             )
         )
     return BillsResponse(bills=bills, total=int(total), page=page, limit=limit)
+
+
+def _latest_bill_text(source: dict[str, Any]) -> str | None:
+    """Latest GovInfo bill-text record for a bill lacking inline full_text."""
+    congress = source.get("congress")
+    bill_type = source.get("type")
+    number = source.get("number")
+    if not (congress and bill_type and number):
+        return None
+    prefix = f"bill-text:{congress}:{str(bill_type).lower()}:{number}:"
+    response = get_opensearch_client().search(
+        index=read_alias("bill"),
+        body={
+            "size": 20,
+            "_source": ["full_text", "version_code"],
+            "query": {
+                "bool": {
+                    "filter": [
+                        {"term": {"source_type": "bill_text"}},
+                        {"prefix": {"id": prefix}},
+                    ]
+                }
+            },
+        },
+    )
+    hits = response.get("hits", {}).get("hits", [])
+    if not hits:
+        return None
+    # Later stages of the legislative text lifecycle rank higher.
+    version_rank = {
+        "ih": 0,
+        "is": 0,
+        "rh": 1,
+        "rs": 1,
+        "rds": 1,
+        "rcs": 1,
+        "eh": 2,
+        "es": 2,
+        "eas": 2,
+        "pcs": 1,
+        "enr": 3,
+    }
+    best = max(
+        hits,
+        key=lambda hit: version_rank.get(
+            str(hit.get("_source", {}).get("version_code") or "").lower(), 0
+        ),
+    )
+    return best.get("_source", {}).get("full_text") or None
 
 
 def get_bill(bill_id: str) -> BillDetailResponse:
@@ -137,7 +186,7 @@ def get_bill(bill_id: str) -> BillDetailResponse:
             constitutional_authority_statement_text=source.get(
                 "constitutional_authority_statement_text"
             ),
-            full_text=source.get("full_text") or None,
+            full_text=source.get("full_text") or _latest_bill_text(source),
             relationship_counts=relationships,
         )
     )

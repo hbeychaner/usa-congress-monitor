@@ -55,6 +55,9 @@ class PipelineConfig:
     force_item_fetch: bool = (
         False  # smoke-test override for every available item endpoint
     )
+    # Resources that fetch items even when their fetch_items_default is False
+    # (e.g. "bill" for bounded daily windows). Requires fetch_items=True.
+    item_resources: frozenset[str] = frozenset()
     # Limits (useful for sampling / smoke-tests)
     max_pages: int | None = None
     max_items: int | None = None
@@ -163,11 +166,16 @@ class Pipeline:
         # config.fetch_items (set by --items flag) explicitly enables item fetch.
         # cfg.list_only always disables it regardless.
         # cfg.fetch_items_default=False marks very large resources (e.g. bills)
-        # that should remain list-only even when --items is set globally;
-        # target them explicitly with --resources bill --items to override.
+        # that stay list-only for bulk runs unless named in item_resources.
         fetch_items = self.config.fetch_items and (
             self.config.force_item_fetch
-            or (cfg.fetch_items_default and not cfg.list_only)
+            or (
+                not cfg.list_only
+                and (
+                    cfg.fetch_items_default
+                    or resource.value in self.config.item_resources
+                )
+            )
         )
 
         # Apply date params only when the resource supports them

@@ -23,6 +23,7 @@ def test_full_plan_covers_static_date_and_congress_scopes() -> None:
     assert "congress:law:118" in labels
     assert "congress:law:119" in labels
     assert all(job.payload["force_item_fetch"] is False for job in jobs)
+    assert all(job.payload["item_resources"] == ["bill"] for job in jobs)
 
 
 def test_smoke_job_is_bounded() -> None:

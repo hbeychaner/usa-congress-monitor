@@ -4,6 +4,16 @@
 
 ### Fixed
 
+- Bill hydration never ran through the worker pipeline: `Pipeline` ignored
+  `fetch_items=True` for bills because `fetch_items_default=False` always won,
+  so every indexed bill was a skeleton (no sponsors, actions, subjects,
+  summaries, or text). New `PipelineConfig.item_resources` override lets
+  payloads opt specific large resources into item fetch; daily, coverage-gap,
+  and full-ingest payloads now pass `item_resources: ["bill"]`. Hydration
+  backfill jobs queued for congresses 116–119.
+- Bill detail API now falls back to the latest GovInfo `bill-text:` record
+  (ranked by text-version lifecycle) when the bill document has no inline
+  `full_text`.
 - Coverage-gap ingest jobs now pass the current Congress, matching daily
   ingest. Previously they hit the bare `/v3/bill?fromDateTime=...` endpoint,
   which returns records from *any* congress touched by Congress.gov metadata
