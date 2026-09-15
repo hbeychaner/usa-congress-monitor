@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from cdm.contracts.api import (
+    ActivityItem,
     MemberActivityItem,
     MemberActivityResponse,
     MemberDetail,
@@ -94,7 +95,7 @@ def _member_detail(source: dict[str, Any], fallback_id: str = "") -> MemberDetai
     )
 
 
-def _recent_activity(bioguide_id: str, limit: int = 20) -> list[dict[str, Any]]:
+def _recent_activity(bioguide_id: str, limit: int = 20) -> list[ActivityItem]:
     response = get_opensearch_client().search(
         index=read_alias("bill"),
         body={
@@ -119,17 +120,19 @@ def _recent_activity(bioguide_id: str, limit: int = 20) -> list[dict[str, Any]]:
             "sort": [{"update_date": {"order": "desc", "missing": "_last"}}],
         },
     )
-    activity: list[dict[str, Any]] = []
+    activity: list[ActivityItem] = []
     for hit in response.get("hits", {}).get("hits", []):
         source = hit.get("_source", {})
         sponsor_ids = source.get("sponsor_bioguide_ids") or []
         activity_type = "Sponsor" if bioguide_id in sponsor_ids else "Cosponsor"
-        activity.append({
-            "bill_id": str(source.get("id") or hit.get("_id") or ""),
-            "title": str(source.get("title") or "Untitled bill"),
-            "activity_type": activity_type,
-            "congress": int(source.get("congress") or 0),
-        })
+        activity.append(
+            ActivityItem(
+                bill_id=str(source.get("id") or hit.get("_id") or ""),
+                title=str(source.get("title") or "Untitled bill"),
+                activity_type=activity_type,
+                congress=int(source.get("congress") or 0),
+            )
+        )
     return activity
 
 

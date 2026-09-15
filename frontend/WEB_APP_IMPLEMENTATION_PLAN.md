@@ -489,7 +489,7 @@ Exit criteria:
 - [x] Implement /states and /states/{code}/districts endpoints.
 - [x] Implement /states/{code}/timeline endpoint with house/senate lanes.
 - [x] Implement /members/{bioguide_id} endpoint.
-- [ ] Add a real member directory endpoint and server-side member filters.
+- [x] Add a real member directory endpoint and server-side member filters.
 - [ ] Replace state map hover placeholders with live delegation summaries.
 - [ ] Wire state and member pages to verified current and historical records.
 - [ ] Add tests for active terms, at-large seats, missing data, and state pivots.
@@ -502,9 +502,9 @@ Exit criteria:
 - [x] Implement bill detail and recent bill list endpoints.
 - [ ] Complete the server-side bills table with date, policy, sponsor, status,
   sorting, URL state, and clear-filter controls.
-- [ ] Implement member activity endpoint for sponsored, introduced,
+- [x] Implement member activity endpoint for sponsored, introduced,
   co-sponsored, supported, and voted records.
-- [ ] Render activity as compact filterable tables with bill-level links.
+- [x] Render activity as compact filterable tables with bill-level links.
 - [x] Implement search endpoint with typed results.
 - [ ] Add global search navigation, URL state, grouped pagination, and query
   explainability.
@@ -527,7 +527,9 @@ Exit criteria:
   do not imply confidence where the pipeline has no evidence.
 
 ### Phase 4: Operations and Accessibility
-- [ ] Turn /admin/ingest into a real resource/job progress dashboard.
+- [x] Turn /admin/ingest into a real resource/job progress dashboard.
+  (Live ingest progress with per-job table, plus search-index document counts
+  and job-ledger counts via /admin/system-status, added 2026-09-15.)
 - [ ] Add freshness indicators and incomplete-data explanations to directories.
 - [ ] Verify keyboard, screen-reader, focus, and mobile behavior for maps,
   tables, filters, dialogs, and timelines.
@@ -575,15 +577,17 @@ Exit criteria:
   - Mitigation: deterministic baseline first, versioned topic pipeline.
 
 ## Immediate Next Implementation Task
-Start the next implementation slice with the highest-confidence data journey:
+Completed since the last revision (2026-09-15): bill detail now renders the
+full indexed record (action history, cosponsors, summaries, titles, text
+versions, committees, related bills, full text); member profiles show
+contact, leadership, and full service history; the admin page shows live
+system status. Remaining next slices, in order of confidence:
 
 - Replace the StatesPage placeholder hover data with a live state summary
   contract and loading/error/unavailable states.
-- Add a server-side member directory and redesign MemberSearchPage as a compact
-  filterable table.
-- Make StateDetailPage and MemberProfilePage use current-term data explicitly,
-  including at-large/district labels and source links.
+- Complete bill table URL state (sorting, filters in the URL, clear-filter
+  controls) and global search navigation.
 - Add focused tests proving active terms such as South Dakota's 119th House seat
   are included and that missing source data is not rendered as zero.
-- Then complete bill table URL state and member activity drilldowns before
-  starting topic visualizations.
+- Then start topic visualizations (Phase 3), which depend on the topic
+  pipeline in planning/TOPIC_ANALYSIS_IMPLEMENTATION_PLAN.md.
