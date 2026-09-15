@@ -56,6 +56,7 @@ def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
             "resources": ["bill"],
             "from_date": "2026-08-23T11:59:59Z",
             "to_date": "2026-08-25T12:00:00Z",
+            "congress": 119,
             "fetch_items": False,
             "index": True,
             "concurrency": 4,

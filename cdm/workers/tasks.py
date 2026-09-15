@@ -572,6 +572,10 @@ def coverage_gap_payloads(now: datetime | None = None) -> list[dict[str, Any]]:
             .replace(microsecond=0)
             .isoformat()
             .replace("+00:00", "Z"),
+            # Scope to the current Congress: the bare list endpoints return
+            # records from ANY congress recently touched by Congress.gov
+            # backfills (e.g. 1978 bills with a 2026 updateDate).
+            "congress": (current.year - 1787) // 2,
             "fetch_items": config.fetch_items_default,
             "index": True,
             "concurrency": 4,

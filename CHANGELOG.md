@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-15
+
+### Fixed
+
+- Coverage-gap ingest jobs now pass the current Congress, matching daily
+  ingest. Previously they hit the bare `/v3/bill?fromDateTime=...` endpoint,
+  which returns records from *any* congress touched by Congress.gov metadata
+  backfills — ~16,000 bills from congresses 91–112 (e.g. 1978's SJRES 105 with
+  a 2026 updateDate) leaked into the index this way. Existing old records are
+  retained.
+
 ## 2026-09-14
 
 ### Added
