@@ -12,6 +12,8 @@ class _FakeToken:
 
 
 class _FakeNlp:
+    max_length = 1_000_000
+
     def pipe(self, texts):
         for text in texts:
             tokens = [_FakeToken(word.upper()) for word in text.split()]

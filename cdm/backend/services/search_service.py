@@ -67,9 +67,6 @@ def _member_query(query: str, size: int) -> dict[str, Any]:
         },
         {"term": {"state": {"value": query.upper(), "boost": 2}}},
     ]
-    lemma_query = try_lemmatize_query(query)
-    if lemma_query:
-        should.append({"match": {"name_lemma": {"query": lemma_query, "boost": 2}}})
     return {
         "size": size,
         "query": {
@@ -106,7 +103,7 @@ def _bill_query(query: str, size: int) -> dict[str, Any]:
             {
                 "multi_match": {
                     "query": lemma_query,
-                    "fields": ["title_lemma^2", "latest_action_text_lemma"],
+                    "fields": ["title_lemma^2", "full_text_lemma"],
                 }
             }
         )

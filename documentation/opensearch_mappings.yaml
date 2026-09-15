@@ -12,8 +12,10 @@
 #                  For every text field with a .lemma multi-field, the loader
 #                  (cdm.store.index_manager.load_definitions) injects a sibling
 #                  "{field}_lemma" text field (whitespace analyzer) that stores
-#                  spaCy-generated lemmas populated at document-build time.
-#
+#                  spaCy-generated lemmas populated at document-build time.#                  Lemma sub-fields are reserved for semantically meaningful
+#                  free text (titles, summaries, full text, purposes, topics)
+#                  used by semantic search and topic modeling. Names, committee
+#                  names, and formulaic action strings are keyword-only.#
 # Index consolidations (20 raw resources → 15 primary + 2 bridge indices)
 # ─────────────────────────────────────────────────────────────────────────
 #   legislation         ← bill + law          (source_type: "bill" | "law")
@@ -112,10 +114,7 @@ legislation:
               name: { type: keyword }
               code: { type: integer }
           type: { type: keyword }
-          text:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
+          text: { type: text }
           action_time: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
       amendments:
         type: nested
@@ -139,10 +138,7 @@ legislation:
         dynamic: false
         properties:
           bioguide_id: { type: keyword }
-          full_name:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
+          full_name: { type: text }
           first_name: { type: keyword }
           last_name: { type: keyword }
           sponsorship_date: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
@@ -151,10 +147,7 @@ legislation:
         dynamic: false
         properties:
           system_code: { type: keyword }
-          name:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
+          name: { type: text }
           chamber: { type: keyword }
           type: { type: keyword }
           url: { type: keyword }
@@ -166,24 +159,15 @@ legislation:
           congress: { type: integer }
           number: { type: keyword }
           type: { type: keyword }
-          title:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
+          title: { type: text }
           url: { type: keyword }
       titles:
         type: nested
         dynamic: false
         properties:
           type: { type: keyword }
-          title:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
-          text:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
+          title: { type: text }
+          text: { type: text }
           chamber: { type: keyword }
           version_code: { type: keyword }
       text_versions:
@@ -195,7 +179,13 @@ legislation:
           formats: { type: object, enabled: false }
           package_id: { type: keyword }
           source_url: { type: keyword }
-      full_text: { type: text, index: false }
+      # full_text itself is stored for display only; the loader-injected
+      # full_text_lemma sibling carries the searchable lemmatized text.
+      full_text:
+        type: text
+        index: false
+        fields:
+          lemma: { type: text, analyzer: whitespace }
       full_text_version_code: { type: keyword }   # lifecycle stage of full_text (ih…enr)
       full_text_version_rank: { type: integer }
       notes:
@@ -251,10 +241,7 @@ legislation:
         dynamic: false
         properties:
           bioguide_id: { type: keyword }
-          full_name:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
+          full_name: { type: text }
           first_name: { type: keyword }
           last_name: { type: keyword }
           party: { type: keyword }
@@ -288,10 +275,7 @@ legislation:
             type: date
             format: "strict_date_optional_time||yyyy-MM-dd"
           action_time: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
-          text:
-            type: text
-            fields:
-              lemma: { type: text, analyzer: whitespace }
+          text: { type: text }
       latest_action_date:
         type: date
         format: "strict_date_optional_time||yyyy-MM-dd"
@@ -299,7 +283,6 @@ legislation:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 512 }
-          lemma:     { type: text, analyzer: whitespace }
 
       # ── law-specific (null for non-law source_type) ──
       is_enacted:    { type: boolean }             # true when laws[] is non-empty
@@ -359,7 +342,6 @@ amendment:
         type: text
         fields:
           keyword:    { type: keyword, ignore_above: 256 }
-          lemma:      { type: text, analyzer: whitespace }
 
       description:
         type: text
@@ -404,7 +386,6 @@ communication:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 256 }
-          lemma:     { type: text, analyzer: whitespace }
 
       update_date:
         type: date
@@ -429,7 +410,6 @@ committee:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 512 }
-          lemma:     { type: text, analyzer: whitespace }
       chamber:             { type: keyword }       # House | Senate | Joint
       committee_type_code: { type: keyword }       # "Committee" | "Subcommittee" | "Joint"
 
@@ -438,7 +418,6 @@ committee:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 512 }
-          lemma:     { type: text, analyzer: whitespace }
       parent_system_code:  { type: keyword }
       parent_url:          { type: keyword }
 
@@ -628,7 +607,6 @@ member:
         type: text
         fields:
           keyword:  { type: keyword, ignore_above: 256 }
-          lemma:    { type: text, analyzer: whitespace }
       state:        { type: keyword }
       party_name:   { type: keyword }
       district:     { type: integer }              # null for senators
@@ -688,7 +666,6 @@ nomination:
         type: text
         fields:
           keyword: { type: keyword, ignore_above: 512 }
-          lemma:   { type: text, analyzer: whitespace }
 
       # ── nomination_type flattened ──
       is_civilian_nomination: { type: boolean }    # from nomination_type.is_civilian
@@ -705,7 +682,7 @@ nomination:
         type: text
         fields:
           keyword: { type: keyword, ignore_above: 512 }
-          lemma:   { type: text, analyzer: whitespace }
+
 
       update_date:
         type: date
@@ -866,7 +843,6 @@ sponsorship:
         type: text
         fields:
           keyword:      { type: keyword, ignore_above: 256 }
-          lemma:        { type: text, analyzer: whitespace }
       member_state:     { type: keyword }
       member_party:     { type: keyword }
 
@@ -912,7 +888,6 @@ vote_position:
         type: text
         fields:
           keyword:   { type: keyword, ignore_above: 256 }
-          lemma:     { type: text, analyzer: whitespace }
 
       vote_date:
         type: date

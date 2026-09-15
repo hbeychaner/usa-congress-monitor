@@ -3,17 +3,6 @@ from cdm.store.index_manager import load_definitions
 from cdm.store.opensearch import resource_target
 
 
-def _text_fields(properties):
-    for name, definition in properties.items():
-        if not isinstance(definition, dict):
-            continue
-        if definition.get("type") == "text":
-            yield name, definition
-        nested = definition.get("properties")
-        if isinstance(nested, dict):
-            yield from _text_fields(nested)
-
-
 def test_every_indexable_resource_has_a_declared_mapping():
     definitions = load_definitions()
 
@@ -54,27 +43,33 @@ def test_mapping_file_is_valid_yaml():
     assert all(isinstance(value, dict) for value in definitions.values())
 
 
-def test_every_text_field_has_whitespace_analyzed_lemma_multifield():
-    definitions = load_definitions()
-    text_fields = [
-        (index_name, field_name, field)
-        for index_name, definition in definitions.items()
-        for field_name, field in _text_fields(
-            definition.get("mappings", {}).get("properties", {})
-        )
-    ]
+def test_lemma_multifields_cover_exactly_the_semantic_text_fields():
+    """Lemmas are reserved for semantically meaningful free text (semantic
+    search / topic modeling); names, committee names, and formulaic action
+    strings are keyword-only."""
+    from cdm.store.index_manager import lemma_field_paths
 
-    assert text_fields
-    for index_name, field_name, field in text_fields:
-        if field.get("index") is False or field_name.endswith("_lemma"):
-            continue
-        assert field.get("fields", {}).get("lemma") == {
-            "type": "text",
-            "analyzer": "whitespace",
-        }, (
-            index_name,
-            field_name,
-        )
+    expected = {
+        "legislation": {
+            ("title",),
+            ("full_text",),
+            ("summaries", "text"),
+            ("notes", "text"),
+            ("amendments", "description"),
+            ("amendments", "purpose"),
+        },
+        "amendment": {("description",), ("purpose",)},
+        "nomination": {("description",)},
+        "treaty": {("topic",)},
+        "crsreport": {("title",), ("summary",)},
+        "member": set(),
+        "committee": set(),
+        "communication": set(),
+        "sponsorship": set(),
+        "vote_position": set(),
+    }
+    for index_name, paths in expected.items():
+        assert set(lemma_field_paths(index_name)) == paths, index_name
 
 
 def _lemma_multifield_parents(properties):
@@ -109,5 +104,6 @@ def test_lemma_field_paths_cover_nested_and_top_level_fields():
     paths = lemma_field_paths("legislation")
 
     assert ("title",) in paths
-    assert ("actions", "text") in paths
+    assert ("full_text",) in paths
+    assert ("summaries", "text") in paths
     assert lemma_field_paths("unknown-index") == ()

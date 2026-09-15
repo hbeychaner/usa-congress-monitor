@@ -13,7 +13,6 @@ from cdm.contracts.api import (
 )
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
-from cdm.utils.lemmatize import try_lemmatize_query
 
 
 def _terms(source: dict[str, Any]) -> list[dict[str, Any]]:
@@ -165,11 +164,6 @@ def list_members(
                 }
             }
         ]
-        lemma_query = try_lemmatize_query(query.strip())
-        if lemma_query:
-            text_should.append(
-                {"match": {"name_lemma": {"query": lemma_query, "boost": 2}}}
-            )
         query_body["bool"]["must"] = [
             {"bool": {"should": text_should, "minimum_should_match": 1}}
         ]

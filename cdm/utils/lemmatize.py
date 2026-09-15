@@ -40,8 +40,11 @@ def lemmatize_texts(texts: Sequence[str]) -> list[str]:
     if not texts:
         return []
     nlp = _get_nlp()
+    # Very large bill texts can exceed spaCy's max_length; truncate rather
+    # than fail — the head of the document still carries the topical signal.
+    max_chars = int(nlp.max_length)
     results: list[str] = []
-    for doc in nlp.pipe([text or "" for text in texts]):
+    for doc in nlp.pipe([(text or "")[:max_chars] for text in texts]):
         results.append(
             " ".join(
                 token.lemma_.lower()

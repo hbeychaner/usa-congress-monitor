@@ -115,15 +115,18 @@ def test_to_document_populates_lemma_siblings_for_spec_fields(monkeypatch):
             "id": "bill:118:hr:1",
             "title": "Border Acts",
             "latest_action_text": "Referred to committees",
-            "actions": [{"text": "Passed House"}, {"text": ""}],
+            "full_text": "An Act to secure the border.",
+            "summaries": [{"text": "Secures the border."}, {"text": ""}],
         },
         "bill",
     )
 
     assert document["title_lemma"] == "lemma(Border Acts)"
-    assert document["latest_action_text_lemma"] == "lemma(Referred to committees)"
-    assert document["actions"][0]["text_lemma"] == "lemma(Passed House)"
-    assert "text_lemma" not in document["actions"][1]
+    assert document["full_text_lemma"] == "lemma(An Act to secure the border.)"
+    assert document["summaries"][0]["text_lemma"] == "lemma(Secures the border.)"
+    assert "text_lemma" not in document["summaries"][1]
+    # Formulaic action strings are keyword territory, not semantic text.
+    assert "latest_action_text_lemma" not in document
 
 
 def test_to_document_skips_lemma_fields_when_lemmatizer_returns_empty():

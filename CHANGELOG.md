@@ -4,6 +4,17 @@
 
 ### Changed
 
+- Lemma fields are now reserved for semantically meaningful free text:
+  legislation title/full text/summaries/notes/amendment purpose+description,
+  amendment purpose/description, nomination description, treaty topic, and
+  CRS report title/summary. Names, committee names, related-bill titles, and
+  formulaic action strings dropped their `.lemma` multi-fields (keyword-only).
+  `full_text` is now lemmatized into a searchable `full_text_lemma` sibling
+  and carried through the version-ranked bill-text merge script; bill search
+  queries `full_text_lemma` instead of `latest_action_text_lemma`, member
+  search dropped its `name_lemma` clause, and the lemmatizer truncates inputs
+  at spaCy's `max_length` so huge bill texts can't fail the pipeline.
+  Mappings pushed live (additive) and workers restarted.
 - Frontend surfaces the full indexed record set: bill detail now returns and
   renders action history, cosponsors, summaries, titles, text versions,
   committees, related bills, and the bill-text version code; member profiles

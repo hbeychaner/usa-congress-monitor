@@ -79,6 +79,7 @@ _TEXT_MERGE_SCRIPT = (
     "if (ctx._source['full_text'] == null"
     "    || (existing != null && params.rank >= ((Number) existing).intValue())) {"
     " ctx._source['full_text'] = params.full_text;"
+    " ctx._source['full_text_lemma'] = params.full_text_lemma;"
     " ctx._source['full_text_version_code'] = params.version_code;"
     " ctx._source['full_text_version_rank'] = params.rank;"
     "}"
@@ -116,6 +117,7 @@ def bill_text_parent_action(
                 "base": base,
                 "rank": TEXT_VERSION_RANKS.get(version_code, 0),
                 "full_text": full_text,
+                "full_text_lemma": doc.get("full_text_lemma"),
                 "version_code": version_code,
             },
         },
