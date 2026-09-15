@@ -16,15 +16,25 @@ function displayName(sponsor: RecordValue): string {
     return String(sponsor.full_name ?? sponsor.name ?? sponsor.id ?? 'Unknown sponsor');
 }
 
+function stripHtml(value: string): string {
+    return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function asRecords(value: unknown): RecordValue[] {
+    return Array.isArray(value) ? (value.filter((item) => item && typeof item === 'object') as RecordValue[]) : [];
+}
+
 export function BillDetailPage() {
     const { billId = '' } = useParams();
     const [response, setResponse] = useState<BillDetailResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [votesResponse, setVotesResponse] = useState<BillVotesResponse | null>(null);
+    const [showAllActions, setShowAllActions] = useState(false);
 
     useEffect(() => {
         setResponse(null);
         setError(null);
+        setShowAllActions(false);
         fetchBill(billId).then(setResponse).catch((err: Error) => setError(err.message));
     }, [billId]);
 
@@ -46,9 +56,17 @@ export function BillDetailPage() {
 
     const bill = response.bill;
     const action = bill.latest_action as RecordValue | null;
-    const subjects = bill.subjects?.legislativeSubjects;
+    const subjectsRaw = bill.subjects as RecordValue | null | undefined;
+    const subjects = asRecords(subjectsRaw?.legislative_subjects ?? subjectsRaw?.legislativeSubjects);
     const sponsors = bill.sponsors ?? [];
+    const cosponsors = asRecords(bill.cosponsors);
+    const actions = asRecords(bill.actions);
+    const summaries = asRecords(bill.summaries);
+    const textVersions = asRecords(bill.text_versions);
+    const committees = asRecords(bill.committees);
+    const relatedBills = asRecords(bill.related_bills);
     const relationshipCounts = bill.relationship_counts ?? {};
+    const visibleActions = showAllActions ? actions : actions.slice(0, 8);
 
     return (
         <Flex direction="column" gap="5">
@@ -76,9 +94,40 @@ export function BillDetailPage() {
                         ) : <Text as="p" color="gray">No action is recorded for this bill.</Text>}
                     </Card>
                     <Card size="3">
+                        <Heading size="4" mb="2">Action history</Heading>
+                        {actions.length ? (
+                            <Flex direction="column" gap="3">
+                                {visibleActions.map((item, index) => (
+                                    <Flex direction="column" gap="1" key={`${String(item.action_date ?? '')}-${index}`}>
+                                        <Text size="1" weight="bold">{formatDate(String(item.action_date ?? ''))}{item.source_system && (item.source_system as RecordValue).name ? ` · ${String((item.source_system as RecordValue).name)}` : ''}</Text>
+                                        <Text size="2">{String(item.text ?? 'Action text not recorded')}</Text>
+                                    </Flex>
+                                ))}
+                                {actions.length > 8 ? (
+                                    <Button variant="soft" onClick={() => setShowAllActions((value) => !value)}>
+                                        {showAllActions ? 'Show fewer actions' : `Show all ${actions.length} actions`}
+                                    </Button>
+                                ) : null}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No actions are indexed for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Summaries</Heading>
+                        {summaries.length ? (
+                            <Flex direction="column" gap="3">
+                                {summaries.map((summary, index) => (
+                                    <Flex direction="column" gap="1" key={`${String(summary.version_code ?? index)}`}>
+                                        <Text size="1" color="gray">{String(summary.action_desc ?? 'Summary')} · {formatDate(String(summary.action_date ?? ''))}</Text>
+                                        <Text as="p">{stripHtml(String(summary.text ?? ''))}</Text>
+                                    </Flex>
+                                ))}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No summaries are indexed for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
                         <Heading size="4" mb="2">Policy and subjects</Heading>
                         {bill.policy_area ? <Badge mb="2">{bill.policy_area}</Badge> : <Text as="p" color="gray">Policy area not recorded.</Text>}
-                        {Array.isArray(subjects) && subjects.length > 0 ? (
+                        {subjects.length > 0 ? (
                             <Flex direction="column" gap="1" mt="2">
                                 {subjects.map((subject, index) => (
                                     <Text as="p" key={`${String(subject.name ?? subject.title ?? index)}`}>
@@ -91,7 +140,7 @@ export function BillDetailPage() {
                     {bill.full_text ? (
                         <Card size="3" asChild>
                             <details>
-                                <summary><Text weight="medium">Bill text</Text></summary>
+                                <summary><Text weight="medium">Bill text{bill.full_text_version_code ? ` (version ${bill.full_text_version_code.toUpperCase()})` : ''}</Text></summary>
                                 <Text as="p" mt="2" style={{ whiteSpace: 'pre-wrap' }}>{bill.full_text}</Text>
                             </details>
                         </Card>
@@ -146,6 +195,74 @@ export function BillDetailPage() {
                                 ))}
                             </Flex>
                         ) : <Text as="p" color="gray">No sponsors are indexed for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Cosponsors {cosponsors.length ? `(${cosponsors.length})` : ''}</Heading>
+                        {cosponsors.length ? (
+                            <Flex direction="column" gap="2">
+                                {cosponsors.map((cosponsor) => (
+                                    <Flex direction="column" key={String(cosponsor.bioguide_id ?? displayName(cosponsor))}>
+                                        {cosponsor.bioguide_id ? (
+                                            <Link to={`/members/${String(cosponsor.bioguide_id)}`}><Text weight="bold">{displayName(cosponsor)}</Text></Link>
+                                        ) : <Text weight="bold">{displayName(cosponsor)}</Text>}
+                                        <Text size="1" color="gray">
+                                            {[cosponsor.party, cosponsor.state, cosponsor.is_original_cosponsor ? 'Original cosponsor' : '', cosponsor.sponsorship_date ? `Joined ${formatDate(String(cosponsor.sponsorship_date))}` : ''].filter(Boolean).join(' · ')}
+                                        </Text>
+                                    </Flex>
+                                ))}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No cosponsors are indexed for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Committees</Heading>
+                        {committees.length ? (
+                            <Flex direction="column" gap="2">
+                                {committees.map((committee, index) => (
+                                    <Flex direction="column" key={String(committee.system_code ?? index)}>
+                                        <Text weight="bold">{String(committee.name ?? 'Unnamed committee')}</Text>
+                                        {committee.chamber ? <Text size="1" color="gray">{String(committee.chamber)}</Text> : null}
+                                    </Flex>
+                                ))}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No committee referrals are indexed for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Text versions</Heading>
+                        {textVersions.length ? (
+                            <Flex direction="column" gap="2">
+                                {textVersions.map((version, index) => (
+                                    <Flex direction="column" gap="1" key={`${String(version.type ?? version.date ?? index)}`}>
+                                        <Text weight="bold">{String(version.type ?? 'Text version')}</Text>
+                                        <Text size="1" color="gray">{formatDate(String(version.date ?? ''))}</Text>
+                                        <Flex gap="2" wrap="wrap">
+                                            {asRecords(version.formats).map((format) => (
+                                                <Text size="1" key={String(format.url ?? format.type)}>
+                                                    <a href={String(format.url ?? '#')} target="_blank" rel="noreferrer">{String(format.type ?? 'Link')}</a>
+                                                </Text>
+                                            ))}
+                                        </Flex>
+                                    </Flex>
+                                ))}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No text versions are indexed for this bill.</Text>}
+                    </Card>
+                    <Card size="3">
+                        <Heading size="4" mb="2">Related bills</Heading>
+                        {relatedBills.length ? (
+                            <Flex direction="column" gap="2">
+                                {relatedBills.map((related, index) => {
+                                    const relatedId = typeof related.id === 'string' ? related.id : null;
+                                    const label = String(related.title ?? relatedId ?? `Related bill ${index + 1}`);
+                                    const relationship = asRecords(related.relationship_details).map((detail) => String(detail.type ?? '')).filter(Boolean).join(', ');
+                                    return (
+                                        <Flex direction="column" gap="1" key={relatedId ?? index}>
+                                            {relatedId ? <Link to={`/bills/${encodeURIComponent(relatedId)}`}><Text weight="bold">{label}</Text></Link> : <Text weight="bold">{label}</Text>}
+                                            <Text size="1" color="gray">{[related.congress ? `Congress ${related.congress}` : '', relationship].filter(Boolean).join(' · ')}</Text>
+                                        </Flex>
+                                    );
+                                })}
+                            </Flex>
+                        ) : <Text as="p" color="gray">No related bills are indexed for this bill.</Text>}
                     </Card>
                     <Card size="3">
                         <Heading size="4" mb="2">Available records</Heading>

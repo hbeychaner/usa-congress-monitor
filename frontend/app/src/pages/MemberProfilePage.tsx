@@ -1,4 +1,4 @@
-import { Avatar, Badge, Button, Card, Flex, Heading, Progress, SegmentedControl, Text } from '@radix-ui/themes';
+import { Avatar, Badge, Button, Card, DataList, Flex, Heading, Progress, SegmentedControl, Table, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -63,6 +63,10 @@ export function MemberProfilePage() {
     return <Text as="p">Failed to load member profile: {error ?? 'Unknown error'}</Text>;
   }
 
+  const member = profile.member;
+  const terms = [...(member.terms ?? [])].sort((a, b) => (b.congress ?? 0) - (a.congress ?? 0));
+  const leadership = member.leadership ?? [];
+
   const activityByType = profile.recent_activity.reduce<Record<string, number>>((acc, item) => {
     acc[item.activity_type] = (acc[item.activity_type] ?? 0) + 1;
     return acc;
@@ -75,25 +79,103 @@ export function MemberProfilePage() {
           <Avatar
             size="7"
             radius="full"
-            src={profile.member.image_url ?? undefined}
-            fallback={profile.member.display_name.charAt(0)}
+            src={member.image_url ?? undefined}
+            fallback={member.display_name.charAt(0)}
           />
           <Flex direction="column" gap="2">
-            <Heading size="7">{profile.member.display_name}</Heading>
-            <Text color="gray">{profile.member.chamber ?? 'Chamber unavailable'} · {profile.member.state}</Text>
+            <Heading size="7">{member.honorific_name ? `${member.honorific_name} ` : ''}{member.display_name}</Heading>
+            <Text color="gray">{member.chamber ?? 'Chamber unavailable'} · {member.state}</Text>
+            {member.birth_year ? (
+              <Text size="2" color="gray">
+                Born {member.birth_year}{member.death_year ? ` · Died ${member.death_year}` : ''}
+              </Text>
+            ) : null}
             <Flex gap="2" wrap="wrap" align="center">
-              <Badge color={PARTY_COLORS[profile.member.party] ?? 'gray'}>{profile.member.party}</Badge>
-              {profile.member.district != null ? <Badge variant="soft">District: {profile.member.district}</Badge> : null}
-              {profile.member.term_start_year != null ? (
-                <Badge variant="soft">
-                  Term: {profile.member.term_start_year}–{profile.member.term_end_year ?? 'present'}
+              <Badge color={PARTY_COLORS[member.party] ?? 'gray'}>{member.party}</Badge>
+              {member.current_member != null ? (
+                <Badge color={member.current_member ? 'green' : 'gray'} variant="soft">
+                  {member.current_member ? 'Currently serving' : 'Former member'}
                 </Badge>
               ) : null}
-              <Badge variant="soft">Bioguide: {profile.member.bioguide_id}</Badge>
+              {member.district != null ? <Badge variant="soft">District: {member.district}</Badge> : null}
+              {member.term_start_year != null ? (
+                <Badge variant="soft">
+                  Term: {member.term_start_year}–{member.term_end_year ?? 'present'}
+                </Badge>
+              ) : null}
+              <Badge variant="soft">Bioguide: {member.bioguide_id}</Badge>
             </Flex>
           </Flex>
         </Flex>
       </Card>
+
+      {member.official_website_url || member.office_address || member.phone_number ? (
+        <Card size="3">
+          <Heading size="4" mb="2">Contact</Heading>
+          <DataList.Root>
+            {member.official_website_url ? (
+              <DataList.Item>
+                <DataList.Label>Official website</DataList.Label>
+                <DataList.Value>
+                  <a href={member.official_website_url} target="_blank" rel="noreferrer">{member.official_website_url}</a>
+                </DataList.Value>
+              </DataList.Item>
+            ) : null}
+            {member.office_address ? (
+              <DataList.Item>
+                <DataList.Label>Office</DataList.Label>
+                <DataList.Value>{member.office_address}</DataList.Value>
+              </DataList.Item>
+            ) : null}
+            {member.phone_number ? (
+              <DataList.Item>
+                <DataList.Label>Phone</DataList.Label>
+                <DataList.Value>{member.phone_number}</DataList.Value>
+              </DataList.Item>
+            ) : null}
+          </DataList.Root>
+        </Card>
+      ) : null}
+
+      {leadership.length > 0 ? (
+        <Card size="3">
+          <Heading size="4" mb="2">Leadership</Heading>
+          <Flex direction="column" gap="1">
+            {leadership.map((role, index) => (
+              <Text as="p" key={index}>
+                {String((role as Record<string, unknown>).type ?? 'Leadership role')}
+                {(role as Record<string, unknown>).congress ? ` · Congress ${String((role as Record<string, unknown>).congress)}` : ''}
+              </Text>
+            ))}
+          </Flex>
+        </Card>
+      ) : null}
+
+      {terms.length > 0 ? (
+        <Card size="3">
+          <Heading size="4" mb="2">Service History</Heading>
+          <Table.Root size="1">
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeaderCell>Congress</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Chamber</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Years</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>State</Table.ColumnHeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {terms.map((term, index) => (
+                <Table.Row key={`${term.congress ?? index}-${term.chamber ?? ''}`}>
+                  <Table.Cell>{term.congress ?? '—'}</Table.Cell>
+                  <Table.Cell>{term.chamber ?? '—'}</Table.Cell>
+                  <Table.Cell>{term.start_year ?? '?'}–{term.end_year ?? 'present'}</Table.Cell>
+                  <Table.Cell>{term.state_name ?? term.state_code ?? '—'}{term.district != null ? ` (District ${term.district})` : ''}</Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Root>
+        </Card>
+      ) : null}
 
       <Card size="3">
         <Heading size="4" mb="2">Activity Breakdown</Heading>

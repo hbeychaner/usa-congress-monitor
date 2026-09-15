@@ -51,6 +51,31 @@ class MembersResponse(BaseModel):
     limit: int = 50
 
 
+class MemberTerm(BaseModel):
+    chamber: str | None = None
+    congress: int | None = None
+    start_year: int | None = None
+    end_year: int | None = None
+    member_type: str | None = None
+    state_code: str | None = None
+    state_name: str | None = None
+    district: int | None = None
+
+
+class MemberDetail(MemberSummary):
+    honorific_name: str | None = None
+    birth_year: str | None = None
+    death_year: str | None = None
+    official_website_url: str | None = None
+    office_address: str | None = None
+    phone_number: str | None = None
+    current_member: bool | None = None
+    leadership: list[dict] = Field(default_factory=list)
+    party_history: list[dict] = Field(default_factory=list)
+    terms: list[MemberTerm] = Field(default_factory=list)
+    image_attribution: str | None = None
+
+
 class ActivityItem(BaseModel):
     bill_id: str
     title: str
@@ -64,7 +89,7 @@ class TopicItem(BaseModel):
 
 
 class MemberProfileResponse(BaseModel):
-    member: MemberSummary
+    member: MemberDetail
     recent_activity: list[ActivityItem]
     topics: list[TopicItem]
 
@@ -132,10 +157,18 @@ class BillDetail(BaseModel):
     latest_action: dict | None = None
     policy_area: str | None = None
     sponsors: list[dict] = Field(default_factory=list)
+    cosponsors: list[dict] = Field(default_factory=list)
+    actions: list[dict] = Field(default_factory=list)
+    summaries: list[dict] = Field(default_factory=list)
+    titles: list[dict] = Field(default_factory=list)
+    text_versions: list[dict] = Field(default_factory=list)
+    committees: list[dict] = Field(default_factory=list)
+    related_bills: list[dict] = Field(default_factory=list)
     subjects: dict | None = None
     laws: list[dict] = Field(default_factory=list)
     constitutional_authority_statement_text: str | None = None
     full_text: str | None = None
+    full_text_version_code: str | None = None
     relationship_counts: dict[str, int] = Field(default_factory=dict)
 
 
@@ -235,3 +268,15 @@ class AdminIngestSnapshot(BaseModel):
     staging: StagingStatus
     ready_for_reconciliation: bool
     ready_for_cutover: bool
+
+
+class IndexStatus(BaseModel):
+    name: str
+    documents: int = 0
+
+
+class SystemStatusResponse(BaseModel):
+    search_connected: bool = False
+    indices: list[IndexStatus] = Field(default_factory=list)
+    jobs: dict[str, JobStatusCounts] = Field(default_factory=dict)
+    generated_at: str | None = None

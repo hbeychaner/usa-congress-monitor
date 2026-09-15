@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/system-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** System Status */
+        get: operations["system_status_api_v1_admin_system_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/states": {
         parameters: {
             query?: never;
@@ -287,6 +304,34 @@ export interface components {
             sponsors?: {
                 [key: string]: unknown;
             }[];
+            /** Cosponsors */
+            cosponsors?: {
+                [key: string]: unknown;
+            }[];
+            /** Actions */
+            actions?: {
+                [key: string]: unknown;
+            }[];
+            /** Summaries */
+            summaries?: {
+                [key: string]: unknown;
+            }[];
+            /** Titles */
+            titles?: {
+                [key: string]: unknown;
+            }[];
+            /** Text Versions */
+            text_versions?: {
+                [key: string]: unknown;
+            }[];
+            /** Committees */
+            committees?: {
+                [key: string]: unknown;
+            }[];
+            /** Related Bills */
+            related_bills?: {
+                [key: string]: unknown;
+            }[];
             /** Subjects */
             subjects?: {
                 [key: string]: unknown;
@@ -299,6 +344,8 @@ export interface components {
             constitutional_authority_statement_text?: string | null;
             /** Full Text */
             full_text?: string | null;
+            /** Full Text Version Code */
+            full_text_version_code?: string | null;
             /** Relationship Counts */
             relationship_counts?: {
                 [key: string]: number;
@@ -411,6 +458,16 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** IndexStatus */
+        IndexStatus: {
+            /** Name */
+            name: string;
+            /**
+             * Documents
+             * @default 0
+             */
+            documents: number;
         };
         /** IngestProgressJob */
         IngestProgressJob: {
@@ -528,9 +585,56 @@ export interface components {
              */
             limit: number;
         };
+        /** MemberDetail */
+        MemberDetail: {
+            /** Bioguide Id */
+            bioguide_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Party */
+            party: string;
+            /** State */
+            state: string;
+            /** Chamber */
+            chamber?: string | null;
+            /** District */
+            district?: number | null;
+            /** Term Start Year */
+            term_start_year?: number | null;
+            /** Term End Year */
+            term_end_year?: number | null;
+            /** Image Url */
+            image_url?: string | null;
+            /** Honorific Name */
+            honorific_name?: string | null;
+            /** Birth Year */
+            birth_year?: string | null;
+            /** Death Year */
+            death_year?: string | null;
+            /** Official Website Url */
+            official_website_url?: string | null;
+            /** Office Address */
+            office_address?: string | null;
+            /** Phone Number */
+            phone_number?: string | null;
+            /** Current Member */
+            current_member?: boolean | null;
+            /** Leadership */
+            leadership?: {
+                [key: string]: unknown;
+            }[];
+            /** Party History */
+            party_history?: {
+                [key: string]: unknown;
+            }[];
+            /** Terms */
+            terms?: components["schemas"]["MemberTerm"][];
+            /** Image Attribution */
+            image_attribution?: string | null;
+        };
         /** MemberProfileResponse */
         MemberProfileResponse: {
-            member: components["schemas"]["MemberSummary"];
+            member: components["schemas"]["MemberDetail"];
             /** Recent Activity */
             recent_activity: components["schemas"]["ActivityItem"][];
             /** Topics */
@@ -556,6 +660,25 @@ export interface components {
             term_end_year?: number | null;
             /** Image Url */
             image_url?: string | null;
+        };
+        /** MemberTerm */
+        MemberTerm: {
+            /** Chamber */
+            chamber?: string | null;
+            /** Congress */
+            congress?: number | null;
+            /** Start Year */
+            start_year?: number | null;
+            /** End Year */
+            end_year?: number | null;
+            /** Member Type */
+            member_type?: string | null;
+            /** State Code */
+            state_code?: string | null;
+            /** State Name */
+            state_name?: string | null;
+            /** District */
+            district?: number | null;
         };
         /** MembersResponse */
         MembersResponse: {
@@ -639,6 +762,22 @@ export interface components {
             state_name: string;
             house: components["schemas"]["ChamberTimeline"];
             senate: components["schemas"]["ChamberTimeline"];
+        };
+        /** SystemStatusResponse */
+        SystemStatusResponse: {
+            /**
+             * Search Connected
+             * @default false
+             */
+            search_connected: boolean;
+            /** Indices */
+            indices?: components["schemas"]["IndexStatus"][];
+            /** Jobs */
+            jobs?: {
+                [key: string]: components["schemas"]["JobStatusCounts"];
+            };
+            /** Generated At */
+            generated_at?: string | null;
         };
         /** TimelineMember */
         TimelineMember: {
@@ -770,6 +909,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminIngestSnapshot"];
+                };
+            };
+        };
+    };
+    system_status_api_v1_admin_system_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemStatusResponse"];
                 };
             };
         };

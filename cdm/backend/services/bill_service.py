@@ -113,8 +113,15 @@ def get_bill(bill_id: str) -> BillDetailResponse:
     policy_area = source.get("policy_area")
     if isinstance(policy_area, dict):
         policy_area = policy_area.get("name")
-    sponsors = source.get("sponsors")
-    laws = source.get("laws")
+
+    def _dict_list(field: str) -> list[dict]:
+        value = source.get(field)
+        if not isinstance(value, list):
+            return []
+        return [item for item in value if isinstance(item, dict)]
+
+    actions = _dict_list("actions")
+    actions.sort(key=lambda item: str(item.get("action_date") or ""), reverse=True)
     return BillDetailResponse(
         bill=BillDetail(
             bill_id=str(source.get("id") or normalized_id),
@@ -129,15 +136,23 @@ def get_bill(bill_id: str) -> BillDetailResponse:
             update_date_including_text=source.get("update_date_including_text"),
             latest_action=source.get("latest_action"),
             policy_area=policy_area,
-            sponsors=sponsors if isinstance(sponsors, list) else [],
+            sponsors=_dict_list("sponsors"),
+            cosponsors=_dict_list("cosponsors"),
+            actions=actions,
+            summaries=_dict_list("summaries"),
+            titles=_dict_list("titles"),
+            text_versions=_dict_list("text_versions"),
+            committees=_dict_list("committees"),
+            related_bills=_dict_list("related_bills"),
             subjects=source.get("subjects")
             if isinstance(source.get("subjects"), dict)
             else None,
-            laws=laws if isinstance(laws, list) else [],
+            laws=_dict_list("laws"),
             constitutional_authority_statement_text=source.get(
                 "constitutional_authority_statement_text"
             ),
             full_text=source.get("full_text"),
+            full_text_version_code=source.get("full_text_version_code"),
             relationship_counts=relationships,
         )
     )

@@ -4,6 +4,14 @@
 
 ### Changed
 
+- Frontend surfaces the full indexed record set: bill detail now returns and
+  renders action history, cosponsors, summaries, titles, text versions,
+  committees, related bills, and the bill-text version code; member profiles
+  now include honorific, birth/death years, current-member status, contact
+  details (website, office, phone), leadership roles, and the full service
+  history; the admin page gained a live system-status panel (new
+  `/admin/system-status` endpoint) showing per-index document counts and job
+  ledger counts by kind and status.
 - Bill text now lives on the bill document: `bulk_upsert` converts GovInfo
   BILLS records into version-ranked scripted updates on the parent
   `bill:{congress}:{type}:{number}` document (later lifecycle stages win:

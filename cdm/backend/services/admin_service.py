@@ -21,10 +21,12 @@ from sqlalchemy.engine import Connection
 from cdm.contracts.api import (
     AdminIngestSnapshot,
     GovInfoCoverage,
+    IndexStatus,
     IngestProgressJob,
     IngestProgressResponse,
     JobStatusCounts,
     StagingStatus,
+    SystemStatusResponse,
 )
 from cdm.store.client import get_opensearch_client
 from settings import (
@@ -422,4 +424,47 @@ def get_admin_ingest_snapshot() -> AdminIngestSnapshot:
             and staging.exists
             and staging.production_alias_target == "congress-legislation"
         ),
+    )
+
+
+_STATUS_INDICES = (
+    "congress-legislation",
+    "congress-member",
+    "congress-vote",
+    "congress-amendment",
+    "congress-committee",
+    "congress-nomination",
+    "congress-treaty",
+)
+
+
+def get_system_status() -> SystemStatusResponse:
+    with _connect_jobs() as conn:
+        kinds = [
+            str(kind)
+            for (kind,) in conn.execute(
+                select(_JOBS_TABLE.c.kind).distinct().order_by(_JOBS_TABLE.c.kind)
+            ).all()
+            if kind
+        ]
+        jobs = {kind: _job_status_counts(conn, kind) for kind in kinds}
+    indices: list[IndexStatus] = []
+    connected = False
+    try:
+        client = get_opensearch_client()
+        connected = bool(client.ping())
+        if connected:
+            for name in _STATUS_INDICES:
+                alias = f"{name}-read"
+                if not client.indices.exists(index=alias):
+                    continue
+                count = int(client.count(index=alias).get("count", 0))
+                indices.append(IndexStatus(name=name, documents=count))
+    except (TransportError, ValueError):
+        connected = False
+    return SystemStatusResponse(
+        search_connected=connected,
+        indices=indices,
+        jobs=jobs,
+        generated_at=datetime.now(UTC).isoformat(),
     )

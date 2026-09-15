@@ -71,3 +71,19 @@ export function fetchIngestProgress(): Promise<IngestProgressResponse> {
 export function fetchAdminIngestSnapshot(): Promise<AdminIngestSnapshot> {
     return apiGet<AdminIngestSnapshot>('/api/v1/admin/ingest-snapshot');
 }
+
+export type IndexStatus = {
+    name: string;
+    documents: number;
+};
+
+export type SystemStatusResponse = {
+    search_connected: boolean;
+    indices: IndexStatus[];
+    jobs: Record<string, JobStatusCounts>;
+    generated_at: string | null;
+};
+
+export function fetchSystemStatus(): Promise<SystemStatusResponse> {
+    return apiGet<SystemStatusResponse>('/api/v1/admin/system-status');
+}

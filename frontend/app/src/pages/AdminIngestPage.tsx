@@ -1,7 +1,7 @@
 import { Badge, Callout, Card, Flex, Grid, Heading, Select, Table, Text } from '@radix-ui/themes';
 import { useEffect, useMemo, useState } from 'react';
 
-import { fetchIngestProgress, type IngestProgressResponse } from '../api/admin';
+import { fetchIngestProgress, fetchSystemStatus, type IngestProgressResponse, type SystemStatusResponse } from '../api/admin';
 
 function formatDate(date: string | null): string {
     if (!date) {
@@ -16,6 +16,32 @@ export function AdminIngestPage() {
     const [error, setError] = useState<string | null>(null);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [statusFilter, setStatusFilter] = useState('');
+    const [systemStatus, setSystemStatus] = useState<SystemStatusResponse | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadStatus() {
+            try {
+                const status = await fetchSystemStatus();
+                if (!cancelled) {
+                    setSystemStatus(status);
+                }
+            } catch {
+                if (!cancelled) {
+                    setSystemStatus(null);
+                }
+            }
+        }
+
+        loadStatus();
+        const timer = window.setInterval(loadStatus, 60000);
+
+        return () => {
+            cancelled = true;
+            window.clearInterval(timer);
+        };
+    }, []);
 
     useEffect(() => {
         let cancelled = false;
@@ -163,6 +189,59 @@ export function AdminIngestPage() {
                                 </Table.Body>
                             </Table.Root>
                         )}
+                    </Card>
+                </>
+            ) : null}
+
+            {systemStatus ? (
+                <>
+                    <Card size="3">
+                        <Flex justify="between" align="center" wrap="wrap" gap="2" mb="2">
+                            <Heading size="4">Search Indices</Heading>
+                            <Badge color={systemStatus.search_connected ? 'green' : 'red'} variant="soft">
+                                {systemStatus.search_connected ? 'Search connected' : 'Search unavailable'}
+                            </Badge>
+                        </Flex>
+                        {systemStatus.indices.length > 0 ? (
+                            <Grid columns={{ initial: '2', sm: '4' }} gap="4">
+                                {systemStatus.indices.map((index) => (
+                                    <Flex direction="column" key={index.name}>
+                                        <Text size="1" color="gray">{index.name.replace('congress-', '')}</Text>
+                                        <Heading size="5">{index.documents.toLocaleString()}</Heading>
+                                    </Flex>
+                                ))}
+                            </Grid>
+                        ) : <Text as="p" color="gray">No indices reported.</Text>}
+                    </Card>
+
+                    <Card size="3">
+                        <Heading size="4" mb="2">Job Ledger</Heading>
+                        {Object.keys(systemStatus.jobs).length > 0 ? (
+                            <Table.Root variant="surface">
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.ColumnHeaderCell>Kind</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Queued</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Running</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Retrying</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Succeeded</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Failed</Table.ColumnHeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {Object.entries(systemStatus.jobs).map(([kind, counts]) => (
+                                        <Table.Row key={kind}>
+                                            <Table.RowHeaderCell>{kind}</Table.RowHeaderCell>
+                                            <Table.Cell>{counts.queued.toLocaleString()}</Table.Cell>
+                                            <Table.Cell>{counts.running.toLocaleString()}</Table.Cell>
+                                            <Table.Cell>{counts.retrying.toLocaleString()}</Table.Cell>
+                                            <Table.Cell>{counts.succeeded.toLocaleString()}</Table.Cell>
+                                            <Table.Cell>{counts.failed.toLocaleString()}</Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table.Root>
+                        ) : <Text as="p" color="gray">No jobs recorded in the ledger.</Text>}
                     </Card>
                 </>
             ) : null}

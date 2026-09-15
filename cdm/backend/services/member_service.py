@@ -4,9 +4,11 @@ from typing import Any
 from cdm.contracts.api import (
     MemberActivityItem,
     MemberActivityResponse,
+    MemberDetail,
     MemberProfileResponse,
     MembersResponse,
     MemberSummary,
+    MemberTerm,
 )
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
@@ -50,6 +52,45 @@ def _member_summary(source: dict[str, Any], fallback_id: str = "") -> MemberSumm
         term_start_year=term.get("start_year"),
         term_end_year=term.get("end_year"),
         image_url=image_url,
+    )
+
+
+def _member_detail(source: dict[str, Any], fallback_id: str = "") -> MemberDetail:
+    summary = _member_summary(source, fallback_id)
+    address = source.get("address_information")
+    if not isinstance(address, dict):
+        address = {}
+    depiction = source.get("depiction")
+    attribution = depiction.get("attribution") if isinstance(depiction, dict) else None
+    leadership = source.get("leadership")
+    party_history = source.get("party_history")
+    terms = [
+        MemberTerm(
+            chamber=term.get("chamber"),
+            congress=term.get("congress"),
+            start_year=term.get("start_year"),
+            end_year=term.get("end_year"),
+            member_type=term.get("member_type"),
+            state_code=term.get("state_code"),
+            state_name=term.get("state_name"),
+            district=term.get("district"),
+        )
+        for term in _terms(source)
+        if isinstance(term, dict)
+    ]
+    return MemberDetail(
+        **summary.model_dump(),
+        honorific_name=source.get("honorific_name") or None,
+        birth_year=str(source["birth_year"]) if source.get("birth_year") else None,
+        death_year=str(source["death_year"]) if source.get("death_year") else None,
+        official_website_url=source.get("official_website_url") or None,
+        office_address=address.get("office_address") or None,
+        phone_number=address.get("phone_number") or None,
+        current_member=source.get("current_member"),
+        leadership=leadership if isinstance(leadership, list) else [],
+        party_history=party_history if isinstance(party_history, list) else [],
+        terms=terms,
+        image_attribution=attribution or None,
     )
 
 
@@ -194,7 +235,7 @@ def get_member_profile(bioguide_id: str) -> MemberProfileResponse:
         matches = search_entities(normalized_id, "member", 1).results
         display_name = matches[0].title if matches else normalized_id
     return MemberProfileResponse(
-        member=_member_summary({**source, "name": display_name}, normalized_id),
+        member=_member_detail({**source, "name": display_name}, normalized_id),
         recent_activity=_recent_activity(normalized_id),
         topics=[],
     )
