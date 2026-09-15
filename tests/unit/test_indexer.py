@@ -42,6 +42,20 @@ def test_to_document_flattens_bill_member_relationships():
     assert document["cosponsor_bioguide_ids"] == ["B000002"]
 
 
+def test_to_document_strips_bill_id_date_suffix():
+    for suffixed in (
+        "bill:119:hr:144:2025-01-03",
+        "bill:119:hr:144:2025-01-03T00:00:00",
+    ):
+        assert to_document({"id": suffixed}, "bill")["id"] == "bill:119:hr:144"
+    # non-bill resources and canonical ids untouched
+    assert to_document({"id": "bill:119:hr:144"}, "bill")["id"] == "bill:119:hr:144"
+    assert (
+        to_document({"id": "bill-text:119:hr:144:ih"}, "bill_text")["id"]
+        == "bill-text:119:hr:144:ih"
+    )
+
+
 def test_to_document_normalizes_reference_id_and_preserves_raw_when_requested():
     record = {
         "id": "bill:118:hr:1",

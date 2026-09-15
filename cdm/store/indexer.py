@@ -6,12 +6,20 @@ storage layer. It may enrich, normalise, or flatten fields before indexing.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 
 from cdm.data_collection.id_utils import parse_url_to_id
 from cdm.store.index_manager import lemma_field_paths
 from cdm.store.opensearch import resource_target
 from cdm.utils.lemmatize import lemmatize_texts
+
+# Hydrated bill items get a ":{introduced_date}" suffix in the ingest runner
+# (multi-version disambiguation); the index key is the canonical 4-part id so
+# hydrated docs upsert over their skeleton list records.
+_BILL_ID_DATE_SUFFIX = re.compile(
+    r"^(bill:\d+:[a-z]+:\d+):\d{4}-\d{2}-\d{2}(?:[T ].*)?$"
+)
 
 
 def _bioguide_ids(value: object) -> list[str]:
@@ -91,6 +99,9 @@ def to_document(
         doc["cosponsor_bioguide_ids"] = _bioguide_ids(doc.get("cosponsors"))
 
     if resource == "bill":
+        match = _BILL_ID_DATE_SUFFIX.match(str(doc.get("id") or ""))
+        if match:
+            doc["id"] = match.group(1)
         doc["sponsor_bioguide_ids"] = _bioguide_ids(doc.get("sponsors"))
         doc["cosponsor_bioguide_ids"] = _bioguide_ids(doc.get("cosponsors"))
         source_metadata = doc.get("source_metadata")

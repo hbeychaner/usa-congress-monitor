@@ -4,6 +4,18 @@
 
 ### Fixed
 
+- Pipeline audit follow-ups: hydrated bill items carried a
+  `:{introduced_date}` id suffix from the ingest runner, so they indexed as
+  duplicates instead of upserting over their skeleton list records — the
+  indexer now canonicalizes bill ids (24 existing duplicates merged and
+  removed). The legislation mapping gained `sponsors`, `policy_area`,
+  `introduced_date`, `latest_action`, `type`, `reference_id`, and
+  `version_code` (all previously unqueryable under `dynamic: false`, which
+  made the `policy_area.name`/`sponsors.full_name` search clauses dead code);
+  pushed live in place. Cancelled the four stale historical bill jobs
+  (superseded by the hydration backfill). Queued a historical treaty backfill
+  — the treaty index was empty because treaties only ever ran in 2-day daily
+  windows.
 - Bill hydration never ran through the worker pipeline: `Pipeline` ignored
   `fetch_items=True` for bills because `fetch_items_default=False` always won,
   so every indexed bill was a skeleton (no sponsors, actions, subjects,

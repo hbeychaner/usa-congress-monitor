@@ -229,7 +229,10 @@ legislation:
       # ── bill fields ──
       congress:      { type: integer }
       bill_type:     { type: keyword }             # HR, S, HJRES, SRES, HRES, SCONRES…
+      type:          { type: keyword }             # raw API bill type ("hr", "sjres", …)
       number:        { type: keyword }             # bill identifiers may be fractional (e.g. "260½")
+      version_code:  { type: keyword }             # bill_text records only (ih, eh, enr, …)
+      reference_id:  { type: keyword }
       title:
         type: text
         fields:
@@ -239,8 +242,34 @@ legislation:
       origin_chamber_code: { type: keyword }       # H | S
       sponsor_bioguide_ids: { type: keyword }
       cosponsor_bioguide_ids: { type: keyword }
+      sponsors:
+        # object (not nested) so flat multi_match on sponsors.full_name works;
+        # bills have a single sponsor in practice.
+        type: object
+        dynamic: false
+        properties:
+          bioguide_id: { type: keyword }
+          full_name:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
+          first_name: { type: keyword }
+          last_name: { type: keyword }
+          party: { type: keyword }
+          state: { type: keyword }
+          district: { type: integer }
+      policy_area:
+        type: object
+        dynamic: false
+        properties:
+          name: { type: keyword }
+      constitutional_authority_statement_text: { type: text, index: false }
+      cbo_cost_estimates: { type: object, enabled: false }
 
       # ── dates ──
+      introduced_date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
       update_date:
         type: date
         format: "strict_date_optional_time||yyyy-MM-dd"
@@ -248,7 +277,19 @@ legislation:
         type: date
         format: "strict_date_optional_time||yyyy-MM-dd"
 
-      # ── latest action (flattened from latest_action: {action_date, text}) ──
+      # ── latest action (object as delivered by the API: {action_date, text}) ──
+      latest_action:
+        type: object
+        dynamic: false
+        properties:
+          action_date:
+            type: date
+            format: "strict_date_optional_time||yyyy-MM-dd"
+          action_time: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
+          text:
+            type: text
+            fields:
+              lemma: { type: text, analyzer: whitespace }
       latest_action_date:
         type: date
         format: "strict_date_optional_time||yyyy-MM-dd"
