@@ -22,7 +22,12 @@ def main() -> None:
     parser.add_argument("--congress", type=int, required=True)
     parser.add_argument("--outdir", default="data/full_history/govinfo")
     parser.add_argument("--queue", action="store_true")
-    parser.add_argument("--staging-version", type=int, default=None)
+    parser.add_argument(
+        "--staging-version",
+        type=int,
+        default=None,
+        help="write to a versioned staging index; omit to merge into the live alias",
+    )
     parser.add_argument(
         "--replace",
         action="store_true",
@@ -53,11 +58,11 @@ def main() -> None:
         print("Dry run: pass --queue to create durable package jobs.")
         return
 
-    if args.staging_version is None:
-        parser.error("--queue requires --staging-version")
-    target_index = IndexManager(get_opensearch_client()).create_versioned(
-        "legislation", args.staging_version
-    )
+    target_index = None
+    if args.staging_version is not None:
+        target_index = IndexManager(get_opensearch_client()).create_versioned(
+            "legislation", args.staging_version
+        )
     job_store = JobStore(JOB_DB_PATH)
 
     package_jobs = []

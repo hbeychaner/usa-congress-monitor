@@ -290,14 +290,14 @@ class GovInfoBillStatusParser:
             "laws": self._laws(bill),
             "source_metadata": source_metadata,
         }
-        for field_name in (
-            "updateDate",
-            "updateDateIncludingText",
-            "originChamber",
-            "originChamberCode",
-            "legislationUrl",
+        for xml_name, field_name in (
+            ("updateDate", "update_date"),
+            ("updateDateIncludingText", "update_date_including_text"),
+            ("originChamber", "origin_chamber"),
+            ("originChamberCode", "origin_chamber_code"),
+            ("legislationUrl", "url"),
         ):
-            value = self._first_text(bill, field_name)
+            value = self._first_text(bill, xml_name)
             if value:
                 record[field_name] = value
         constitutional = self._first_text(bill, "constitutionalAuthorityStatementText")
@@ -305,10 +305,13 @@ class GovInfoBillStatusParser:
             record["constitutional_authority_statement_text"] = constitutional
         introduced = self._first_text(bill, "introducedDate")
         if introduced:
-            record["introducedDate"] = introduced
+            record["introduced_date"] = introduced
+        policy_area = record["subjects"].get("policy_area")
+        if policy_area:
+            record["policy_area"] = policy_area
         latest_action = self._latest_action(bill)
         if latest_action:
-            record["latestAction"] = latest_action
+            record["latest_action"] = latest_action
         return record
 
     @staticmethod
@@ -351,7 +354,7 @@ class GovInfoBillStatusParser:
             date = cls._first_text(element, "actionDate")
             text = cls._first_text(element, "text")
             if date or text:
-                actions.append({"actionDate": date, "text": text})
+                actions.append({"action_date": date, "text": text})
         return actions
 
     @classmethod
@@ -363,9 +366,9 @@ class GovInfoBillStatusParser:
         sponsors = []
         for element in cls._elements(root, element_name):
             sponsor = {
-                "fullName": cls._first_text(element, "fullName")
+                "full_name": cls._first_text(element, "fullName")
                 or cls._first_text(element, "name"),
-                "bioguideId": cls._first_text(element, "bioguideId"),
+                "bioguide_id": cls._first_text(element, "bioguideId"),
             }
             if any(sponsor.values()):
                 sponsors.append({key: value for key, value in sponsor.items() if value})
@@ -390,18 +393,18 @@ class GovInfoBillStatusParser:
             if cls._local_name(element.tag) not in {item_name, container_name[:-1]}:
                 continue
             values = {
-                key: cls._first_text(element, key)
-                for key in (
-                    "fullName",
-                    "bioguideId",
-                    "firstName",
-                    "middleName",
-                    "lastName",
-                    "party",
-                    "state",
-                    "district",
-                    "sponsorshipDate",
-                    "isOriginalCosponsor",
+                field: cls._first_text(element, xml_name)
+                for xml_name, field in (
+                    ("fullName", "full_name"),
+                    ("bioguideId", "bioguide_id"),
+                    ("firstName", "first_name"),
+                    ("middleName", "middle_name"),
+                    ("lastName", "last_name"),
+                    ("party", "party"),
+                    ("state", "state"),
+                    ("district", "district"),
+                    ("sponsorshipDate", "sponsorship_date"),
+                    ("isOriginalCosponsor", "is_original_cosponsor"),
                 )
             }
             if any(values.values()):
@@ -426,7 +429,7 @@ class GovInfoBillStatusParser:
                 continue
             values: dict[str, Any] = {
                 "name": cls._first_text(element, "name"),
-                "systemCode": cls._first_text(element, "systemCode"),
+                "system_code": cls._first_text(element, "systemCode"),
                 "chamber": cls._first_text(element, "chamber"),
                 "type": cls._first_text(element, "type"),
             }
@@ -468,7 +471,7 @@ class GovInfoBillStatusParser:
                 if relationship:
                     result["relationship"] = relationship
                 if identified_by:
-                    result["identifiedBy"] = identified_by
+                    result["identified_by"] = identified_by
                 related.append(result)
         return related
 
@@ -477,11 +480,11 @@ class GovInfoBillStatusParser:
         summaries = []
         for element in cls._elements(root, "summary"):
             values = {
-                "actionDate": cls._first_text(element, "actionDate"),
-                "actionDesc": cls._first_text(element, "actionDesc"),
+                "action_date": cls._first_text(element, "actionDate"),
+                "action_desc": cls._first_text(element, "actionDesc"),
                 "text": cls._first_text(element, "text"),
-                "updateDate": cls._first_text(element, "updateDate"),
-                "versionCode": cls._first_text(element, "versionCode"),
+                "update_date": cls._first_text(element, "updateDate"),
+                "version_code": cls._first_text(element, "versionCode"),
             }
             if any(values.values()):
                 summaries.append(values)
@@ -495,9 +498,9 @@ class GovInfoBillStatusParser:
             if cls._first_text(element, "name")
         ]
         policy_area = cls._first_text(root, "policyArea")
-        result: dict[str, Any] = {"legislativeSubjects": subjects}
+        result: dict[str, Any] = {"legislative_subjects": subjects}
         if policy_area:
-            result["policyArea"] = {"name": policy_area}
+            result["policy_area"] = {"name": policy_area}
         return result
 
     @classmethod
@@ -677,12 +680,14 @@ class GovInfoBillSummaryParser:
         for summary in item:
             if self._local_name(summary.tag) != "summary":
                 continue
-            values: dict[str, Any] = dict(summary.attrib)
-            values["actionDate"] = self._child_text(summary, "action-date")
-            values["actionDesc"] = self._child_text(summary, "action-desc")
-            values["updateDate"] = summary.attrib.get("update-date", "")
-            values["chamber"] = summary.attrib.get("currentChamber", "")
-            values["text"] = self._child_text(summary, "summary-text")
+            values: dict[str, Any] = {
+                "version_code": summary.attrib.get("summary-id", ""),
+                "action_date": self._child_text(summary, "action-date"),
+                "action_desc": self._child_text(summary, "action-desc"),
+                "update_date": summary.attrib.get("update-date", ""),
+                "current_chamber": summary.attrib.get("currentChamber", ""),
+                "text": self._child_text(summary, "summary-text"),
+            }
             summaries.append({key: value for key, value in values.items() if value})
         return {
             "id": f"bill:{package.congress}:{package.measure_type.lower()}:{int(match['number'])}",

@@ -2,6 +2,22 @@
 
 ## 2026-09-15
 
+### Changed
+
+- Bill backfill switched from the rate-limited Congress.gov API to GovInfo
+  bulk data (unmetered): the GovInfo BILLSTATUS/BILLSUM parsers now emit
+  snake_case fields matching the API hydration path and the legislation
+  mapping (`introduced_date`, `latest_action.action_date`,
+  `sponsors[].bioguide_id/full_name`, `policy_area`, `subjects
+  .legislative_subjects`, committee `system_code`, summary
+  `action_date/action_desc/version_code`), so bulk records merge cleanly onto
+  the same documents. `queue_govinfo_bulk.py` no longer requires
+  `--staging-version` — omitting it merges into the live alias. Queued
+  BILLSTATUS+BILLSUM+BILLS for congresses 116–119 (~211k packages) and
+  cancelled the four API hydration backfill jobs they supersede. Removed the
+  completed one-time `scripts/migrate_jsonl_to_sqlite.py` and stale `data/`
+  checkpoint directories.
+
 ### Fixed
 
 - Pipeline audit follow-ups: hydrated bill items carried a

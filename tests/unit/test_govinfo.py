@@ -403,14 +403,17 @@ def test_billstatus_parser_normalizes_namespaced_xml_and_provenance():
 
     assert record["id"] == "bill:118:hr:1"
     assert record["title"] == "An official title"
-    assert record["introducedDate"] == "2023-01-03"
+    assert record["introduced_date"] == "2023-01-03"
     assert record["actions"][-1]["text"] == "Referred"
-    assert record["latestAction"]["actionDate"] == "2023-02-01"
-    assert record["sponsors"] == [{"fullName": "Alex Example", "bioguideId": "E000001"}]
-    assert record["cosponsors"][0]["bioguideId"] == "E000002"
-    assert record["committees"][0]["systemCode"] == "HSXX"
+    assert record["latest_action"]["action_date"] == "2023-02-01"
+    assert record["sponsors"] == [
+        {"full_name": "Alex Example", "bioguide_id": "E000001"}
+    ]
+    assert record["cosponsors"][0]["bioguide_id"] == "E000002"
+    assert record["committees"][0]["system_code"] == "HSXX"
     assert record["summaries"][0]["text"] == "<p>Bill summary</p>"
-    assert record["subjects"]["policyArea"]["name"] == "Science"
+    assert record["subjects"]["policy_area"]["name"] == "Science"
+    assert record["policy_area"] == {"name": "Science"}
     assert record["text_versions"][0]["formats"][0]["type"] == "XML"
     assert record["laws"] == [{"number": "118-1", "type": "Public Law"}]
     assert record["source_metadata"]["source"] == "govinfo:billstatus"
@@ -492,4 +495,6 @@ def test_billsum_parser_extracts_real_summary_schema():
     assert record["id"] == "bill:118:hr:1"
     assert record["title"] == "Example Act"
     assert record["summaries"][0]["text"] == "<p>Summary.</p>"
+    assert record["summaries"][0]["action_date"] == "2023-01-01"
+    assert record["summaries"][0]["current_chamber"] == "HOUSE"
     assert record["source_metadata"]["source"] == "govinfo:billsum"
