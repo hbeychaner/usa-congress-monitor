@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any
+from typing import Any, cast
 
 from redis import Redis
 from redis.exceptions import ResponseError
@@ -34,11 +34,16 @@ class RedisRecordStream:
         }
         if ingest_metadata is not None:
             fields["ingest_metadata"] = json.dumps(ingest_metadata, default=str)
-        entry_id = self.client.xadd(
-            self.stream,
-            fields,
-            maxlen=self.maxlen,
-            approximate=True,
+        # redis-py types sync returns as ResponseT (includes Awaitable); the
+        # sync client always returns concrete values.
+        entry_id = cast(
+            "bytes | str",
+            self.client.xadd(
+                self.stream,
+                cast(Any, fields),
+                maxlen=self.maxlen,
+                approximate=True,
+            ),
         )
         return entry_id.decode() if isinstance(entry_id, bytes) else entry_id
 
@@ -62,23 +67,29 @@ class RedisRecordStream:
             raise ValueError("count must be positive")
         consumer = consumer or f"consumer-{os.getpid()}"
         self.ensure_group(group)
-        pending = self.client.xautoclaim(
-            self.stream,
-            group,
-            consumer,
-            min_idle_time=min_idle_ms,
-            start_id="0-0",
-            count=count,
+        pending = cast(
+            "tuple[Any, list[tuple[Any, dict[Any, Any]]], Any]",
+            self.client.xautoclaim(
+                self.stream,
+                group,
+                consumer,
+                min_idle_time=min_idle_ms,
+                start_id="0-0",
+                count=count,
+            ),
         )
         records = self._decode_entries(pending[1])
         if len(records) >= count:
             return records[:count]
-        fresh = self.client.xreadgroup(
-            group,
-            consumer,
-            {self.stream: ">"},
-            count=count - len(records),
-            block=block_ms,
+        fresh = cast(
+            "list[tuple[Any, list[tuple[Any, dict[Any, Any]]]]]",
+            self.client.xreadgroup(
+                group,
+                consumer,
+                {self.stream: ">"},
+                count=count - len(records),
+                block=block_ms,
+            ),
         )
         for _, entries in fresh:
             records.extend(self._decode_entries(entries))
@@ -87,7 +98,7 @@ class RedisRecordStream:
     def acknowledge(self, group: str, entry_ids: list[str]) -> int:
         if not entry_ids:
             return 0
-        return int(self.client.xack(self.stream, group, *entry_ids))
+        return int(cast(Any, self.client.xack(self.stream, group, *entry_ids)))
 
     @staticmethod
     def _decode_entries(
