@@ -82,7 +82,7 @@ case "${1:-}" in
 
         mkdir -p "$agent_dir" "$log_dir"
         install_agent com.congress-tracker.ingest-recovery \
-            '-A cdm.workers.celery_app:celery_app worker --hostname=ingest-launchd@%h --pool=prefork --concurrency=2 --max-tasks-per-child=10 --loglevel=INFO --queues=congress-ingest' \
+            '-A cdm.workers.celery_app:celery_app worker --hostname=ingest-launchd@%h --pool=prefork --concurrency=6 --max-tasks-per-child=10 --loglevel=INFO --queues=congress-ingest' \
             worker-ingest-launchd.log
         install_agent com.congress-tracker.index \
             '-A cdm.workers.celery_app:celery_app worker --hostname=index-launchd@%h --pool=prefork --concurrency=4 --max-tasks-per-child=1 --loglevel=INFO --queues=congress-index' \
