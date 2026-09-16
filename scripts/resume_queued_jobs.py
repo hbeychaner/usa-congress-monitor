@@ -20,18 +20,23 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cdm.jobs.store import JobKind, JobStore
 from cdm.workers.celery_app import celery_app
-from settings import CELERY_INDEX_QUEUE, CELERY_INGEST_QUEUE, JOB_DB_PATH
+from settings import (
+    CELERY_BULK_QUEUE,
+    CELERY_INDEX_QUEUE,
+    CELERY_INGEST_QUEUE,
+    JOB_DB_PATH,
+)
 
 _TASK_AND_QUEUE = {
     JobKind.INGEST.value: ("cdm.workers.tasks.run_ingest_job", CELERY_INGEST_QUEUE),
     JobKind.INDEX.value: ("cdm.workers.tasks.run_index_job", CELERY_INDEX_QUEUE),
     JobKind.GOVINFO_BULK.value: (
         "cdm.workers.tasks.run_govinfo_bulk_job",
-        CELERY_INGEST_QUEUE,
+        CELERY_BULK_QUEUE,
     ),
     JobKind.GOVINFO_BULK_BATCH.value: (
         "cdm.workers.tasks.run_govinfo_bulk_batch",
-        CELERY_INGEST_QUEUE,
+        CELERY_BULK_QUEUE,
     ),
 }
 

@@ -129,7 +129,7 @@ def test_recovery_requeues_stale_queued_govinfo_package(monkeypatch):
         (
             "cdm.workers.tasks.run_govinfo_bulk_job",
             [job["id"]],
-            tasks.CELERY_INGEST_QUEUE,
+            tasks.CELERY_BULK_QUEUE,
         )
     ]
 
@@ -263,7 +263,7 @@ def test_govinfo_batch_fans_out_package_jobs(monkeypatch):
         (
             "cdm.workers.tasks.run_govinfo_bulk_job",
             [package_id],
-            tasks.CELERY_INGEST_QUEUE,
+            tasks.CELERY_BULK_QUEUE,
         )
         for package_id in package_ids
     ]

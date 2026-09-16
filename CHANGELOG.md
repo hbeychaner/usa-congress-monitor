@@ -4,6 +4,13 @@
 
 ### Changed
 
+- GovInfo bulk backfill traffic (batch fan-out and package jobs) moved to a
+  dedicated `congress-bulk` Celery queue; the ingest worker now consumes
+  `congress-ingest,congress-bulk` round-robin. Previously ~83k backfill
+  messages shared one FIFO queue with operational tasks, so the daily sweep,
+  coverage-gap, retention, and `recover_failed_ingest_jobs` messages sat
+  behind the entire backlog — beat kept sending recovery tasks that were
+  never consumed, leaving crashed ingest jobs stuck in "running".
 - Admin page now shows real backfill progress: a GovInfo bulk backfill card
   with a progress bar, package counts, trailing-hour throughput, and an
   estimated completion time, plus progress bars for the overall ingest window

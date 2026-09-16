@@ -36,6 +36,10 @@ REDIS_STREAM_MAXLEN = int(os.getenv("REDIS_STREAM_MAXLEN", "1000000"))
 REDIS_CONSUMER_GROUP = os.getenv("REDIS_CONSUMER_GROUP", "congress-indexers")
 CELERY_TASK_QUEUE = os.getenv("CELERY_TASK_QUEUE", "congress-sync")
 CELERY_INGEST_QUEUE = os.getenv("CELERY_INGEST_QUEUE", "congress-ingest")
+# Bulk-backfill fan-out gets its own queue so hundreds of thousands of
+# package messages can never starve operational traffic (daily sweep,
+# recovery, retention) that shares the ingest worker.
+CELERY_BULK_QUEUE = os.getenv("CELERY_BULK_QUEUE", "congress-bulk")
 CELERY_INDEX_QUEUE = os.getenv("CELERY_INDEX_QUEUE", "congress-index")
 CELERY_RETRY_MAX = int(os.getenv("CELERY_RETRY_MAX", "8"))
 CELERY_RETRY_MAX_TRANSIENT = int(os.getenv("CELERY_RETRY_MAX_TRANSIENT", "24"))

@@ -37,6 +37,7 @@ from cdm.store.redis_indexing import RedisIndexingRunner
 from cdm.utils.rate_limiter import TokenBucket
 from cdm.workers.celery_app import celery_app
 from settings import (
+    CELERY_BULK_QUEUE,
     CELERY_INDEX_QUEUE,
     CELERY_INGEST_QUEUE,
     CELERY_RETRY_BACKOFF_MAX,
@@ -124,13 +125,13 @@ def submit_job(
             celery_app.send_task(
                 "cdm.workers.tasks.run_govinfo_bulk_job",
                 args=[job_id],
-                queue=CELERY_INGEST_QUEUE,
+                queue=CELERY_BULK_QUEUE,
             )
         elif kind == JobKind.GOVINFO_BULK_BATCH:
             celery_app.send_task(
                 "cdm.workers.tasks.run_govinfo_bulk_batch",
                 args=[job_id],
-                queue=CELERY_INGEST_QUEUE,
+                queue=CELERY_BULK_QUEUE,
             )
         elif kind == JobKind.RECONCILE:
             celery_app.send_task(
@@ -411,7 +412,7 @@ def run_govinfo_bulk_batch(self, batch_id: str) -> dict:
         celery_app.send_task(
             "cdm.workers.tasks.run_govinfo_bulk_job",
             args=[package_job_id],
-            queue=CELERY_INGEST_QUEUE,
+            queue=CELERY_BULK_QUEUE,
         )
         dispatched.append(package_job_id)
     store.mark_succeeded(batch_id)
@@ -718,16 +719,12 @@ def recover_failed_ingest_jobs() -> dict:
                 task_name = "cdm.workers.tasks.run_govinfo_bulk_batch"
             else:
                 task_name = "cdm.workers.tasks.run_govinfo_bulk_job"
-            queue = (
-                CELERY_INGEST_QUEUE
-                if job["kind"]
-                in {
-                    JobKind.INGEST,
-                    JobKind.GOVINFO_BULK,
-                    JobKind.GOVINFO_BULK_BATCH,
-                }
-                else CELERY_INDEX_QUEUE
-            )
+            if job["kind"] == JobKind.INGEST:
+                queue = CELERY_INGEST_QUEUE
+            elif job["kind"] in {JobKind.GOVINFO_BULK, JobKind.GOVINFO_BULK_BATCH}:
+                queue = CELERY_BULK_QUEUE
+            else:
+                queue = CELERY_INDEX_QUEUE
             celery_app.send_task(
                 task_name,
                 args=[requeued["id"]],
