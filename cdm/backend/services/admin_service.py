@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import requests
@@ -20,6 +20,7 @@ from sqlalchemy.engine import Connection
 
 from cdm.contracts.api import (
     AdminIngestSnapshot,
+    BackfillProgress,
     GovInfoCoverage,
     IndexStatus,
     IngestProgressJob,
@@ -47,6 +48,7 @@ _JOBS_TABLE = Table(
     Column("status", String),
     Column("payload", String),
     Column("created_at", String),
+    Column("updated_at", String),
 )
 _RECORDS_TABLE = Table(
     "records",
@@ -76,8 +78,6 @@ class _ActiveJob:
     from_date: str | None
     to_date: str | None
     fetch_items: bool
-    package_ids: tuple[str, ...] = ()
-    counts_toward_aggregate: bool = True
 
 
 def _connect_jobs():
@@ -94,9 +94,9 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
                 _JOBS_TABLE.c.status,
                 _JOBS_TABLE.c.payload,
             )
-            .where(
-                _JOBS_TABLE.c.kind.in_(("ingest", "govinfo_bulk", "govinfo_bulk_batch"))
-            )
+            # GovInfo bulk packages/batches are aggregated separately; listing
+            # each of the ~211k queued packages here made this endpoint unusable.
+            .where(_JOBS_TABLE.c.kind == "ingest")
             .where(_JOBS_TABLE.c.status.in_(("queued", "running", "retrying")))
             .order_by(_JOBS_TABLE.c.created_at)
         )
@@ -107,38 +107,6 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
     jobs: list[_ActiveJob] = []
     for row in rows:
         payload = json.loads(row["payload"])
-        if row["kind"] == "govinfo_bulk_batch":
-            jobs.append(
-                _ActiveJob(
-                    job_id=str(row["id"]),
-                    status=str(row["status"]),
-                    resource="GovInfo batch",
-                    congress=None,
-                    outdir=Path("."),
-                    from_date=None,
-                    to_date=None,
-                    fetch_items=True,
-                    package_ids=tuple(payload.get("job_ids", ())),
-                )
-            )
-            continue
-        if row["kind"] == "govinfo_bulk":
-            package_id = str(payload.get("package_id") or row["id"])
-            jobs.append(
-                _ActiveJob(
-                    job_id=str(row["id"]),
-                    status=str(row["status"]),
-                    resource=f"GovInfo package {package_id}",
-                    congress=None,
-                    outdir=Path(str(payload.get("outdir", "."))),
-                    from_date=None,
-                    to_date=None,
-                    fetch_items=True,
-                    package_ids=(str(row["id"]),),
-                    counts_toward_aggregate=False,
-                )
-            )
-            continue
         resources = payload.get("resources") or []
         if not resources:
             continue
@@ -227,8 +195,6 @@ def _fetch_bill_total(
 
 
 def _latest_progress_at(conn: Connection, job: _ActiveJob) -> str | None:
-    if job.package_ids:
-        return None
     return conn.execute(
         select(func.max(_INGEST_WINDOWS_TABLE.c.last_progress_at)).where(
             (_INGEST_WINDOWS_TABLE.c.job_id == job.job_id)
@@ -254,11 +220,60 @@ def _job_activity(status: str, last_progress_at: str | None) -> str:
     return "continuing" if age <= _PROGRESS_STALE_AFTER_SECONDS else "stalled"
 
 
+def _backfill_progress(conn: Connection) -> BackfillProgress | None:
+    rows = conn.execute(
+        select(_JOBS_TABLE.c.status, func.count())
+        .where(_JOBS_TABLE.c.kind == "govinfo_bulk")
+        .group_by(_JOBS_TABLE.c.status)
+    ).all()
+    counts = {str(status): int(count) for status, count in rows}
+    total = sum(counts.values())
+    if total == 0:
+        return None
+    succeeded = counts.get("succeeded", 0)
+    pending = sum(counts.get(s, 0) for s in ("queued", "running", "retrying"))
+    failed = counts.get("failed", 0) + counts.get("cancelled", 0)
+
+    now = datetime.now(UTC)
+    hour_ago = (now - timedelta(hours=1)).isoformat()
+    rate = int(
+        conn.execute(
+            select(func.count())
+            .where(_JOBS_TABLE.c.kind == "govinfo_bulk")
+            .where(_JOBS_TABLE.c.status == "succeeded")
+            .where(_JOBS_TABLE.c.updated_at >= hour_ago)
+        ).scalar_one()
+        or 0
+    )
+    batches_pending = int(
+        conn.execute(
+            select(func.count())
+            .where(_JOBS_TABLE.c.kind == "govinfo_bulk_batch")
+            .where(_JOBS_TABLE.c.status.in_(("queued", "running", "retrying")))
+        ).scalar_one()
+        or 0
+    )
+    eta: str | None = None
+    if pending and rate > 0:
+        eta = (now + timedelta(hours=pending / rate)).isoformat()
+    return BackfillProgress(
+        total=total,
+        succeeded=succeeded,
+        pending=pending,
+        failed=failed,
+        percent=round(succeeded / total * 100, 1),
+        rate_per_hour=rate,
+        eta=eta,
+        batches_pending=batches_pending,
+    )
+
+
 def get_ingest_progress() -> IngestProgressResponse:
     api_total_cache: dict[tuple[str | None, str | None], int | None] = {}
 
     with _connect_jobs() as conn:
         active_jobs = _load_active_ingest_jobs(conn)
+        backfill = _backfill_progress(conn)
 
     jobs: list[IngestProgressJob] = []
     total_hydrated = 0
@@ -279,38 +294,23 @@ def get_ingest_progress() -> IngestProgressResponse:
             latest_progress_at is None or job_progress_at > latest_progress_at
         ):
             latest_progress_at = job_progress_at
-        if job.package_ids:
-            status_query = (
-                select(_JOBS_TABLE.c.status, func.count())
-                .where(_JOBS_TABLE.c.id.in_(job.package_ids))
-                .group_by(_JOBS_TABLE.c.status)
-            )
-            with _JOBS_ENGINE.connect() as batch_conn:
-                status_rows = batch_conn.execute(status_query).all()
-            package_counts = {str(status): int(count) for status, count in status_rows}
-            hydrated = package_counts.get("succeeded", 0)
-            discovered = hydrated + package_counts.get("running", 0)
-            target = len(job.package_ids)
-            api_total = None
-        else:
-            hydrated = (
-                _hydrated_count(job) if job.fetch_items else _cached_list_count(job)
-            )
-            discovered = _cached_list_count(job)
-            api_total = _fetch_bill_total(job, api_total_cache)
+        hydrated = (
+            _hydrated_count(job) if job.fetch_items else _cached_list_count(job)
+        )
+        discovered = _cached_list_count(job)
+        api_total = _fetch_bill_total(job, api_total_cache)
 
-            if api_total and api_total > 0:
-                target = max(hydrated, discovered, api_total)
-            else:
-                target = max(hydrated, discovered)
+        if api_total and api_total > 0:
+            target = max(hydrated, discovered, api_total)
+        else:
+            target = max(hydrated, discovered)
 
         discovered = min(target, discovered)
         remaining = max(0, target - hydrated)
 
-        if job.counts_toward_aggregate:
-            total_hydrated += hydrated
-            total_discovered += discovered
-            total_target += target
+        total_hydrated += hydrated
+        total_discovered += discovered
+        total_target += target
 
         jobs.append(
             IngestProgressJob(
@@ -347,6 +347,7 @@ def get_ingest_progress() -> IngestProgressResponse:
         ),
         last_progress_at=latest_progress_at,
         jobs=jobs,
+        backfill=backfill,
     )
 
 

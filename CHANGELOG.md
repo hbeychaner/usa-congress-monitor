@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-16
+
+### Changed
+
+- Admin page now shows real backfill progress: a GovInfo bulk backfill card
+  with a progress bar, package counts, trailing-hour throughput, and an
+  estimated completion time, plus progress bars for the overall ingest window
+  and each active job. The progress endpoint no longer enumerates every
+  queued GovInfo package as an "active job" (211k rows with a COUNT query
+  per batch every 10 seconds — it hammered the jobs SQLite the workers write
+  to); the backfill is aggregated in two GROUP BY queries instead.
+- Launchd ingest worker concurrency raised from 2 to 6: the two long-running
+  daily API-ingest tasks were pinning both slots, starving the queued GovInfo
+  bulk package tasks.
+
 ## 2026-09-15
 
 ### Changed

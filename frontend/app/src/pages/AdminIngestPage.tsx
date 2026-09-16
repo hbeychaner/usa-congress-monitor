@@ -1,4 +1,4 @@
-import { Badge, Callout, Card, Flex, Grid, Heading, Select, Table, Text } from '@radix-ui/themes';
+import { Badge, Callout, Card, Flex, Grid, Heading, Progress, Select, Table, Text } from '@radix-ui/themes';
 import { useEffect, useMemo, useState } from 'react';
 
 import { fetchIngestProgress, fetchSystemStatus, type IngestProgressResponse, type SystemStatusResponse } from '../api/admin';
@@ -8,6 +8,24 @@ function formatDate(date: string | null): string {
         return 'n/a';
     }
     return date;
+}
+
+function formatEta(eta: string | null): string {
+    if (!eta) {
+        return 'unknown';
+    }
+    const target = new Date(eta);
+    const hoursLeft = (target.getTime() - Date.now()) / 3_600_000;
+    const clock = target.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    if (hoursLeft <= 0) {
+        return clock;
+    }
+    const remaining = hoursLeft >= 48
+        ? `${Math.round(hoursLeft / 24)} days`
+        : hoursLeft >= 1
+            ? `${Math.round(hoursLeft)} h`
+            : `${Math.max(1, Math.round(hoursLeft * 60))} min`;
+    return `${clock} (~${remaining} left)`;
 }
 
 export function AdminIngestPage() {
@@ -135,8 +153,51 @@ export function AdminIngestPage() {
                                 <Flex direction="column"><Text size="1" color="gray">Target</Text><Heading size="5">{data.target.toLocaleString()}</Heading></Flex>
                                 <Flex direction="column"><Text size="1" color="gray">Remaining</Text><Heading size="5">{data.remaining.toLocaleString()}</Heading></Flex>
                             </Grid>
+                            {data.target > 0 ? (
+                                <Flex direction="column" gap="1">
+                                    <Progress value={Math.min(100, (data.hydrated / data.target) * 100)} size="3" />
+                                    <Text size="1" color="gray">{((data.hydrated / data.target) * 100).toFixed(1)}% of the daily API ingest window hydrated</Text>
+                                </Flex>
+                            ) : null}
                         </Flex>
                     </Card>
+
+                    {data.backfill ? (
+                        <Card size="3">
+                            <Flex direction="column" gap="4">
+                                <Flex align="center" gap="3" wrap="wrap">
+                                    <Heading size="4">GovInfo bulk backfill</Heading>
+                                    <Badge color={data.backfill.pending === 0 ? 'green' : data.backfill.rate_per_hour > 0 ? 'blue' : 'amber'} variant="soft">
+                                        {data.backfill.pending === 0
+                                            ? 'Complete'
+                                            : data.backfill.rate_per_hour > 0
+                                                ? `${data.backfill.rate_per_hour.toLocaleString()} packages/hour`
+                                                : data.backfill.batches_pending > 0
+                                                    ? 'Dispatching batches'
+                                                    : 'No packages completed in the last hour'}
+                                    </Badge>
+                                </Flex>
+                                <Grid columns={{ initial: '2', sm: '5' }} gap="4">
+                                    <Flex direction="column"><Text size="1" color="gray">Packages</Text><Heading size="5">{data.backfill.total.toLocaleString()}</Heading></Flex>
+                                    <Flex direction="column"><Text size="1" color="gray">Completed</Text><Heading size="5">{data.backfill.succeeded.toLocaleString()}</Heading></Flex>
+                                    <Flex direction="column"><Text size="1" color="gray">Pending</Text><Heading size="5">{data.backfill.pending.toLocaleString()}</Heading></Flex>
+                                    <Flex direction="column"><Text size="1" color="gray">Failed</Text><Heading size="5">{data.backfill.failed.toLocaleString()}</Heading></Flex>
+                                    <Flex direction="column"><Text size="1" color="gray">Batches waiting</Text><Heading size="5">{data.backfill.batches_pending.toLocaleString()}</Heading></Flex>
+                                </Grid>
+                                <Flex direction="column" gap="1">
+                                    <Progress value={data.backfill.percent} size="3" />
+                                    <Flex justify="between" wrap="wrap" gap="2">
+                                        <Text size="1" color="gray">{data.backfill.percent.toFixed(1)}% complete</Text>
+                                        <Text size="1" color="gray">
+                                            {data.backfill.pending === 0
+                                                ? 'Backfill finished'
+                                                : `Estimated completion: ${formatEta(data.backfill.eta)}`}
+                                        </Text>
+                                    </Flex>
+                                </Flex>
+                            </Flex>
+                        </Card>
+                    ) : null}
 
                     <Card size="3">
                         <Flex justify="between" align="center" wrap="wrap" gap="3" mb="2">
@@ -171,6 +232,7 @@ export function AdminIngestPage() {
                                         <Table.ColumnHeaderCell>Observed</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Target</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Remaining</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Progress</Table.ColumnHeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
@@ -184,6 +246,12 @@ export function AdminIngestPage() {
                                             <Table.Cell>{job.discovered.toLocaleString()}</Table.Cell>
                                             <Table.Cell>{job.target.toLocaleString()}</Table.Cell>
                                             <Table.Cell>{job.remaining.toLocaleString()}</Table.Cell>
+                                            <Table.Cell style={{ minWidth: 120 }}>
+                                                <Flex direction="column" gap="1">
+                                                    <Progress value={job.target > 0 ? Math.min(100, (job.hydrated / job.target) * 100) : 0} size="2" />
+                                                    <Text size="1" color="gray">{job.target > 0 ? `${((job.hydrated / job.target) * 100).toFixed(0)}%` : 'n/a'}</Text>
+                                                </Flex>
+                                            </Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>

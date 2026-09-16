@@ -218,6 +218,22 @@ class IngestProgressJob(BaseModel):
     remaining: int
 
 
+class BackfillProgress(BaseModel):
+    total: int
+    succeeded: int
+    pending: int
+    failed: int
+    percent: float = Field(description="Completion percentage, 0-100.")
+    rate_per_hour: int = Field(
+        description="Packages completed in the trailing hour."
+    )
+    eta: str | None = Field(
+        default=None,
+        description="Estimated completion timestamp (UTC) from the trailing-hour rate.",
+    )
+    batches_pending: int = 0
+
+
 class IngestProgressResponse(BaseModel):
     hydrated: int
     discovered: int
@@ -229,6 +245,7 @@ class IngestProgressResponse(BaseModel):
         default=None, description="Most recent durable ingest progress heartbeat."
     )
     jobs: list[IngestProgressJob]
+    backfill: BackfillProgress | None = None
 
 
 class JobStatusCounts(BaseModel):

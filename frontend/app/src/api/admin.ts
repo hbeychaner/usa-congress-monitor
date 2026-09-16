@@ -14,6 +14,17 @@ export type IngestProgressJob = {
     remaining: number;
 };
 
+export type BackfillProgress = {
+    total: number;
+    succeeded: number;
+    pending: number;
+    failed: number;
+    percent: number;
+    rate_per_hour: number;
+    eta: string | null;
+    batches_pending: number;
+};
+
 export type IngestProgressResponse = {
     hydrated: number;
     discovered: number;
@@ -23,6 +34,7 @@ export type IngestProgressResponse = {
     activity: 'continuing' | 'stalled' | 'waiting' | 'queued' | 'idle';
     last_progress_at: string | null;
     jobs: IngestProgressJob[];
+    backfill: BackfillProgress | null;
 };
 
 export type JobStatusCounts = {
