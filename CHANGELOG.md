@@ -4,6 +4,12 @@
 
 ### Changed
 
+- Fixed ~10-15s of overhead on every Celery task: each task constructed a
+  fresh `JobStore`, whose init re-registered ingest windows for every ingest
+  job row under an exclusive cross-process file lock — six workers serialized
+  behind it, so even a no-op task took ~12s. The store is now cached per
+  worker process and the init reconciliation is set-based (only repairs
+  jobs with missing window rows plus one bulk status sync).
 - GovInfo bulk backfill traffic (batch fan-out and package jobs) moved to a
   dedicated `congress-bulk` Celery queue; the ingest worker now consumes
   `congress-ingest,congress-bulk` round-robin. Previously ~83k backfill

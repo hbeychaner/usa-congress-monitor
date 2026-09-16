@@ -140,29 +140,47 @@ class JobStore:
             fcntl.flock(init_lock.fileno(), fcntl.LOCK_EX)
             _METADATA.create_all(self.engine)
             with self._transaction_lock(), self.engine.begin() as connection:
-                rows = connection.execute(
+                # Repair path for legacy rows: register windows only for
+                # ingest jobs that have none, instead of re-registering all.
+                missing = connection.execute(
                     select(
                         _JOBS.c.id,
                         _JOBS.c.payload,
                         _JOBS.c.status,
                         _JOBS.c.created_at,
-                    ).where(_JOBS.c.kind == JobKind.INGEST.value)
-                )
-                for row in rows:
-                    job_id = str(row.id)
+                    )
+                    .where(_JOBS.c.kind == JobKind.INGEST.value)
+                    .where(
+                        ~_JOBS.c.id.in_(
+                            select(_INGEST_WINDOWS.c.job_id).distinct()
+                        )
+                    )
+                ).all()
+                for row in missing:
                     self._register_ingest_windows(
                         connection,
-                        job_id,
+                        str(row.id),
                         json.loads(row.payload),
                         str(row.created_at),
                         str(row.status),
                     )
-                    connection.execute(
-                        update(_INGEST_WINDOWS)
-                        .where(_INGEST_WINDOWS.c.job_id == job_id)
-                        .where(_INGEST_WINDOWS.c.status != str(row.status))
-                        .values(status=str(row.status))
+                job_status = (
+                    select(_JOBS.c.status)
+                    .where(_JOBS.c.id == _INGEST_WINDOWS.c.job_id)
+                    .scalar_subquery()
+                )
+                connection.execute(
+                    update(_INGEST_WINDOWS)
+                    .where(
+                        _INGEST_WINDOWS.c.job_id.in_(
+                            select(_JOBS.c.id).where(
+                                _JOBS.c.kind == JobKind.INGEST.value
+                            )
+                        )
                     )
+                    .where(_INGEST_WINDOWS.c.status != job_status)
+                    .values(status=job_status)
+                )
             fcntl.flock(init_lock.fileno(), fcntl.LOCK_UN)
 
     @contextmanager

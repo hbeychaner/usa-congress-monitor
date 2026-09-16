@@ -7,6 +7,7 @@ import json
 import shutil
 import time
 from datetime import UTC, datetime, timedelta
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, NoReturn
 
@@ -53,6 +54,10 @@ from settings import (
 )
 
 
+# One store per (forked) worker process: JobStore.__init__ reconciles the
+# ingest_windows table under an exclusive cross-process lock, so per-task
+# construction serializes every worker behind that lock.
+@lru_cache(maxsize=1)
 def _store() -> JobStore:
     return JobStore(JOB_DB_PATH)
 
