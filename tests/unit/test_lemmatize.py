@@ -5,10 +5,11 @@ from cdm.utils.lemmatize import lemmatize_texts, try_lemmatize_query
 
 
 class _FakeToken:
-    def __init__(self, lemma, is_punct=False, is_space=False):
+    def __init__(self, lemma, is_punct=False, is_space=False, is_stop=False):
         self.lemma_ = lemma
         self.is_punct = is_punct
         self.is_space = is_space
+        self.is_stop = is_stop
 
 
 class _FakeNlp:

@@ -18,6 +18,8 @@ dependencies = [
     "spacy>=3.8,<4",
     "en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl",
     "sqlalchemy>=2.0,<3",
+    "bertopic>=0.17",
+    "sentence-transformers>=3",
 ]
 
 [project.optional-dependencies]

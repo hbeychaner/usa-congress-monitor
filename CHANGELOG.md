@@ -2,6 +2,19 @@
 
 ## 2026-09-16
 
+### Added
+
+- Discovery-phase BERTopic topic modeling: `cdm/utils/topic_modeler.py` wraps
+  batch BERTopic (all-mpnet-base-v2 embeddings, bigram vectorizer with
+  legislative-boilerplate stopwords) over bill titles + latest summaries, with
+  `topics_over_time` for temporal trends and `transform` for assigning new
+  documents. `scripts/train_topic_model.py` trains on the legislation index,
+  saves versioned models under `models/topics/`, and writes topics,
+  per-document assignments, and topics-over-time rows to the
+  `congress-analysis-topics` index. Batch + periodic refit was chosen over
+  online `partial_fit` (fixed cluster count, no outlier handling) because the
+  corpus is bounded with a small daily trickle.
+
 ### Changed
 
 - Fixed ~10-15s of overhead on every Celery task: each task constructed a

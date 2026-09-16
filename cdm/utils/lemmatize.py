@@ -49,7 +49,8 @@ def lemmatize_texts(texts: Sequence[str]) -> list[str]:
             " ".join(
                 token.lemma_.lower()
                 for token in doc
-                if token.lemma_ and not (token.is_punct or token.is_space)
+                if token.lemma_
+                and not (token.is_punct or token.is_space or token.is_stop)
             )
         )
     return results
