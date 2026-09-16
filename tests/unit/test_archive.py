@@ -1,6 +1,18 @@
-import sqlite3
+from sqlalchemy import create_engine, func, select
+from sqlalchemy.sql import table
 
 from cdm.ingest.archive import SQLiteQuarantineArchive, SQLiteRecordArchive
+
+
+def _record_count(db_path) -> int:
+    engine = create_engine(f"sqlite:///{db_path}")
+    try:
+        with engine.connect() as connection:
+            return connection.execute(
+                select(func.count()).select_from(table("records"))
+            ).scalar_one()
+    finally:
+        engine.dispose()
 
 
 def test_archive_writes_compressed_deduplicated_records(tmp_path) -> None:
@@ -10,9 +22,7 @@ def test_archive_writes_compressed_deduplicated_records(tmp_path) -> None:
     archive.write("bill", {"id": "bill:2", "title": "Second"})
 
     archive.write("bill", {"id": "bill:1", "title": "First"})
-    with sqlite3.connect(tmp_path / "records.sqlite3") as connection:
-        count = connection.execute("SELECT COUNT(*) FROM records").fetchone()[0]
-    assert count == 2
+    assert _record_count(tmp_path / "records.sqlite3") == 2
     assert archive.ids("bill") == {"bill:1", "bill:2"}
     assert archive.records("bill") == [
         {"id": "bill:1", "title": "First"},
