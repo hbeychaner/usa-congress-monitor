@@ -4,6 +4,14 @@
 
 ### Added
 
+- GovInfo bulk downloads are now rate limited (`GOVINFO_RATE_LIMIT_PER_HOUR`,
+  default 1,200 per worker process via a token bucket) after the unthrottled
+  backfill drew connection-level throttling from govinfo.gov (SSL EOF, DNS
+  resolution failures, 429s) and failed 4,061 package jobs.
+- `scripts/relemmatize_indices.py` recomputes stale `*_lemma` fields in place
+  for every index that declares lemma siblings, needed after the lemmatizer
+  started dropping stop words.
+
 - Discovery-phase BERTopic topic modeling: `cdm/utils/topic_modeler.py` wraps
   batch BERTopic (all-mpnet-base-v2 embeddings, bigram vectorizer with
   legislative-boilerplate stopwords) over bill titles + latest summaries, with
@@ -17,6 +25,15 @@
 
 ### Changed
 
+- Transient-error detection for worker jobs now unwraps
+  `GovInfoDownloadError.__cause__` (requests SSL/connection/timeout errors were
+  previously classified permanent), and the failed-job recovery sweep
+  recognizes throttling signatures (`max retries exceeded`, `failed to
+  resolve`, `sslerror`, `disk i/o error`) as retryable — the 4,061 failed
+  backfill jobs requeue automatically.
+- Topic modeling now runs on lemma fields: `build_topic_documents` prefers
+  `title_lemma`/summary `text_lemma` for the c-TF-IDF vectorizer while keeping
+  raw text for sentence embeddings (embedders degrade on lemmatized input).
 - Fixed ~10-15s of overhead on every Celery task: each task constructed a
   fresh `JobStore`, whose init re-registered ingest windows for every ingest
   job row under an exclusive cross-process file lock — six workers serialized

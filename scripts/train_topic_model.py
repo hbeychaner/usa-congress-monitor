@@ -68,7 +68,13 @@ def fetch_documents(client, max_docs: int | None):
         index=read_alias("bill"),
         query={
             "query": {"term": {"source_type": "bill"}},
-            "_source": ["title", "summaries", "introduced_date", "latest_action"],
+            "_source": [
+                "title",
+                "title_lemma",
+                "summaries",
+                "introduced_date",
+                "latest_action",
+            ],
         },
     )
     collected = []

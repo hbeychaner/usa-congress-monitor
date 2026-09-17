@@ -36,6 +36,9 @@ REDIS_STREAM_MAXLEN = int(os.getenv("REDIS_STREAM_MAXLEN", "1000000"))
 REDIS_CONSUMER_GROUP = os.getenv("REDIS_CONSUMER_GROUP", "congress-indexers")
 CELERY_TASK_QUEUE = os.getenv("CELERY_TASK_QUEUE", "congress-sync")
 CELERY_INGEST_QUEUE = os.getenv("CELERY_INGEST_QUEUE", "congress-ingest")
+# Per-worker-process GovInfo bulkdata download pacing; unpaced parallel
+# downloads get connection-level throttling (SSL EOF, DNS refusals).
+GOVINFO_RATE_LIMIT_PER_HOUR = int(os.getenv("GOVINFO_RATE_LIMIT_PER_HOUR", "1200"))
 # Bulk-backfill fan-out gets its own queue so hundreds of thousands of
 # package messages can never starve operational traffic (daily sweep,
 # recovery, retention) that shares the ingest worker.

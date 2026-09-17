@@ -22,6 +22,7 @@ from cdm.ingest.govinfo import (
     GovInfoBillStatusParser,
     GovInfoBillSummaryParser,
     GovInfoDownloader,
+    GovInfoDownloadError,
     GovInfoManifestStore,
     GovInfoPackage,
 )
@@ -46,6 +47,7 @@ from settings import (
     CELERY_RETRY_MAX_TRANSIENT,
     ES_LOCAL_API_KEY,
     ES_LOCAL_URL,
+    GOVINFO_RATE_LIMIT_PER_HOUR,
     JOB_DB_PATH,
     REDIS_CONSUMER_GROUP,
     REDIS_STREAM_MAXLEN,
@@ -71,6 +73,7 @@ def _redis() -> Redis:
 
 
 _GOVINFO_SESSION: requests.Session | None = None
+_GOVINFO_RATE_LIMITER: TokenBucket | None = None
 
 
 def _govinfo_session() -> requests.Session:
@@ -78,6 +81,13 @@ def _govinfo_session() -> requests.Session:
     if _GOVINFO_SESSION is None:
         _GOVINFO_SESSION = requests.Session()
     return _GOVINFO_SESSION
+
+
+def _govinfo_rate_limiter() -> TokenBucket:
+    global _GOVINFO_RATE_LIMITER
+    if _GOVINFO_RATE_LIMITER is None:
+        _GOVINFO_RATE_LIMITER = TokenBucket(rate_per_hour=GOVINFO_RATE_LIMIT_PER_HOUR)
+    return _GOVINFO_RATE_LIMITER
 
 
 def _job_id(kind: str, payload: dict[str, Any]) -> str:
@@ -148,12 +158,18 @@ def submit_job(
 
 
 def _is_transient(exc: Exception) -> bool:
+    # Download failures wrap the network cause; classify by the cause.
+    if isinstance(exc, GovInfoDownloadError) and isinstance(
+        exc.__cause__, Exception
+    ):
+        return _is_transient(exc.__cause__)
     if isinstance(exc, requests.HTTPError):
         response = exc.response
         return response is not None and (
             response.status_code == 429 or response.status_code >= 500
         )
-    if "database is locked" in str(exc).lower():
+    message = str(exc).lower()
+    if "database is locked" in message or "disk i/o error" in message:
         return True
     return isinstance(exc, (requests.ConnectionError, requests.Timeout))
 
@@ -173,7 +189,12 @@ def _is_retryable_error(error: str | None) -> bool:
             "connection aborted",
             "connection closed by server",
             "database is locked",
+            "disk i/o error",
             "timed out",
+            # Connection-level throttling by govinfo.gov surfaces as these.
+            "max retries exceeded",
+            "failed to resolve",
+            "sslerror",
             # Resume dedupe banks progress across attempts, so a task that
             # ran out of time budget is worth retrying from its archive.
             "softtimelimitexceeded",
@@ -336,6 +357,7 @@ def _process_govinfo_bulk_job(job_id: str) -> dict:
         manifest_store=manifest,
         session=_govinfo_session(),
     )
+    _govinfo_rate_limiter().acquire()
     artifact = downloader.download(package)
     if package.collection == "BILLSTATUS":
         record = GovInfoBillStatusParser().parse(artifact.read_bytes(), package)

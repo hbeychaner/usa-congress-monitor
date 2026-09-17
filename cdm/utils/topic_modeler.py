@@ -55,11 +55,22 @@ BOILERPLATE_STOPWORDS = [
 
 @dataclass(frozen=True)
 class TopicDocument:
-    """One unit of text to model, tied back to a canonical document."""
+    """One unit of text to model, tied back to a canonical document.
+
+    ``text`` feeds the vectorizer (topic words) and should be lemmatized when
+    available; ``embed_text`` feeds the sentence embedder and should stay
+    natural language (embedders degrade on lemmatized text). When
+    ``embed_text`` is empty, ``text`` is embedded instead.
+    """
 
     doc_id: str
     text: str
     timestamp: datetime | None = None
+    embed_text: str = ""
+
+    @property
+    def embedding_input(self) -> str:
+        return self.embed_text or self.text
 
 
 @dataclass(frozen=True)
@@ -82,39 +93,56 @@ def _parse_date(value: Any) -> datetime | None:
         return None
 
 
-def _latest_summary_text(source: dict[str, Any]) -> str:
+def _latest_summary_text(source: dict[str, Any]) -> tuple[str, str]:
+    """Return (raw, lemma) text of the summary with the latest action date."""
     summaries = source.get("summaries") or []
     dated = []
     for summary in summaries:
         text = _clean(str(summary.get("text") or ""))
         if text:
-            dated.append((str(summary.get("action_date") or ""), text))
+            lemma = _clean(str(summary.get("text_lemma") or ""))
+            dated.append((str(summary.get("action_date") or ""), text, lemma))
     if not dated:
-        return ""
-    return max(dated, key=lambda pair: pair[0])[1]
+        return "", ""
+    _, text, lemma = max(dated, key=lambda entry: entry[0])
+    return text, lemma
+
+
+def _join(first: str, second: str) -> str:
+    return f"{first}. {second}" if first and second else (first or second)
 
 
 def build_topic_documents(hits: list[dict[str, Any]]) -> list[TopicDocument]:
     """Build model inputs (title + latest summary) from OpenSearch hits.
 
-    Hits without any usable text are dropped. The timestamp prefers
-    ``introduced_date`` and falls back to ``latest_action.action_date`` so
-    topics-over-time bins reflect when the measure entered Congress.
+    ``text`` prefers the ``*_lemma`` sibling fields (falling back to raw text
+    per field) so topic words come from lemmas, while ``embed_text`` keeps the
+    raw text for the embedder. Hits without any usable text are dropped. The
+    timestamp prefers ``introduced_date`` and falls back to
+    ``latest_action.action_date`` so topics-over-time bins reflect when the
+    measure entered Congress.
     """
     documents = []
     for hit in hits:
         source = hit.get("_source") or {}
         title = _clean(str(source.get("title") or ""))
-        summary = _latest_summary_text(source)
-        text = f"{title}. {summary}" if title and summary else (title or summary)
-        if not text:
+        title_lemma = _clean(str(source.get("title_lemma") or ""))
+        summary, summary_lemma = _latest_summary_text(source)
+        raw_text = _join(title, summary)
+        lemma_text = _join(title_lemma or title, summary_lemma or summary)
+        if not lemma_text:
             continue
         latest_action = source.get("latest_action") or {}
         timestamp = _parse_date(source.get("introduced_date")) or _parse_date(
             latest_action.get("action_date")
         )
         documents.append(
-            TopicDocument(doc_id=str(hit.get("_id")), text=text, timestamp=timestamp)
+            TopicDocument(
+                doc_id=str(hit.get("_id")),
+                text=lemma_text,
+                timestamp=timestamp,
+                embed_text=raw_text,
+            )
         )
     return documents
 
@@ -133,13 +161,16 @@ class TopicModeler:
         self.min_topic_size = min_topic_size
         self.nr_topics = nr_topics
         self._model: Any = None
+        self._embedding_model: Any = None
         self._documents: list[TopicDocument] = []
         self._topics: list[int] = []
 
     def _embedder(self) -> Any:
-        from sentence_transformers import SentenceTransformer
+        if self._embedding_model is None:
+            from sentence_transformers import SentenceTransformer
 
-        return SentenceTransformer(self.embedding_model_name)
+            self._embedding_model = SentenceTransformer(self.embedding_model_name)
+        return self._embedding_model
 
     def fit(self, documents: list[TopicDocument]) -> list[TopicAssignment]:
         """Train on the full corpus and return per-document assignments."""
@@ -153,8 +184,9 @@ class TopicModeler:
             raise ValueError("no documents to fit")
         self._documents = documents
         stop_words = list(ENGLISH_STOP_WORDS.union(BOILERPLATE_STOPWORDS))
+        embedder = self._embedder()
         self._model = BERTopic(
-            embedding_model=self._embedder(),
+            embedding_model=embedder,
             vectorizer_model=CountVectorizer(
                 stop_words=stop_words, ngram_range=(1, 2), min_df=5
             ),
@@ -163,8 +195,11 @@ class TopicModeler:
             calculate_probabilities=False,
             verbose=True,
         )
+        embeddings = embedder.encode(
+            [doc.embedding_input for doc in documents], show_progress_bar=True
+        )
         topics, probabilities = self._model.fit_transform(
-            [doc.text for doc in documents]
+            [doc.text for doc in documents], embeddings=embeddings
         )
         self._topics = [int(topic) for topic in topics]
         return _assignments(documents, topics, probabilities)
@@ -172,8 +207,11 @@ class TopicModeler:
     def transform(self, documents: list[TopicDocument]) -> list[TopicAssignment]:
         """Assign topics to new documents without refitting."""
         self._require_model()
+        embeddings = self._embedder().encode(
+            [doc.embedding_input for doc in documents]
+        )
         topics, probabilities = self._model.transform(
-            [doc.text for doc in documents]
+            [doc.text for doc in documents], embeddings=embeddings
         )
         return _assignments(documents, topics, probabilities)
 
