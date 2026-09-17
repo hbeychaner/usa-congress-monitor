@@ -231,10 +231,12 @@ def get_member_profile(bioguide_id: str) -> MemberProfileResponse:
 
         matches = search_entities(normalized_id, "member", 1).results
         display_name = matches[0].title if matches else normalized_id
+    from cdm.backend.services.topic_service import get_member_topics
+
     return MemberProfileResponse(
         member=_member_detail({**source, "name": display_name}, normalized_id),
         recent_activity=_recent_activity(normalized_id),
-        topics=[],
+        topics=get_member_topics(normalized_id).topics[:10],
     )
 
 

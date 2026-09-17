@@ -1,8 +1,14 @@
 from fastapi import APIRouter, Query
 
 from cdm.backend.services.bill_service import get_bill, list_recent_bills
+from cdm.backend.services.topic_service import get_bill_topics
 from cdm.backend.services.vote_service import list_votes_for_bill
-from cdm.contracts.api import BillDetailResponse, BillsResponse, BillVotesResponse
+from cdm.contracts.api import (
+    BillDetailResponse,
+    BillsResponse,
+    BillTopicsResponse,
+    BillVotesResponse,
+)
 
 router = APIRouter(prefix="/bills", tags=["bills"])
 
@@ -27,3 +33,8 @@ def bill_detail(bill_id: str) -> BillDetailResponse:
 @router.get("/{bill_id}/votes", response_model=BillVotesResponse)
 def bill_votes(bill_id: str) -> BillVotesResponse:
     return list_votes_for_bill(bill_id)
+
+
+@router.get("/{bill_id}/topics", response_model=BillTopicsResponse)
+def bill_topics(bill_id: str) -> BillTopicsResponse:
+    return get_bill_topics(bill_id)

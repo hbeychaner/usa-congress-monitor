@@ -1,56 +1,58 @@
-import { Card, Flex, Grid, Heading, Progress, Text } from '@radix-ui/themes';
+import { Badge, Card, Flex, Grid, Heading, Text } from '@radix-ui/themes';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const SAMPLE_TOPICS = [
-  {
-    label: 'Energy Transition',
-    memberCount: 72,
-    avgConfidence: 0.78,
-  },
-  {
-    label: 'Infrastructure',
-    memberCount: 65,
-    avgConfidence: 0.71,
-  },
-  {
-    label: 'Healthcare Access',
-    memberCount: 59,
-    avgConfidence: 0.67,
-  },
-];
+import { fetchTopics } from '../api/topics';
+import type { TopicsResponse } from '../api/topics';
 
 export function TopicsPage() {
+  const [data, setData] = useState<TopicsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchTopics()
+      .then(setData)
+      .catch((err) => setError((err as Error).message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const topics = data?.topics ?? [];
+
   return (
     <Flex direction="column" gap="5">
       <Flex direction="column" gap="2">
         <Heading size="8">Topics</Heading>
         <Text color="gray">
-          Topic profiles are scaffolded for now and will be populated from backend NLP pipelines as ingest completes.
+          Topics discovered from bill titles and summaries by the BERTopic pipeline.
+          {data?.trained_at ? ` Last trained ${new Date(data.trained_at).toLocaleString()}.` : ''}
         </Text>
       </Flex>
 
+      {loading && <Text as="p">Loading topics…</Text>}
+      {error && <Text as="p" color="red">Failed to load topics: {error}</Text>}
+      {!loading && !error && topics.length === 0 && (
+        <Card size="3">
+          <Text as="p" color="gray">
+            No trained topic model yet. Run <code>scripts/train_topic_model.py</code> to populate topics.
+          </Text>
+        </Card>
+      )}
+
       <Grid columns={{ initial: '1', sm: '2', md: '3' }} gap="4">
-        {SAMPLE_TOPICS.map((topic) => (
-          <Card key={topic.label} size="3">
-            <Heading size="4" mb="1">
-              <Link to={`/topics/${topic.label.toLowerCase().replace(/\s+/g, '-')}`}>{topic.label}</Link>
+        {topics.map((topic) => (
+          <Card key={topic.topic_id} size="3">
+            <Heading size="4" mb="1" style={{ textTransform: 'capitalize' }}>
+              <Link to={`/topics/${topic.topic_id}`}>{topic.label}</Link>
             </Heading>
-            <Text as="p" color="gray">Members tagged: {topic.memberCount}</Text>
-            <Text as="p" color="gray" mb="2">Average confidence: {Math.round(topic.avgConfidence * 100)}%</Text>
-            <Progress value={Math.round(topic.avgConfidence * 100)} />
+            <Text as="p" color="gray" mb="2">{topic.size} bills</Text>
+            <Flex gap="1" wrap="wrap">
+              {topic.top_words.slice(0, 6).map((word) => (
+                <Badge key={word} variant="soft">{word}</Badge>
+              ))}
+            </Flex>
           </Card>
         ))}
       </Grid>
-
-      <Card size="3">
-        <Heading size="4" mb="1">Planned Backend Contract</Heading>
-        <Text as="p">
-          The final UI will consume <strong>GET /api/v1/members/{'{id}'}/topics</strong> plus aggregate topic endpoints.
-        </Text>
-        <Text as="p">
-          For now, explore an archived <Link to="/members/H001092">member profile</Link>.
-        </Text>
-      </Card>
     </Flex>
   );
 }

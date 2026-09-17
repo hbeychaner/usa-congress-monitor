@@ -88,6 +88,65 @@ class TopicItem(BaseModel):
     weight: float
 
 
+class TopicSummary(BaseModel):
+    topic_id: int
+    name: str
+    label: str
+    size: int
+    top_words: list[str] = Field(default_factory=list)
+
+
+class TopicsResponse(BaseModel):
+    topics: list[TopicSummary]
+    model_version: str | None = None
+    trained_at: str | None = None
+
+
+class TopicTrendPoint(BaseModel):
+    timestamp: str
+    frequency: int
+    words: str | None = None
+
+
+class TopicBill(BaseModel):
+    bill_id: str
+    title: str | None = None
+    probability: float
+
+
+class TopicDetailResponse(BaseModel):
+    topic: TopicSummary
+    model_version: str | None = None
+    trend: list[TopicTrendPoint] = Field(default_factory=list)
+    top_bills: list[TopicBill] = Field(default_factory=list)
+
+
+class TopicAssignmentItem(BaseModel):
+    topic_id: int
+    label: str
+    probability: float
+
+
+class BillTopicsResponse(BaseModel):
+    bill_id: str
+    topics: list[TopicAssignmentItem] = Field(default_factory=list)
+    model_version: str | None = None
+
+
+class MemberTopicTrendPoint(BaseModel):
+    period: str
+    topic_id: int
+    label: str
+    count: int
+
+
+class MemberTopicsResponse(BaseModel):
+    bioguide_id: str
+    topics: list[TopicItem] = Field(default_factory=list)
+    trend: list[MemberTopicTrendPoint] = Field(default_factory=list)
+    model_version: str | None = None
+
+
 class MemberProfileResponse(BaseModel):
     member: MemberDetail
     recent_activity: list[ActivityItem]

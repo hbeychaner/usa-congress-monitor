@@ -5,10 +5,12 @@ from cdm.backend.services.member_service import (
     list_member_activity,
     list_members,
 )
+from cdm.backend.services.topic_service import get_member_topics
 from cdm.contracts.api import (
     MemberActivityResponse,
     MemberProfileResponse,
     MembersResponse,
+    MemberTopicsResponse,
 )
 
 router = APIRouter(prefix="/members", tags=["members"])
@@ -42,3 +44,8 @@ def get_member_activity(
     limit: int = Query(default=25, ge=5, le=100),
 ) -> MemberActivityResponse:
     return list_member_activity(bioguide_id, types, page, limit)
+
+
+@router.get("/{bioguide_id}/topics", response_model=MemberTopicsResponse)
+def member_topics(bioguide_id: str) -> MemberTopicsResponse:
+    return get_member_topics(bioguide_id)

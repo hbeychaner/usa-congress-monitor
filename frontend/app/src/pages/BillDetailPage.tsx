@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { fetchBill, fetchBillVotes, type BillDetailResponse, type BillVotesResponse } from '../api/bills';
+import { fetchBillTopics, type BillTopicsResponse } from '../api/topics';
 
 type RecordValue = Record<string, unknown>;
 
@@ -29,6 +30,7 @@ export function BillDetailPage() {
     const [response, setResponse] = useState<BillDetailResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [votesResponse, setVotesResponse] = useState<BillVotesResponse | null>(null);
+    const [topicsResponse, setTopicsResponse] = useState<BillTopicsResponse | null>(null);
     const [showAllActions, setShowAllActions] = useState(false);
 
     useEffect(() => {
@@ -41,6 +43,11 @@ export function BillDetailPage() {
     useEffect(() => {
         setVotesResponse(null);
         fetchBillVotes(billId).then(setVotesResponse).catch(() => setVotesResponse(null));
+    }, [billId]);
+
+    useEffect(() => {
+        setTopicsResponse(null);
+        fetchBillTopics(billId).then(setTopicsResponse).catch(() => setTopicsResponse(null));
     }, [billId]);
 
     if (error) {
@@ -76,6 +83,15 @@ export function BillDetailPage() {
                     <Text size="1" color="gray">{bill.bill_type ?? 'Bill'} {bill.number ?? ''} · Congress {bill.congress ?? 'Unknown'}</Text>
                     <Heading size="7">{bill.title}</Heading>
                     <Text color="gray">{bill.origin_chamber ?? 'Chamber not recorded'} · Introduced {formatDate(bill.introduced_date)}</Text>
+                    {topicsResponse && topicsResponse.topics.length > 0 ? (
+                        <Flex gap="1" wrap="wrap" mt="1">
+                            {topicsResponse.topics.map((topic) => (
+                                <Badge key={topic.topic_id} variant="soft" title={`Confidence ${Math.round(topic.probability * 100)}%`} style={{ textTransform: 'capitalize' }} asChild>
+                                    <Link to={`/topics/${topic.topic_id}`}>{topic.label}</Link>
+                                </Badge>
+                            ))}
+                        </Flex>
+                    ) : null}
                 </Flex>
                 <Button asChild>
                     <a href={`https://www.congress.gov/bill/${bill.congress}/${(bill.bill_type ?? '').toLowerCase()}/${bill.number}`} target="_blank" rel="noreferrer">View on Congress.gov</a>

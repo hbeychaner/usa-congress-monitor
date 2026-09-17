@@ -7,6 +7,7 @@ import {
   type MemberActivityResponse,
   type MemberProfileResponse,
 } from '../api/members';
+import { fetchMemberTopics, type MemberTopicsResponse } from '../api/topics';
 
 const PARTY_COLORS: Record<string, 'blue' | 'red' | 'gray'> = {
   Democratic: 'blue',
@@ -34,6 +35,14 @@ export function MemberProfilePage() {
   const [activityLoading, setActivityLoading] = useState(true);
   const [activityType, setActivityType] = useState('all');
   const [activityPage, setActivityPage] = useState(1);
+  const [memberTopics, setMemberTopics] = useState<MemberTopicsResponse | null>(null);
+
+  useEffect(() => {
+    setMemberTopics(null);
+    fetchMemberTopics(bioguideId)
+      .then(setMemberTopics)
+      .catch(() => setMemberTopics(null));
+  }, [bioguideId]);
 
   useEffect(() => {
     setActivityLoading(true);
@@ -184,6 +193,52 @@ export function MemberProfilePage() {
             <Badge key={activityType} variant="soft">{activityType}: {count}</Badge>
           ))}
         </Flex>
+      </Card>
+
+      <Card size="3">
+        <Heading size="4" mb="2">Legislative Topics</Heading>
+        {profile.topics.length > 0 ? (
+          <Flex direction="column" gap="3">
+            <Flex direction="column" gap="2">
+              {profile.topics.map((topic) => (
+                <Flex key={topic.label} align="center" gap="2">
+                  <Text size="2" style={{ width: 220, textTransform: 'capitalize' }}>{topic.label}</Text>
+                  <div style={{ flex: 1 }}>
+                    <Progress value={Math.round(topic.weight * 100)} />
+                  </div>
+                  <Text size="1" color="gray" style={{ width: 40, textAlign: 'right' }}>
+                    {Math.round(topic.weight * 100)}%
+                  </Text>
+                </Flex>
+              ))}
+            </Flex>
+            {memberTopics && memberTopics.trend.length > 0 ? (
+              <Flex direction="column" gap="1">
+                <Heading size="3" mt="2">Topics Over Time</Heading>
+                {Object.entries(
+                  memberTopics.trend.reduce<Record<string, typeof memberTopics.trend>>((acc, point) => {
+                    (acc[point.period] ??= []).push(point);
+                    return acc;
+                  }, {}),
+                ).map(([period, points]) => (
+                  <Flex key={period} align="center" gap="2" wrap="wrap">
+                    <Text size="1" weight="bold" style={{ width: 70 }}>{period}</Text>
+                    {points
+                      .sort((a, b) => b.count - a.count)
+                      .slice(0, 6)
+                      .map((point) => (
+                        <Badge key={`${period}:${point.topic_id}`} variant="soft" style={{ textTransform: 'capitalize' }} asChild>
+                          <Link to={`/topics/${point.topic_id}`}>{point.label} × {point.count}</Link>
+                        </Badge>
+                      ))}
+                  </Flex>
+                ))}
+              </Flex>
+            ) : null}
+          </Flex>
+        ) : (
+          <Text as="p" color="gray">No topic assignments yet — topics appear after the topic model is trained.</Text>
+        )}
       </Card>
 
       <Card size="3">

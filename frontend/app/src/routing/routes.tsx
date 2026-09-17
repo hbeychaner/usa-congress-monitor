@@ -24,7 +24,7 @@ export function AppRoutes() {
       <Route path="/bills" element={<BillsPage />} />
       <Route path="/bills/:billId" element={<BillDetailPage />} />
       <Route path="/topics" element={<TopicsPage />} />
-      <Route path="/topics/:topicLabel" element={<TopicDetailPage />} />
+      <Route path="/topics/:topicId" element={<TopicDetailPage />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

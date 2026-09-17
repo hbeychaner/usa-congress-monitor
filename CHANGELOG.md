@@ -11,6 +11,15 @@
 - `scripts/relemmatize_indices.py` recomputes stale `*_lemma` fields in place
   for every index that declares lemma siblings, needed after the lemmatizer
   started dropping stop words.
+- Topic API surface: `GET /api/v1/topics` and `/topics/{topic_id}` (topic list,
+  time trend, representative bills), `GET /api/v1/bills/{bill_id}/topics`
+  (per-bill topic labels), and `GET /api/v1/members/{bioguide_id}/topics`
+  (topic share + per-quarter trend over the member's sponsored/cosponsored
+  bills), all served from the latest model version in
+  `congress-analysis-topics`. `MemberProfileResponse.topics` is now populated.
+  Frontend: TopicsPage and TopicDetailPage render live model output, bill pages
+  show topic badges, and member profiles show a Legislative Topics card with a
+  topics-over-time breakdown.
 
 - Discovery-phase BERTopic topic modeling: `cdm/utils/topic_modeler.py` wraps
   batch BERTopic (all-mpnet-base-v2 embeddings, bigram vectorizer with
