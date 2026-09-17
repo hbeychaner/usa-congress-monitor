@@ -4,6 +4,18 @@
 
 ### Added
 
+- CRS subject tracking as a human-annotated complement to modeled topics:
+  `GET /api/v1/subjects` aggregates legislative subjects and policy areas,
+  `/bills/recent` accepts a `subject` filter, and member topic responses now
+  include per-member subject/policy-area shares. Frontend: Topics page lists
+  CRS subjects with counts, bill pages link subject badges to filtered bill
+  lists, bills page gained a subject filter (URL-drivable via `?subject=`),
+  and member profiles show a CRS Subjects breakdown.
+- Fixed the govinfo BILLSTATUS parser never extracting legislative subjects:
+  it looked for `<legislativeSubject>` elements, but the real feed nests them
+  as `<legislativeSubjects><item><name>` — every hydrated bill had
+  `legislative_subjects: []`. Already-processed packages need a manifest-forced
+  re-parse to backfill subjects.
 - GovInfo bulk downloads are now rate limited (`GOVINFO_RATE_LIMIT_PER_HOUR`,
   default 1,200 per worker process via a token bucket) after the unthrottled
   backfill drew connection-level throttling from govinfo.gov (SSL EOF, DNS

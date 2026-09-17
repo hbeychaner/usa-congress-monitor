@@ -21,8 +21,9 @@ def recent_bills(
     congress: int | None = Query(default=None, ge=1, le=200),
     bill_type: str | None = Query(default=None, max_length=20),
     chamber: str | None = Query(default=None, pattern="^(House|Senate)$"),
+    subject: str | None = Query(default=None, max_length=200),
 ) -> BillsResponse:
-    return list_recent_bills(limit, page, query, congress, bill_type, chamber)
+    return list_recent_bills(limit, page, query, congress, bill_type, chamber, subject)
 
 
 @router.get("/{bill_id}", response_model=BillDetailResponse)

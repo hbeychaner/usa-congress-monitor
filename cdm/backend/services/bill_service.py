@@ -17,6 +17,7 @@ def list_recent_bills(
     congress: int | None = None,
     bill_type: str | None = None,
     chamber: str | None = None,
+    subject: str | None = None,
 ) -> BillsResponse:
     """Return the most recently updated bills from the legislation read alias."""
     client = get_opensearch_client()
@@ -27,6 +28,27 @@ def list_recent_bills(
         filters.append({"wildcard": {"id": f"bill:*:{bill_type.lower()}:*"}})
     if chamber:
         filters.append({"term": {"origin_chamber": chamber}})
+    if subject:
+        filters.append(
+            {
+                "bool": {
+                    "should": [
+                        {
+                            "nested": {
+                                "path": "subjects.legislative_subjects",
+                                "query": {
+                                    "term": {
+                                        "subjects.legislative_subjects.name": subject
+                                    }
+                                },
+                            }
+                        },
+                        {"term": {"policy_area.name": subject}},
+                    ],
+                    "minimum_should_match": 1,
+                }
+            }
+        )
     search_query: dict[str, Any] = {"bool": {"filter": filters}}
     if query and query.strip():
         text_should: list[dict[str, Any]] = [

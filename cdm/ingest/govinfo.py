@@ -492,11 +492,16 @@ class GovInfoBillStatusParser:
 
     @classmethod
     def _subjects(cls, root: ET.Element) -> dict[str, Any]:
-        subjects = [
-            {"name": cls._first_text(element, "name")}
-            for element in cls._elements(root, "legislativeSubject")
-            if cls._first_text(element, "name")
-        ]
+        # BILLSTATUS nests subjects as <legislativeSubjects><item><name>.
+        container = next(cls._elements(root, "legislativeSubjects"), None)
+        subjects = []
+        if container is not None:
+            for element in container:
+                if cls._local_name(element.tag) != "item":
+                    continue
+                name = cls._first_text(element, "name")
+                if name:
+                    subjects.append({"name": name})
         policy_area = cls._first_text(root, "policyArea")
         result: dict[str, Any] = {"legislative_subjects": subjects}
         if policy_area:

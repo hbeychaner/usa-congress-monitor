@@ -57,6 +57,8 @@ export type MemberTopicsResponse = {
   topics: { label: string; weight: number }[];
   trend: MemberTopicTrendPoint[];
   model_version: string | null;
+  subjects: { label: string; weight: number }[];
+  policy_areas: { label: string; weight: number }[];
 };
 
 export function fetchTopics(): Promise<TopicsResponse> {

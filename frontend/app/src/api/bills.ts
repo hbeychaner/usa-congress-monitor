@@ -24,6 +24,7 @@ export type BillFilters = {
   congress?: string;
   chamber?: string;
   billType?: string;
+  subject?: string;
 };
 
 export function fetchRecentBills(limit = 50, page = 1, filters: BillFilters = {}): Promise<BillsResponse> {
@@ -32,6 +33,7 @@ export function fetchRecentBills(limit = 50, page = 1, filters: BillFilters = {}
     if (filters.congress) params.set('congress', filters.congress);
     if (filters.chamber) params.set('chamber', filters.chamber);
     if (filters.billType) params.set('bill_type', filters.billType);
+    if (filters.subject) params.set('subject', filters.subject);
     return apiGet<BillsResponse>(`/api/v1/bills/recent?${params.toString()}`);
 }
 

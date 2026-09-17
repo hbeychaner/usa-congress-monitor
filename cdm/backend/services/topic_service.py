@@ -59,14 +59,12 @@ def _hits(response: dict[str, Any] | None) -> list[dict[str, Any]]:
 
 
 def _latest_model_version() -> tuple[str | None, str | None]:
-    response = _search(
-        {
-            "size": 1,
-            "query": {"term": {"kind": "topic"}},
-            "sort": [{"trained_at": {"order": "desc"}}],
-            "_source": ["model_version", "trained_at"],
-        }
-    )
+    response = _search({
+        "size": 1,
+        "query": {"term": {"kind": "topic"}},
+        "sort": [{"trained_at": {"order": "desc"}}],
+        "_source": ["model_version", "trained_at"],
+    })
     hits = _hits(response)
     if not hits:
         return None, None
@@ -75,19 +73,17 @@ def _latest_model_version() -> tuple[str | None, str | None]:
 
 
 def _topic_summaries(model_version: str) -> dict[int, TopicSummary]:
-    response = _search(
-        {
-            "size": 1000,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "topic"}},
-                        {"term": {"model_version": model_version}},
-                    ]
-                }
-            },
-        }
-    )
+    response = _search({
+        "size": 1000,
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"kind": "topic"}},
+                    {"term": {"model_version": model_version}},
+                ]
+            }
+        },
+    })
     summaries: dict[int, TopicSummary] = {}
     for hit in _hits(response):
         source = hit.get("_source", {})
@@ -127,21 +123,19 @@ def get_topic(topic_id: int, *, top_bills: int = 20) -> TopicDetailResponse | No
     if topic is None:
         return None
 
-    trend_response = _search(
-        {
-            "size": 500,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "topic_over_time"}},
-                        {"term": {"model_version": model_version}},
-                        {"term": {"topic_id": topic_id}},
-                    ]
-                }
-            },
-            "sort": [{"timestamp": {"order": "asc"}}],
-        }
-    )
+    trend_response = _search({
+        "size": 500,
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"kind": "topic_over_time"}},
+                    {"term": {"model_version": model_version}},
+                    {"term": {"topic_id": topic_id}},
+                ]
+            }
+        },
+        "sort": [{"timestamp": {"order": "asc"}}],
+    })
     trend = [
         TopicTrendPoint(
             timestamp=str(source.get("timestamp")),
@@ -152,22 +146,20 @@ def get_topic(topic_id: int, *, top_bills: int = 20) -> TopicDetailResponse | No
         if (source := hit.get("_source", {})).get("timestamp")
     ]
 
-    assignment_response = _search(
-        {
-            "size": top_bills,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "assignment"}},
-                        {"term": {"model_version": model_version}},
-                        {"term": {"topic_id": topic_id}},
-                    ]
-                }
-            },
-            "sort": [{"probability": {"order": "desc"}}],
-            "_source": ["doc_id", "probability"],
-        }
-    )
+    assignment_response = _search({
+        "size": top_bills,
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"kind": "assignment"}},
+                    {"term": {"model_version": model_version}},
+                    {"term": {"topic_id": topic_id}},
+                ]
+            }
+        },
+        "sort": [{"probability": {"order": "desc"}}],
+        "_source": ["doc_id", "probability"],
+    })
     assignments = [
         (str(source.get("doc_id")), float(source.get("probability") or 0.0))
         for hit in _hits(assignment_response)
@@ -207,21 +199,19 @@ def get_bill_topics(bill_id: str) -> BillTopicsResponse:
     model_version, _ = _latest_model_version()
     if not model_version:
         return BillTopicsResponse(bill_id=bill_id)
-    response = _search(
-        {
-            "size": 10,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "assignment"}},
-                        {"term": {"model_version": model_version}},
-                        {"term": {"doc_id": bill_id}},
-                    ]
-                }
-            },
-            "sort": [{"probability": {"order": "desc"}}],
-        }
-    )
+    response = _search({
+        "size": 10,
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"kind": "assignment"}},
+                    {"term": {"model_version": model_version}},
+                    {"term": {"doc_id": bill_id}},
+                ]
+            }
+        },
+        "sort": [{"probability": {"order": "desc"}}],
+    })
     summaries = _topic_summaries(model_version)
     topics = []
     for hit in _hits(response):
@@ -288,21 +278,19 @@ def _member_assignments(
     pairs: list[tuple[str, int]] = []
     for start in range(0, len(bill_ids), _TERMS_CHUNK):
         chunk = bill_ids[start : start + _TERMS_CHUNK]
-        response = _search(
-            {
-                "size": len(chunk),
-                "query": {
-                    "bool": {
-                        "filter": [
-                            {"term": {"kind": "assignment"}},
-                            {"term": {"model_version": model_version}},
-                            {"terms": {"doc_id": chunk}},
-                        ]
-                    }
-                },
-                "_source": ["doc_id", "topic_id"],
-            }
-        )
+        response = _search({
+            "size": len(chunk),
+            "query": {
+                "bool": {
+                    "filter": [
+                        {"term": {"kind": "assignment"}},
+                        {"term": {"model_version": model_version}},
+                        {"terms": {"doc_id": chunk}},
+                    ]
+                }
+            },
+            "_source": ["doc_id", "topic_id"],
+        })
         for hit in _hits(response):
             source = hit.get("_source", {})
             topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
@@ -319,18 +307,29 @@ def _quarter(date: str) -> str:
 
 def get_member_topics(bioguide_id: str) -> MemberTopicsResponse:
     """Topic totals and per-quarter trend for a member's sponsored bills."""
+    from cdm.backend.services.subject_service import member_subject_items
+
+    subjects, policy_areas = member_subject_items(bioguide_id)
     model_version, _ = _latest_model_version()
     if not model_version:
-        return MemberTopicsResponse(bioguide_id=bioguide_id)
+        return MemberTopicsResponse(
+            bioguide_id=bioguide_id, subjects=subjects, policy_areas=policy_areas
+        )
     bill_dates = _member_bill_dates(bioguide_id)
     if not bill_dates:
         return MemberTopicsResponse(
-            bioguide_id=bioguide_id, model_version=model_version
+            bioguide_id=bioguide_id,
+            model_version=model_version,
+            subjects=subjects,
+            policy_areas=policy_areas,
         )
     pairs = _member_assignments(list(bill_dates), model_version)
     if not pairs:
         return MemberTopicsResponse(
-            bioguide_id=bioguide_id, model_version=model_version
+            bioguide_id=bioguide_id,
+            model_version=model_version,
+            subjects=subjects,
+            policy_areas=policy_areas,
         )
     summaries = _topic_summaries(model_version)
 
@@ -371,4 +370,6 @@ def get_member_topics(bioguide_id: str) -> MemberTopicsResponse:
         topics=topics,
         trend=trend,
         model_version=model_version,
+        subjects=subjects,
+        policy_areas=policy_areas,
     )

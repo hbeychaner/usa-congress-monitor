@@ -145,6 +145,19 @@ class MemberTopicsResponse(BaseModel):
     topics: list[TopicItem] = Field(default_factory=list)
     trend: list[MemberTopicTrendPoint] = Field(default_factory=list)
     model_version: str | None = None
+    subjects: list[TopicItem] = Field(default_factory=list)
+    policy_areas: list[TopicItem] = Field(default_factory=list)
+
+
+class SubjectCount(BaseModel):
+    name: str
+    count: int
+
+
+class SubjectsResponse(BaseModel):
+    subjects: list[SubjectCount] = Field(default_factory=list)
+    policy_areas: list[SubjectCount] = Field(default_factory=list)
+    total_bills: int = 0
 
 
 class MemberProfileResponse(BaseModel):

@@ -197,8 +197,8 @@ export function MemberProfilePage() {
 
       <Card size="3">
         <Heading size="4" mb="2">Legislative Topics</Heading>
-        {profile.topics.length > 0 ? (
-          <Flex direction="column" gap="3">
+        <Flex direction="column" gap="3">
+          {profile.topics.length > 0 ? (
             <Flex direction="column" gap="2">
               {profile.topics.map((topic) => (
                 <Flex key={topic.label} align="center" gap="2">
@@ -212,6 +212,23 @@ export function MemberProfilePage() {
                 </Flex>
               ))}
             </Flex>
+          ) : (
+            <Text as="p" color="gray">No modeled topic assignments yet — topics appear after the topic model is trained.</Text>
+          )}
+          {memberTopics && memberTopics.subjects.length > 0 ? (
+              <Flex direction="column" gap="1">
+                <Heading size="3" mt="2">CRS Subjects</Heading>
+                <Flex gap="1" wrap="wrap">
+                  {memberTopics.subjects.map((subject) => (
+                    <Badge key={subject.label} variant="soft" asChild>
+                      <Link to={`/bills?subject=${encodeURIComponent(subject.label)}`}>
+                        {subject.label} · {Math.round(subject.weight * 100)}%
+                      </Link>
+                    </Badge>
+                  ))}
+                </Flex>
+              </Flex>
+            ) : null}
             {memberTopics && memberTopics.trend.length > 0 ? (
               <Flex direction="column" gap="1">
                 <Heading size="3" mt="2">Topics Over Time</Heading>
@@ -235,10 +252,7 @@ export function MemberProfilePage() {
                 ))}
               </Flex>
             ) : null}
-          </Flex>
-        ) : (
-          <Text as="p" color="gray">No topic assignments yet — topics appear after the topic model is trained.</Text>
-        )}
+        </Flex>
       </Card>
 
       <Card size="3">

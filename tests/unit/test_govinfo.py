@@ -388,7 +388,8 @@ def test_billstatus_parser_normalizes_namespaced_xml_and_provenance():
                 <summaries><summary><actionDate>2023-02-02</actionDate>
                     <actionDesc>Summary</actionDesc><text><![CDATA[<p>Bill summary</p>]]></text>
                     <versionCode>00</versionCode></summary></summaries>
-                <subjects><legislativeSubject><name>Testing</name></legislativeSubject>
+                <subjects><legislativeSubjects><item><name>Testing</name></item>
+                    <item><name>Science policy</name></item></legislativeSubjects>
                     <policyArea><name>Science</name></policyArea></subjects>
                 <textVersions><textVersion><type>Introduced</type><date>2023-01-03</date>
                     <packageId>BILLS-118HR1IH</packageId><formats><format><type>XML</type>
@@ -413,6 +414,10 @@ def test_billstatus_parser_normalizes_namespaced_xml_and_provenance():
     assert record["committees"][0]["system_code"] == "HSXX"
     assert record["summaries"][0]["text"] == "<p>Bill summary</p>"
     assert record["subjects"]["policy_area"]["name"] == "Science"
+    assert record["subjects"]["legislative_subjects"] == [
+        {"name": "Testing"},
+        {"name": "Science policy"},
+    ]
     assert record["policy_area"] == {"name": "Science"}
     assert record["text_versions"][0]["formats"][0]["type"] == "XML"
     assert record["laws"] == [{"number": "118-1", "type": "Public Law"}]

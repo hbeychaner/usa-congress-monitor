@@ -1,6 +1,6 @@
 import { Badge, Button, Card, Flex, Heading, Select, Table, Text, TextField } from '@radix-ui/themes';
 import { useEffect, useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { fetchRecentBills, type BillFilters, type BillSummary } from '../api/bills';
 
@@ -12,13 +12,22 @@ function label(bill: BillSummary): string {
 }
 
 export function BillsPage() {
+  const [searchParams] = useSearchParams();
+  const initialSubject = searchParams.get('subject') ?? undefined;
   const [bills, setBills] = useState<BillSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<BillFilters>({});
-  const [draft, setDraft] = useState<BillFilters>({});
+  const [filters, setFilters] = useState<BillFilters>({ subject: initialSubject });
+  const [draft, setDraft] = useState<BillFilters>({ subject: initialSubject });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const subject = searchParams.get('subject') ?? undefined;
+    setPage(1);
+    setFilters((current) => ({ ...current, subject }));
+    setDraft((current) => ({ ...current, subject }));
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,6 +107,14 @@ export function BillsPage() {
                   ))}
                 </Select.Content>
               </Select.Root>
+            </label>
+            <label>
+              <Text as="div" size="2" mb="1" weight="medium">Subject</Text>
+              <TextField.Root
+                value={draft.subject ?? ''}
+                onChange={(event) => setDraft({ ...draft, subject: event.target.value || undefined })}
+                placeholder="e.g. Health"
+              />
             </label>
             <Button type="submit">Apply filters</Button>
           </Flex>

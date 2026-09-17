@@ -142,14 +142,21 @@ export function BillDetailPage() {
                     </Card>
                     <Card size="3">
                         <Heading size="4" mb="2">Policy and subjects</Heading>
-                        {bill.policy_area ? <Badge mb="2">{bill.policy_area}</Badge> : <Text as="p" color="gray">Policy area not recorded.</Text>}
+                        {bill.policy_area ? (
+                            <Badge mb="2" asChild>
+                                <Link to={`/bills?subject=${encodeURIComponent(bill.policy_area)}`}>{bill.policy_area}</Link>
+                            </Badge>
+                        ) : <Text as="p" color="gray">Policy area not recorded.</Text>}
                         {subjects.length > 0 ? (
-                            <Flex direction="column" gap="1" mt="2">
-                                {subjects.map((subject, index) => (
-                                    <Text as="p" key={`${String(subject.name ?? subject.title ?? index)}`}>
-                                        {String(subject.name ?? subject.title ?? 'Unnamed subject')}
-                                    </Text>
-                                ))}
+                            <Flex gap="1" wrap="wrap" mt="2">
+                                {subjects.map((subject, index) => {
+                                    const name = String(subject.name ?? subject.title ?? 'Unnamed subject');
+                                    return (
+                                        <Badge variant="soft" key={`${name}-${index}`} asChild>
+                                            <Link to={`/bills?subject=${encodeURIComponent(name)}`}>{name}</Link>
+                                        </Badge>
+                                    );
+                                })}
                             </Flex>
                         ) : <Text as="p" color="gray">Legislative subjects are not expanded in this record.</Text>}
                     </Card>
