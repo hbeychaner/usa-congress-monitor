@@ -103,7 +103,8 @@ def process_index(
                 "_op_type": "update",
                 "_index": hit["_index"],
                 "_id": hit["_id"],
-                "doc": {root: source.get(root) for root in changed},
+                "retry_on_conflict": 3,
+                "doc": {key: source.get(key) for key in changed},
             }
         )
         if len(actions) >= batch_size:
