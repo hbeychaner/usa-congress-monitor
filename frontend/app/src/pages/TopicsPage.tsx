@@ -39,7 +39,7 @@ function TopTopicsChart({ topics }: { topics: TopicSummary[] }) {
     <Flex direction="column" gap="2">
       {top.map((topic) => (
         <Flex key={topic.topic_id} align="center" gap="3">
-          <Box style={{ width: 220, flexShrink: 0 }}>
+          <Box style={{ width: 220, flexShrink: 0, overflow: 'hidden' }}>
             <Text size="2" style={{ textTransform: 'capitalize' }} truncate>
               <Link to={`/topics/${topic.topic_id}`}>{topic.label}</Link>
             </Text>
@@ -70,7 +70,7 @@ function PolicyAreaChart({ areas }: { areas: SubjectsResponse['policy_areas'] })
     <Flex direction="column" gap="2">
       {areas.map((area) => (
         <Flex key={area.name} align="center" gap="3">
-          <Box style={{ width: 220, flexShrink: 0 }}>
+          <Box style={{ width: 220, flexShrink: 0, overflow: 'hidden' }}>
             <Text size="2" truncate>
               <Link to={`/bills?subject=${encodeURIComponent(area.name)}`}>{area.name}</Link>
             </Text>
