@@ -286,8 +286,12 @@ class GovInfoBillStatusParser:
             "related_bills": self._related_bills(bill),
             "summaries": self._summaries(bill),
             "subjects": self._subjects(bill),
+            "titles": self._titles(bill),
             "text_versions": self._text_versions(bill),
             "laws": self._laws(bill),
+            "amendments": self._amendments(bill),
+            "cbo_cost_estimates": self._cbo_cost_estimates(bill),
+            "committee_reports": self._committee_reports(bill),
             "source_metadata": source_metadata,
         }
         for xml_name, field_name in (
@@ -576,6 +580,81 @@ class GovInfoBillStatusParser:
             if values["number"] and values["type"]:
                 laws.append(values)
         return laws
+
+    @classmethod
+    def _titles(cls, root: ET.Element) -> list[dict[str, str]]:
+        """Alternate titles: <titles><item><titleType>/<title>/...</item>."""
+        container = next(cls._elements(root, "titles"), None)
+        titles = []
+        if container is None:
+            return titles
+        for element in container:
+            if cls._local_name(element.tag) != "item":
+                continue
+            values = {
+                "type": cls._first_text(element, "titleType"),
+                "title": cls._first_text(element, "title"),
+                "chamber": cls._first_text(element, "chamberName"),
+                "version_code": cls._first_text(element, "billTextVersionCode"),
+            }
+            if values["title"]:
+                titles.append({key: value for key, value in values.items() if value})
+        return titles
+
+    @classmethod
+    def _amendments(cls, root: ET.Element) -> list[dict[str, str]]:
+        """<amendments><amendment><number>/<congress>/<type>/<purpose>..."""
+        container = next(cls._elements(root, "amendments"), None)
+        amendments = []
+        if container is None:
+            return amendments
+        for element in container:
+            if cls._local_name(element.tag) != "amendment":
+                continue
+            values = {
+                "number": cls._first_text(element, "number"),
+                "congress": cls._first_text(element, "congress"),
+                "type": cls._first_text(element, "type"),
+                "purpose": cls._first_text(element, "purpose"),
+                "description": cls._first_text(element, "description"),
+            }
+            if values["number"] or values["purpose"]:
+                amendments.append(
+                    {key: value for key, value in values.items() if value}
+                )
+        return amendments
+
+    @classmethod
+    def _cbo_cost_estimates(cls, root: ET.Element) -> list[dict[str, str]]:
+        """<cboCostEstimates><item><pubDate>/<title>/<url>/<description>."""
+        container = next(cls._elements(root, "cboCostEstimates"), None)
+        estimates = []
+        if container is None:
+            return estimates
+        for element in container:
+            if cls._local_name(element.tag) != "item":
+                continue
+            values = {
+                "pub_date": cls._first_text(element, "pubDate"),
+                "title": cls._first_text(element, "title"),
+                "url": cls._first_text(element, "url"),
+                "description": cls._first_text(element, "description"),
+            }
+            if values["title"] or values["url"]:
+                estimates.append(
+                    {key: value for key, value in values.items() if value}
+                )
+        return estimates
+
+    @classmethod
+    def _committee_reports(cls, root: ET.Element) -> list[dict[str, str]]:
+        """<committeeReports><committeeReport><citation>."""
+        reports = []
+        for element in cls._elements(root, "committeeReport"):
+            citation = cls._first_text(element, "citation")
+            if citation:
+                reports.append({"citation": citation})
+        return reports
 
     @classmethod
     def _latest_action(cls, root: ET.Element) -> dict[str, str] | None:

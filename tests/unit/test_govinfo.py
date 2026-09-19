@@ -396,6 +396,18 @@ def test_billstatus_parser_normalizes_namespaced_xml_and_provenance():
                     <url>https://www.govinfo.gov/content/pkg/BILLS-118HR1IH/xml/BILLS-118HR1IH.xml</url>
                     </format></formats></textVersion></textVersions>
                 <laws><law><number>118-1</number><type>Public Law</type></law></laws>
+                <titles><item><titleType>Display Title</titleType>
+                    <title>Short name</title></item>
+                    <item><titleType>Official Title as Introduced</titleType>
+                    <title>An official title</title>
+                    <billTextVersionCode>IH</billTextVersionCode></item></titles>
+                <amendments><amendment><number>938</number><congress>118</congress>
+                    <type>SAMDT</type><purpose>To improve the bill.</purpose></amendment></amendments>
+                <cboCostEstimates><item><pubDate>2023-03-01T00:00:00Z</pubDate>
+                    <title>CBO estimate</title>
+                    <url>https://www.cbo.gov/publication/1</url></item></cboCostEstimates>
+                <committeeReports><committeeReport>
+                    <citation>H. Rept. 118-1</citation></committeeReport></committeeReports>
             </bill>
         </billStatus>
         """
@@ -421,6 +433,30 @@ def test_billstatus_parser_normalizes_namespaced_xml_and_provenance():
     assert record["policy_area"] == {"name": "Science"}
     assert record["text_versions"][0]["formats"][0]["type"] == "XML"
     assert record["laws"] == [{"number": "118-1", "type": "Public Law"}]
+    assert record["titles"] == [
+        {"type": "Display Title", "title": "Short name"},
+        {
+            "type": "Official Title as Introduced",
+            "title": "An official title",
+            "version_code": "IH",
+        },
+    ]
+    assert record["amendments"] == [
+        {
+            "number": "938",
+            "congress": "118",
+            "type": "SAMDT",
+            "purpose": "To improve the bill.",
+        }
+    ]
+    assert record["cbo_cost_estimates"] == [
+        {
+            "pub_date": "2023-03-01T00:00:00Z",
+            "title": "CBO estimate",
+            "url": "https://www.cbo.gov/publication/1",
+        }
+    ]
+    assert record["committee_reports"] == [{"citation": "H. Rept. 118-1"}]
     assert record["source_metadata"]["source"] == "govinfo:billstatus"
 
 
