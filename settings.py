@@ -17,6 +17,9 @@ if os.path.exists(elastic_env_path):
 # Set up environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 TIMEOUT_SECS = int(os.getenv("TIMEOUT_SECS", "30"))
+# Local Ollama server used to generate human-readable topic titles at train time.
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
 CONGRESS_API_KEY = os.getenv("CONGRESS_API_KEY", "")
 CONGRESS_API_URL = os.getenv("CONGRESS_API_URL", "")
 ELASTIC_API_URL = os.getenv("ELASTIC_API_URL", "")

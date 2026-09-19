@@ -1,9 +1,10 @@
-"""Train the discovery BERTopic model on legislation titles + summaries.
+"""Train the discovery BERTopic model on legislation titles + summaries + CRS subjects.
 
 Reads bills from the legislation index, fits a batch BERTopic model, saves it
-under --model-dir, and writes topics, per-document assignments, and
-topics-over-time rows to the congress-analysis-topics index (discriminated by
-``kind``). Discovery output only — not canonical topic labels.
+under --model-dir, generates human-readable topic titles with a local Ollama
+model (skipped with --no-llm-labels), and writes topics, per-document
+assignments, and topics-over-time rows to the congress-analysis-topics index
+(discriminated by ``kind``). Discovery output only — not canonical topic labels.
 
 Usage:
     uv run python scripts/train_topic_model.py --max-docs 5000 --dry-run
@@ -32,6 +33,7 @@ _ANALYSIS_MAPPINGS = {
         "trained_at": {"type": "date"},
         "topic_id": {"type": "integer"},
         "name": {"type": "keyword"},
+        "label": {"type": "keyword"},
         "size": {"type": "integer"},
         "top_words": {"type": "keyword"},
         "doc_id": {"type": "keyword"},
@@ -48,10 +50,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-docs", type=int, help="Cap corpus size (for test runs)")
     parser.add_argument("--min-topic-size", type=int, default=25)
     parser.add_argument("--nr-bins", type=int, default=60)
-    parser.add_argument(
-        "--embedding-model", default="all-mpnet-base-v2"
-    )
+    parser.add_argument("--embedding-model", default="all-mpnet-base-v2")
     parser.add_argument("--model-dir", default="models/topics")
+    parser.add_argument(
+        "--no-llm-labels",
+        action="store_true",
+        help="Skip Ollama topic-title generation (keyword labels only)",
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -74,6 +79,8 @@ def fetch_documents(client, max_docs: int | None):
                 "summaries",
                 "introduced_date",
                 "latest_action",
+                "policy_area",
+                "subjects.legislative_subjects",
             ],
         },
     )
@@ -145,9 +152,21 @@ def main() -> None:
     summaries = modeler.topic_summaries()
     over_time = modeler.topics_over_time(nr_bins=args.nr_bins)
 
+    if not args.no_llm_labels:
+        from cdm.utils.topic_labeler import label_topics
+
+        print("Generating topic titles with Ollama...")
+        labels = label_topics(summaries, modeler.representative_docs())
+        for topic in summaries:
+            label = labels.get(int(topic["topic_id"]))
+            if label:
+                topic["label"] = label
+        print(f"Labeled {len(labels)}/{len(summaries) - 1} topics")
+
     print(f"\nTopics found: {len(summaries) - 1} (excluding outliers)")
     for topic in summaries[:20]:
-        print(f"  {topic['topic_id']:>4}  {topic['size']:>6}  {topic['name']}")
+        display = topic.get("label") or topic["name"]
+        print(f"  {topic['topic_id']:>4}  {topic['size']:>6}  {display}")
 
     if args.dry_run:
         print("\nDry run: model not saved, results not indexed.")

@@ -80,8 +80,8 @@ export function fetchTopicTrends(size = 8): Promise<TopicTrendsResponse> {
   return apiGet<TopicTrendsResponse>(`/api/v1/topics/trends?size=${size}`);
 }
 
-export function fetchTopic(topicId: number): Promise<TopicDetailResponse> {
-  return apiGet<TopicDetailResponse>(`/api/v1/topics/${topicId}`);
+export function fetchTopic(topicId: number, bills = 20): Promise<TopicDetailResponse> {
+  return apiGet<TopicDetailResponse>(`/api/v1/topics/${topicId}?bills=${bills}`);
 }
 
 export function fetchBillTopics(billId: string): Promise<BillTopicsResponse> {

@@ -112,8 +112,22 @@ def _join(first: str, second: str) -> str:
     return f"{first}. {second}" if first and second else (first or second)
 
 
+def _subject_terms(source: dict[str, Any]) -> str:
+    """CRS policy area + legislative subject names as a text fragment."""
+    terms: list[str] = []
+    policy_area = (source.get("policy_area") or {}).get("name")
+    if policy_area:
+        terms.append(str(policy_area))
+    subjects = (source.get("subjects") or {}).get("legislative_subjects") or []
+    for subject in subjects:
+        name = (subject or {}).get("name")
+        if name:
+            terms.append(str(name))
+    return "; ".join(dict.fromkeys(terms))
+
+
 def build_topic_documents(hits: list[dict[str, Any]]) -> list[TopicDocument]:
-    """Build model inputs (title + latest summary) from OpenSearch hits.
+    """Build model inputs (title + latest summary + CRS subjects) from hits.
 
     ``text`` prefers the ``*_lemma`` sibling fields (falling back to raw text
     per field) so topic words come from lemmas, while ``embed_text`` keeps the
@@ -128,8 +142,11 @@ def build_topic_documents(hits: list[dict[str, Any]]) -> list[TopicDocument]:
         title = _clean(str(source.get("title") or ""))
         title_lemma = _clean(str(source.get("title_lemma") or ""))
         summary, summary_lemma = _latest_summary_text(source)
-        raw_text = _join(title, summary)
-        lemma_text = _join(title_lemma or title, summary_lemma or summary)
+        subjects = _subject_terms(source)
+        raw_text = _join(_join(title, summary), subjects)
+        lemma_text = _join(
+            _join(title_lemma or title, summary_lemma or summary), subjects
+        )
         if not lemma_text:
             continue
         latest_action = source.get("latest_action") or {}
@@ -256,6 +273,12 @@ class TopicModeler:
             }
             for row in info.itertuples()
         ]
+
+    def representative_docs(self) -> dict[int, list[str]]:
+        """Most representative document texts per topic (for labeling)."""
+        self._require_model()
+        docs = self._model.get_representative_docs() or {}
+        return {int(topic_id): list(texts or []) for topic_id, texts in docs.items()}
 
     def save(self, path: Path | str) -> None:
         self._require_model()

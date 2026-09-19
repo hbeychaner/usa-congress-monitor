@@ -1,28 +1,24 @@
-import { Badge, Card, Flex, Heading, Table, Text } from '@radix-ui/themes';
-import { useEffect, useState } from 'react';
+import { Badge, Card, Flex, Heading, Table, Text, TextField } from '@radix-ui/themes';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchTopic } from '../api/topics';
 import type { TopicDetailResponse } from '../api/topics';
+import { TrendLineChart } from '../components/TrendLineChart';
+import type { TrendSeries } from '../components/TrendLineChart';
 
-function TrendBars({ trend }: { trend: TopicDetailResponse['trend'] }) {
-  const max = Math.max(...trend.map((point) => point.frequency), 1);
-  return (
-    <Flex align="end" gap="1" style={{ height: 120 }}>
-      {trend.map((point) => (
-        <div
-          key={point.timestamp}
-          title={`${new Date(point.timestamp).toLocaleDateString()}: ${point.frequency} bills`}
-          style={{
-            flex: 1,
-            minWidth: 3,
-            height: `${Math.max((point.frequency / max) * 100, 2)}%`,
-            background: 'var(--accent-9)',
-            borderRadius: 2,
-          }}
-        />
-      ))}
-    </Flex>
-  );
+function trendToSeries(label: string, trend: TopicDetailResponse['trend']): TrendSeries[] {
+  const byYear = new Map<number, number>();
+  for (const point of trend) {
+    const year = new Date(point.timestamp).getFullYear();
+    if (!Number.isFinite(year)) continue;
+    byYear.set(year, (byYear.get(year) ?? 0) + point.frequency);
+  }
+  if (byYear.size < 2) return [];
+  const years = [...byYear.keys()];
+  const min = Math.min(...years);
+  const max = Math.max(...years);
+  const grid = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+  return [{ name: label, points: grid.map((year) => [year, byYear.get(year) ?? 0]) }];
 }
 
 export function TopicDetailPage() {
@@ -30,24 +26,40 @@ export function TopicDetailPage() {
   const [data, setData] = useState<TopicDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [billQuery, setBillQuery] = useState('');
 
   useEffect(() => {
-    fetchTopic(Number(topicId))
+    fetchTopic(Number(topicId), 100)
       .then(setData)
       .catch((err) => setError((err as Error).message))
       .finally(() => setLoading(false));
   }, [topicId]);
 
+  const series = useMemo(
+    () => (data ? trendToSeries(data.topic.label, data.trend) : []),
+    [data],
+  );
+  const filteredBills = useMemo(() => {
+    const bills = data?.top_bills ?? [];
+    const needle = billQuery.trim().toLowerCase();
+    if (!needle) return bills;
+    return bills.filter(
+      (bill) =>
+        (bill.title ?? '').toLowerCase().includes(needle) ||
+        bill.bill_id.toLowerCase().includes(needle),
+    );
+  }, [data, billQuery]);
+
   if (loading) return <Text as="p">Loading topic…</Text>;
   if (error || !data) return <Text as="p" color="red">Failed to load topic: {error}</Text>;
 
-  const { topic, trend, top_bills: topBills } = data;
+  const { topic, top_bills: topBills } = data;
 
   return (
     <Flex direction="column" gap="5">
       <Flex direction="column" gap="2">
         <Heading size="8" style={{ textTransform: 'capitalize' }}>{topic.label}</Heading>
-        <Text color="gray">{topic.size} bills assigned to this topic.</Text>
+        <Text color="gray">{topic.size.toLocaleString()} bills assigned to this topic.</Text>
         <Flex gap="1" wrap="wrap">
           {topic.top_words.map((word) => (
             <Badge key={word} variant="soft">{word}</Badge>
@@ -55,21 +67,29 @@ export function TopicDetailPage() {
         </Flex>
       </Flex>
 
-      {trend.length > 0 && (
+      {series.length > 0 && (
         <Card size="3">
           <Heading size="4" mb="2">Activity Over Time</Heading>
-          <TrendBars trend={trend} />
-          <Flex justify="between" mt="1">
-            <Text size="1" color="gray">{new Date(trend[0].timestamp).toLocaleDateString()}</Text>
-            <Text size="1" color="gray">{new Date(trend[trend.length - 1].timestamp).toLocaleDateString()}</Text>
-          </Flex>
+          <TrendLineChart series={series} height={260} />
         </Card>
       )}
 
       <Card size="3">
-        <Heading size="4" mb="2">Representative Bills</Heading>
+        <Flex justify="between" align="center" wrap="wrap" gap="3" mb="2">
+          <Heading size="4">Related Bills ({filteredBills.length})</Heading>
+          {topBills.length > 0 && (
+            <TextField.Root
+              placeholder="Filter bills…"
+              value={billQuery}
+              onChange={(event) => setBillQuery(event.target.value)}
+              style={{ width: 220 }}
+            />
+          )}
+        </Flex>
         {topBills.length === 0 ? (
           <Text as="p" color="gray">No bill assignments indexed for this topic.</Text>
+        ) : filteredBills.length === 0 ? (
+          <Text as="p" color="gray">No bills match “{billQuery}”.</Text>
         ) : (
           <Table.Root>
             <Table.Header>
@@ -79,7 +99,7 @@ export function TopicDetailPage() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {topBills.map((bill) => (
+              {filteredBills.map((bill) => (
                 <Table.Row key={bill.bill_id}>
                   <Table.RowHeaderCell>
                     <Link to={`/bills/${encodeURIComponent(bill.bill_id)}`}>

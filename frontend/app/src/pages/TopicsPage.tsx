@@ -10,14 +10,37 @@ import {
   TextField,
 } from '@radix-ui/themes';
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { fetchSubjects } from '../api/subjects';
-import type { SubjectsResponse } from '../api/subjects';
+import { Link, useNavigate } from 'react-router-dom';
+import { fetchPolicyAreaTrends, fetchSubjects } from '../api/subjects';
+import type { PolicyAreaTrendsResponse, SubjectsResponse } from '../api/subjects';
 import { fetchTopicTrends, fetchTopics } from '../api/topics';
-import type { TopicSummary, TopicTrendsResponse, TopicsResponse } from '../api/topics';
-import { TopicTrendsChart } from '../components/TopicTrendsChart';
+import type { TopicSummary, TopicTrendSeries, TopicTrendsResponse, TopicsResponse } from '../api/topics';
+import { TrendLineChart } from '../components/TrendLineChart';
+import type { TrendSeries } from '../components/TrendLineChart';
 
 const TOPIC_PAGE_SIZE = 24;
+
+function topicSeriesToTrend(series: TopicTrendSeries[]): TrendSeries[] {
+  const allYears = new Set<number>();
+  const binned = series.map((s) => {
+    const byYear = new Map<number, number>();
+    for (const point of s.points) {
+      const year = new Date(point.timestamp).getFullYear();
+      if (!Number.isFinite(year)) continue;
+      byYear.set(year, (byYear.get(year) ?? 0) + point.frequency);
+      allYears.add(year);
+    }
+    return { name: s.label, byYear };
+  });
+  if (allYears.size < 2) return [];
+  const min = Math.min(...allYears);
+  const max = Math.max(...allYears);
+  const grid = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+  return binned.map(({ name, byYear }) => ({
+    name,
+    points: grid.map((year) => [year, byYear.get(year) ?? 0] as [number, number]),
+  }));
+}
 
 function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
@@ -97,9 +120,11 @@ function PolicyAreaChart({ areas }: { areas: SubjectsResponse['policy_areas'] })
 }
 
 export function TopicsPage() {
+  const navigate = useNavigate();
   const [data, setData] = useState<TopicsResponse | null>(null);
   const [subjects, setSubjects] = useState<SubjectsResponse | null>(null);
   const [trends, setTrends] = useState<TopicTrendsResponse | null>(null);
+  const [policyTrends, setPolicyTrends] = useState<PolicyAreaTrendsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -113,6 +138,7 @@ export function TopicsPage() {
       .finally(() => setLoading(false));
     fetchSubjects().then(setSubjects).catch(() => setSubjects(null));
     fetchTopicTrends(10).then(setTrends).catch(() => setTrends(null));
+    fetchPolicyAreaTrends(10).then(setPolicyTrends).catch(() => setPolicyTrends(null));
   }, []);
 
   const topics = useMemo(() => data?.topics ?? [], [data]);
@@ -125,10 +151,10 @@ export function TopicsPage() {
     const needle = query.trim().toLowerCase();
     const matches = needle
       ? topics.filter(
-          (topic) =>
-            topic.label.toLowerCase().includes(needle) ||
-            topic.top_words.some((word) => word.toLowerCase().includes(needle)),
-        )
+        (topic) =>
+          topic.label.toLowerCase().includes(needle) ||
+          topic.top_words.some((word) => word.toLowerCase().includes(needle)),
+      )
       : topics;
     return [...matches].sort((a, b) =>
       sort === 'size' ? b.size - a.size : a.label.localeCompare(b.label),
@@ -136,6 +162,16 @@ export function TopicsPage() {
   }, [topics, query, sort]);
 
   const visible = filtered.slice(0, limit);
+
+  const policySeries = useMemo<TrendSeries[]>(
+    () =>
+      (policyTrends?.series ?? []).map((s) => ({
+        name: s.name,
+        points: s.points.map((p) => [p.year, p.count] as [number, number]),
+      })),
+    [policyTrends],
+  );
+  const topicSeries = useMemo(() => topicSeriesToTrend(trends?.series ?? []), [trends]);
 
   return (
     <Flex direction="column" gap="5">
@@ -175,9 +211,34 @@ export function TopicsPage() {
           </Grid>
 
           <Card size="3">
-            <Heading size="4" mb="3">Topic Activity Over Time</Heading>
-            {trends && trends.series.length > 0 ? (
-              <TopicTrendsChart series={trends.series} />
+            <Heading size="4" mb="1">Policy Area Activity Over Time</Heading>
+            <Text as="p" size="2" color="gray" mb="3">
+              Bills introduced per year in the largest CRS policy areas. Click a line to browse its bills; drag or scroll to zoom.
+            </Text>
+            {policySeries.length > 0 ? (
+              <TrendLineChart
+                series={policySeries}
+                onSeriesClick={(name) => navigate(`/bills?subject=${encodeURIComponent(name)}`)}
+              />
+            ) : (
+              <Text as="p" color="gray">No CRS policy-area data indexed yet.</Text>
+            )}
+          </Card>
+
+          <Card size="3">
+            <Heading size="4" mb="1">Discovered Topic Activity</Heading>
+            <Text as="p" size="2" color="gray" mb="3">
+              Bills per year for the largest machine-discovered topics. Click a line to open the topic.
+            </Text>
+            {topicSeries.length > 0 ? (
+              <TrendLineChart
+                series={topicSeries}
+                height={280}
+                onSeriesClick={(name) => {
+                  const match = trends?.series.find((s) => s.label === name);
+                  if (match) navigate(`/topics/${match.topic_id}`);
+                }}
+              />
             ) : (
               <TopTopicsChart topics={[...topics].sort((a, b) => b.size - a.size)} />
             )}

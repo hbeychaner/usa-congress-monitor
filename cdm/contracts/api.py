@@ -171,6 +171,22 @@ class SubjectsResponse(BaseModel):
     total_bills: int = 0
 
 
+class PolicyAreaTrendPoint(BaseModel):
+    year: int
+    count: int
+
+
+class PolicyAreaTrendSeries(BaseModel):
+    name: str
+    total: int
+    points: list[PolicyAreaTrendPoint]
+
+
+class PolicyAreaTrendsResponse(BaseModel):
+    series: list[PolicyAreaTrendSeries] = Field(default_factory=list)
+    total_bills: int = 0
+
+
 class MemberProfileResponse(BaseModel):
     member: MemberDetail
     recent_activity: list[ActivityItem]
@@ -307,9 +323,7 @@ class BackfillProgress(BaseModel):
     pending: int
     failed: int
     percent: float = Field(description="Completion percentage, 0-100.")
-    rate_per_hour: int = Field(
-        description="Packages completed in the trailing hour."
-    )
+    rate_per_hour: int = Field(description="Packages completed in the trailing hour.")
     eta: str | None = Field(
         default=None,
         description="Estimated completion timestamp (UTC) from the trailing-hour rate.",

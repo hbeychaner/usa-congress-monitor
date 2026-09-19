@@ -25,8 +25,8 @@ def topic_trends(size: int = 8) -> TopicTrendsResponse:
 
 
 @router.get("/{topic_id}", response_model=TopicDetailResponse)
-def topic_detail(topic_id: int) -> TopicDetailResponse:
-    detail = get_topic(topic_id)
+def topic_detail(topic_id: int, bills: int = 20) -> TopicDetailResponse:
+    detail = get_topic(topic_id, top_bills=max(1, min(bills, 200)))
     if detail is None:
         raise HTTPException(status_code=404, detail="topic not found")
     return detail

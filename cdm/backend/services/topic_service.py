@@ -90,10 +90,11 @@ def _topic_summaries(model_version: str) -> dict[int, TopicSummary]:
     for hit in _hits(response):
         source = hit.get("_source", {})
         topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
+        stored_label = str(source.get("label") or "").strip()
         summaries[topic_id] = TopicSummary(
             topic_id=topic_id,
             name=str(source.get("name") or ""),
-            label=topic_label(source.get("name"), topic_id),
+            label=stored_label or topic_label(source.get("name"), topic_id),
             size=int(source.get("size") or 0),
             top_words=[str(word) for word in source.get("top_words") or []],
         )
