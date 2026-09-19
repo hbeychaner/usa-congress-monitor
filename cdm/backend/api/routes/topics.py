@@ -1,7 +1,15 @@
 from fastapi import APIRouter, HTTPException
 
-from cdm.backend.services.topic_service import get_topic, list_topics
-from cdm.contracts.api import TopicDetailResponse, TopicsResponse
+from cdm.backend.services.topic_service import (
+    get_topic,
+    list_topic_trends,
+    list_topics,
+)
+from cdm.contracts.api import (
+    TopicDetailResponse,
+    TopicsResponse,
+    TopicTrendsResponse,
+)
 
 router = APIRouter(prefix="/topics", tags=["topics"])
 
@@ -9,6 +17,11 @@ router = APIRouter(prefix="/topics", tags=["topics"])
 @router.get("", response_model=TopicsResponse)
 def topics_list() -> TopicsResponse:
     return list_topics()
+
+
+@router.get("/trends", response_model=TopicTrendsResponse)
+def topic_trends(size: int = 8) -> TopicTrendsResponse:
+    return list_topic_trends(size=max(1, min(size, 25)))
 
 
 @router.get("/{topic_id}", response_model=TopicDetailResponse)

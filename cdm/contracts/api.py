@@ -108,6 +108,17 @@ class TopicTrendPoint(BaseModel):
     words: str | None = None
 
 
+class TopicTrendSeries(BaseModel):
+    topic_id: int
+    label: str
+    points: list[TopicTrendPoint]
+
+
+class TopicTrendsResponse(BaseModel):
+    series: list[TopicTrendSeries]
+    model_version: str | None = None
+
+
 class TopicBill(BaseModel):
     bill_id: str
     title: str | None = None

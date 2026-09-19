@@ -13,8 +13,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchSubjects } from '../api/subjects';
 import type { SubjectsResponse } from '../api/subjects';
-import { fetchTopics } from '../api/topics';
-import type { TopicSummary, TopicsResponse } from '../api/topics';
+import { fetchTopicTrends, fetchTopics } from '../api/topics';
+import type { TopicSummary, TopicTrendsResponse, TopicsResponse } from '../api/topics';
+import { TopicTrendsChart } from '../components/TopicTrendsChart';
 
 const TOPIC_PAGE_SIZE = 24;
 
@@ -98,6 +99,7 @@ function PolicyAreaChart({ areas }: { areas: SubjectsResponse['policy_areas'] })
 export function TopicsPage() {
   const [data, setData] = useState<TopicsResponse | null>(null);
   const [subjects, setSubjects] = useState<SubjectsResponse | null>(null);
+  const [trends, setTrends] = useState<TopicTrendsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -110,6 +112,7 @@ export function TopicsPage() {
       .catch((err) => setError((err as Error).message))
       .finally(() => setLoading(false));
     fetchSubjects().then(setSubjects).catch(() => setSubjects(null));
+    fetchTopicTrends(10).then(setTrends).catch(() => setTrends(null));
   }, []);
 
   const topics = useMemo(() => data?.topics ?? [], [data]);
@@ -172,8 +175,12 @@ export function TopicsPage() {
           </Grid>
 
           <Card size="3">
-            <Heading size="4" mb="3">Largest Topics</Heading>
-            <TopTopicsChart topics={[...topics].sort((a, b) => b.size - a.size)} />
+            <Heading size="4" mb="3">Topic Activity Over Time</Heading>
+            {trends && trends.series.length > 0 ? (
+              <TopicTrendsChart series={trends.series} />
+            ) : (
+              <TopTopicsChart topics={[...topics].sort((a, b) => b.size - a.size)} />
+            )}
           </Card>
 
           <Card size="3">

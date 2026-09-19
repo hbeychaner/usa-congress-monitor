@@ -157,6 +157,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/members/{bioguide_id}/topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Member Topics */
+        get: operations["member_topics_api_v1_members__bioguide_id__topics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/search": {
         parameters: {
             query?: never;
@@ -225,6 +242,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/bills/{bill_id}/topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Bill Topics */
+        get: operations["bill_topics_api_v1_bills__bill_id__topics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Topics List */
+        get: operations["topics_list_api_v1_topics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/topics/{topic_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Topic Detail */
+        get: operations["topic_detail_api_v1_topics__topic_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subjects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Subjects List */
+        get: operations["subjects_list_api_v1_subjects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -271,6 +356,37 @@ export interface components {
             ready_for_reconciliation: boolean;
             /** Ready For Cutover */
             ready_for_cutover: boolean;
+        };
+        /** BackfillProgress */
+        BackfillProgress: {
+            /** Total */
+            total: number;
+            /** Succeeded */
+            succeeded: number;
+            /** Pending */
+            pending: number;
+            /** Failed */
+            failed: number;
+            /**
+             * Percent
+             * @description Completion percentage, 0-100.
+             */
+            percent: number;
+            /**
+             * Rate Per Hour
+             * @description Packages completed in the trailing hour.
+             */
+            rate_per_hour: number;
+            /**
+             * Eta
+             * @description Estimated completion timestamp (UTC) from the trailing-hour rate.
+             */
+            eta?: string | null;
+            /**
+             * Batches Pending
+             * @default 0
+             */
+            batches_pending: number;
         };
         /** BillDetail */
         BillDetail: {
@@ -371,6 +487,15 @@ export interface components {
             chamber?: string | null;
             /** Updated At */
             updated_at?: string | null;
+        };
+        /** BillTopicsResponse */
+        BillTopicsResponse: {
+            /** Bill Id */
+            bill_id: string;
+            /** Topics */
+            topics?: components["schemas"]["TopicAssignmentItem"][];
+            /** Model Version */
+            model_version?: string | null;
         };
         /** BillVotesResponse */
         BillVotesResponse: {
@@ -518,6 +643,7 @@ export interface components {
             last_progress_at?: string | null;
             /** Jobs */
             jobs: components["schemas"]["IngestProgressJob"][];
+            backfill?: components["schemas"]["BackfillProgress"] | null;
         };
         /** JobStatusCounts */
         JobStatusCounts: {
@@ -680,6 +806,32 @@ export interface components {
             /** District */
             district?: number | null;
         };
+        /** MemberTopicTrendPoint */
+        MemberTopicTrendPoint: {
+            /** Period */
+            period: string;
+            /** Topic Id */
+            topic_id: number;
+            /** Label */
+            label: string;
+            /** Count */
+            count: number;
+        };
+        /** MemberTopicsResponse */
+        MemberTopicsResponse: {
+            /** Bioguide Id */
+            bioguide_id: string;
+            /** Topics */
+            topics?: components["schemas"]["TopicItem"][];
+            /** Trend */
+            trend?: components["schemas"]["MemberTopicTrendPoint"][];
+            /** Model Version */
+            model_version?: string | null;
+            /** Subjects */
+            subjects?: components["schemas"]["TopicItem"][];
+            /** Policy Areas */
+            policy_areas?: components["schemas"]["TopicItem"][];
+        };
         /** MembersResponse */
         MembersResponse: {
             /** Members */
@@ -763,6 +915,25 @@ export interface components {
             house: components["schemas"]["ChamberTimeline"];
             senate: components["schemas"]["ChamberTimeline"];
         };
+        /** SubjectCount */
+        SubjectCount: {
+            /** Name */
+            name: string;
+            /** Count */
+            count: number;
+        };
+        /** SubjectsResponse */
+        SubjectsResponse: {
+            /** Subjects */
+            subjects?: components["schemas"]["SubjectCount"][];
+            /** Policy Areas */
+            policy_areas?: components["schemas"]["SubjectCount"][];
+            /**
+             * Total Bills
+             * @default 0
+             */
+            total_bills: number;
+        };
         /** SystemStatusResponse */
         SystemStatusResponse: {
             /**
@@ -792,12 +963,71 @@ export interface components {
             /** Congress End */
             congress_end: number;
         };
+        /** TopicAssignmentItem */
+        TopicAssignmentItem: {
+            /** Topic Id */
+            topic_id: number;
+            /** Label */
+            label: string;
+            /** Probability */
+            probability: number;
+        };
+        /** TopicBill */
+        TopicBill: {
+            /** Bill Id */
+            bill_id: string;
+            /** Title */
+            title?: string | null;
+            /** Probability */
+            probability: number;
+        };
+        /** TopicDetailResponse */
+        TopicDetailResponse: {
+            topic: components["schemas"]["TopicSummary"];
+            /** Model Version */
+            model_version?: string | null;
+            /** Trend */
+            trend?: components["schemas"]["TopicTrendPoint"][];
+            /** Top Bills */
+            top_bills?: components["schemas"]["TopicBill"][];
+        };
         /** TopicItem */
         TopicItem: {
             /** Label */
             label: string;
             /** Weight */
             weight: number;
+        };
+        /** TopicSummary */
+        TopicSummary: {
+            /** Topic Id */
+            topic_id: number;
+            /** Name */
+            name: string;
+            /** Label */
+            label: string;
+            /** Size */
+            size: number;
+            /** Top Words */
+            top_words?: string[];
+        };
+        /** TopicTrendPoint */
+        TopicTrendPoint: {
+            /** Timestamp */
+            timestamp: string;
+            /** Frequency */
+            frequency: number;
+            /** Words */
+            words?: string | null;
+        };
+        /** TopicsResponse */
+        TopicsResponse: {
+            /** Topics */
+            topics: components["schemas"]["TopicSummary"][];
+            /** Model Version */
+            model_version?: string | null;
+            /** Trained At */
+            trained_at?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -1123,6 +1353,37 @@ export interface operations {
             };
         };
     };
+    member_topics_api_v1_members__bioguide_id__topics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                bioguide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberTopicsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     search_api_v1_search_get: {
         parameters: {
             query: {
@@ -1165,6 +1426,7 @@ export interface operations {
                 congress?: number | null;
                 bill_type?: string | null;
                 chamber?: string | null;
+                subject?: string | null;
             };
             header?: never;
             path?: never;
@@ -1241,6 +1503,120 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BillVotesResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bill_topics_api_v1_bills__bill_id__topics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                bill_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillTopicsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    topics_list_api_v1_topics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicsResponse"];
+                };
+            };
+        };
+    };
+    topic_detail_api_v1_topics__topic_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subjects_list_api_v1_subjects_get: {
+        parameters: {
+            query?: {
+                congress?: number | null;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectsResponse"];
                 };
             };
             /** @description Validation Error */

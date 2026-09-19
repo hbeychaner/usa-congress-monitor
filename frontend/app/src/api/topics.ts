@@ -61,8 +61,23 @@ export type MemberTopicsResponse = {
   policy_areas: { label: string; weight: number }[];
 };
 
+export type TopicTrendSeries = {
+  topic_id: number;
+  label: string;
+  points: TopicTrendPoint[];
+};
+
+export type TopicTrendsResponse = {
+  series: TopicTrendSeries[];
+  model_version: string | null;
+};
+
 export function fetchTopics(): Promise<TopicsResponse> {
   return apiGet<TopicsResponse>('/api/v1/topics');
+}
+
+export function fetchTopicTrends(size = 8): Promise<TopicTrendsResponse> {
+  return apiGet<TopicTrendsResponse>(`/api/v1/topics/trends?size=${size}`);
 }
 
 export function fetchTopic(topicId: number): Promise<TopicDetailResponse> {

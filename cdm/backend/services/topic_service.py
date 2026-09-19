@@ -23,6 +23,8 @@ from cdm.contracts.api import (
     TopicsResponse,
     TopicSummary,
     TopicTrendPoint,
+    TopicTrendSeries,
+    TopicTrendsResponse,
 )
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
@@ -112,6 +114,54 @@ def list_topics() -> TopicsResponse:
     return TopicsResponse(
         topics=topics, model_version=model_version, trained_at=trained_at
     )
+
+
+def list_topic_trends(*, size: int = 8) -> TopicTrendsResponse:
+    """Time series for the largest topics, EMM-dashboard style."""
+    model_version, _ = _latest_model_version()
+    if not model_version:
+        return TopicTrendsResponse(series=[])
+    summaries = _topic_summaries(model_version)
+    top = sorted(
+        (topic for topic in summaries.values() if topic.topic_id != _OUTLIER_TOPIC_ID),
+        key=lambda topic: topic.size,
+        reverse=True,
+    )[:size]
+    top_ids = [topic.topic_id for topic in top]
+    response = _search({
+        "size": 10000,
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"kind": "topic_over_time"}},
+                    {"term": {"model_version": model_version}},
+                    {"terms": {"topic_id": top_ids}},
+                ]
+            }
+        },
+        "sort": [{"timestamp": {"order": "asc"}}],
+    })
+    points: dict[int, list[TopicTrendPoint]] = defaultdict(list)
+    for hit in _hits(response):
+        source = hit.get("_source", {})
+        topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
+        points[topic_id].append(
+            TopicTrendPoint(
+                timestamp=str(source.get("timestamp") or ""),
+                frequency=int(source.get("frequency") or 0),
+                words=source.get("words"),
+            )
+        )
+    series = [
+        TopicTrendSeries(
+            topic_id=topic.topic_id,
+            label=topic.label,
+            points=points.get(topic.topic_id, []),
+        )
+        for topic in top
+        if points.get(topic.topic_id)
+    ]
+    return TopicTrendsResponse(series=series, model_version=model_version)
 
 
 def get_topic(topic_id: int, *, top_bills: int = 20) -> TopicDetailResponse | None:
