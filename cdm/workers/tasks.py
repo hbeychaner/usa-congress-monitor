@@ -356,8 +356,8 @@ def _process_govinfo_bulk_job(job_id: str) -> dict:
         outdir,
         manifest_store=manifest,
         session=_govinfo_session(),
+        rate_limiter=_govinfo_rate_limiter(),
     )
-    _govinfo_rate_limiter().acquire()
     artifact = downloader.download(package)
     if package.collection == "BILLSTATUS":
         record = GovInfoBillStatusParser().parse(artifact.read_bytes(), package)

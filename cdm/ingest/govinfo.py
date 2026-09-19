@@ -1005,6 +1005,7 @@ class GovInfoDownloader:
         session: GovInfoHttpSession | None = None,
         timeout: int = 60,
         manifest_store: GovInfoManifestStore | None = None,
+        rate_limiter: Any | None = None,
     ) -> None:
         if timeout < 1:
             raise ValueError("timeout must be positive")
@@ -1014,6 +1015,7 @@ class GovInfoDownloader:
         self.session = session or requests.Session()
         self.timeout = timeout
         self.manifest_store = manifest_store
+        self.rate_limiter = rate_limiter
 
     def download(self, package: GovInfoPackage, *, force: bool = False) -> Path:
         """Download *package* and return its verified local artifact path."""
@@ -1035,6 +1037,10 @@ class GovInfoDownloader:
         ):
             return destination
 
+        # Rate-limit only actual network fetches; cache hits above return
+        # without consuming a token so reparse passes are not throttled.
+        if self.rate_limiter is not None:
+            self.rate_limiter.acquire()
         destination.parent.mkdir(parents=True, exist_ok=True)
         temporary = destination.with_suffix(destination.suffix + ".part")
         headers: dict[str, str] = {}
