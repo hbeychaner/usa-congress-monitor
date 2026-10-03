@@ -55,3 +55,6 @@ logs/
 # In-progress design docs / planning notes — working scratch, not tracked history
 planning/
 
+# Trained topic-model artifacts (regenerate with scripts/train_topic_model.py)
+models/
+

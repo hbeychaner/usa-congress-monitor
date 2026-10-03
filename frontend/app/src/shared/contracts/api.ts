@@ -276,6 +276,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/topics/trends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Topic Trends */
+        get: operations["topic_trends_api_v1_topics_trends_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/topics/{topic_id}": {
         parameters: {
             query?: never;
@@ -302,6 +319,23 @@ export interface paths {
         };
         /** Subjects List */
         get: operations["subjects_list_api_v1_subjects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subjects/policy-area-trends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Policy Area Trends */
+        get: operations["policy_area_trends_api_v1_subjects_policy_area_trends_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -849,6 +883,32 @@ export interface components {
              */
             limit: number;
         };
+        /** PolicyAreaTrendPoint */
+        PolicyAreaTrendPoint: {
+            /** Year */
+            year: number;
+            /** Count */
+            count: number;
+        };
+        /** PolicyAreaTrendSeries */
+        PolicyAreaTrendSeries: {
+            /** Name */
+            name: string;
+            /** Total */
+            total: number;
+            /** Points */
+            points: components["schemas"]["PolicyAreaTrendPoint"][];
+        };
+        /** PolicyAreaTrendsResponse */
+        PolicyAreaTrendsResponse: {
+            /** Series */
+            series?: components["schemas"]["PolicyAreaTrendSeries"][];
+            /**
+             * Total Bills
+             * @default 0
+             */
+            total_bills: number;
+        };
         /** SearchResponse */
         SearchResponse: {
             /** Query */
@@ -1019,6 +1079,22 @@ export interface components {
             frequency: number;
             /** Words */
             words?: string | null;
+        };
+        /** TopicTrendSeries */
+        TopicTrendSeries: {
+            /** Topic Id */
+            topic_id: number;
+            /** Label */
+            label: string;
+            /** Points */
+            points: components["schemas"]["TopicTrendPoint"][];
+        };
+        /** TopicTrendsResponse */
+        TopicTrendsResponse: {
+            /** Series */
+            series: components["schemas"]["TopicTrendSeries"][];
+            /** Model Version */
+            model_version?: string | null;
         };
         /** TopicsResponse */
         TopicsResponse: {
@@ -1567,9 +1643,42 @@ export interface operations {
             };
         };
     };
+    topic_trends_api_v1_topics_trends_get: {
+        parameters: {
+            query?: {
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicTrendsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     topic_detail_api_v1_topics__topic_id__get: {
         parameters: {
-            query?: never;
+            query?: {
+                bills?: number;
+            };
             header?: never;
             path: {
                 topic_id: number;
@@ -1617,6 +1726,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubjectsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    policy_area_trends_api_v1_subjects_policy_area_trends_get: {
+        parameters: {
+            query?: {
+                size?: number;
+                start_year?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyAreaTrendsResponse"];
                 };
             };
             /** @description Validation Error */
