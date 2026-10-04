@@ -22,7 +22,7 @@ install_agent() {
     <array>
         <string>/bin/zsh</string>
         <string>-lc</string>
-        <string>cd "$repo_root" &amp;&amp; exec "$uv_path" run celery $command</string>
+        <string>cd "$repo_root" &amp;&amp; exec env OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES "$uv_path" run celery $command</string>
     </array>
     <key>WorkingDirectory</key>
     <string>$repo_root</string>
@@ -60,7 +60,16 @@ EOF
 EOF
 
     launchctl bootout "gui/$UID/$label" 2>/dev/null || true
-    launchctl bootstrap "gui/$UID" "$plist"
+    # bootout is asynchronous; bootstrapping before it settles fails with EIO.
+    attempt=0
+    until launchctl bootstrap "gui/$UID" "$plist" 2>/dev/null; do
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 10 ]; then
+            launchctl bootstrap "gui/$UID" "$plist"
+            break
+        fi
+        sleep 1
+    done
     launchctl kickstart -k "gui/$UID/$label"
 }
 
@@ -85,7 +94,7 @@ case "${1:-}" in
             '-A cdm.workers.celery_app:celery_app worker --hostname=ingest-launchd@%h --pool=prefork --concurrency=6 --max-tasks-per-child=10 --loglevel=INFO --queues=congress-ingest,congress-bulk' \
             worker-ingest-launchd.log
         install_agent com.congress-tracker.index \
-            '-A cdm.workers.celery_app:celery_app worker --hostname=index-launchd@%h --pool=prefork --concurrency=4 --max-tasks-per-child=1 --loglevel=INFO --queues=congress-index' \
+            '-A cdm.workers.celery_app:celery_app worker --hostname=index-launchd@%h --pool=prefork --concurrency=4 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index' \
             worker-index-launchd.log
         install_agent com.congress-tracker.beat \
             '-A cdm.workers.celery_app:celery_app beat --loglevel=INFO' \

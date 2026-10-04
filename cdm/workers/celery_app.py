@@ -45,7 +45,7 @@ celery_app.conf.update(
         },
         "recover-failed-ingest-jobs": {
             "task": "cdm.workers.tasks.recover_failed_ingest_jobs",
-            "schedule": crontab(minute="*/10"),
+            "schedule": crontab(minute="*/5"),
         },
         "retention-maintenance": {
             "task": "cdm.workers.tasks.run_retention_maintenance",

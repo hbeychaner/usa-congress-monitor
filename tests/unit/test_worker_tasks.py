@@ -182,6 +182,7 @@ def test_recovery_caps_orphaned_queued_jobs_per_tick(monkeypatch):
     dispatched = []
     monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
     monkeypatch.setattr(tasks, "_store", lambda: store)
+    monkeypatch.setattr(tasks, "_index_redispatch_budget", lambda: 25)
     monkeypatch.setattr(
         tasks.celery_app,
         "send_task",
@@ -190,8 +191,31 @@ def test_recovery_caps_orphaned_queued_jobs_per_tick(monkeypatch):
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
 
-    assert len(result["recovered"]) == tasks._ORPHAN_RECOVERY_BATCH_LIMIT
-    assert len(dispatched) == tasks._ORPHAN_RECOVERY_BATCH_LIMIT
+    assert len(result["recovered"]) == 25
+    assert len(dispatched) == 25
+
+
+def test_recovery_skips_index_redispatch_when_queue_is_deep(monkeypatch):
+    lock = FakeLock(acquired=True)
+    stale = (datetime.now(UTC) - timedelta(minutes=90)).isoformat()
+    jobs = [
+        {
+            "id": f"index:{i}",
+            "kind": JobKind.INDEX.value,
+            "status": JobStatus.QUEUED.value,
+            "updated_at": stale,
+            "payload": {},
+        }
+        for i in range(10)
+    ]
+    store = FakeStore(queued=jobs)
+    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
+    monkeypatch.setattr(tasks, "_store", lambda: store)
+    monkeypatch.setattr(tasks, "_queue_depth", lambda queue: 10_000)
+
+    result = cast(Any, tasks.recover_failed_ingest_jobs).run()
+
+    assert result["recovered"] == []
 
 
 def test_recovery_requeues_stale_active_job(monkeypatch):
@@ -250,9 +274,7 @@ def test_govinfo_batch_fans_out_package_jobs(monkeypatch):
         lambda name, *, args, queue: dispatched.append((name, args, queue)),
     )
 
-    result = cast(Any, tasks.run_govinfo_bulk_batch).run(
-        "govinfo_bulk_batch:one"
-    )
+    result = cast(Any, tasks.run_govinfo_bulk_batch).run("govinfo_bulk_batch:one")
 
     assert result == {
         "job_id": "govinfo_bulk_batch:one",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import shutil
 import time
 from datetime import UTC, datetime, timedelta
@@ -13,6 +14,7 @@ from typing import Any, NoReturn
 
 import requests
 from celery.exceptions import MaxRetriesExceededError
+from celery.signals import worker_init
 from kombu.exceptions import OperationalError
 from redis import Redis
 
@@ -35,7 +37,7 @@ from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
 from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
 from cdm.store.opensearch import resource_target
-from cdm.store.redis_indexing import RedisIndexingRunner
+from cdm.store.batch_indexing import index_streams
 from cdm.utils.rate_limiter import TokenBucket
 from cdm.workers.celery_app import celery_app
 from settings import (
@@ -45,9 +47,12 @@ from settings import (
     CELERY_RETRY_BACKOFF_MAX,
     CELERY_RETRY_MAX,
     CELERY_RETRY_MAX_TRANSIENT,
+    COVERAGE_LOOKBACK_DAYS,
     ES_LOCAL_API_KEY,
     ES_LOCAL_URL,
     GOVINFO_RATE_LIMIT_PER_HOUR,
+    INDEX_BATCH_DOCS,
+    INDEX_BATCH_JOBS,
     JOB_DB_PATH,
     REDIS_CONSUMER_GROUP,
     REDIS_STREAM_MAXLEN,
@@ -56,12 +61,20 @@ from settings import (
 )
 
 
-# One store per (forked) worker process: JobStore.__init__ reconciles the
-# ingest_windows table under an exclusive cross-process lock, so per-task
-# construction serializes every worker behind that lock.
+logger = logging.getLogger(__name__)
+
+
+# Legacy-window repair scans the whole ledger under a global lock, so it runs
+# once per worker boot (see _warm_store), never per task.
 @lru_cache(maxsize=1)
 def _store() -> JobStore:
-    return JobStore(JOB_DB_PATH)
+    return JobStore(JOB_DB_PATH, repair=False)
+
+
+@worker_init.connect
+def _warm_store(**_: Any) -> None:
+    """Build the store in the parent so forked children inherit it."""
+    _store().repair_legacy_windows()
 
 
 # Seconds between ledger status polls inside the ingest progress callback.
@@ -159,9 +172,7 @@ def submit_job(
 
 def _is_transient(exc: Exception) -> bool:
     # Download failures wrap the network cause; classify by the cause.
-    if isinstance(exc, GovInfoDownloadError) and isinstance(
-        exc.__cause__, Exception
-    ):
+    if isinstance(exc, GovInfoDownloadError) and isinstance(exc.__cause__, Exception):
         return _is_transient(exc.__cause__)
     if isinstance(exc, requests.HTTPError):
         response = exc.response
@@ -169,35 +180,61 @@ def _is_transient(exc: Exception) -> bool:
             response.status_code == 429 or response.status_code >= 500
         )
     message = str(exc).lower()
-    if "database is locked" in message or "disk i/o error" in message:
+    if any(marker in message for marker in _TRANSIENT_MARKERS):
         return True
     return isinstance(exc, (requests.ConnectionError, requests.Timeout))
+
+
+# Infrastructure hiccups that heal on their own; retrying is always safe
+# because indexing is idempotent and unacked stream entries are redelivered.
+_TRANSIENT_MARKERS = (
+    "database is locked",
+    "disk i/o error",
+    "version_conflict_engine_exception",
+    "authentication",
+    "connectionerror",
+    "connection timed out",
+    "connectiontimeout",
+    "too_many_requests",
+    "es_rejected_execution",
+    "circuit_breaking",
+    "cluster_block",
+    "no_shard_available",
+    "unavailable_shards_exception",
+    "still has",
+    "transporterror(5",
+    "transporterror(429",
+)
 
 
 def _is_retryable_error(error: str | None) -> bool:
     if not error:
         return False
-    return error.startswith((
-        "server error: 5",
-        "server error: 429",
-        "HTTP 5",
-        "HTTP 429",
-    )) or any(
-        marker in error.lower()
-        for marker in (
-            "connectionerror",
-            "connection aborted",
-            "connection closed by server",
-            "database is locked",
-            "disk i/o error",
-            "timed out",
-            # Connection-level throttling by govinfo.gov surfaces as these.
-            "max retries exceeded",
-            "failed to resolve",
-            "sslerror",
-            # Resume dedupe banks progress across attempts, so a task that
-            # ran out of time budget is worth retrying from its archive.
-            "softtimelimitexceeded",
+    return (
+        error.startswith((
+            "server error: 5",
+            "server error: 429",
+            "HTTP 5",
+            "HTTP 429",
+        ))
+        or any(marker in error.lower() for marker in _TRANSIENT_MARKERS)
+        or any(
+            marker in error.lower()
+            for marker in (
+                "connectionerror",
+                "connection aborted",
+                "connection closed by server",
+                "database is locked",
+                "disk i/o error",
+                "timed out",
+                # Connection-level throttling by govinfo.gov surfaces as these.
+                "max retries exceeded",
+                "failed to resolve",
+                "sslerror",
+                # Resume dedupe banks progress across attempts, so a task that
+                # ran out of time budget is worth retrying from its archive.
+                "softtimelimitexceeded",
+            )
         )
     )
 
@@ -454,49 +491,93 @@ def run_index_job(self, job_id: str) -> dict:
         existing = store.get(job_id)
         return {"job_id": job_id, "skipped": True, "status": existing["status"]}
     payload = job["payload"]
+
+    def same_batch(other: dict) -> bool:
+        candidate = other["payload"]
+        return all(
+            candidate.get(key) == payload.get(key)
+            for key in ("resource", "target_index", "replace", "preserve_raw")
+        )
+
+    claimed = (
+        store.claim_queued(
+            JobKind.INDEX.value,
+            same_batch,
+            INDEX_BATCH_JOBS - 1,
+            exclude={job_id},
+        )
+        if INDEX_BATCH_JOBS > 1
+        else []
+    )
+    jobs = {job_id: payload} | {str(other["id"]): other["payload"] for other in claimed}
     try:
         client = get_opensearch_client(url=ES_LOCAL_URL, api_key=ES_LOCAL_API_KEY)
         target, _ = resource_target(payload["resource"])
         target_index = payload.get("target_index")
-        if target_index:
-            if not client.indices.exists(index=target_index):
-                raise RuntimeError(
-                    f"Configured staging index does not exist: {target_index}"
-                )
-        else:
+        if target_index and not client.indices.exists(index=target_index):
+            logger.warning(
+                "Staging index %s is gone; indexing %s via its write alias",
+                target_index,
+                payload["resource"],
+            )
+            target_index = None
+        if not target_index:
             IndexManager(client).create(target, exists_ok=True)
-        result = RedisIndexingRunner(
-            redis_client=_redis(),
-            opensearch_client=client,
-            stream=payload["stream"],
+        for item in jobs.values():
+            item.setdefault("consumer_group", REDIS_CONSUMER_GROUP)
+        outcomes = index_streams(
+            _redis(),
+            client,
+            jobs,
             resource=payload["resource"],
-            batch_size=int(payload.get("batch_size", 500)),
-            consumer_group=payload.get("consumer_group", REDIS_CONSUMER_GROUP),
-            preserve_raw=bool(payload.get("preserve_raw", False)),
             target_index=target_index,
             replace=bool(payload.get("replace", False)),
-        ).run()
-        expected_count = payload.get("expected_count")
-        if result["pending"] != 0:
-            raise RuntimeError(
-                f"Redis stream still has {result['pending']} pending entries: "
-                f"{payload['stream']}"
-            )
-        if expected_count is not None and result["indexed"] < int(expected_count):
-            # The stream may have been trimmed or lost (Redis restart, maxlen
-            # eviction); the durable per-job archive is the fallback source.
-            replayed = _replay_archive_into_index(client, payload)
-            result["replayed_from_archive"] = replayed
-            if result["indexed"] + replayed < int(expected_count):
-                raise RuntimeError(
-                    f"Indexed {result['indexed']} records "
-                    f"(+{replayed} archive replays), expected at least "
-                    f"{expected_count}: {payload['stream']}"
-                )
-        store.mark_succeeded(job_id)
-        return result
+            preserve_raw=bool(payload.get("preserve_raw", False)),
+            batch_docs=INDEX_BATCH_DOCS,
+        )
     except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
+        for other in claimed:
+            store.mark_failed(str(other["id"]), str(exc))
         _retry(self, job_id, exc)
+
+    own_error: Exception | None = None
+    own_result: dict | None = None
+    for current_id, outcome in outcomes.items():
+        try:
+            if isinstance(outcome, Exception):
+                raise outcome
+            _finalize_index_job(client, jobs[current_id], outcome)
+            store.mark_succeeded(current_id)
+            if current_id == job_id:
+                own_result = outcome
+        except Exception as exc:  # noqa: BLE001
+            if current_id == job_id:
+                own_error = exc
+            else:
+                store.mark_failed(current_id, str(exc))
+    if own_error is not None:
+        _retry(self, job_id, own_error)
+    return {**(own_result or {}), "batched_jobs": len(jobs)}
+
+
+def _finalize_index_job(client, payload: dict, result: dict) -> None:
+    expected_count = payload.get("expected_count")
+    if result["pending"] != 0:
+        raise RuntimeError(
+            f"Redis stream still has {result['pending']} pending entries: "
+            f"{payload['stream']}"
+        )
+    if expected_count is not None and result["indexed"] < int(expected_count):
+        # The stream may have been trimmed or lost (Redis restart, maxlen
+        # eviction); the durable per-job archive is the fallback source.
+        replayed = _replay_archive_into_index(client, payload)
+        result["replayed_from_archive"] = replayed
+        if result["indexed"] + replayed < int(expected_count):
+            raise RuntimeError(
+                f"Indexed {result['indexed']} records "
+                f"(+{replayed} archive replays), expected at least "
+                f"{expected_count}: {payload['stream']}"
+            )
 
 
 def _replay_archive_into_index(client, payload: dict) -> int:
@@ -566,56 +647,103 @@ def schedule_daily_ingest() -> dict:
     return submit_job("ingest", payload)
 
 
+def _parse_utc(value: Any) -> datetime:
+    parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+
+
+def _coverage_holes(
+    intervals: list[tuple[datetime, datetime]],
+    lookback_start: datetime,
+    current: datetime,
+) -> list[tuple[datetime, datetime]]:
+    """Return uncovered spans after the first covered window within the lookback.
+
+    Spans shorter than the freshness threshold are ignored; the trailing span up
+    to ``current`` is included once it exceeds 24 hours.
+    """
+    clipped = sorted(
+        (max(start, lookback_start), end)
+        for start, end in intervals
+        if end > lookback_start
+    )
+    if not clipped:
+        return []
+    holes = []
+    covered_to = clipped[0][1]
+    for start, end in clipped[1:]:
+        if start - covered_to > _MIN_GAP:
+            holes.append((covered_to, start))
+        covered_to = max(covered_to, end)
+    if current - covered_to > _MIN_GAP:
+        holes.append((covered_to, current))
+    return holes
+
+
+def _chunk_span(start: datetime, end: datetime) -> list[tuple[datetime, datetime]]:
+    chunks = []
+    while start < end:
+        stop = min(end, start + _GAP_CHUNK)
+        chunks.append((start, stop))
+        start = stop
+    return chunks
+
+
+_MIN_GAP = timedelta(hours=24)
+_GAP_CHUNK = timedelta(days=7)
+_GAP_JOBS_PER_RESOURCE = 4
+
+
 def coverage_gap_payloads(now: datetime | None = None) -> list[dict[str, Any]]:
-    """Build jobs for date-windowed resources stale by more than 24 hours."""
+    """Build jobs for uncovered spans (interior holes and a stale tail)."""
     current = now or datetime.now(UTC)
     if current.tzinfo is None:
         current = current.replace(tzinfo=UTC)
+    lookback_start = current - timedelta(days=COVERAGE_LOOKBACK_DAYS)
     store = _store()
     payloads = []
     for config in date_windowed():
         resource = config.resource.value
-        completed = [
-            row
+        intervals = [
+            (
+                _parse_utc(row["window_start"])
+                if row.get("window_start")
+                else datetime.min.replace(tzinfo=UTC),
+                _parse_utc(row["window_end"]),
+            )
             for row in store.coverage(resource)
             if row["status"] == JobStatus.SUCCEEDED.value and row["window_end"]
         ]
-        if not completed:
-            continue
-        window_ends = []
-        for row in completed:
-            end = datetime.fromisoformat(str(row["window_end"]))
-            # Normalize before max(): mixing naive and aware datetimes raises.
-            if end.tzinfo is None:
-                end = end.replace(tzinfo=UTC)
-            window_ends.append(end)
-        latest = max(window_ends)
-        if current - latest <= timedelta(hours=24):
-            continue
-        payloads.append({
-            "outdir": "data/daily",
-            "resources": [resource],
-            "from_date": latest
-            .replace(microsecond=0)
-            .isoformat()
-            .replace("+00:00", "Z"),
-            "to_date": current
-            .replace(microsecond=0)
-            .isoformat()
-            .replace("+00:00", "Z"),
-            # Scope to the current Congress: the bare list endpoints return
-            # records from ANY congress recently touched by Congress.gov
-            # backfills (e.g. 1978 bills with a 2026 updateDate).
-            "congress": (current.year - 1787) // 2,
-            "fetch_items": config.fetch_items_default,
-            # Bills default to list-only; gap windows are small enough to
-            # hydrate full detail (actions, cosponsors, subjects, text).
-            "item_resources": ["bill"],
-            "index": True,
-            "concurrency": 4,
-            "index_batch_size": 500,
-            "mode": "coverage_gap",
-        })
+        spans = [
+            chunk
+            for hole in _coverage_holes(intervals, lookback_start, current)
+            for chunk in _chunk_span(*hole)
+        ]
+        for span_start, span_end in spans[:_GAP_JOBS_PER_RESOURCE]:
+            payloads.append({
+                "outdir": "data/daily",
+                "resources": [resource],
+                "from_date": span_start
+                .replace(microsecond=0)
+                .isoformat()
+                .replace("+00:00", "Z"),
+                "to_date": span_end
+                .replace(microsecond=0)
+                .isoformat()
+                .replace("+00:00", "Z"),
+                # Scope to the current Congress: the bare list endpoints return
+                # records from ANY congress recently touched by Congress.gov
+                # backfills (e.g. 1978 bills with a 2026 updateDate).
+                "congress": (current.year - 1787) // 2,
+                "fetch_items": config.fetch_items_default,
+                # Bills default to list-only; gap windows are small enough to
+                # hydrate full detail (actions, cosponsors, subjects, text).
+                "item_resources": ["bill"],
+                "index": True,
+                "concurrency": 4,
+                "index_batch_size": 500,
+                "mode": "coverage_gap",
+            })
     return payloads
 
 
@@ -672,8 +800,30 @@ _ORPHAN_RECOVERY_BATCH_LIMIT = 25
 _ORPHAN_RECOVERABLE_KINDS = (
     JobKind.GOVINFO_BULK.value,
     JobKind.GOVINFO_BULK_BATCH.value,
-    JobKind.INDEX.value,
 )
+# Index jobs are re-sent only when the broker queue is nearly empty, topping
+# it up to the high watermark, so a lost message heals without duplicate storms.
+_INDEX_LOW_WATERMARK = 500
+_INDEX_HIGH_WATERMARK = 2000
+_INDEX_QUEUED_CUTOFF_MINUTES = 5
+
+
+def _queue_depth(queue: str) -> int | None:
+    """Return the broker message count for *queue*, or None if unavailable."""
+    try:
+        with celery_app.connection_for_read() as connection:
+            channel = connection.default_channel
+            return int(channel.queue_declare(queue=queue, passive=True).message_count)
+    except Exception:  # noqa: BLE001 - dispatching is skipped when depth is unknown.
+        logger.warning("Could not read depth of queue %s", queue, exc_info=True)
+        return None
+
+
+def _index_redispatch_budget() -> int:
+    depth = _queue_depth(CELERY_INDEX_QUEUE)
+    if depth is None or depth >= _INDEX_LOW_WATERMARK:
+        return 0
+    return _INDEX_HIGH_WATERMARK - depth
 
 
 @celery_app.task(name="cdm.workers.tasks.recover_failed_ingest_jobs")
@@ -719,6 +869,15 @@ def recover_failed_ingest_jobs() -> dict:
                 _ORPHAN_RECOVERY_BATCH_LIMIT,
             ),
         ]
+        index_budget = _index_redispatch_budget()
+        if index_budget:
+            candidates.extend(
+                store.stale_queued(
+                    (JobKind.INDEX.value,),
+                    (now - timedelta(minutes=_INDEX_QUEUED_CUTOFF_MINUTES)).isoformat(),
+                    index_budget,
+                )
+            )
         batched_package_ids = {
             package_id
             for batch in store.jobs(JobKind.GOVINFO_BULK_BATCH.value)
@@ -840,6 +999,7 @@ def run_retention_maintenance() -> dict:
             archives_deleted += 1
 
     vacuumed = store.vacuum() if pruned else False
+    store.checkpoint_wal()
     return {
         "pruned_jobs": len(pruned),
         "streams_deleted": streams_deleted,

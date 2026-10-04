@@ -49,7 +49,7 @@ services:
     container_name: congress-worker-index
     working_dir: /workspace
     command: >
-      sh -lc "uv sync --no-sources && /opt/venv/bin/celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=2 --max-tasks-per-child=1 --loglevel=INFO --queues=congress-index"
+      sh -lc "uv sync --no-sources && /opt/venv/bin/celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=2 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index"
     env_file:
       - elastic-start-local/.env
     environment:

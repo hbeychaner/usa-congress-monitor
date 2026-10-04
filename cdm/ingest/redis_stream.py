@@ -60,7 +60,7 @@ class RedisRecordStream:
         *,
         count: int,
         consumer: str | None = None,
-        block_ms: int = 1000,
+        block_ms: int | None = 1000,
         min_idle_ms: int = 60_000,
     ) -> list[tuple[str, dict[str, Any]]]:
         if count < 1:
@@ -117,14 +117,12 @@ class RedisRecordStream:
                 ingest_metadata = json.loads(normalized["ingest_metadata"])
                 if not isinstance(ingest_metadata, dict):
                     ingest_metadata = None
-            decoded.append(
-                (
-                    entry_id.decode() if isinstance(entry_id, bytes) else entry_id,
-                    {
-                        "resource": resource,
-                        "record": record,
-                        "ingest_metadata": ingest_metadata,
-                    },
-                )
-            )
+            decoded.append((
+                entry_id.decode() if isinstance(entry_id, bytes) else entry_id,
+                {
+                    "resource": resource,
+                    "record": record,
+                    "ingest_metadata": ingest_metadata,
+                },
+            ))
         return decoded

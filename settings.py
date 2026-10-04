@@ -55,6 +55,10 @@ CELERY_TASK_TIME_LIMIT = int(os.getenv("CELERY_TASK_TIME_LIMIT", "3900"))
 # Terminal jobs (succeeded/cancelled) older than this are pruned from the
 # ledger along with their Redis streams and local archive directories.
 RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "30"))
+INDEX_BATCH_JOBS = int(os.getenv("INDEX_BATCH_JOBS", "200"))
+INDEX_BATCH_DOCS = int(os.getenv("INDEX_BATCH_DOCS", "1000"))
+# Ledger windows older than this are not scanned for interior coverage holes.
+COVERAGE_LOOKBACK_DAYS = int(os.getenv("COVERAGE_LOOKBACK_DAYS", "30"))
 CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
@@ -66,4 +70,6 @@ CORS_ORIGINS = [
 # When true, the client will raise an error if response fields are
 # present in the API payload but not represented in our Pydantic models.
 # Set via environment variable to one of: 1,true,yes
-CONGRESS_STRICT_FIELD_CHECK = os.getenv("CONGRESS_STRICT_FIELD_CHECK", "true").lower() in ("1", "true", "yes")
+CONGRESS_STRICT_FIELD_CHECK = os.getenv(
+    "CONGRESS_STRICT_FIELD_CHECK", "true"
+).lower() in ("1", "true", "yes")

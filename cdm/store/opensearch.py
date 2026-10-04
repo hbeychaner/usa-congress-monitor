@@ -7,6 +7,9 @@ from typing import Any, cast
 
 INDEX_PREFIX = "congress"
 
+# Bill, summary, and text records all update the same bill document.
+UPDATE_RETRY_ON_CONFLICT = 8
+
 # Source resources that share a physical index must carry a discriminator in
 # the document so queries can distinguish their source shapes.
 _RESOURCE_TARGETS: dict[str, tuple[str, dict[str, str]]] = {
@@ -86,9 +89,7 @@ _TEXT_MERGE_SCRIPT = (
 )
 
 
-def bill_text_parent_action(
-    doc: dict, index: str
-) -> dict[str, Any] | None:
+def bill_text_parent_action(doc: dict, index: str) -> dict[str, Any] | None:
     """Return the parent-bill update action for a bill-text record."""
     congress = doc.get("congress")
     bill_type = str(doc.get("type") or "").lower()
@@ -123,6 +124,7 @@ def bill_text_parent_action(
         },
         "upsert": {},
         "scripted_upsert": True,
+        "retry_on_conflict": UPDATE_RETRY_ON_CONFLICT,
     }
 
 
@@ -185,6 +187,7 @@ def bulk_upsert(
                 },
                 "upsert": doc,
                 "scripted_upsert": True,
+                "retry_on_conflict": UPDATE_RETRY_ON_CONFLICT,
             })
         elif resource == "bill_text":
             action = bill_text_parent_action(doc, index)
@@ -197,6 +200,7 @@ def bulk_upsert(
                 "_id": doc["id"],
                 "doc": doc,
                 "doc_as_upsert": True,
+                "retry_on_conflict": UPDATE_RETRY_ON_CONFLICT,
             })
     if not actions:
         return {

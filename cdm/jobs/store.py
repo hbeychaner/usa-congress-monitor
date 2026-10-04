@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import fcntl
 import json
+from collections.abc import Callable
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -115,7 +116,7 @@ def _row_dict(row: Any) -> dict:
 class JobStore:
     """Persist job lifecycle independently of the RabbitMQ result backend."""
 
-    def __init__(self, path: Path | str) -> None:
+    def __init__(self, path: Path | str, *, repair: bool = True) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.engine: Engine = create_engine(
@@ -139,9 +140,17 @@ class JobStore:
         with init_lock_path.open("w") as init_lock:
             fcntl.flock(init_lock.fileno(), fcntl.LOCK_EX)
             _METADATA.create_all(self.engine)
+            fcntl.flock(init_lock.fileno(), fcntl.LOCK_UN)
+        if repair:
+            self.repair_legacy_windows()
+
+    def repair_legacy_windows(self) -> None:
+        """Reconcile ingest_windows with ingest jobs; slow, run once per boot."""
+        init_lock_path = self.path.with_name(f".{self.path.name}.init.lock")
+        with init_lock_path.open("w") as init_lock:
+            fcntl.flock(init_lock.fileno(), fcntl.LOCK_EX)
             with self._transaction_lock(), self.engine.begin() as connection:
-                # Repair path for legacy rows: register windows only for
-                # ingest jobs that have none, instead of re-registering all.
+                # Register windows only for ingest jobs that have none.
                 missing = connection.execute(
                     select(
                         _JOBS.c.id,
@@ -150,11 +159,7 @@ class JobStore:
                         _JOBS.c.created_at,
                     )
                     .where(_JOBS.c.kind == JobKind.INGEST.value)
-                    .where(
-                        ~_JOBS.c.id.in_(
-                            select(_INGEST_WINDOWS.c.job_id).distinct()
-                        )
-                    )
+                    .where(~_JOBS.c.id.in_(select(_INGEST_WINDOWS.c.job_id).distinct()))
                 ).all()
                 for row in missing:
                     self._register_ingest_windows(
@@ -325,14 +330,60 @@ class JobStore:
                 )
         return self.get(job_id)
 
+    def claim_queued(
+        self,
+        kind: str,
+        accept: Callable[[dict], bool],
+        limit: int,
+        *,
+        scan: int = 2000,
+        exclude: set[str] | None = None,
+    ) -> list[dict]:
+        """Atomically move up to ``limit`` QUEUED jobs of ``kind`` accepted by
+        ``accept`` to RUNNING, oldest first, and return them."""
+        if limit < 1:
+            return []
+        now = _now()
+        claimed: list[dict] = []
+        with self._transaction_lock(), self.engine.begin() as connection:
+            rows = connection.execute(
+                select(_JOBS)
+                .where(_JOBS.c.status == JobStatus.QUEUED.value)
+                .where(_JOBS.c.kind == kind)
+                .order_by(_JOBS.c.created_at)
+                .limit(scan)
+            ).mappings()
+            for row in rows:
+                if exclude and row["id"] in exclude:
+                    continue
+                job = dict(row)
+                job["payload"] = json.loads(job["payload"])
+                if not accept(job):
+                    continue
+                claimed.append(job)
+                if len(claimed) >= limit:
+                    break
+            if claimed:
+                connection.execute(
+                    update(_JOBS)
+                    .where(_JOBS.c.id.in_([job["id"] for job in claimed]))
+                    .values(
+                        status=JobStatus.RUNNING.value,
+                        attempts=_JOBS.c.attempts + 1,
+                        started_at=now,
+                        updated_at=now,
+                        last_error=None,
+                    )
+                )
+        return claimed
+
     def mark_succeeded(self, job_id: str) -> dict:
         now = _now()
         with self._transaction_lock(), self.engine.begin() as connection:
             connection.execute(
                 update(_JOBS)
                 .where(
-                    (_JOBS.c.id == job_id)
-                    & (_JOBS.c.status == JobStatus.RUNNING.value)
+                    (_JOBS.c.id == job_id) & (_JOBS.c.status == JobStatus.RUNNING.value)
                 )
                 .values(
                     status=JobStatus.SUCCEEDED.value,
@@ -360,8 +411,7 @@ class JobStore:
             connection.execute(
                 update(_JOBS)
                 .where(
-                    (_JOBS.c.id == job_id)
-                    & (_JOBS.c.status == JobStatus.RUNNING.value)
+                    (_JOBS.c.id == job_id) & (_JOBS.c.status == JobStatus.RUNNING.value)
                 )
                 .values(
                     status=JobStatus.FAILED.value,
@@ -533,6 +583,15 @@ class JobStore:
                     chunk = ids[start : start + 500]
                     connection.execute(_JOBS.delete().where(_JOBS.c.id.in_(chunk)))
         return pruned
+
+    def checkpoint_wal(self) -> bool:
+        """Fold the WAL back into the main file; returns False if busy."""
+        try:
+            with self.engine.connect() as connection:
+                connection.exec_driver_sql("PRAGMA wal_checkpoint(TRUNCATE)")
+            return True
+        except Exception:  # noqa: BLE001 - opportunistic maintenance.
+            return False
 
     def vacuum(self) -> bool:
         """Reclaim ledger disk space; returns False if busy (safe to skip)."""

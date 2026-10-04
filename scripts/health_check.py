@@ -134,11 +134,11 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
     }
 
     try:
-        with JobStore(JOB_DB_PATH).engine.connect() as connection:
+        with JobStore(JOB_DB_PATH, repair=False).engine.connect() as connection:
             integrity = connection.execute(text("PRAGMA integrity_check")).scalar_one()
         if integrity != "ok":
             raise RuntimeError(f"SQLite integrity check failed: {integrity}")
-        report["checks"]["jobs"] = _job_snapshot(JobStore(JOB_DB_PATH), window_minutes)
+        report["checks"]["jobs"] = _job_snapshot(JobStore(JOB_DB_PATH, repair=False), window_minutes)
     except Exception as exc:  # noqa: BLE001 - report dependency failures without aborting the check.
         report["status"] = "failed"
         report["checks"]["jobs"] = {"status": "failed", "error": str(exc)}
@@ -159,6 +159,11 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
     backlog = sum(count for key, count in counts.items() if key.endswith(":queued"))
     if backlog:
         report["warnings"].append(f"{backlog:,} queued jobs remain")
+    if backlog and not jobs.get("recent_succeeded"):
+        report["warnings"].append(
+            f"{backlog:,} jobs queued but none completed in the last "
+            f"{window_minutes} minutes: pipeline appears stalled"
+        )
     if jobs.get("failures"):
         report["warnings"].append(
             f"{jobs.get('actionable_failure_count', 0):,} actionable failed jobs remain"
