@@ -41,7 +41,7 @@ celery_app.conf.update(
         },
         "coverage-gap-ingest": {
             "task": "cdm.workers.tasks.schedule_coverage_gaps",
-            "schedule": timedelta(hours=24),
+            "schedule": timedelta(hours=6),
         },
         "recover-failed-ingest-jobs": {
             "task": "cdm.workers.tasks.recover_failed_ingest_jobs",
