@@ -21,6 +21,7 @@ from . import (
     nomination_specs,
     treaty_specs,
 )
+from . import congress_list_specs  # noqa: E402  (must follow the specs it derives from)
 
 __all__ = [
     "amendment_specs",

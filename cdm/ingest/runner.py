@@ -26,6 +26,7 @@ import cdm.data_collection.specs  # noqa: F401
 from cdm.data_collection.client import get_client
 from cdm.data_collection.endpoint_registry import get_spec
 from cdm.data_collection.id_utils import canonical_id
+from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
 from cdm.data_collection.utils import resolve_pagination
 from cdm.ingest.archive import SQLiteListCache
 from cdm.jobs.store import CoverageStage
@@ -220,8 +221,8 @@ class IngestRunner:
     record_archive_sink: Callable[[str, dict], None] | None = field(
         default=None, repr=False
     )
-    validation_failure_sink: Callable[[str, dict, str, str | None], None] | None = field(
-        default=None, repr=False
+    validation_failure_sink: Callable[[str, dict, str, str | None], None] | None = (
+        field(default=None, repr=False)
     )
     # Guardrail for API pages that consistently return HTTP 5xx at a fixed offset.
     # We skip a bounded number of poisoned offsets and continue the ingest.
@@ -454,6 +455,8 @@ class IngestRunner:
         list_spec = get_spec(self.resource.list_spec_name())
         if self.resource is Resource.BILL and self.congress is not None:
             list_spec = get_spec("bill_list_by_congress")
+        elif self.congress is not None and self.resource.value in CONGRESS_LISTABLE:
+            list_spec = get_spec(f"{list_spec.name}_by_congress")
         item_spec = None
         if self.resource != Resource.SUMMARIES:
             item_spec = get_spec(self.resource.item_spec_name())
@@ -599,6 +602,7 @@ class IngestRunner:
             logger.info("Parsed response; extracted %d records", len(records))
             if not records:
                 break
+
             def quarantine_list_record(raw_record, error) -> None:
                 if self.validation_failure_sink is not None:
                     self.validation_failure_sink(
@@ -732,7 +736,10 @@ class IngestRunner:
             # models, the list identity (often a URL) differs from item IDs, so
             # check both the list identity and best-effort canonical item ID.
             model_key = self._model_identity(meta)
-            if model_key is not None and self._normalize_record_id(model_key) in seen_ids:
+            if (
+                model_key is not None
+                and self._normalize_record_id(model_key) in seen_ids
+            ):
                 return True
             meta_data = meta.model_dump(mode="json")
             if self.resource is Resource.BILL and meta_data.get("introduced_date"):
@@ -742,9 +749,7 @@ class IngestRunner:
                 item_key = canonical_id(meta)
             except Exception:  # noqa: BLE001 - best effort dedupe only.
                 item_key = None
-            return bool(
-                item_key and self._normalize_record_id(item_key) in seen_ids
-            )
+            return bool(item_key and self._normalize_record_id(item_key) in seen_ids)
 
         pending = [
             (idx, meta) for idx, meta in pending if not _meta_already_archived(meta)

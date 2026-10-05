@@ -31,8 +31,9 @@ from cdm.ingest.govinfo import (
 from cdm.ingest.pipeline import Pipeline, PipelineConfig
 from cdm.ingest.reconciliation import replay_govinfo_archives
 from cdm.ingest.redis_stream import RedisRecordStream
-from cdm.ingest.resource_config import congress_scoped, date_windowed
+from cdm.ingest.resource_config import congress_scoped, date_windowed, static_resources
 from cdm.ingest.runner import IngestCancelledError
+from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
 from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
 from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
@@ -753,6 +754,45 @@ def schedule_coverage_gaps() -> dict:
     queued = []
     for payload in coverage_gap_payloads():
         queued.append(submit_job(JobKind.INGEST.value, payload)["id"])
+    return {"queued": queued, "count": len(queued)}
+
+
+# Static list endpoints ignore date filters, so refresh them weekly: a cheap
+# list-only pass over everything plus full hydration of the current Congress.
+def static_refresh_payloads(today) -> list[dict[str, Any]]:
+    stamp = today.isocalendar()
+    week = f"{stamp.year}-W{stamp.week:02d}"
+    congress = (today.year - 1787) // 2
+    payloads = []
+    for config in static_resources():
+        resource = config.resource.value
+        base = {
+            "outdir": "data/daily",
+            "resources": [resource],
+            "index": True,
+            "concurrency": 4,
+            "index_batch_size": 500,
+            "schedule_week": week,
+        }
+        payloads.append(base | {"fetch_items": False, "mode": "static_refresh"})
+        if resource in CONGRESS_LISTABLE and config.fetch_items_default:
+            payloads.append(
+                base
+                | {
+                    "congress": congress,
+                    "fetch_items": True,
+                    "mode": "static_refresh_congress",
+                }
+            )
+    return payloads
+
+
+@celery_app.task(name="cdm.workers.tasks.schedule_static_refresh")
+def schedule_static_refresh() -> dict:
+    queued = [
+        submit_job(JobKind.INGEST.value, payload)["id"]
+        for payload in static_refresh_payloads(datetime.now(UTC).date())
+    ]
     return {"queued": queued, "count": len(queued)}
 
 
