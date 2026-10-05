@@ -320,6 +320,7 @@ def run_ingest_job(self, job_id: str) -> dict:
             max_pages=payload.get("max_pages"),
             max_items=payload.get("max_items"),
             list_page_size=int(payload.get("list_page_size", 250)),
+            max_skipped_list_pages=int(payload.get("max_skipped_list_pages", 0)),
             concurrency=int(payload.get("concurrency", 1)),
             rate_limiter=TokenBucket(rate_per_hour=4800),
             api_key=payload.get("api_key"),
@@ -773,6 +774,8 @@ def static_refresh_payloads(today) -> list[dict[str, Any]]:
             "concurrency": 4,
             "index_batch_size": 500,
             "schedule_week": week,
+            # The API 500s on tail pages of some full-collection lists.
+            "max_skipped_list_pages": 100,
         }
         payloads.append(base | {"fetch_items": False, "mode": "static_refresh"})
         if resource in CONGRESS_LISTABLE and config.fetch_items_default:

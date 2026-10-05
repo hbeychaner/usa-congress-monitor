@@ -62,6 +62,7 @@ class PipelineConfig:
     max_pages: int | None = None
     max_items: int | None = None
     list_page_size: int = 250
+    max_skipped_list_pages: int = 0
     # Concurrency: parallel item-fetch workers
     concurrency: int = 1
     # Shared rate limiter (TokenBucket), injected into every per-thread
@@ -192,6 +193,7 @@ class Pipeline:
                 max_pages=self.config.max_pages,
                 max_items=self.config.max_items,
                 list_page_size=self.config.list_page_size,
+                max_skipped_list_pages=self.config.max_skipped_list_pages,
                 congress=self.config.congress,
                 from_date=from_date,
                 to_date=to_date,
