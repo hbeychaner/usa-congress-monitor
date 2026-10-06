@@ -10,6 +10,8 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 SPACY_MODEL = "en_core_web_md"
+# Cap spaCy input; lemma fields only need the head and huge texts starve workers.
+MAX_LEMMA_CHARS = 200_000
 
 _nlp: Any = None
 _lock = threading.Lock()
@@ -42,7 +44,7 @@ def lemmatize_texts(texts: Sequence[str]) -> list[str]:
     nlp = _get_nlp()
     # Very large bill texts can exceed spaCy's max_length; truncate rather
     # than fail — the head of the document still carries the topical signal.
-    max_chars = int(nlp.max_length)
+    max_chars = min(int(nlp.max_length), MAX_LEMMA_CHARS)
     results: list[str] = []
     for doc in nlp.pipe([(text or "")[:max_chars] for text in texts]):
         results.append(

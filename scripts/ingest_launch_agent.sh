@@ -22,7 +22,7 @@ install_agent() {
     <array>
         <string>/bin/zsh</string>
         <string>-lc</string>
-        <string>cd "$repo_root" &amp;&amp; exec env OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES "$uv_path" run celery $command</string>
+        <string>cd "$repo_root" &amp;&amp; exec env OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 OPENBLAS_NUM_THREADS=1 "$uv_path" run celery $command</string>
     </array>
     <key>WorkingDirectory</key>
     <string>$repo_root</string>
