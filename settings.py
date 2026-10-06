@@ -55,7 +55,7 @@ CELERY_TASK_TIME_LIMIT = int(os.getenv("CELERY_TASK_TIME_LIMIT", "3900"))
 # Terminal jobs (succeeded/cancelled) older than this are pruned from the
 # ledger along with their Redis streams and local archive directories.
 RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "30"))
-INDEX_BATCH_JOBS = int(os.getenv("INDEX_BATCH_JOBS", "200"))
+INDEX_BATCH_JOBS = int(os.getenv("INDEX_BATCH_JOBS", "25"))
 INDEX_BATCH_DOCS = int(os.getenv("INDEX_BATCH_DOCS", "1000"))
 # Ledger windows older than this are not scanned for interior coverage holes.
 COVERAGE_LOOKBACK_DAYS = int(os.getenv("COVERAGE_LOOKBACK_DAYS", "30"))
