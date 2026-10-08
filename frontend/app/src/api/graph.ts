@@ -10,6 +10,7 @@ export type NeighborhoodParams = {
     members: string[];
     collaborationWeight: number;
     votingWeight: number;
+    topicWeight: number;
     congress: number | null;
     chamber: 'house' | 'senate' | null;
     parties: PartyGroup[];
@@ -20,6 +21,7 @@ export function fetchNeighborhood(params: NeighborhoodParams): Promise<Neighborh
     const query = new URLSearchParams({
         collaboration_weight: String(params.collaborationWeight),
         voting_weight: String(params.votingWeight),
+        topic_weight: String(params.topicWeight),
         limit: String(params.limit),
     });
     params.members.forEach((member) => query.append('member', member));

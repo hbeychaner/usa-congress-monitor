@@ -81,3 +81,16 @@ def test_zero_weight_signal_is_ignored(service: NeighborhoodService):
     )
     response = service.neighborhood(query)
     assert set(response.versions) == {Signal.COLLABORATION}
+
+
+def test_shared_topics_are_carried_to_links(service: NeighborhoodService):
+    graph = service.graph
+    graph.table[Signal.TOPIC] = [
+        MemberEdge(
+            graph_version="v1", signal=Signal.TOPIC, member="A", neighbor="B",
+            score=0.6, shared_topics=["health care"],
+        )
+    ]
+    query = NeighborhoodQuery(seeds=["A"], weights={Signal.TOPIC: 1.0})
+    link = service.neighborhood(query).links[0]
+    assert link.shared_topics == ["health care"]

@@ -59,6 +59,7 @@ class BillSignature(BaseModel):
 
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
+    id: str = ""
     congress: int
     sponsor_ids: list[str] = Field(default_factory=list, alias="sponsor_bioguide_ids")
     cosponsor_ids: list[str] = Field(
@@ -105,6 +106,7 @@ class MemberEdge(BaseModel):
     member: str
     neighbor: str
     score: float
+    shared_topics: list[str] = Field(default_factory=list)
     by_congress: list[CongressEdgeStats] = Field(default_factory=list)
 
     @computed_field

@@ -11,6 +11,7 @@ from cdm.graph.collaboration import CollaborationGraphBuilder
 from cdm.graph.models import MemberEdge, Signal
 from cdm.graph.runner import BuildState, GraphBuildRunner
 from cdm.graph.store import BillSignatureReader, GraphStore, RollCallReader
+from cdm.graph.topics import TopicGraphBuilder, TopicModelReader
 from cdm.graph.voting import VotingGraphBuilder
 
 
@@ -26,6 +27,7 @@ class GraphBuildJob:
         return {
             Signal.COLLABORATION: self._collaboration_edges,
             Signal.VOTING: self._voting_edges,
+            Signal.TOPIC: self._topic_edges,
         }
 
     def _collaboration_edges(self, version: str) -> Iterator[MemberEdge]:
@@ -37,6 +39,18 @@ class GraphBuildJob:
         rolls = list(RollCallReader(self.client).read())
         print(f"Read {len(rolls):,} roll calls")
         return VotingGraphBuilder(rolls, version).build()
+
+    def _topic_edges(self, version: str) -> Iterator[MemberEdge]:
+        model = TopicModelReader(self.client)
+        topic_version = model.latest_version()
+        if topic_version is None:
+            raise RuntimeError("no trained topic model; run topic training first")
+        assignments = model.assignments(topic_version)
+        bills = list(BillSignatureReader(self.client).read())
+        print(f"Read {len(bills):,} bills, {len(assignments):,} topic assignments ({topic_version})")
+        return TopicGraphBuilder(
+            bills, assignments, model.labels(topic_version), version
+        ).build()
 
     def _report(self, **fields: object) -> None:
         if self.runner is not None:

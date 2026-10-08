@@ -420,6 +420,7 @@ class SimilarMember(BaseModel):
     agreed_votes: int = 0
     shared_split_votes: int = 0
     agreed_split_votes: int = 0
+    shared_topics: list[str] = Field(default_factory=list)
 
 
 class SimilarMembersResponse(BaseModel):
@@ -441,6 +442,7 @@ class GraphLink(BaseModel):
     target: str
     score: float
     signal_scores: dict[Signal, float] = Field(default_factory=dict)
+    shared_topics: list[str] = Field(default_factory=list)
 
 
 class NeighborhoodResponse(BaseModel):

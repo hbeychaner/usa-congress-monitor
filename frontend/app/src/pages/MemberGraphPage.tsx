@@ -32,6 +32,7 @@ export function MemberGraphPage() {
   const seeds = searchParams.getAll('member');
   const [collaborationWeight, setCollaborationWeight] = useState(1);
   const [votingWeight, setVotingWeight] = useState(0.6);
+  const [topicWeight, setTopicWeight] = useState(0.3);
   const [congress, setCongress] = useState<number | null>(null);
   const [chamber, setChamber] = useState<'house' | 'senate' | null>(null);
   const [parties, setParties] = useState<PartyGroup[]>([]);
@@ -51,7 +52,7 @@ export function MemberGraphPage() {
     }
     let cancelled = false;
     setLoading(true);
-    fetchNeighborhood({ members: seeds, collaborationWeight, votingWeight, congress, chamber, parties, limit })
+    fetchNeighborhood({ members: seeds, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit })
       .then((response) => {
         if (cancelled) return;
         setData(response);
@@ -62,7 +63,7 @@ export function MemberGraphPage() {
       .finally(() => !cancelled && setLoading(false));
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedKey, collaborationWeight, votingWeight, congress, chamber, parties, limit]);
+  }, [seedKey, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit]);
 
   const names = useMemo(
     () => new Map((data?.nodes ?? []).map((node) => [node.member.bioguide_id, node.member.display_name])),
@@ -94,7 +95,7 @@ export function MemberGraphPage() {
         <Flex direction="column" gap="1">
           <Text size="1" color="gray">Relationships</Text>
           <Heading size="7">Member graph</Heading>
-          <Text color="gray">Who works with, and votes like, a member. Edges blend cosponsorship and roll-call agreement.</Text>
+          <Text color="gray">Who works with, and votes like, a member. Edges blend cosponsorship, roll-call agreement and shared legislative topics.</Text>
         </Flex>
         <Flex gap="3" align="center">
           {PARTIES.map((party) => (
@@ -143,6 +144,7 @@ export function MemberGraphPage() {
           <Flex gap="5" wrap="wrap" align="end">
             <WeightSlider label="Collaboration" value={collaborationWeight} onCommit={setCollaborationWeight} />
             <WeightSlider label="Voting" value={votingWeight} onCommit={setVotingWeight} />
+            <WeightSlider label="Topics" value={topicWeight} onCommit={setTopicWeight} />
             <Flex direction="column" gap="1" style={{ minWidth: 160 }}>
               <Text size="2" weight="medium">Neighbors per member: {limit}</Text>
               <Slider min={5} max={40} step={1} defaultValue={[limit]} onValueCommit={([next]) => setLimit(next)} />
@@ -215,7 +217,8 @@ export function MemberGraphPage() {
                 return (
                   <Text key={other} size="2">
                     {names.get(other) ?? other}: {link.score.toFixed(2)}
-                    <Text size="1" color="gray"> (collab {(signals.collaboration ?? 0).toFixed(2)}, votes {(signals.voting ?? 0).toFixed(2)})</Text>
+                    <Text size="1" color="gray"> (collab {(signals.collaboration ?? 0).toFixed(2)}, votes {(signals.voting ?? 0).toFixed(2)}, topics {(signals.topic ?? 0).toFixed(2)})</Text>
+                    {link.shared_topics?.length ? <Text as="div" size="1" color="gray">Shared: {link.shared_topics.join('; ')}</Text> : null}
                   </Text>
                 );
               })}

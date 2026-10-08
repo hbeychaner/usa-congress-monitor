@@ -728,6 +728,8 @@ export interface components {
             signal_scores?: {
                 [key: string]: number;
             };
+            /** Shared Topics */
+            shared_topics?: string[];
         };
         /** GraphNode */
         GraphNode: {
@@ -1122,6 +1124,8 @@ export interface components {
              * @default 0
              */
             agreed_split_votes: number;
+            /** Shared Topics */
+            shared_topics?: string[];
         };
         /** SimilarMembersResponse */
         SimilarMembersResponse: {
@@ -2120,6 +2124,7 @@ export interface operations {
                 member: string[];
                 collaboration_weight?: number;
                 voting_weight?: number;
+                topic_weight?: number;
                 congress?: number | null;
                 limit?: number;
                 party?: components["schemas"]["PartyGroup"][];

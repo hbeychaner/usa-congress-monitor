@@ -115,7 +115,9 @@ class GraphService:
             similar=similar,
         )
 
-    def _stats(self, edge: MemberEdge, congress: int | None) -> dict[str, float | int]:
+    def _stats(
+        self, edge: MemberEdge, congress: int | None
+    ) -> dict[str, float | int | list[str]]:
         selected: list[CongressEdgeStats] = [
             stats
             for stats in edge.by_congress
@@ -130,4 +132,5 @@ class GraphService:
             "agreed_votes": sum(stats.agreed_votes for stats in selected),
             "shared_split_votes": sum(stats.shared_split_votes for stats in selected),
             "agreed_split_votes": sum(stats.agreed_split_votes for stats in selected),
+            "shared_topics": edge.shared_topics,
         }

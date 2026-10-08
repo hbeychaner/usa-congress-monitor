@@ -19,6 +19,7 @@ from cdm.ingest.voteview import Chamber
 
 CANDIDATE_FACTOR = 3
 VOTING_FLOOR = 0.5
+TOPIC_FLOOR = 0.2
 
 PairKey = tuple[str, str]
 
@@ -49,6 +50,8 @@ class SignalScaler:
     def apply(self, signal: Signal, score: float) -> float:
         if signal is Signal.VOTING:
             return max(0.0, (score - VOTING_FLOOR) / (1 - VOTING_FLOOR))
+        if signal is Signal.TOPIC:
+            return max(0.0, (score - TOPIC_FLOOR) / (1 - TOPIC_FLOOR))
         if self.collaboration_max <= 0:
             return 0.0
         return min(1.0, score / self.collaboration_max)
@@ -83,11 +86,14 @@ class NeighborhoodService:
         signal: Signal,
         scaler: SignalScaler,
         congress: int | None,
+        topics: dict[PairKey, list[str]],
     ) -> None:
         for edge in edges:
+            key = self._key(edge.member, edge.neighbor)
             score = scaler.apply(signal, self.graph.score(edge, congress))
-            slot = pairs[self._key(edge.member, edge.neighbor)]
-            slot[signal] = max(slot.get(signal, 0.0), score)
+            pairs[key][signal] = max(pairs[key].get(signal, 0.0), score)
+            if edge.shared_topics:
+                topics[key] = edge.shared_topics
 
     @staticmethod
     def _blend(signal_scores: dict[Signal, float], query: NeighborhoodQuery) -> float:
@@ -120,8 +126,9 @@ class NeighborhoodService:
             ])
 
         pairs: dict[PairKey, dict[Signal, float]] = defaultdict(dict)
+        topics: dict[PairKey, list[str]] = {}
         for signal, edges in seed_edges.items():
-            self._collect(pairs, edges, signal, scaler, query.congress)
+            self._collect(pairs, edges, signal, scaler, query.congress, topics)
 
         seeds = set(query.seeds)
         candidates: dict[str, dict[str, float]] = {seed: {} for seed in query.seeds}
@@ -154,6 +161,7 @@ class NeighborhoodService:
                 signal,
                 scaler,
                 query.congress,
+                topics,
             )
 
         node_set = set(node_ids)
@@ -163,6 +171,7 @@ class NeighborhoodService:
                 target=second,
                 score=blended,
                 signal_scores=signal_scores,
+                shared_topics=topics.get((first, second), []),
             )
             for (first, second), signal_scores in pairs.items()
             if first in node_set
