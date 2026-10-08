@@ -22,6 +22,49 @@ def _terms(source: dict[str, Any]) -> list[dict[str, Any]]:
     return raw_terms if isinstance(raw_terms, list) else []
 
 
+def _congress_for_year(year: int) -> int:
+    return (year - 1789) // 2 + 1
+
+
+def _expand_terms(source: dict[str, Any]) -> list[MemberTerm]:
+    """One row per Congress served; list-endpoint terms only carry years."""
+    current_year = datetime.now(UTC).year
+    state_name = source.get("state")
+    rows: list[MemberTerm] = []
+    for term in _terms(source):
+        if not isinstance(term, dict):
+            continue
+        base = {
+            "chamber": term.get("chamber"),
+            "member_type": term.get("member_type"),
+            "state_code": term.get("state_code"),
+            "state_name": term.get("state_name") or state_name,
+            "district": term.get("district"),
+        }
+        start, end = term.get("start_year"), term.get("end_year")
+        if term.get("congress") or not start:
+            rows.append(
+                MemberTerm(
+                    **base, congress=term.get("congress"), start_year=start, end_year=end
+                )
+            )
+            continue
+        # A term ending in an odd year ended in January, before that Congress began.
+        last_year = current_year if not end else (end - 1 if end % 2 else end)
+        first = _congress_for_year(start)
+        last = max(first, _congress_for_year(last_year))
+        for congress in range(first, last + 1):
+            rows.append(
+                MemberTerm(
+                    **base,
+                    congress=congress,
+                    start_year=max(start, 1789 + 2 * (congress - 1)),
+                    end_year=min(end, 1791 + 2 * (congress - 1)) if end else None,
+                )
+            )
+    return rows
+
+
 def _current_term(source: dict[str, Any]) -> dict[str, Any]:
     terms = _terms(source)
     if not terms:
@@ -64,20 +107,7 @@ def _member_detail(source: dict[str, Any], fallback_id: str = "") -> MemberDetai
     attribution = depiction.get("attribution") if isinstance(depiction, dict) else None
     leadership = source.get("leadership")
     party_history = source.get("party_history")
-    terms = [
-        MemberTerm(
-            chamber=term.get("chamber"),
-            congress=term.get("congress"),
-            start_year=term.get("start_year"),
-            end_year=term.get("end_year"),
-            member_type=term.get("member_type"),
-            state_code=term.get("state_code"),
-            state_name=term.get("state_name"),
-            district=term.get("district"),
-        )
-        for term in _terms(source)
-        if isinstance(term, dict)
-    ]
+    terms = _expand_terms(source)
     return MemberDetail(
         **summary.model_dump(),
         honorific_name=source.get("honorific_name") or None,

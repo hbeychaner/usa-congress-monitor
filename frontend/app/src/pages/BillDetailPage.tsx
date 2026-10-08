@@ -17,8 +17,13 @@ function displayName(sponsor: RecordValue): string {
     return String(sponsor.full_name ?? sponsor.name ?? sponsor.id ?? 'Unknown sponsor');
 }
 
+function decodeEntities(value: string): string {
+    if (!value.includes('&')) return value;
+    return new DOMParser().parseFromString(value, 'text/html').documentElement.textContent ?? value;
+}
+
 function stripHtml(value: string): string {
-    return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    return decodeEntities(value.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
 }
 
 function asRecords(value: unknown): RecordValue[] {
@@ -164,7 +169,7 @@ export function BillDetailPage() {
                         <Card size="3" asChild>
                             <details>
                                 <summary><Text weight="medium">Bill text{bill.full_text_version_code ? ` (version ${bill.full_text_version_code.toUpperCase()})` : ''}</Text></summary>
-                                <Text as="p" mt="2" style={{ whiteSpace: 'pre-wrap' }}>{bill.full_text}</Text>
+                                <Text as="p" mt="2" style={{ whiteSpace: 'pre-wrap' }}>{decodeEntities(bill.full_text)}</Text>
                             </details>
                         </Card>
                     ) : null}

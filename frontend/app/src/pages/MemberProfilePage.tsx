@@ -1,6 +1,6 @@
 import { Avatar, Badge, Button, Card, DataList, Flex, Heading, Progress, SegmentedControl, Table, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   fetchMemberActivity,
   fetchMemberProfile,
@@ -8,6 +8,7 @@ import {
   type MemberProfileResponse,
 } from '../api/members';
 import { fetchMemberTopics, type MemberTopicsResponse } from '../api/topics';
+import { HorizontalBarChart } from '../components/HorizontalBarChart';
 
 const PARTY_COLORS: Record<string, 'blue' | 'red' | 'gray'> = {
   Democratic: 'blue',
@@ -21,6 +22,10 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 
 const ACTIVITY_PAGE_SIZE = 25;
 
+function formatPercent(value: number): string {
+  return `${Math.round(value * 100)}%`;
+}
+
 function formatDate(value: string | null | undefined): string {
   if (!value) return 'No date';
   return value.slice(0, 10);
@@ -28,6 +33,7 @@ function formatDate(value: string | null | undefined): string {
 
 export function MemberProfilePage() {
   const { bioguideId = '' } = useParams();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<MemberProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -218,15 +224,11 @@ export function MemberProfilePage() {
           {memberTopics && memberTopics.subjects.length > 0 ? (
               <Flex direction="column" gap="1">
                 <Heading size="3" mt="2">CRS Subjects</Heading>
-                <Flex gap="1" wrap="wrap">
-                  {memberTopics.subjects.map((subject) => (
-                    <Badge key={subject.label} variant="soft" asChild>
-                      <Link to={`/bills?subject=${encodeURIComponent(subject.label)}`}>
-                        {subject.label} · {Math.round(subject.weight * 100)}%
-                      </Link>
-                    </Badge>
-                  ))}
-                </Flex>
+                <HorizontalBarChart
+                  data={memberTopics.subjects.map((subject) => ({ label: subject.label, value: subject.weight }))}
+                  formatValue={formatPercent}
+                  onBarClick={(label) => navigate(`/bills?subject=${encodeURIComponent(label)}`)}
+                />
               </Flex>
             ) : null}
             {memberTopics && memberTopics.trend.length > 0 ? (

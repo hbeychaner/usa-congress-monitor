@@ -18,6 +18,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from cdm.utils.topic_terms import dedupe_terms, keyword_label
+
 _HTML_TAG = re.compile(r"<[^>]+>")
 _WHITESPACE = re.compile(r"\s+")
 
@@ -262,17 +264,24 @@ class TopicModeler:
         """One row per topic: id, generated name, size, and top words."""
         self._require_model()
         info = self._model.get_topic_info()
-        return [
-            {
-                "topic_id": int(row.Topic),
-                "name": str(row.Name),
-                "size": int(row.Count),
-                "top_words": [
-                    word for word, _ in (self._model.get_topic(row.Topic) or [])
-                ],
-            }
-            for row in info.itertuples()
-        ]
+        summaries = []
+        for row in info.itertuples():
+            topic_id = int(row.Topic)
+            words = dedupe_terms(
+                word for word, _ in (self._model.get_topic(row.Topic) or [])
+            )
+            name = str(row.Name)
+            if topic_id != -1 and words:
+                name = f"{topic_id}_{keyword_label(words).replace(' ', '_')}"
+            summaries.append(
+                {
+                    "topic_id": topic_id,
+                    "name": name,
+                    "size": int(row.Count),
+                    "top_words": words,
+                }
+            )
+        return summaries
 
     def representative_docs(self) -> dict[int, list[str]]:
         """Most representative document texts per topic (for labeling)."""

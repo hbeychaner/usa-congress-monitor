@@ -28,6 +28,7 @@ from cdm.contracts.api import (
 )
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
+from cdm.utils.topic_terms import dedupe_terms, keyword_label
 
 ANALYSIS_INDEX = "congress-analysis-topics"
 _OUTLIER_TOPIC_ID = -1
@@ -91,12 +92,16 @@ def _topic_summaries(model_version: str) -> dict[int, TopicSummary]:
         source = hit.get("_source", {})
         topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
         stored_label = str(source.get("label") or "").strip()
+        top_words = dedupe_terms(str(word) for word in source.get("top_words") or [])
+        keywords = keyword_label(top_words)
         summaries[topic_id] = TopicSummary(
             topic_id=topic_id,
             name=str(source.get("name") or ""),
-            label=stored_label or topic_label(source.get("name"), topic_id),
+            label=stored_label
+            or (keywords if topic_id != _OUTLIER_TOPIC_ID and keywords else None)
+            or topic_label(source.get("name"), topic_id),
             size=int(source.get("size") or 0),
-            top_words=[str(word) for word in source.get("top_words") or []],
+            top_words=top_words,
         )
     return summaries
 
