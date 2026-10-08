@@ -808,6 +808,16 @@ def schedule_topic_training() -> dict:
     return {"started": status["started"], "state": status["state"]}
 
 
+@celery_app.task(name="cdm.workers.tasks.schedule_vote_refresh")
+def schedule_vote_refresh() -> dict:
+    """Refresh roll calls (both chambers) for the current Congress."""
+    from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
+
+    congress = current_congress(datetime.now(UTC).year)
+    ingestor = VoteIngestor(get_opensearch_client(), VoteviewClient(Path("data/voteview")))
+    return {"congress": congress, "roll_calls": ingestor.ingest_congress(congress, refresh=True)}
+
+
 @celery_app.task(name="cdm.workers.tasks.schedule_govinfo_refresh")
 def schedule_govinfo_refresh() -> dict:
     """Queue GovInfo packages for the current Congress that have no job yet."""

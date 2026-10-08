@@ -892,3 +892,40 @@ vote_position:
       vote_date:
         type: date
         format: "strict_date_optional_time||yyyy-MM-dd"
+
+
+# ── rollcall ──────────────────────────────────────────────────────────────────
+# Source: Voteview bulk CSVs (both chambers, 113th onward). One doc per roll call;
+# member positions are keyword id arrays (bioguide ids) so member vote history and
+# pairwise agreement are term queries without a per-member-vote index.
+rollcall:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+      id:               { type: keyword }          # rollcall:{congress}:{chamber}:{roll}
+      record_type:      { type: keyword }
+      congress:         { type: integer }
+      chamber:          { type: keyword }          # house | senate
+      session_number:   { type: integer }
+      roll_number:      { type: integer }
+      clerk_roll_number: { type: integer }
+      date:
+        type: date
+        format: "strict_date_optional_time||yyyy-MM-dd"
+      question:         { type: keyword }
+      description:      { type: text }
+      result:           { type: keyword }
+      bill_number:      { type: keyword }
+      legislation_id:   { type: keyword }          # bill:{congress}:{type_lower}:{number}
+      yea_count:        { type: integer }
+      nay_count:        { type: integer }
+      party_split:      { type: boolean }          # majority of D opposes majority of R
+      party_positions:  { type: object, enabled: false }
+      yea_ids:          { type: keyword }
+      nay_ids:          { type: keyword }
+      present_ids:      { type: keyword }
+      not_voting_ids:   { type: keyword }
+      defector_ids:     { type: keyword }          # voted against own party on a party_split vote
