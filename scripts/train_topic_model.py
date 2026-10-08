@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -23,8 +24,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
 from cdm.utils.topic_modeler import TopicModeler, build_topic_documents
+from cdm.utils.topic_training import write_status
 
 ANALYSIS_INDEX = "congress-analysis-topics"
+KEEP_MODEL_VERSIONS = 2
 
 _ANALYSIS_MAPPINGS = {
     "properties": {
@@ -52,6 +55,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--nr-bins", type=int, default=60)
     parser.add_argument("--embedding-model", default="all-mpnet-base-v2")
     parser.add_argument("--model-dir", default="models/topics")
+    parser.add_argument(
+        "--status-file",
+        type=Path,
+        help="Write progress to this JSON file (used by the admin/scheduled launcher)",
+    )
     parser.add_argument(
         "--no-llm-labels",
         action="store_true",
@@ -134,10 +142,54 @@ def index_results(client, *, model_version, summaries, assignments, over_time):
     return success, errors
 
 
+def prune_old_versions(client, model_dir: Path) -> None:
+    """Keep only the newest model versions in the index and on disk."""
+    response = client.search(
+        index=ANALYSIS_INDEX,
+        size=0,
+        aggs={"v": {"terms": {"field": "model_version", "size": 100}}},
+    )
+    versions = sorted(
+        (bucket["key"] for bucket in response["aggregations"]["v"]["buckets"]),
+        reverse=True,
+    )
+    stale = versions[KEEP_MODEL_VERSIONS:]
+    if not stale:
+        return
+    client.delete_by_query(
+        index=ANALYSIS_INDEX,
+        query={"terms": {"model_version": stale}},
+        conflicts="proceed",
+        wait_for_completion=False,
+    )
+    for version in stale:
+        shutil.rmtree(model_dir / version, ignore_errors=True)
+    print(f"Pruned old model versions: {', '.join(stale)}")
+
+
 def main() -> None:
     args = parse_args()
+    status_file = args.status_file
+
+    def report(**fields) -> None:
+        if status_file:
+            write_status(status_file, **fields)
+
+    try:
+        run(args, report)
+    except BaseException as exc:
+        report(
+            state="failed",
+            finished_at=datetime.now(UTC).isoformat(),
+            message=str(exc) or type(exc).__name__,
+        )
+        raise
+
+
+def run(args: argparse.Namespace, report) -> None:
     client = get_opensearch_client()
 
+    report(stage="fetching documents")
     print("Fetching documents...")
     documents = fetch_documents(client, args.max_docs)
     print(f"Corpus: {len(documents)} documents")
@@ -148,6 +200,7 @@ def main() -> None:
         embedding_model=args.embedding_model,
         min_topic_size=args.min_topic_size,
     )
+    report(stage=f"fitting model on {len(documents):,} documents")
     assignments = modeler.fit(documents)
     summaries = modeler.topic_summaries()
     over_time = modeler.topics_over_time(nr_bins=args.nr_bins)
@@ -170,8 +223,10 @@ def main() -> None:
 
     if args.dry_run:
         print("\nDry run: model not saved, results not indexed.")
+        report(state="succeeded", finished_at=datetime.now(UTC).isoformat(), message="dry run")
         return
 
+    report(stage="indexing results")
     model_version = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     model_path = Path(args.model_dir) / model_version
     modeler.save(model_path)
@@ -188,6 +243,15 @@ def main() -> None:
     if errors:
         for error in errors[:5]:
             print(f"  {error}")
+        raise RuntimeError(f"{len(errors)} documents failed to index")
+    prune_old_versions(client, Path(args.model_dir))
+    report(
+        state="succeeded",
+        stage="done",
+        finished_at=datetime.now(UTC).isoformat(),
+        model_version=model_version,
+        message=f"{len(summaries) - 1} topics, {len(assignments):,} bills assigned",
+    )
 
 
 if __name__ == "__main__":

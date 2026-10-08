@@ -9,9 +9,21 @@ from cdm.contracts.api import (
     AdminIngestSnapshot,
     IngestProgressResponse,
     SystemStatusResponse,
+    TopicTrainingStatus,
 )
+from cdm.utils.topic_training import read_status, start_training
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+
+@router.get("/topic-training", response_model=TopicTrainingStatus)
+def topic_training_status() -> TopicTrainingStatus:
+    return TopicTrainingStatus(**read_status())
+
+
+@router.post("/topic-training", response_model=TopicTrainingStatus)
+def topic_training_start() -> TopicTrainingStatus:
+    return TopicTrainingStatus(**start_training())
 
 
 @router.get("/ingest-progress", response_model=IngestProgressResponse)

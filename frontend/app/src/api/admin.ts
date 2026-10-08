@@ -1,4 +1,22 @@
-import { apiGet } from './client';
+import { apiGet, apiPost } from './client';
+
+export type TopicTrainingStatus = {
+    state: 'idle' | 'running' | 'succeeded' | 'failed';
+    started?: boolean | null;
+    stage?: string | null;
+    message?: string | null;
+    model_version?: string | null;
+    started_at?: string | null;
+    finished_at?: string | null;
+};
+
+export function fetchTopicTraining(): Promise<TopicTrainingStatus> {
+    return apiGet<TopicTrainingStatus>('/api/v1/admin/topic-training');
+}
+
+export function startTopicTraining(): Promise<TopicTrainingStatus> {
+    return apiPost<TopicTrainingStatus>('/api/v1/admin/topic-training');
+}
 
 export type IngestProgressJob = {
     job_id: string;

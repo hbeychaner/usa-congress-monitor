@@ -160,6 +160,18 @@ class MemberTopicsResponse(BaseModel):
     policy_areas: list[TopicItem] = Field(default_factory=list)
 
 
+class TopicTrainingStatus(BaseModel):
+    state: str = "idle"
+    started: bool | None = None
+    pid: int | None = None
+    stage: str | None = None
+    message: str | None = None
+    model_version: str | None = None
+    started_at: str | None = None
+    finished_at: str | None = None
+    updated_at: str | None = None
+
+
 class SubjectCount(BaseModel):
     name: str
     count: int

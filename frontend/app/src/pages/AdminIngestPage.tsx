@@ -2,6 +2,7 @@ import { Badge, Callout, Card, Flex, Grid, Heading, Progress, Select, Table, Tex
 import { useEffect, useMemo, useState } from 'react';
 
 import { fetchIngestProgress, fetchSystemStatus, type IngestProgressResponse, type SystemStatusResponse } from '../api/admin';
+import { TopicTrainingCard } from '../components/TopicTrainingCard';
 
 function formatDate(date: string | null): string {
     if (!date) {
@@ -115,6 +116,8 @@ export function AdminIngestPage() {
                     <Text><Text weight="bold">Active jobs:</Text> {data?.active_jobs ?? 0}</Text>
                 </Flex>
             </Card>
+
+            <TopicTrainingCard />
 
             {error ? (
                 <Callout.Root color="red">

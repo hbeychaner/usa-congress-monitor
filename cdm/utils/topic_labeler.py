@@ -80,6 +80,11 @@ def label_topics(
     representative_docs: dict[int, list[str]],
 ) -> dict[int, str]:
     """Labels for every non-outlier topic; skips topics Ollama can't label."""
+    try:
+        requests.get(f"{settings.OLLAMA_URL}/api/tags", timeout=3).raise_for_status()
+    except requests.RequestException:
+        logger.warning("ollama unreachable; using keyword labels")
+        return {}
     labels: dict[int, str] = {}
     for topic in summaries:
         topic_id = int(topic["topic_id"])

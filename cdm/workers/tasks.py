@@ -18,6 +18,7 @@ from celery.signals import worker_init
 from kombu.exceptions import OperationalError
 from redis import Redis
 
+from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
 from cdm.ingest.archive import JsonlRecordArchive, SQLiteQuarantineArchive
 from cdm.ingest.govinfo import (
     GovInfoBillsParser,
@@ -34,12 +35,11 @@ from cdm.ingest.reconciliation import replay_govinfo_archives
 from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.ingest.resource_config import congress_scoped, date_windowed, static_resources
 from cdm.ingest.runner import IngestCancelledError
-from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
 from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
+from cdm.store.batch_indexing import index_streams
 from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
 from cdm.store.opensearch import resource_target
-from cdm.store.batch_indexing import index_streams
 from cdm.utils.rate_limiter import TokenBucket
 from cdm.workers.celery_app import celery_app
 from settings import (
@@ -61,7 +61,6 @@ from settings import (
     REDIS_URL,
     RETENTION_DAYS,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -800,6 +799,15 @@ def schedule_static_refresh() -> dict:
     return {"queued": queued, "count": len(queued)}
 
 
+@celery_app.task(name="cdm.workers.tasks.schedule_topic_training")
+def schedule_topic_training() -> dict:
+    """Start a topic-model retrain unless one is already running."""
+    from cdm.utils.topic_training import start_training
+
+    status = start_training()
+    return {"started": status["started"], "state": status["state"]}
+
+
 @celery_app.task(name="cdm.workers.tasks.schedule_govinfo_refresh")
 def schedule_govinfo_refresh() -> dict:
     """Queue GovInfo packages for the current Congress that have no job yet."""
@@ -824,7 +832,9 @@ def schedule_govinfo_refresh() -> dict:
             continue
         except KeyError:
             pass
-        queued.append(submit_job(JobKind.GOVINFO_BULK.value, payload, store=store)["id"])
+        queued.append(
+            submit_job(JobKind.GOVINFO_BULK.value, payload, store=store)["id"]
+        )
     return {"congress": congress, "queued": len(queued)}
 
 
