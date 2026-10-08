@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from cdm.graph.models import Signal
+
 
 class StateSummary(BaseModel):
     code: str = Field(description="Two-letter state code")
@@ -406,3 +408,19 @@ class SystemStatusResponse(BaseModel):
     indices: list[IndexStatus] = Field(default_factory=list)
     jobs: dict[str, JobStatusCounts] = Field(default_factory=dict)
     generated_at: str | None = None
+
+
+class SimilarMember(BaseModel):
+    member: MemberSummary
+    score: float
+    member_sponsored: int
+    neighbor_sponsored: int
+    co_signed: float
+
+
+class SimilarMembersResponse(BaseModel):
+    member_id: str
+    signal: Signal
+    congress: int | None = None
+    graph_version: str | None = None
+    similar: list[SimilarMember]

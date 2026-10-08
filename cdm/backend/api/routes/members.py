@@ -5,15 +5,19 @@ from cdm.backend.services.member_service import (
     list_member_activity,
     list_members,
 )
+from cdm.backend.services.graph_service import GraphService
 from cdm.backend.services.topic_service import get_member_topics
 from cdm.contracts.api import (
     MemberActivityResponse,
     MemberProfileResponse,
     MembersResponse,
     MemberTopicsResponse,
+    SimilarMembersResponse,
 )
+from cdm.graph.models import Signal
 
 router = APIRouter(prefix="/members", tags=["members"])
+graph_service = GraphService()
 
 
 @router.get("", response_model=MembersResponse)
@@ -49,3 +53,13 @@ def get_member_activity(
 @router.get("/{bioguide_id}/topics", response_model=MemberTopicsResponse)
 def member_topics(bioguide_id: str) -> MemberTopicsResponse:
     return get_member_topics(bioguide_id)
+
+
+@router.get("/{bioguide_id}/similar", response_model=SimilarMembersResponse)
+def similar_members(
+    bioguide_id: str,
+    signal: Signal = Query(default=Signal.COLLABORATION),
+    congress: int | None = Query(default=None, ge=1),
+    limit: int = Query(default=10, ge=1, le=50),
+) -> SimilarMembersResponse:
+    return graph_service.similar(bioguide_id, signal, congress, limit)

@@ -929,3 +929,32 @@ rollcall:
       present_ids:      { type: keyword }
       not_voting_ids:   { type: keyword }
       defector_ids:     { type: keyword }          # voted against own party on a party_split vote
+
+
+# ── analysis_graph ────────────────────────────────────────────────────────────
+# Versioned member graph: `edge` docs per member pair and signal, plus one
+# `pointer` doc per signal that selects the live graph_version.
+analysis_graph:
+  settings:
+    number_of_shards: 1
+    number_of_replicas: 1
+  mappings:
+    dynamic: false
+    properties:
+      id:             { type: keyword }
+      kind:           { type: keyword }            # edge | pointer
+      signal:         { type: keyword }            # collaboration | voting | topic
+      graph_version:  { type: keyword }
+      built_at:       { type: date }
+      member:         { type: keyword }            # bioguide id
+      neighbor:       { type: keyword }
+      score:          { type: float }
+      shared_bills:   { type: integer }
+      by_congress:
+        type: nested
+        properties:
+          congress:           { type: integer }
+          member_sponsored:   { type: integer }
+          neighbor_sponsored: { type: integer }
+          co_signed:          { type: float }
+          score:              { type: float }

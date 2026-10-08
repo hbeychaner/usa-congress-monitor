@@ -395,3 +395,19 @@ def list_member_activity(
         page=page,
         limit=limit,
     )
+
+
+def get_member_summaries(bioguide_ids: list[str]) -> dict[str, MemberSummary]:
+    """Summaries for the given ids; ids with no member document are omitted."""
+    if not bioguide_ids:
+        return {}
+    response = get_opensearch_client().mget(
+        index=read_alias("member"),
+        ids=[f"member:{bioguide_id}" for bioguide_id in bioguide_ids],
+    )
+    summaries: dict[str, MemberSummary] = {}
+    for doc in response["docs"]:
+        if doc.get("found"):
+            summary = _member_summary(doc["_source"])
+            summaries[summary.bioguide_id] = summary
+    return summaries
