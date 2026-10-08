@@ -56,13 +56,28 @@ class BillSignature(BaseModel):
         return [] if value is None else value
 
 
+class RollCallVotes(BaseModel):
+    """The yea and nay voters of one roll call, read from the roll call index."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    congress: int
+    party_split: bool = False
+    yea_ids: list[str] = Field(default_factory=list)
+    nay_ids: list[str] = Field(default_factory=list)
+
+
 class CongressEdgeStats(BaseModel):
-    """Collaboration between two members within one Congress."""
+    """Collaboration and voting between two members within one Congress."""
 
     congress: int
     member_sponsored: int = 0
     neighbor_sponsored: int = 0
     co_signed: float = 0.0
+    shared_votes: int = 0
+    agreed_votes: int = 0
+    shared_split_votes: int = 0
+    agreed_split_votes: int = 0
     score: float = 0.0
 
 
@@ -92,6 +107,11 @@ class MemberEdge(BaseModel):
             stats.member_sponsored + stats.neighbor_sponsored
             for stats in self.by_congress
         )
+
+    @computed_field
+    @property
+    def shared_votes(self) -> int:
+        return sum(stats.shared_votes for stats in self.by_congress)
 
 
 class GraphVersionPointer(BaseModel):

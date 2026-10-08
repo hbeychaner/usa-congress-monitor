@@ -15,6 +15,7 @@ from cdm.graph.models import (
     GraphField,
     GraphVersionPointer,
     MemberEdge,
+    RollCallVotes,
     Signal,
 )
 from cdm.store.index_manager import IndexManager
@@ -54,6 +55,26 @@ class BillSignatureReader:
         )
         for hit in hits:
             yield BillSignature.model_validate(hit["_source"])
+
+
+class RollCallReader:
+    """Streams yea/nay voter ids for roll calls from the roll call index."""
+
+    def __init__(self, client: Elasticsearch, first_congress: int = FIRST_CONGRESS):
+        self.client = client
+        self.first_congress = first_congress
+
+    def read(self) -> Iterator[RollCallVotes]:
+        hits = scan(
+            self.client,
+            index=read_alias("rollcall"),
+            query={
+                "query": {"range": {"congress": {"gte": self.first_congress}}},
+                "_source": list(RollCallVotes.model_fields),
+            },
+        )
+        for hit in hits:
+            yield RollCallVotes.model_validate(hit["_source"])
 
 
 class GraphStore:

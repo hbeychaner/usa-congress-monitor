@@ -120,4 +120,8 @@ class GraphService:
             "member_sponsored": sum(stats.member_sponsored for stats in selected),
             "neighbor_sponsored": sum(stats.neighbor_sponsored for stats in selected),
             "co_signed": sum(stats.co_signed for stats in selected),
+            "shared_votes": sum(stats.shared_votes for stats in selected),
+            "agreed_votes": sum(stats.agreed_votes for stats in selected),
+            "shared_split_votes": sum(stats.shared_split_votes for stats in selected),
+            "agreed_split_votes": sum(stats.agreed_split_votes for stats in selected),
         }

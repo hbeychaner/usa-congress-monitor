@@ -413,9 +413,13 @@ class SystemStatusResponse(BaseModel):
 class SimilarMember(BaseModel):
     member: MemberSummary
     score: float
-    member_sponsored: int
-    neighbor_sponsored: int
-    co_signed: float
+    member_sponsored: int = 0
+    neighbor_sponsored: int = 0
+    co_signed: float = 0.0
+    shared_votes: int = 0
+    agreed_votes: int = 0
+    shared_split_votes: int = 0
+    agreed_split_votes: int = 0
 
 
 class SimilarMembersResponse(BaseModel):

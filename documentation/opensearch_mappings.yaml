@@ -950,6 +950,7 @@ analysis_graph:
       neighbor:       { type: keyword }
       score:          { type: float }
       shared_bills:   { type: integer }
+      shared_votes:   { type: integer }
       by_congress:
         type: nested
         properties:
@@ -957,4 +958,8 @@ analysis_graph:
           member_sponsored:   { type: integer }
           neighbor_sponsored: { type: integer }
           co_signed:          { type: float }
+          shared_votes:       { type: integer }
+          agreed_votes:       { type: integer }
+          shared_split_votes: { type: integer }
+          agreed_split_votes: { type: integer }
           score:              { type: float }
