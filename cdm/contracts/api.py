@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from cdm.graph.models import Signal
+from cdm.graph.models import PartyGroup, Signal
 
 
 class StateSummary(BaseModel):
@@ -428,3 +428,24 @@ class SimilarMembersResponse(BaseModel):
     congress: int | None = None
     graph_version: str | None = None
     similar: list[SimilarMember]
+
+
+class GraphNode(BaseModel):
+    member: MemberSummary
+    party_group: PartyGroup
+    is_seed: bool = False
+
+
+class GraphLink(BaseModel):
+    source: str
+    target: str
+    score: float
+    signal_scores: dict[Signal, float] = Field(default_factory=dict)
+
+
+class NeighborhoodResponse(BaseModel):
+    seeds: list[str]
+    congress: int | None = None
+    versions: dict[Signal, str] = Field(default_factory=dict)
+    nodes: list[GraphNode] = Field(default_factory=list)
+    links: list[GraphLink] = Field(default_factory=list)

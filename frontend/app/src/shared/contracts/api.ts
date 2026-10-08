@@ -4,6 +4,42 @@
  */
 
 export interface paths {
+    "/api/v1/admin/topic-training": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Topic Training Status */
+        get: operations["topic_training_status_api_v1_admin_topic_training_get"];
+        put?: never;
+        /** Topic Training Start */
+        post: operations["topic_training_start_api_v1_admin_topic_training_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/member-graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Member Graph Status */
+        get: operations["member_graph_status_api_v1_admin_member_graph_get"];
+        put?: never;
+        /** Member Graph Build */
+        post: operations["member_graph_build_api_v1_admin_member_graph_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/ingest-progress": {
         parameters: {
             query?: never;
@@ -174,6 +210,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/members/{bioguide_id}/similar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Similar Members */
+        get: operations["similar_members_api_v1_members__bioguide_id__similar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/search": {
         parameters: {
             query?: never;
@@ -336,6 +389,23 @@ export interface paths {
         };
         /** Policy Area Trends */
         get: operations["policy_area_trends_api_v1_subjects_policy_area_trends_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/graph/neighborhood": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Neighborhood */
+        get: operations["neighborhood_api_v1_graph_neighborhood_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -557,6 +627,16 @@ export interface components {
              */
             limit: number;
         };
+        /**
+         * BuildState
+         * @enum {string}
+         */
+        BuildState: "idle" | "running" | "succeeded" | "failed";
+        /**
+         * Chamber
+         * @enum {string}
+         */
+        Chamber: "house" | "senate";
         /** ChamberTimeline */
         ChamberTimeline: {
             /** Chamber */
@@ -612,6 +692,52 @@ export interface components {
              * @default false
              */
             report_found: boolean;
+        };
+        /** GraphBuildStatus */
+        GraphBuildStatus: {
+            /** @default idle */
+            state: components["schemas"]["BuildState"];
+            /** Started */
+            started?: boolean | null;
+            /** Pid */
+            pid?: number | null;
+            /** Stage */
+            stage?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /** Finished At */
+            finished_at?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+            /** Versions */
+            versions?: {
+                [key: string]: string;
+            };
+        };
+        /** GraphLink */
+        GraphLink: {
+            /** Source */
+            source: string;
+            /** Target */
+            target: string;
+            /** Score */
+            score: number;
+            /** Signal Scores */
+            signal_scores?: {
+                [key: string]: number;
+            };
+        };
+        /** GraphNode */
+        GraphNode: {
+            member: components["schemas"]["MemberSummary"];
+            party_group: components["schemas"]["PartyGroup"];
+            /**
+             * Is Seed
+             * @default false
+             */
+            is_seed: boolean;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -883,6 +1009,26 @@ export interface components {
              */
             limit: number;
         };
+        /** NeighborhoodResponse */
+        NeighborhoodResponse: {
+            /** Seeds */
+            seeds: string[];
+            /** Congress */
+            congress?: number | null;
+            /** Versions */
+            versions?: {
+                [key: string]: string;
+            };
+            /** Nodes */
+            nodes?: components["schemas"]["GraphNode"][];
+            /** Links */
+            links?: components["schemas"]["GraphLink"][];
+        };
+        /**
+         * PartyGroup
+         * @enum {string}
+         */
+        PartyGroup: "democratic" | "republican" | "other";
         /** PolicyAreaTrendPoint */
         PolicyAreaTrendPoint: {
             /** Year */
@@ -930,6 +1076,64 @@ export interface components {
             title: string;
             /** Subtitle */
             subtitle?: string | null;
+        };
+        /**
+         * Signal
+         * @enum {string}
+         */
+        Signal: "collaboration" | "voting" | "topic";
+        /** SimilarMember */
+        SimilarMember: {
+            member: components["schemas"]["MemberSummary"];
+            /** Score */
+            score: number;
+            /**
+             * Member Sponsored
+             * @default 0
+             */
+            member_sponsored: number;
+            /**
+             * Neighbor Sponsored
+             * @default 0
+             */
+            neighbor_sponsored: number;
+            /**
+             * Co Signed
+             * @default 0
+             */
+            co_signed: number;
+            /**
+             * Shared Votes
+             * @default 0
+             */
+            shared_votes: number;
+            /**
+             * Agreed Votes
+             * @default 0
+             */
+            agreed_votes: number;
+            /**
+             * Shared Split Votes
+             * @default 0
+             */
+            shared_split_votes: number;
+            /**
+             * Agreed Split Votes
+             * @default 0
+             */
+            agreed_split_votes: number;
+        };
+        /** SimilarMembersResponse */
+        SimilarMembersResponse: {
+            /** Member Id */
+            member_id: string;
+            signal: components["schemas"]["Signal"];
+            /** Congress */
+            congress?: number | null;
+            /** Graph Version */
+            graph_version?: string | null;
+            /** Similar */
+            similar: components["schemas"]["SimilarMember"][];
         };
         /** StagingStatus */
         StagingStatus: {
@@ -1071,6 +1275,30 @@ export interface components {
             /** Top Words */
             top_words?: string[];
         };
+        /** TopicTrainingStatus */
+        TopicTrainingStatus: {
+            /**
+             * State
+             * @default idle
+             */
+            state: string;
+            /** Started */
+            started?: boolean | null;
+            /** Pid */
+            pid?: number | null;
+            /** Stage */
+            stage?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Model Version */
+            model_version?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /** Finished At */
+            finished_at?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+        };
         /** TopicTrendPoint */
         TopicTrendPoint: {
             /** Timestamp */
@@ -1179,6 +1407,86 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    topic_training_status_api_v1_admin_topic_training_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicTrainingStatus"];
+                };
+            };
+        };
+    };
+    topic_training_start_api_v1_admin_topic_training_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicTrainingStatus"];
+                };
+            };
+        };
+    };
+    member_graph_status_api_v1_admin_member_graph_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphBuildStatus"];
+                };
+            };
+        };
+    };
+    member_graph_build_api_v1_admin_member_graph_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphBuildStatus"];
+                };
+            };
+        };
+    };
     ingest_progress_api_v1_admin_ingest_progress_get: {
         parameters: {
             query?: never;
@@ -1447,6 +1755,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberTopicsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    similar_members_api_v1_members__bioguide_id__similar_get: {
+        parameters: {
+            query?: {
+                signal?: components["schemas"]["Signal"];
+                congress?: number | null;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                bioguide_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimilarMembersResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1758,6 +2101,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PolicyAreaTrendsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    neighborhood_api_v1_graph_neighborhood_get: {
+        parameters: {
+            query: {
+                member: string[];
+                collaboration_weight?: number;
+                voting_weight?: number;
+                congress?: number | null;
+                limit?: number;
+                party?: components["schemas"]["PartyGroup"][];
+                chamber?: components["schemas"]["Chamber"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NeighborhoodResponse"];
                 };
             };
             /** @description Validation Error */

@@ -18,6 +18,24 @@ export function startTopicTraining(): Promise<TopicTrainingStatus> {
     return apiPost<TopicTrainingStatus>('/api/v1/admin/topic-training');
 }
 
+export type MemberGraphStatus = {
+    state: 'idle' | 'running' | 'succeeded' | 'failed';
+    started?: boolean | null;
+    stage?: string | null;
+    message?: string | null;
+    started_at?: string | null;
+    finished_at?: string | null;
+    versions?: Record<string, string>;
+};
+
+export function fetchMemberGraph(): Promise<MemberGraphStatus> {
+    return apiGet<MemberGraphStatus>('/api/v1/admin/member-graph');
+}
+
+export function startMemberGraph(): Promise<MemberGraphStatus> {
+    return apiPost<MemberGraphStatus>('/api/v1/admin/member-graph');
+}
+
 export type IngestProgressJob = {
     job_id: string;
     status: string;

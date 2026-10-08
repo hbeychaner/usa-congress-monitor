@@ -2,6 +2,7 @@ import { Badge, Callout, Card, Flex, Grid, Heading, Progress, Select, Table, Tex
 import { useEffect, useMemo, useState } from 'react';
 
 import { fetchIngestProgress, fetchSystemStatus, type IngestProgressResponse, type SystemStatusResponse } from '../api/admin';
+import { MemberGraphCard } from '../components/MemberGraphCard';
 import { TopicTrainingCard } from '../components/TopicTrainingCard';
 
 function formatDate(date: string | null): string {
@@ -118,6 +119,7 @@ export function AdminIngestPage() {
             </Card>
 
             <TopicTrainingCard />
+            <MemberGraphCard />
 
             {error ? (
                 <Callout.Root color="red">

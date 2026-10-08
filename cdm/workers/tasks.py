@@ -808,6 +808,15 @@ def schedule_topic_training() -> dict:
     return {"started": status["started"], "state": status["state"]}
 
 
+@celery_app.task(name="cdm.workers.tasks.schedule_member_graph_build")
+def schedule_member_graph_build() -> dict:
+    """Start a member graph rebuild unless one is already running."""
+    from cdm.graph.runner import GraphBuildRunner
+
+    status = GraphBuildRunner().start()
+    return {"started": status.started, "state": status.state.value}
+
+
 @celery_app.task(name="cdm.workers.tasks.schedule_vote_refresh")
 def schedule_vote_refresh() -> dict:
     """Refresh roll calls (both chambers) for the current Congress."""

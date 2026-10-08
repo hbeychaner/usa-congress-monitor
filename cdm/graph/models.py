@@ -20,6 +20,21 @@ class Signal(StrEnum):
     TOPIC = "topic"
 
 
+class PartyGroup(StrEnum):
+    DEMOCRATIC = "democratic"
+    REPUBLICAN = "republican"
+    OTHER = "other"
+
+    @classmethod
+    def of(cls, party_name: str) -> PartyGroup:
+        name = party_name.strip().lower()
+        if name.startswith("democrat"):
+            return cls.DEMOCRATIC
+        if name.startswith("republican"):
+            return cls.REPUBLICAN
+        return cls.OTHER
+
+
 class DocumentKind(StrEnum):
     EDGE = "edge"
     POINTER = "pointer"
