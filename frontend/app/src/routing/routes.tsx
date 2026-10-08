@@ -4,6 +4,7 @@ import { AdminIngestPage } from '../pages/AdminIngestPage';
 import { BillDetailPage } from '../pages/BillDetailPage';
 import { BillsPage } from '../pages/BillsPage';
 import { HomePage } from '../pages/HomePage';
+import { MemberGraphPage } from '../pages/MemberGraphPage';
 import { MemberProfilePage } from '../pages/MemberProfilePage';
 import { MemberSearchPage } from '../pages/MemberSearchPage';
 import { SearchPage } from '../pages/SearchPage';
@@ -21,6 +22,7 @@ export function AppRoutes() {
       <Route path="/states/:stateCode" element={<StateDetailPage />} />
       <Route path="/members" element={<MemberSearchPage />} />
       <Route path="/members/:bioguideId" element={<MemberProfilePage />} />
+      <Route path="/graph" element={<MemberGraphPage />} />
       <Route path="/bills" element={<BillsPage />} />
       <Route path="/bills/:billId" element={<BillDetailPage />} />
       <Route path="/topics" element={<TopicsPage />} />

@@ -14,6 +14,7 @@ const navItems = [
   { href: '/topics', label: 'Topics' },
   { href: '/search', label: 'Search' },
   { href: '/members', label: 'Members' },
+  { href: '/graph', label: 'Graph' },
 ];
 
 export function AppShell({ children }: PropsWithChildren) {
