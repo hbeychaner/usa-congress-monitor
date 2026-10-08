@@ -23,6 +23,7 @@ from cdm.ingest.govinfo import (
     GovInfoBillsParser,
     GovInfoBillStatusParser,
     GovInfoBillSummaryParser,
+    GovInfoDiscovery,
     GovInfoDownloader,
     GovInfoDownloadError,
     GovInfoManifestStore,
@@ -797,6 +798,34 @@ def schedule_static_refresh() -> dict:
         for payload in static_refresh_payloads(datetime.now(UTC).date())
     ]
     return {"queued": queued, "count": len(queued)}
+
+
+@celery_app.task(name="cdm.workers.tasks.schedule_govinfo_refresh")
+def schedule_govinfo_refresh() -> dict:
+    """Queue GovInfo packages for the current Congress that have no job yet."""
+    congress = (datetime.now(UTC).year - 1787) // 2
+    store = _store()
+    queued = []
+    for package in GovInfoDiscovery().list_congress_packages(congress):
+        payload = {
+            "collection": package.collection,
+            "congress": package.congress,
+            "measure_type": package.measure_type,
+            "package_id": package.package_id,
+            "url": package.url,
+            "session": package.session,
+            "version_code": package.version_code,
+            "outdir": "data/full_history/govinfo",
+            "target_index": None,
+            "replace": False,
+        }
+        try:
+            store.get(_job_id(JobKind.GOVINFO_BULK.value, payload))
+            continue
+        except KeyError:
+            pass
+        queued.append(submit_job(JobKind.GOVINFO_BULK.value, payload, store=store)["id"])
+    return {"congress": congress, "queued": len(queued)}
 
 
 def daily_ingest_payload(today) -> dict:

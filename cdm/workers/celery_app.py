@@ -24,6 +24,7 @@ celery_app.conf.update(
         "cdm.workers.tasks.schedule_daily_ingest": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.schedule_coverage_gaps": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.schedule_static_refresh": {"queue": CELERY_INGEST_QUEUE},
+        "cdm.workers.tasks.schedule_govinfo_refresh": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.recover_failed_ingest_jobs": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.run_retention_maintenance": {"queue": CELERY_INGEST_QUEUE},
     },
@@ -51,6 +52,10 @@ celery_app.conf.update(
         "static-resource-refresh": {
             "task": "cdm.workers.tasks.schedule_static_refresh",
             "schedule": crontab(hour=4, minute=0, day_of_week="sunday"),
+        },
+        "govinfo-refresh": {
+            "task": "cdm.workers.tasks.schedule_govinfo_refresh",
+            "schedule": crontab(hour=5, minute=0),
         },
         "retention-maintenance": {
             "task": "cdm.workers.tasks.run_retention_maintenance",

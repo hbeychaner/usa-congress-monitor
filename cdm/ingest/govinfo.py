@@ -685,7 +685,16 @@ class GovInfoBillsParser:
         try:
             root = ET.fromstring(xml)
         except ET.ParseError as exc:
-            raise GovInfoParseError(f"Invalid BILLS XML: {exc}") from exc
+            # Some source files carry bare "&" in titles; escape and retry once.
+            fixed = re.sub(
+                rb"&(?!(?:[A-Za-z][A-Za-z0-9]*|#[0-9]+|#x[0-9A-Fa-f]+);)", b"&amp;", xml
+            ) if isinstance(xml, bytes) else re.sub(
+                r"&(?!(?:[A-Za-z][A-Za-z0-9]*|#[0-9]+|#x[0-9A-Fa-f]+);)", "&amp;", xml
+            )
+            try:
+                root = ET.fromstring(fixed)
+            except ET.ParseError:
+                raise GovInfoParseError(f"Invalid BILLS XML: {exc}") from exc
 
         text = self._all_text(root, "text") or self._first_text(root, "content")
         number = int(match["number"])
