@@ -15,6 +15,7 @@ export type NeighborhoodParams = {
     chamber: 'house' | 'senate' | null;
     parties: PartyGroup[];
     limit: number;
+    includeTopics: boolean;
 };
 
 export function fetchNeighborhood(params: NeighborhoodParams): Promise<Neighborhood> {
@@ -23,6 +24,7 @@ export function fetchNeighborhood(params: NeighborhoodParams): Promise<Neighborh
         voting_weight: String(params.votingWeight),
         topic_weight: String(params.topicWeight),
         limit: String(params.limit),
+        include_topics: String(params.includeTopics),
     });
     params.members.forEach((member) => query.append('member', member));
     params.parties.forEach((party) => query.append('party', party));

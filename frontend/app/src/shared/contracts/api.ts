@@ -741,6 +741,24 @@ export interface components {
              */
             is_seed: boolean;
         };
+        /** GraphTopicLink */
+        GraphTopicLink: {
+            /** Member */
+            member: string;
+            /** Topic Id */
+            topic_id: number;
+            /** Share */
+            share: number;
+            /** Bills */
+            bills: number;
+        };
+        /** GraphTopicNode */
+        GraphTopicNode: {
+            /** Topic Id */
+            topic_id: number;
+            /** Label */
+            label: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1025,6 +1043,10 @@ export interface components {
             nodes?: components["schemas"]["GraphNode"][];
             /** Links */
             links?: components["schemas"]["GraphLink"][];
+            /** Topic Nodes */
+            topic_nodes?: components["schemas"]["GraphTopicNode"][];
+            /** Topic Links */
+            topic_links?: components["schemas"]["GraphTopicLink"][];
         };
         /**
          * PartyGroup
@@ -2129,6 +2151,8 @@ export interface operations {
                 limit?: number;
                 party?: components["schemas"]["PartyGroup"][];
                 chamber?: components["schemas"]["Chamber"] | null;
+                include_topics?: boolean;
+                topics_per_member?: number;
             };
             header?: never;
             path?: never;

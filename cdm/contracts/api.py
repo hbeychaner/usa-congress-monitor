@@ -445,9 +445,23 @@ class GraphLink(BaseModel):
     shared_topics: list[str] = Field(default_factory=list)
 
 
+class GraphTopicNode(BaseModel):
+    topic_id: int
+    label: str
+
+
+class GraphTopicLink(BaseModel):
+    member: str
+    topic_id: int
+    share: float
+    bills: int
+
+
 class NeighborhoodResponse(BaseModel):
     seeds: list[str]
     congress: int | None = None
     versions: dict[Signal, str] = Field(default_factory=dict)
     nodes: list[GraphNode] = Field(default_factory=list)
     links: list[GraphLink] = Field(default_factory=list)
+    topic_nodes: list[GraphTopicNode] = Field(default_factory=list)
+    topic_links: list[GraphTopicLink] = Field(default_factory=list)
