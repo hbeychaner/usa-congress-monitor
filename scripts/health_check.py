@@ -14,6 +14,7 @@ from sqlalchemy import text
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cdm.graph.health import GraphHealthChecker, HealthState
 from cdm.jobs.store import JobStore
 from cdm.store.client import get_opensearch_client
 from cdm.workers.celery_app import celery_app
@@ -124,6 +125,11 @@ def _check_celery() -> dict[str, Any]:
     }
 
 
+def _check_member_graph() -> dict[str, Any]:
+    report = GraphHealthChecker(get_opensearch_client()).check()
+    return {**report.model_dump(mode="json"), "status": report.state.value}
+
+
 def collect_health(window_minutes: int = 15) -> dict[str, Any]:
     """Collect health data without changing application state."""
     report: dict[str, Any] = {
@@ -147,12 +153,18 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
         ("celery", _check_celery),
         ("redis", _check_redis),
         ("opensearch", _check_opensearch),
+        ("member_graph", _check_member_graph),
     ):
         try:
             report["checks"][name] = check()
         except Exception as exc:  # noqa: BLE001 - report dependency failures without aborting the check.
             report["status"] = "failed"
             report["checks"][name] = {"status": "failed", "error": str(exc)}
+
+    graph = report["checks"].get("member_graph", {})
+    report["warnings"].extend(graph.get("warnings", []))
+    if graph.get("state") == HealthState.FAILED:
+        report["status"] = "failed"
 
     jobs = report["checks"].get("jobs", {})
     counts = jobs.get("counts", {})

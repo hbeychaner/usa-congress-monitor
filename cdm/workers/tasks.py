@@ -1035,6 +1035,15 @@ def _stream_source_job_id(stream_name: str) -> str | None:
     return job_id or None
 
 
+@celery_app.task(name="cdm.workers.tasks.trim_logs")
+def trim_logs() -> dict:
+    """Cap every log file at its newest lines."""
+    from cdm.utils.log_trimmer import LogTrimmer
+
+    trimmed = LogTrimmer().trim_all()
+    return {"trimmed": [result.model_dump() for result in trimmed]}
+
+
 @celery_app.task(name="cdm.workers.tasks.run_retention_maintenance")
 def run_retention_maintenance() -> dict:
     """Prune old terminal jobs and their Redis streams and archive directories.

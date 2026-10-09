@@ -28,6 +28,7 @@ celery_app.conf.update(
         "cdm.workers.tasks.schedule_topic_training": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.schedule_vote_refresh": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.schedule_member_graph_build": {"queue": CELERY_INGEST_QUEUE},
+        "cdm.workers.tasks.trim_logs": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.recover_failed_ingest_jobs": {"queue": CELERY_INGEST_QUEUE},
         "cdm.workers.tasks.run_retention_maintenance": {"queue": CELERY_INGEST_QUEUE},
     },
@@ -71,6 +72,10 @@ celery_app.conf.update(
         "member-graph-build": {
             "task": "cdm.workers.tasks.schedule_member_graph_build",
             "schedule": crontab(hour=5, minute=0, day_of_week="monday"),
+        },
+        "trim-logs": {
+            "task": "cdm.workers.tasks.trim_logs",
+            "schedule": crontab(minute=15),
         },
         "retention-maintenance": {
             "task": "cdm.workers.tasks.run_retention_maintenance",

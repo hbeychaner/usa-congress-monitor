@@ -20,9 +20,9 @@ services: local
 	@if [ "$$(uname)" = "Darwin" ]; then \
 		$(MAKE) ingest-service-install; \
 	else \
-		mkdir -p logs; nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=ingest@%h --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest > logs/worker-ingest.log 2>&1 & \
-		nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=index@%h --pool=prefork --concurrency=4 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index > logs/worker-index.log 2>&1 & \
-		nohup uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO > logs/beat.log 2>&1 & \
+		mkdir -p logs; nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=ingest@%h --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest >> logs/worker-ingest.log 2>&1 & \
+		nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=index@%h --pool=prefork --concurrency=4 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index >> logs/worker-index.log 2>&1 & \
+		nohup uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO >> logs/beat.log 2>&1 & \
 		echo "Worker and beat started; logs are in logs/worker-ingest.log, logs/worker-index.log, and logs/beat.log."; \
 	fi
 

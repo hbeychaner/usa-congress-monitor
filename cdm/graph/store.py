@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Iterator
 from itertools import batched
-from typing import Any
 
 from elasticsearch import Elasticsearch, NotFoundError
 from elasticsearch.helpers import scan
@@ -110,15 +109,33 @@ class GraphStore:
             refresh=True,
         )
 
-    def active_version(self, signal: Signal) -> str | None:
+    def active_pointer(self, signal: Signal) -> GraphVersionPointer | None:
         try:
             response = self.client.get(
                 index=self.index, id=GraphVersionPointer.pointer_id(signal)
             )
         except NotFoundError:
             return None
-        source: dict[str, Any] = response["_source"]
-        return source.get(GraphField.GRAPH_VERSION)
+        return GraphVersionPointer.model_validate(response["_source"])
+
+    def active_version(self, signal: Signal) -> str | None:
+        pointer = self.active_pointer(signal)
+        return pointer.graph_version if pointer else None
+
+    def edge_count(self, signal: Signal, graph_version: str) -> int:
+        response = self.client.count(
+            index=self.index,
+            query={
+                "bool": {
+                    "filter": [
+                        {"term": {GraphField.KIND: DocumentKind.EDGE}},
+                        {"term": {GraphField.SIGNAL: signal}},
+                        {"term": {GraphField.GRAPH_VERSION: graph_version}},
+                    ]
+                }
+            },
+        )
+        return int(response["count"])
 
     def prune(self, signal: Signal) -> list[str]:
         """Delete edges of all but the newest versions for the signal."""

@@ -120,6 +120,11 @@ export function MemberProfilePage() {
               ) : null}
               <Badge variant="soft">Bioguide: {member.bioguide_id}</Badge>
             </Flex>
+            <Flex>
+              <Button size="1" variant="soft" asChild>
+                <Link to={`/graph?member=${encodeURIComponent(member.bioguide_id)}`}>View in member graph</Link>
+              </Button>
+            </Flex>
           </Flex>
         </Flex>
       </Card>
