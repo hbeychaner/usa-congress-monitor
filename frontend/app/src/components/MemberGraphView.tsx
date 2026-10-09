@@ -1,3 +1,4 @@
+import louvain from 'graphology-communities-louvain';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import Graph from 'graphology';
 import Sigma from 'sigma';
@@ -11,23 +12,32 @@ export const PARTY_COLORS: Record<PartyGroup, string> = {
   other: '#6b7280',
 };
 
-const SEED_SIZE = 12;
-const NODE_SIZE = 6;
+const COMMUNITY_COLORS = ['#0ea5e9', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#84cc16', '#6366f1', '#ef4444'];
+const MIN_EXTENT = 20;
+
+export type ColorMode = 'party' | 'community';
+
+// Shrink nodes as the neighborhood grows so large graphs stay legible.
+function nodeSize(order: number, isSeed: boolean): number {
+  const base = Math.max(3, 8 - order / 25);
+  return isSeed ? base * 1.6 : base;
+}
 
 type Props = {
   data: Neighborhood;
   selectedId: string | null;
+  colorMode: ColorMode;
   onSelect: (bioguideId: string | null) => void;
 };
 
-function buildGraph(data: Neighborhood): Graph {
+function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
   const graph = new Graph({ type: 'undirected' });
   const nodes = data.nodes ?? [];
   nodes.forEach((node, index) => {
     const angle = (2 * Math.PI * index) / Math.max(nodes.length, 1);
     graph.addNode(node.member.bioguide_id, {
       label: node.member.display_name,
-      size: node.is_seed ? SEED_SIZE : NODE_SIZE,
+      size: nodeSize(nodes.length, node.is_seed),
       color: PARTY_COLORS[node.party_group],
       x: Math.cos(angle) * 10,
       y: Math.sin(angle) * 10,
@@ -53,10 +63,34 @@ function buildGraph(data: Neighborhood): Graph {
       },
     });
   }
+  if (colorMode === 'community' && graph.size > 0) {
+    const communities = louvain(graph, { getEdgeWeight: 'weight' });
+    graph.forEachNode((id) => {
+      graph.setNodeAttribute(id, 'color', COMMUNITY_COLORS[communities[id] % COMMUNITY_COLORS.length]);
+    });
+  }
   return graph;
 }
 
-export function MemberGraphView({ data, selectedId, onSelect }: Props) {
+// A fixed minimum extent keeps sizes sane when only a few nodes are shown.
+function paddedBBox(graph: Graph): { x: [number, number]; y: [number, number] } {
+  const xs: number[] = [];
+  const ys: number[] = [];
+  graph.forEachNode((_, attrs) => {
+    xs.push(attrs.x);
+    ys.push(attrs.y);
+  });
+  const axis = (values: number[]): [number, number] => {
+    const lo = Math.min(...values);
+    const hi = Math.max(...values);
+    const half = Math.max((hi - lo) / 2, MIN_EXTENT / 2);
+    const mid = (lo + hi) / 2;
+    return [mid - half, mid + half];
+  };
+  return { x: axis(xs), y: axis(ys) };
+}
+
+export function MemberGraphView({ data, selectedId, colorMode, onSelect }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
   const onSelectRef = useRef(onSelect);
@@ -64,11 +98,13 @@ export function MemberGraphView({ data, selectedId, onSelect }: Props) {
 
   useEffect(() => {
     if (!container.current) return;
-    const sigma = new Sigma(buildGraph(data), container.current, {
+    const graph = buildGraph(data, colorMode);
+    const sigma = new Sigma(graph, container.current, {
       labelRenderedSizeThreshold: 0,
       labelDensity: 1,
       defaultEdgeType: 'line',
     });
+    sigma.setCustomBBox(paddedBBox(graph));
     sigma.on('clickNode', ({ node }) => onSelectRef.current(node));
     sigma.on('clickStage', () => onSelectRef.current(null));
     sigmaRef.current = sigma;
@@ -76,7 +112,7 @@ export function MemberGraphView({ data, selectedId, onSelect }: Props) {
       sigma.kill();
       sigmaRef.current = null;
     };
-  }, [data]);
+  }, [data, colorMode]);
 
   useEffect(() => {
     const sigma = sigmaRef.current;

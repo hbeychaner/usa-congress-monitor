@@ -1,10 +1,10 @@
-import { Badge, Button, Callout, Card, Checkbox, Flex, Heading, Select, Slider, Text, TextField } from '@radix-ui/themes';
+import { Badge, Button, Callout, Card, Checkbox, Flex, Heading, SegmentedControl, Select, Slider, Text, TextField } from '@radix-ui/themes';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import { fetchNeighborhood, type Neighborhood, type PartyGroup } from '../api/graph';
 import { fetchMembers, type MemberSummary } from '../api/members';
-import { MemberGraphView, PARTY_COLORS } from '../components/MemberGraphView';
+import { MemberGraphView, PARTY_COLORS, type ColorMode } from '../components/MemberGraphView';
 
 const MAX_SEEDS = 5;
 const CONGRESSES = [119, 118, 117, 116, 115, 114, 113];
@@ -37,6 +37,7 @@ export function MemberGraphPage() {
   const [chamber, setChamber] = useState<'house' | 'senate' | null>(null);
   const [parties, setParties] = useState<PartyGroup[]>([]);
   const [limit, setLimit] = useState(15);
+  const [colorMode, setColorMode] = useState<ColorMode>('party');
   const [data, setData] = useState<Neighborhood | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,12 +99,16 @@ export function MemberGraphPage() {
           <Text color="gray">Who works with, and votes like, a member. Edges blend cosponsorship, roll-call agreement and shared legislative topics.</Text>
         </Flex>
         <Flex gap="3" align="center">
-          {PARTIES.map((party) => (
+          <SegmentedControl.Root size="1" value={colorMode} onValueChange={(value) => setColorMode(value as ColorMode)}>
+            <SegmentedControl.Item value="party">Party</SegmentedControl.Item>
+            <SegmentedControl.Item value="community">Communities</SegmentedControl.Item>
+          </SegmentedControl.Root>
+          {colorMode === 'party' ? PARTIES.map((party) => (
             <Flex key={party.value} gap="1" align="center">
               <span style={{ width: 10, height: 10, borderRadius: 5, background: PARTY_COLORS[party.value] }} />
               <Text size="1" color="gray">{party.label}</Text>
             </Flex>
-          ))}
+          )) : <Text size="1" color="gray">Colors mark clusters of closely connected members</Text>}
         </Flex>
       </Flex>
 
@@ -191,7 +196,7 @@ export function MemberGraphPage() {
           {!seeds.length ? (
             <Text color="gray">Search for a member to start exploring their network.</Text>
           ) : data && data.nodes?.length ? (
-            <MemberGraphView data={data} selectedId={selectedId} onSelect={setSelectedId} />
+            <MemberGraphView data={data} selectedId={selectedId} colorMode={colorMode} onSelect={setSelectedId} />
           ) : (
             <Text color="gray">{loading ? 'Loading graph...' : 'No connections match these filters.'}</Text>
           )}
