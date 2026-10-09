@@ -48,7 +48,7 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
     graph.addEdge(link.source, link.target, {
       weight: link.score,
       size: 0.3 + 2 * link.score,
-      color: `rgba(90, 90, 100, ${0.05 + 0.3 * link.score ** 2})`,
+      color: `rgba(90, 90, 100, ${0.2 + 0.5 * link.score})`,
     });
   });
   if (graph.order > 1) {
