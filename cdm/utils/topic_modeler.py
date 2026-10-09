@@ -52,7 +52,24 @@ BOILERPLATE_STOPWORDS = [
     "states",
     "title",
     "united",
+    "authorize",
+    "authorizes",
+    "certain",
+    "direct",
+    "directs",
+    "establish",
+    "establishes",
+    "fiscal",
+    "make",
+    "makes",
+    "secretary",
+    "shall",
+    "year",
+    "years",
 ]
+
+# Alphabetic words of 3+ letters, so years and other numbers never become keywords.
+ALPHA_TOKEN_PATTERN = r"(?u)\b[^\W\d_]{3,}\b"
 
 
 @dataclass(frozen=True)
@@ -194,6 +211,7 @@ class TopicModeler:
     def fit(self, documents: list[TopicDocument]) -> list[TopicAssignment]:
         """Train on the full corpus and return per-document assignments."""
         from bertopic import BERTopic
+        from bertopic.representation import MaximalMarginalRelevance
         from sklearn.feature_extraction.text import (
             ENGLISH_STOP_WORDS,
             CountVectorizer,
@@ -207,8 +225,12 @@ class TopicModeler:
         self._model = BERTopic(
             embedding_model=embedder,
             vectorizer_model=CountVectorizer(
-                stop_words=stop_words, ngram_range=(1, 2), min_df=5
+                stop_words=stop_words,
+                ngram_range=(1, 2),
+                min_df=5,
+                token_pattern=ALPHA_TOKEN_PATTERN,
             ),
+            representation_model=MaximalMarginalRelevance(diversity=0.4),
             min_topic_size=self.min_topic_size,
             nr_topics=self.nr_topics,
             calculate_probabilities=False,
