@@ -2,6 +2,7 @@ import louvain from 'graphology-communities-louvain';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import Graph from 'graphology';
 import Sigma from 'sigma';
+import EdgeCurveProgram from '@sigma/edge-curve';
 import { useEffect, useRef } from 'react';
 
 import type { Neighborhood, PartyGroup } from '../api/graph';
@@ -48,6 +49,8 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
   (data.links ?? []).forEach((link) => {
     if (link.source === link.target || graph.hasEdge(link.source, link.target)) return;
     graph.addEdge(link.source, link.target, {
+      type: 'curved',
+      curvature: 0.25,
       weight: link.score,
       size: 0.3 + 2 * link.score,
       color: `rgba(90, 90, 100, ${0.2 + 0.5 * link.score})`,
@@ -66,6 +69,8 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
     const topicId = `${TOPIC_PREFIX}${link.topic_id}`;
     if (!graph.hasNode(link.member) || !graph.hasNode(topicId) || graph.hasEdge(link.member, topicId)) return;
     graph.addEdge(link.member, topicId, {
+      type: 'curved',
+      curvature: 0.25,
       weight: 1,
       size: 0.5 + 3 * link.share,
       color: 'rgba(168, 85, 247, 0.5)',
@@ -123,7 +128,8 @@ export function MemberGraphView({ data, selectedId, colorMode, onSelect }: Props
     const sigma = new Sigma(graph, container.current, {
       labelRenderedSizeThreshold: 0,
       labelDensity: 1,
-      defaultEdgeType: 'line',
+      defaultEdgeType: 'curved',
+      edgeProgramClasses: { curved: EdgeCurveProgram },
     });
     sigma.setCustomBBox(paddedBBox(graph));
     sigma.on('clickNode', ({ node }) => onSelectRef.current(node));

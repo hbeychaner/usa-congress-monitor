@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "@radix-ui/themes": "^3.3.0",
+        "@sigma/edge-curve": "^3.1.0",
         "echarts": "^6.1.0",
         "graphology": "^0.26.0",
         "graphology-communities-louvain": "^2.0.2",
