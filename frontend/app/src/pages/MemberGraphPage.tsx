@@ -83,7 +83,7 @@ export function MemberGraphPage() {
   async function search(event: FormEvent) {
     event.preventDefault();
     if (!query.trim()) return;
-    setResults((await fetchMembers(1, 8, { query })).members);
+    setResults((await fetchMembers(1, 10, { query })).members);
   }
 
   function toggleParty(party: PartyGroup, checked: boolean) {

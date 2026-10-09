@@ -190,6 +190,8 @@ def list_members(
             {
                 "multi_match": {
                     "query": query.strip(),
+                    "type": "cross_fields",
+                    "operator": "and",
                     "fields": ["name^3", "full_name^3", "bioguide_id", "state"],
                 }
             }
@@ -204,7 +206,7 @@ def list_members(
             "size": limit,
             "track_total_hits": True,
             "query": query_body,
-            "sort": [{"update_date": "desc"}, {"bioguide_id": "asc"}],
+            "sort": [{"_score": "desc"}, {"update_date": "desc"}, {"bioguide_id": "asc"}],
         },
     )
     total = response.get("hits", {}).get("total", 0)
