@@ -21,9 +21,15 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 };
 
 const ACTIVITY_PAGE_SIZE = 25;
+const TOPICS_COLLAPSED = 8;
+const TOPICS_EXPANDED = 30;
 
 function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`;
+}
+
+function formatShare(value: number): string {
+  return `${(value * 100).toFixed(1)}%`;
 }
 
 function formatDate(value: string | null | undefined): string {
@@ -42,6 +48,7 @@ export function MemberProfilePage() {
   const [activityType, setActivityType] = useState('all');
   const [activityPage, setActivityPage] = useState(1);
   const [memberTopics, setMemberTopics] = useState<MemberTopicsResponse | null>(null);
+  const [showAllTopics, setShowAllTopics] = useState(false);
 
   useEffect(() => {
     setMemberTopics(null);
@@ -81,6 +88,8 @@ export function MemberProfilePage() {
   const member = profile.member;
   const terms = [...(member.terms ?? [])].sort((a, b) => (b.congress ?? 0) - (a.congress ?? 0));
   const leadership = member.leadership ?? [];
+  const topics = memberTopics && memberTopics.topics.length > 0 ? memberTopics.topics : profile.topics;
+  const shownTopics = topics.slice(0, showAllTopics ? TOPICS_EXPANDED : TOPICS_COLLAPSED);
 
   const activityByType = profile.recent_activity.reduce<Record<string, number>>((acc, item) => {
     acc[item.activity_type] = (acc[item.activity_type] ?? 0) + 1;
@@ -209,19 +218,22 @@ export function MemberProfilePage() {
       <Card size="3">
         <Heading size="4" mb="2">Legislative Topics</Heading>
         <Flex direction="column" gap="3">
-          {profile.topics.length > 0 ? (
+          {topics.length > 0 ? (
             <Flex direction="column" gap="2">
-              {profile.topics.map((topic) => (
-                <Flex key={topic.label} align="center" gap="2">
-                  <Text size="2" style={{ width: 220, textTransform: 'capitalize' }}>{topic.label}</Text>
-                  <div style={{ flex: 1 }}>
-                    <Progress value={Math.round(topic.weight * 100)} />
-                  </div>
-                  <Text size="1" color="gray" style={{ width: 40, textAlign: 'right' }}>
-                    {Math.round(topic.weight * 100)}%
-                  </Text>
-                </Flex>
-              ))}
+              <HorizontalBarChart
+                data={shownTopics.map((topic) => ({ label: topic.label, value: topic.weight }))}
+                formatValue={formatShare}
+              />
+              <Flex justify="between" align="center">
+                <Text size="1" color="gray">
+                  Top {shownTopics.length} of {topics.length} topics cover {formatShare(shownTopics.reduce((sum, topic) => sum + topic.weight, 0))} of sponsored bills
+                </Text>
+                {topics.length > TOPICS_COLLAPSED ? (
+                  <Button size="1" variant="ghost" onClick={() => setShowAllTopics(!showAllTopics)}>
+                    {showAllTopics ? 'Show fewer' : 'Show more'}
+                  </Button>
+                ) : null}
+              </Flex>
             </Flex>
           ) : (
             <Text as="p" color="gray">No modeled topic assignments yet — topics appear after the topic model is trained.</Text>
