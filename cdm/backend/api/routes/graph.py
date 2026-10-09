@@ -24,6 +24,8 @@ def neighborhood(
     chamber: Chamber | None = None,
     include_topics: bool = False,
     topics_per_member: int = Query(default=3, ge=1, le=8),
+    include_subjects: bool = False,
+    subjects_per_member: int = Query(default=3, ge=1, le=8),
 ) -> NeighborhoodResponse:
     return service.neighborhood(
         NeighborhoodQuery(
@@ -39,5 +41,7 @@ def neighborhood(
             chamber=chamber,
             include_topics=include_topics,
             topics_per_member=topics_per_member,
+            include_subjects=include_subjects,
+            subjects_per_member=subjects_per_member,
         )
     )

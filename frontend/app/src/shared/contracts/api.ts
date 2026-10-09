@@ -741,6 +741,20 @@ export interface components {
              */
             is_seed: boolean;
         };
+        /** GraphSubjectLink */
+        GraphSubjectLink: {
+            /** Member */
+            member: string;
+            /** Subject */
+            subject: string;
+            /** Bills */
+            bills: number;
+        };
+        /** GraphSubjectNode */
+        GraphSubjectNode: {
+            /** Name */
+            name: string;
+        };
         /** GraphTopicLink */
         GraphTopicLink: {
             /** Member */
@@ -1047,6 +1061,10 @@ export interface components {
             topic_nodes?: components["schemas"]["GraphTopicNode"][];
             /** Topic Links */
             topic_links?: components["schemas"]["GraphTopicLink"][];
+            /** Subject Nodes */
+            subject_nodes?: components["schemas"]["GraphSubjectNode"][];
+            /** Subject Links */
+            subject_links?: components["schemas"]["GraphSubjectLink"][];
         };
         /**
          * PartyGroup
@@ -2153,6 +2171,8 @@ export interface operations {
                 chamber?: components["schemas"]["Chamber"] | null;
                 include_topics?: boolean;
                 topics_per_member?: number;
+                include_subjects?: boolean;
+                subjects_per_member?: number;
             };
             header?: never;
             path?: never;

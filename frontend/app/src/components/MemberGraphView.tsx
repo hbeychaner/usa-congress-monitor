@@ -16,7 +16,9 @@ export const PARTY_COLORS: Record<PartyGroup, string> = {
 const COMMUNITY_COLORS = ['#0ea5e9', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#84cc16', '#6366f1', '#ef4444'];
 const MIN_EXTENT = 20;
 const TOPIC_COLOR = '#a855f7';
+const SUBJECT_COLOR = '#d97706';
 export const TOPIC_PREFIX = 'topic:';
+export const SUBJECT_PREFIX = 'subject:';
 
 export type ColorMode = 'party' | 'community';
 
@@ -76,6 +78,26 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
       color: 'rgba(168, 85, 247, 0.5)',
     });
   });
+  (data.subject_nodes ?? []).forEach((subject) => {
+    graph.addNode(`${SUBJECT_PREFIX}${subject.name}`, {
+      label: subject.name,
+      size: nodeSize(nodes.length, false) * 0.8,
+      color: SUBJECT_COLOR,
+      x: Math.random() * 10 - 5,
+      y: Math.random() * 10 - 5,
+    });
+  });
+  (data.subject_links ?? []).forEach((link) => {
+    const subjectId = `${SUBJECT_PREFIX}${link.subject}`;
+    if (!graph.hasNode(link.member) || !graph.hasNode(subjectId) || graph.hasEdge(link.member, subjectId)) return;
+    graph.addEdge(link.member, subjectId, {
+      type: 'curved',
+      curvature: 0.25,
+      weight: 1,
+      size: 0.5 + Math.min(2.5, link.bills / 20),
+      color: 'rgba(217, 119, 6, 0.5)',
+    });
+  });
   if (graph.order > 1) {
     forceAtlas2.assign(graph, {
       iterations: 300,
@@ -91,7 +113,7 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
   if (colorMode === 'community' && graph.size > 0) {
     const communities = louvain(graph, { getEdgeWeight: 'weight' });
     graph.forEachNode((id) => {
-      if (id.startsWith(TOPIC_PREFIX)) return;
+      if (id.startsWith(TOPIC_PREFIX) || id.startsWith(SUBJECT_PREFIX)) return;
       graph.setNodeAttribute(id, 'color', COMMUNITY_COLORS[communities[id] % COMMUNITY_COLORS.length]);
     });
   }

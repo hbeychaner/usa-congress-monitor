@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 
 import { fetchNeighborhood, type Neighborhood, type PartyGroup } from '../api/graph';
 import { fetchMembers, type MemberSummary } from '../api/members';
-import { MemberGraphView, PARTY_COLORS, TOPIC_PREFIX, type ColorMode } from '../components/MemberGraphView';
+import { MemberGraphView, PARTY_COLORS, SUBJECT_PREFIX, TOPIC_PREFIX, type ColorMode } from '../components/MemberGraphView';
 
 const MAX_SEEDS = 5;
 const CONGRESSES = [119, 118, 117, 116, 115, 114, 113];
@@ -38,6 +38,7 @@ export function MemberGraphPage() {
   const [parties, setParties] = useState<PartyGroup[]>([]);
   const [limit, setLimit] = useState(15);
   const [showTopics, setShowTopics] = useState(false);
+  const [showSubjects, setShowSubjects] = useState(false);
   const [colorMode, setColorMode] = useState<ColorMode>('party');
   const [data, setData] = useState<Neighborhood | null>(null);
   const [loading, setLoading] = useState(false);
@@ -54,7 +55,7 @@ export function MemberGraphPage() {
     }
     let cancelled = false;
     setLoading(true);
-    fetchNeighborhood({ members: seeds, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, includeTopics: showTopics })
+    fetchNeighborhood({ members: seeds, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, includeTopics: showTopics, includeSubjects: showSubjects })
       .then((response) => {
         if (cancelled) return;
         setData(response);
@@ -65,7 +66,7 @@ export function MemberGraphPage() {
       .finally(() => !cancelled && setLoading(false));
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedKey, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, showTopics]);
+  }, [seedKey, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, showTopics, showSubjects]);
 
   const names = useMemo(
     () => new Map((data?.nodes ?? []).map((node) => [node.member.bioguide_id, node.member.display_name])),
@@ -80,6 +81,19 @@ export function MemberGraphPage() {
       .filter((link) => link.topic_id === selectedTopic?.topic_id)
       .sort((a, b) => b.bills - a.bills),
     [data, selectedTopic],
+  );
+  const selectedSubject = selectedId?.startsWith(SUBJECT_PREFIX)
+    ? data?.subject_nodes?.find((subject) => `${SUBJECT_PREFIX}${subject.name}` === selectedId) ?? null
+    : null;
+  const subjectMembers = useMemo(
+    () => (data?.subject_links ?? [])
+      .filter((link) => link.subject === selectedSubject?.name)
+      .sort((a, b) => b.bills - a.bills),
+    [data, selectedSubject],
+  );
+  const memberSubjects = useMemo(
+    () => (data?.subject_links ?? []).filter((link) => link.member === selectedId),
+    [data, selectedId],
   );
   const memberTopics = useMemo(() => {
     const labels = new Map((data?.topic_nodes ?? []).map((topic) => [topic.topic_id, topic.label]));
@@ -198,6 +212,12 @@ export function MemberGraphPage() {
                   Show topics
                 </Flex>
               </Text>
+              <Text as="label" size="2">
+                <Flex gap="1" align="center">
+                  <Checkbox checked={showSubjects} onCheckedChange={(checked) => setShowSubjects(checked === true)} />
+                  Show subjects
+                </Flex>
+              </Text>
               {PARTIES.map((party) => (
                 <Text key={party.value} as="label" size="2">
                   <Flex gap="1" align="center">
@@ -243,6 +263,12 @@ export function MemberGraphPage() {
                   {memberTopics.map((topic) => <Text key={topic.label} size="2">{topic.label} ({topic.bills})</Text>)}
                 </>
               ) : null}
+              {memberSubjects.length ? (
+                <>
+                  <Text size="2" weight="bold" mt="2">Top subjects (sponsored bills)</Text>
+                  {memberSubjects.map((link) => <Text key={link.subject} size="2">{link.subject} ({link.bills})</Text>)}
+                </>
+              ) : null}
               <Text size="2" weight="bold" mt="2">Strongest links</Text>
               {selectedLinks.map((link) => {
                 const other = link.source === selectedId ? link.target : link.source;
@@ -255,6 +281,18 @@ export function MemberGraphPage() {
                   </Text>
                 );
               })}
+            </Flex>
+          </Card>
+        ) : selectedSubject ? (
+          <Card size="3" style={{ flex: '0 0 300px' }}>
+            <Flex direction="column" gap="2">
+              <Heading size="4">{selectedSubject.name}</Heading>
+              <Text size="2" weight="bold" mt="2">Members sponsoring on it (bills)</Text>
+              {subjectMembers.map((link) => (
+                <Text key={link.member} size="2">
+                  <Link to={`/members/${link.member}`}>{names.get(link.member) ?? link.member}</Link> ({link.bills})
+                </Text>
+              ))}
             </Flex>
           </Card>
         ) : selectedTopic ? (

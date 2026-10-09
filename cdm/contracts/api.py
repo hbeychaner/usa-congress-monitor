@@ -457,6 +457,16 @@ class GraphTopicLink(BaseModel):
     bills: int
 
 
+class GraphSubjectNode(BaseModel):
+    name: str
+
+
+class GraphSubjectLink(BaseModel):
+    member: str
+    subject: str
+    bills: int
+
+
 class NeighborhoodResponse(BaseModel):
     seeds: list[str]
     congress: int | None = None
@@ -465,3 +475,5 @@ class NeighborhoodResponse(BaseModel):
     links: list[GraphLink] = Field(default_factory=list)
     topic_nodes: list[GraphTopicNode] = Field(default_factory=list)
     topic_links: list[GraphTopicLink] = Field(default_factory=list)
+    subject_nodes: list[GraphSubjectNode] = Field(default_factory=list)
+    subject_links: list[GraphSubjectLink] = Field(default_factory=list)

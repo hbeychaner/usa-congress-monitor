@@ -16,6 +16,7 @@ export type NeighborhoodParams = {
     parties: PartyGroup[];
     limit: number;
     includeTopics: boolean;
+    includeSubjects: boolean;
 };
 
 export function fetchNeighborhood(params: NeighborhoodParams): Promise<Neighborhood> {
@@ -25,6 +26,7 @@ export function fetchNeighborhood(params: NeighborhoodParams): Promise<Neighborh
         topic_weight: String(params.topicWeight),
         limit: String(params.limit),
         include_topics: String(params.includeTopics),
+        include_subjects: String(params.includeSubjects),
     });
     params.members.forEach((member) => query.append('member', member));
     params.parties.forEach((party) => query.append('party', party));

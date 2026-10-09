@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from cdm.backend.services.graph_service import GraphService
 from cdm.backend.services.member_service import get_member_summaries
+from cdm.backend.services.member_subject_overlay import MemberSubjectOverlayBuilder
 from cdm.backend.services.member_topic_overlay import MemberTopicOverlayBuilder
 from cdm.contracts.api import (
     GraphLink,
@@ -34,6 +35,8 @@ class NeighborhoodQuery(BaseModel):
     chamber: Chamber | None = None
     include_topics: bool = False
     topics_per_member: int = 3
+    include_subjects: bool = False
+    subjects_per_member: int = 3
 
     @property
     def signals(self) -> list[Signal]:
@@ -187,6 +190,11 @@ class NeighborhoodService:
             if query.include_topics
             else None
         )
+        subjects = (
+            MemberSubjectOverlayBuilder().build(node_ids, query.congress, query.subjects_per_member)
+            if query.include_subjects
+            else None
+        )
         return NeighborhoodResponse(
             seeds=query.seeds,
             congress=query.congress,
@@ -202,4 +210,6 @@ class NeighborhoodService:
             links=links,
             topic_nodes=overlay.nodes if overlay else [],
             topic_links=overlay.links if overlay else [],
+            subject_nodes=subjects.nodes if subjects else [],
+            subject_links=subjects.links if subjects else [],
         )
