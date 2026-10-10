@@ -113,6 +113,8 @@ class MetasubjectConfig(_Section):
     metasubject_match_min_similarity: float = 0.85
     # Bills below this similarity to their centroid are flagged low confidence.
     metasubject_low_confidence_similarity: float = 0.5
+    # A matched group keeps its old name only if its size changed by less than this factor.
+    metasubject_name_carry_max_size_ratio: float = 3.0
 
 
 class ApiConfig(_Section):

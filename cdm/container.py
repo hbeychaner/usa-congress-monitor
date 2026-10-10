@@ -109,6 +109,7 @@ class Container:
             settings.metasubject_target_groups,
             overrides,
             disambiguator,
+            settings.metasubject_name_carry_max_size_ratio,
         )
 
     def metasubject_assigner(

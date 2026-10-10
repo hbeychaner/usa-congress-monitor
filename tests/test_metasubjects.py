@@ -85,9 +85,9 @@ def test_unmatched_group_gets_a_fresh_id() -> None:
 
     second = builder.build(shifted, previous=first)
 
-    assert {g.metasubject_id for g in second}.isdisjoint({
-        g.metasubject_id for g in first
-    })
+    assert {g.metasubject_id for g in second}.isdisjoint(
+        {g.metasubject_id for g in first}
+    )
 
 
 def test_override_beats_generated_and_carried_names() -> None:
@@ -133,3 +133,22 @@ def test_quarterly_trend_counts_assignments_and_skips_undated() -> None:
     rows = QuarterlyTrendBuilder().build(assigned, dates)
 
     assert [(r.timestamp[:10], r.frequency) for r in rows] == [("2020-01-01", 2)]
+
+
+def test_carried_name_is_replaced_when_the_group_size_changes_a_lot() -> None:
+    builder = MetasubjectBuilder(
+        LargestTopicNamer(),
+        StableIdMatcher(0.85),
+        target_groups=2,
+        name_carry_max_size_ratio=3.0,
+    )
+    first = builder.build(_topics())
+    grown = [
+        topic.model_copy(update={"size": topic.size * 10, "label": "Grown"})
+        for topic in _topics()
+    ]
+
+    second = builder.build(grown, previous=first)
+
+    assert {g.metasubject_id for g in second} == {g.metasubject_id for g in first}
+    assert {g.name for g in second} == {"Grown"}

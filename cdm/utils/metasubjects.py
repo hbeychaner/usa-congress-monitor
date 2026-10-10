@@ -131,7 +131,9 @@ class MetasubjectBuilder:
         target_groups: int,
         overrides: MetasubjectOverrides | None = None,
         disambiguator: NameDisambiguator | None = None,
+        name_carry_max_size_ratio: float | None = None,
     ) -> None:
+        self.name_carry_max_size_ratio = name_carry_max_size_ratio
         self.disambiguator = disambiguator
         self.namer = namer
         self.matcher = matcher
@@ -157,6 +159,13 @@ class MetasubjectBuilder:
         stacked = np.vstack([_unit(topic.vector) for topic in members])
         return _unit(np.average(stacked, axis=0, weights=weights))
 
+    def _keeps_name(self, match: Metasubject, size: int) -> bool:
+        """A carried name is stale once the group grew or shrank past the ratio."""
+        limit = self.name_carry_max_size_ratio
+        if limit is None or match.size <= 0 or size <= 0:
+            return True
+        return 1 / limit <= size / match.size <= limit
+
     def build(
         self,
         topics: Sequence[TopicVector],
@@ -170,11 +179,17 @@ class MetasubjectBuilder:
         results: list[Metasubject] = []
         members_of: dict[int, list[TopicVector]] = {}
         for members, centroid, match in zip(groups, centroids, matches):
+            size = sum(topic.size for topic in members)
             if match is None:
                 metasubject_id, name = next_id, self.namer.name(members)
                 next_id += 1
             else:
-                metasubject_id, name = match.metasubject_id, match.name
+                metasubject_id = match.metasubject_id
+                name = (
+                    match.name
+                    if self._keeps_name(match, size)
+                    else self.namer.name(members)
+                )
             members_of[metasubject_id] = list(members)
             ranked = sorted(members, key=lambda topic: topic.size, reverse=True)
             name = self.overrides.names.get(metasubject_id, name)
@@ -184,7 +199,7 @@ class MetasubjectBuilder:
                     metasubject_id=metasubject_id,
                     name=name,
                     topic_ids=sorted(topic.topic_id for topic in members),
-                    size=sum(topic.size for topic in members),
+                    size=size,
                     top_words=list(words)[:MAX_GROUP_WORDS],
                     centroid=centroid.tolist(),
                 )
@@ -242,9 +257,9 @@ class MetasubjectAssigner:
     ) -> None:
         self.metasubjects = list(metasubjects)
         self.ids = [group.metasubject_id for group in metasubjects]
-        self.centroids = np.vstack([
-            _unit(np.asarray(g.centroid)) for g in metasubjects
-        ])
+        self.centroids = np.vstack(
+            [_unit(np.asarray(g.centroid)) for g in metasubjects]
+        )
         self.by_topic = topic_to_metasubject(metasubjects)
         self.low_confidence_below = low_confidence_below
 
