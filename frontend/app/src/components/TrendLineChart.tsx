@@ -33,11 +33,13 @@ export type TrendSeries = {
 type Props = {
   series: TrendSeries[];
   height?: number;
+  /** Stack series into filled areas instead of overlaying lines. */
+  stacked?: boolean;
   onSeriesClick?: (name: string) => void;
 };
 
 /** EMM-style interactive multi-line trend chart (ECharts canvas). */
-export function TrendLineChart({ series, height = 320, onSeriesClick }: Props) {
+export function TrendLineChart({ series, height = 320, stacked = false, onSeriesClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const clickRef = useRef(onSeriesClick);
   clickRef.current = onSeriesClick;
@@ -80,6 +82,7 @@ export function TrendLineChart({ series, height = 320, onSeriesClick }: Props) {
         type: 'line',
         smooth: 0.25,
         showSymbol: false,
+        ...(stacked ? { stack: 'total', areaStyle: { opacity: 0.85 } } : {}),
         emphasis: { focus: 'series' },
         data: s.points.map(([year, value]) => [String(year), value]),
       })),
@@ -94,7 +97,7 @@ export function TrendLineChart({ series, height = 320, onSeriesClick }: Props) {
       observer.disconnect();
       chart.dispose();
     };
-  }, [series]);
+  }, [series, stacked]);
 
   if (series.length === 0) return null;
   return <div ref={containerRef} style={{ width: '100%', height }} />;

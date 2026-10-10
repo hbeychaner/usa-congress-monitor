@@ -1,8 +1,13 @@
+from typing import cast
+
 import pytest
 
-from cdm.backend.services import neighborhood_service
 from cdm.backend.services.graph_service import GraphService
-from cdm.backend.services.neighborhood_service import NeighborhoodQuery, NeighborhoodService
+from cdm.backend.services.member_service import MemberService
+from cdm.backend.services.neighborhood_service import (
+    NeighborhoodQuery,
+    NeighborhoodService,
+)
 from cdm.contracts.api import MemberSummary
 from cdm.graph.models import MemberEdge, PartyGroup, Signal
 
@@ -19,9 +24,16 @@ def _summary(member_id: str, party: str, chamber: str) -> MemberSummary:
     )
 
 
+class FakeMembers(MemberService):
+    def __init__(self, members: dict[str, MemberSummary]) -> None:
+        self.table = members
+
+    def get_summaries(self, bioguide_ids: list[str]) -> dict[str, MemberSummary]:
+        return {key: self.table[key] for key in bioguide_ids if key in self.table}
+
+
 class FakeGraph(GraphService):
     def __init__(self) -> None:
-        super().__init__(client=None)
         self.table = {
             Signal.COLLABORATION: [_edge(Signal.COLLABORATION, "A", "B", 0.02), _edge(Signal.COLLABORATION, "A", "C", 0.01)],
             Signal.VOTING: [_edge(Signal.VOTING, "A", "B", 0.9), _edge(Signal.VOTING, "A", "C", 0.3)],
@@ -38,25 +50,22 @@ class FakeGraph(GraphService):
 
 
 @pytest.fixture
-def service(monkeypatch: pytest.MonkeyPatch) -> NeighborhoodService:
+def service() -> NeighborhoodService:
     members = {
         "A": _summary("A", "Democratic", "House of Representatives"),
         "B": _summary("B", "Democratic", "Senate"),
         "C": _summary("C", "Republican", "House of Representatives"),
     }
-    monkeypatch.setattr(
-        neighborhood_service,
-        "get_member_summaries",
-        lambda ids: {key: members[key] for key in ids if key in members},
+    return NeighborhoodService(
+        FakeGraph(), FakeMembers(members), None, None  # type: ignore[arg-type]
     )
-    return NeighborhoodService(FakeGraph())
 
 
-def _query(**fields: object) -> NeighborhoodQuery:
+def _query(parties: set[PartyGroup] | None = None) -> NeighborhoodQuery:
     return NeighborhoodQuery(
         seeds=["A"],
         weights={Signal.COLLABORATION: 1.0, Signal.VOTING: 1.0},
-        **fields,
+        parties=parties or set(),
     )
 
 
@@ -70,7 +79,7 @@ def test_blends_signals_and_marks_seed(service: NeighborhoodService):
 
 
 def test_party_filter_removes_other_party(service: NeighborhoodService):
-    response = service.neighborhood(_query(parties={PartyGroup.DEMOCRATIC}))
+    response = service.neighborhood(_query({PartyGroup.DEMOCRATIC}))
     assert {node.member.bioguide_id for node in response.nodes} == {"A", "B"}
     assert all(node.party_group is PartyGroup.DEMOCRATIC for node in response.nodes)
 
@@ -84,7 +93,7 @@ def test_zero_weight_signal_is_ignored(service: NeighborhoodService):
 
 
 def test_shared_topics_are_carried_to_links(service: NeighborhoodService):
-    graph = service.graph
+    graph = cast(FakeGraph, service.graph)
     graph.table[Signal.TOPIC] = [
         MemberEdge(
             graph_version="v1", signal=Signal.TOPIC, member="A", neighbor="B",

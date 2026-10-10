@@ -6,6 +6,7 @@ import {
   Grid,
   Heading,
   Select,
+  SegmentedControl,
   Text,
   TextField,
 } from '@radix-ui/themes';
@@ -13,12 +14,68 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchPolicyAreaTrends, fetchSubjects } from '../api/subjects';
 import type { PolicyAreaTrendsResponse, SubjectsResponse } from '../api/subjects';
-import { fetchTopicTrends, fetchTopics } from '../api/topics';
-import type { TopicSummary, TopicTrendSeries, TopicTrendsResponse, TopicsResponse } from '../api/topics';
+import { fetchMetasubjectTrends, fetchTopicTrends, fetchTopics } from '../api/topics';
+import type {
+  MetasubjectTrendSeries,
+  MetasubjectTrendsResponse,
+  TopicSummary,
+  TopicTrendSeries,
+  TopicTrendsResponse,
+  TopicsResponse,
+} from '../api/topics';
 import { TrendLineChart } from '../components/TrendLineChart';
 import type { TrendSeries } from '../components/TrendLineChart';
 
 const TOPIC_PAGE_SIZE = 24;
+const METASUBJECT_CHART_TOP = 8;
+const OTHER_LABEL = 'Other';
+
+type GroupView = 'count' | 'share';
+
+function groupSeriesToTrend(
+  series: MetasubjectTrendSeries[],
+  view: GroupView,
+): TrendSeries[] {
+  const byGroup = series.map((s) => {
+    const byYear = new Map<number, number>();
+    for (const point of s.points) {
+      const year = new Date(point.timestamp).getUTCFullYear();
+      if (!Number.isFinite(year)) continue;
+      byYear.set(year, (byYear.get(year) ?? 0) + point.frequency);
+    }
+    const total = [...byYear.values()].reduce((sum, value) => sum + value, 0);
+    return { name: s.label, byYear, total };
+  });
+  const years = new Set(byGroup.flatMap((group) => [...group.byYear.keys()]));
+  if (years.size < 2) return [];
+  const grid = Array.from(
+    { length: Math.max(...years) - Math.min(...years) + 1 },
+    (_, i) => Math.min(...years) + i,
+  );
+  const ranked = [...byGroup].sort((a, b) => b.total - a.total);
+  const head = ranked.slice(0, METASUBJECT_CHART_TOP);
+  const tail = ranked.slice(METASUBJECT_CHART_TOP);
+  const rows = [...head.map((group) => ({ name: group.name, byYear: group.byYear }))];
+  if (tail.length > 0) {
+    const other = new Map<number, number>();
+    for (const group of tail) {
+      for (const [year, value] of group.byYear) other.set(year, (other.get(year) ?? 0) + value);
+    }
+    rows.push({ name: OTHER_LABEL, byYear: other });
+  }
+  const yearTotals = new Map(
+    grid.map((year) => [year, rows.reduce((sum, row) => sum + (row.byYear.get(year) ?? 0), 0)]),
+  );
+  return rows.map((row) => ({
+    name: row.name,
+    points: grid.map((year) => {
+      const value = row.byYear.get(year) ?? 0;
+      const total = yearTotals.get(year) ?? 0;
+      const shown = view === 'share' ? (total > 0 ? (value / total) * 100 : 0) : value;
+      return [year, Math.round(shown * 10) / 10] as [number, number];
+    }),
+  }));
+}
 
 function topicSeriesToTrend(series: TopicTrendSeries[]): TrendSeries[] {
   const allYears = new Set<number>();
@@ -125,6 +182,9 @@ export function TopicsPage() {
   const [subjects, setSubjects] = useState<SubjectsResponse | null>(null);
   const [trends, setTrends] = useState<TopicTrendsResponse | null>(null);
   const [policyTrends, setPolicyTrends] = useState<PolicyAreaTrendsResponse | null>(null);
+  const [groupTrends, setGroupTrends] = useState<MetasubjectTrendsResponse | null>(null);
+  const [groupView, setGroupView] = useState<GroupView>('count');
+  const [groupFilter, setGroupFilter] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -139,6 +199,7 @@ export function TopicsPage() {
     fetchSubjects().then(setSubjects).catch(() => setSubjects(null));
     fetchTopicTrends(10).then(setTrends).catch(() => setTrends(null));
     fetchPolicyAreaTrends(10).then(setPolicyTrends).catch(() => setPolicyTrends(null));
+    fetchMetasubjectTrends().then(setGroupTrends).catch(() => setGroupTrends(null));
   }, []);
 
   const topics = useMemo(() => data?.topics ?? [], [data]);
@@ -149,17 +210,20 @@ export function TopicsPage() {
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
+    const inGroup = groupFilter === null
+      ? topics
+      : topics.filter((topic) => topic.metasubject_id === groupFilter);
     const matches = needle
-      ? topics.filter(
+      ? inGroup.filter(
         (topic) =>
           topic.label.toLowerCase().includes(needle) ||
           topic.top_words.some((word) => word.toLowerCase().includes(needle)),
       )
-      : topics;
+      : inGroup;
     return [...matches].sort((a, b) =>
       sort === 'size' ? b.size - a.size : a.label.localeCompare(b.label),
     );
-  }, [topics, query, sort]);
+  }, [topics, query, sort, groupFilter]);
 
   const visible = filtered.slice(0, limit);
 
@@ -172,6 +236,11 @@ export function TopicsPage() {
     [policyTrends],
   );
   const topicSeries = useMemo(() => topicSeriesToTrend(trends?.series ?? []), [trends]);
+  const groupSeries = useMemo(
+    () => groupSeriesToTrend(groupTrends?.series ?? [], groupView),
+    [groupTrends, groupView],
+  );
+  const activeGroup = groupTrends?.series.find((s) => s.metasubject_id === groupFilter);
 
   return (
     <Flex direction="column" gap="5">
@@ -226,6 +295,35 @@ export function TopicsPage() {
           </Card>
 
           <Card size="3">
+            <Flex justify="between" align="center" wrap="wrap" gap="3" mb="1">
+              <Heading size="4">Subject Groups Over Time</Heading>
+              <SegmentedControl.Root
+                value={groupView}
+                onValueChange={(value) => setGroupView(value as GroupView)}
+              >
+                <SegmentedControl.Item value="count">Bills</SegmentedControl.Item>
+                <SegmentedControl.Item value="share">Share</SegmentedControl.Item>
+              </SegmentedControl.Root>
+            </Flex>
+            <Text as="p" size="2" color="gray" mb="3">
+              Topics grouped into broad subject areas, by year introduced. Click a band to list its topics below.
+            </Text>
+            {groupSeries.length > 0 ? (
+              <TrendLineChart
+                series={groupSeries}
+                height={340}
+                stacked
+                onSeriesClick={(name) => {
+                  const match = groupTrends?.series.find((s) => s.label === name);
+                  if (match) setGroupFilter(match.metasubject_id);
+                }}
+              />
+            ) : (
+              <Text as="p" color="gray">No subject groups yet; they appear after the next model training run.</Text>
+            )}
+          </Card>
+
+          <Card size="3">
             <Heading size="4" mb="1">Discovered Topic Activity</Heading>
             <Text as="p" size="2" color="gray" mb="3">
               Bills per year for the largest machine-discovered topics. Click a line to open the topic.
@@ -247,6 +345,11 @@ export function TopicsPage() {
           <Card size="3">
             <Flex justify="between" align="center" wrap="wrap" gap="3" mb="3">
               <Heading size="4">All Topics ({filtered.length})</Heading>
+              {activeGroup ? (
+                <Badge size="2" variant="soft" style={{ cursor: 'pointer' }} onClick={() => setGroupFilter(null)}>
+                  {activeGroup.label} ✕
+                </Badge>
+              ) : null}
               <Flex gap="2" align="center">
                 <TextField.Root
                   placeholder="Search topics…"

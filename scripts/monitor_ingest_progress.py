@@ -21,7 +21,7 @@ import requests
 from sqlalchemy import Column, MetaData, String, Table, create_engine, func, select
 from sqlalchemy.engine import Connection
 
-from settings import CONGRESS_API_KEY, CONGRESS_API_URL, JOB_DB_PATH
+from cdm.config import get_config
 
 _JOBS_TABLE = Table(
     "jobs",
@@ -54,7 +54,7 @@ class IngestJob:
 
 
 def _connect_jobs():
-    return create_engine(f"sqlite:///{JOB_DB_PATH}").connect()
+    return create_engine(f"sqlite:///{get_config().ledger.job_db_path}").connect()
 
 
 def _load_active_ingest_jobs(conn: Connection) -> list[IngestJob]:
@@ -132,13 +132,13 @@ def _fetch_bill_total(job: IngestJob, cache: dict[tuple[str | None, str | None],
     if key in cache:
         return cache[key]
 
-    if not CONGRESS_API_KEY or not CONGRESS_API_URL:
+    if not get_config().congress_api.congress_api_key or not get_config().congress_api.congress_api_url:
         cache[key] = None
         return None
 
     try:
         response = requests.get(
-            f"{CONGRESS_API_URL.rstrip('/')}/bill",
+            f"{get_config().congress_api.congress_api_url.rstrip('/')}/bill",
             params={
                 "format": "json",
                 "offset": 0,
@@ -146,7 +146,7 @@ def _fetch_bill_total(job: IngestJob, cache: dict[tuple[str | None, str | None],
                 "fromDateTime": job.from_date,
                 "toDateTime": job.to_date,
             },
-            headers={"x-api-key": CONGRESS_API_KEY},
+            headers={"x-api-key": get_config().congress_api.congress_api_key},
             timeout=20,
         )
         response.raise_for_status()

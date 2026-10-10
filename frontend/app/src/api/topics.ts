@@ -6,6 +6,7 @@ export type TopicSummary = {
   label: string;
   size: number;
   top_words: string[];
+  metasubject_id: number | null;
 };
 
 export type TopicsResponse = {
@@ -71,6 +72,29 @@ export type TopicTrendsResponse = {
   series: TopicTrendSeries[];
   model_version: string | null;
 };
+
+export type MetasubjectSummary = {
+  metasubject_id: number;
+  name: string;
+  size: number;
+  top_words: string[];
+  topic_ids: number[];
+};
+
+export type MetasubjectTrendSeries = {
+  metasubject_id: number;
+  label: string;
+  points: TopicTrendPoint[];
+};
+
+export type MetasubjectTrendsResponse = {
+  series: MetasubjectTrendSeries[];
+  model_version: string | null;
+};
+
+export function fetchMetasubjectTrends(): Promise<MetasubjectTrendsResponse> {
+  return apiGet<MetasubjectTrendsResponse>('/api/v1/topics/metasubjects/trends');
+}
 
 export function fetchTopics(): Promise<TopicsResponse> {
   return apiGet<TopicsResponse>('/api/v1/topics');

@@ -1,5 +1,6 @@
-from cdm.backend.services import member_service
-from cdm.backend.services.member_service import list_member_activity
+from typing import Any, cast
+
+from cdm.backend.services.member_service import MemberService
 
 
 class FakeSearchClient:
@@ -18,15 +19,13 @@ class FakeSearchClient:
         }
 
 
-def _install(monkeypatch, responses):
+def _install(responses) -> tuple[MemberService, FakeSearchClient]:
     client = FakeSearchClient(responses)
-    monkeypatch.setattr(member_service, "get_opensearch_client", lambda: client)
-    return client
+    return MemberService(client, cast(Any, None), cast(Any, None)), client
 
 
-def test_list_member_activity_merges_types_sorted_by_date(monkeypatch):
-    client = _install(
-        monkeypatch,
+def test_list_member_activity_merges_types_sorted_by_date():
+    service, client = _install(
         {
             "congress-legislation-read": [
                 {
@@ -52,7 +51,7 @@ def test_list_member_activity_merges_types_sorted_by_date(monkeypatch):
         },
     )
 
-    response = list_member_activity("a000001", None, 1, 25)
+    response = service.list_activity("a000001", None, 1, 25)
 
     assert response.total == 2
     assert response.counts == {"bill": 1, "amendment": 1}
@@ -68,7 +67,7 @@ def test_list_member_activity_merges_types_sorted_by_date(monkeypatch):
         assert "A000001" in str(body)
 
 
-def test_list_member_activity_type_filter_and_pagination(monkeypatch):
+def test_list_member_activity_type_filter_and_pagination():
     amendments = [
         {
             "id": f"amendment:118:samdt:{n}",
@@ -79,9 +78,9 @@ def test_list_member_activity_type_filter_and_pagination(monkeypatch):
         }
         for n in range(1, 8)
     ]
-    _install(monkeypatch, {"congress-amendment-read": amendments})
+    service, _ = _install({"congress-amendment-read": amendments})
 
-    page2 = list_member_activity("A000001", "amendment", 2, 3)
+    page2 = service.list_activity("A000001", "amendment", 2, 3)
 
     assert page2.counts == {"amendment": 7}
     assert len(page2.items) == 3
@@ -93,10 +92,10 @@ def test_list_member_activity_type_filter_and_pagination(monkeypatch):
     ]
 
 
-def test_list_member_activity_ignores_unknown_types(monkeypatch):
-    client = _install(monkeypatch, {})
+def test_list_member_activity_ignores_unknown_types():
+    service, client = _install({})
 
-    response = list_member_activity("A000001", "nonsense", 1, 10)
+    response = service.list_activity("A000001", "nonsense", 1, 10)
 
     assert response.total == 0
     assert set(response.counts) == {"bill", "amendment"}

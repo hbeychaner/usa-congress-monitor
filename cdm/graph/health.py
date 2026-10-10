@@ -45,17 +45,19 @@ class GraphHealthChecker:
     def __init__(
         self,
         client: Elasticsearch,
+        analysis_index: str,
         runner: GraphBuildRunner | None = None,
         now: datetime | None = None,
     ) -> None:
         self.client = client
+        self.analysis_index = analysis_index
         self.store = GraphStore(client)
         self.runner = runner or GraphBuildRunner()
         self.now = now or datetime.now(UTC)
 
     def _topic_model_version(self) -> str | None:
         try:
-            return TopicModelReader(self.client).latest_version()
+            return TopicModelReader(self.client, self.analysis_index).latest_version()
         except NotFoundError:
             return None
 

@@ -12,12 +12,24 @@ topics.
 
 from __future__ import annotations
 
+import html
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+from bertopic import BERTopic
+from bertopic.representation import MaximalMarginalRelevance
+from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, CountVectorizer
+
+from cdm.store.embedding_store import EmbeddingStore
+from cdm.utils.cached_embedder import EMBED_CHUNK_SIZE, CachedEmbedder, EmbeddingJob
+from cdm.utils.metasubjects import TopicVector
+from cdm.utils.topic_records import TopicSummaryRow, TopicTimeBin
 from cdm.utils.topic_terms import dedupe_terms, keyword_label
 
 _HTML_TAG = re.compile(r"<[^>]+>")
@@ -68,6 +80,8 @@ BOILERPLATE_STOPWORDS = [
     "years",
 ]
 
+TOP_N_WORDS = 15
+
 # Alphabetic words of 3+ letters, so years and other numbers never become keywords.
 ALPHA_TOKEN_PATTERN = r"(?u)\b[^\W\d_]{3,}\b"
 
@@ -100,7 +114,7 @@ class TopicAssignment:
 
 
 def _clean(text: str) -> str:
-    return _WHITESPACE.sub(" ", _HTML_TAG.sub(" ", text)).strip()
+    return _WHITESPACE.sub(" ", _HTML_TAG.sub(" ", html.unescape(text))).strip()
 
 
 def _parse_date(value: Any) -> datetime | None:
@@ -192,31 +206,51 @@ class TopicModeler:
         embedding_model: str = "all-mpnet-base-v2",
         min_topic_size: int = 25,
         nr_topics: int | str | None = None,
+        embedding_store: EmbeddingStore | None = None,
     ) -> None:
         self.embedding_model_name = embedding_model
         self.min_topic_size = min_topic_size
         self.nr_topics = nr_topics
+        self.embedding_store = embedding_store
         self._model: Any = None
         self._embedding_model: Any = None
         self._documents: list[TopicDocument] = []
         self._topics: list[int] = []
+        self._embeddings: np.ndarray | None = None
 
     def _embedder(self) -> Any:
         if self._embedding_model is None:
-            from sentence_transformers import SentenceTransformer
-
             self._embedding_model = SentenceTransformer(self.embedding_model_name)
         return self._embedding_model
 
-    def fit(self, documents: list[TopicDocument]) -> list[TopicAssignment]:
-        """Train on the full corpus and return per-document assignments."""
-        from bertopic import BERTopic
-        from bertopic.representation import MaximalMarginalRelevance
-        from sklearn.feature_extraction.text import (
-            ENGLISH_STOP_WORDS,
-            CountVectorizer,
-        )
+    def _embed(
+        self,
+        documents: list[TopicDocument],
+        on_progress: Callable[[float], None] | None,
+    ) -> np.ndarray:
+        if self.embedding_store is not None:
+            cached = CachedEmbedder(self.embedding_store, self._embedder)
+            jobs = [EmbeddingJob(doc.doc_id, doc.embedding_input) for doc in documents]
+            return cached.embed(jobs, on_progress)
+        embedder = self._embedder()
+        texts = [doc.embedding_input for doc in documents]
+        batches = []
+        for start in range(0, len(texts), EMBED_CHUNK_SIZE):
+            batches.append(
+                embedder.encode(
+                    texts[start : start + EMBED_CHUNK_SIZE], show_progress_bar=False
+                )
+            )
+            if on_progress:
+                on_progress(min(1.0, (start + EMBED_CHUNK_SIZE) / len(texts)))
+        return np.vstack(batches)
 
+    def fit(
+        self,
+        documents: list[TopicDocument],
+        on_embed_progress: Callable[[float], None] | None = None,
+    ) -> list[TopicAssignment]:
+        """Train on the full corpus and return per-document assignments."""
         if not documents:
             raise ValueError("no documents to fit")
         self._documents = documents
@@ -233,12 +267,12 @@ class TopicModeler:
             representation_model=MaximalMarginalRelevance(diversity=0.4),
             min_topic_size=self.min_topic_size,
             nr_topics=self.nr_topics,
+            top_n_words=TOP_N_WORDS,
             calculate_probabilities=False,
             verbose=True,
         )
-        embeddings = embedder.encode(
-            [doc.embedding_input for doc in documents], show_progress_bar=True
-        )
+        embeddings = self._embed(documents, on_embed_progress)
+        self._embeddings = embeddings
         topics, probabilities = self._model.fit_transform(
             [doc.text for doc in documents], embeddings=embeddings
         )
@@ -248,15 +282,13 @@ class TopicModeler:
     def transform(self, documents: list[TopicDocument]) -> list[TopicAssignment]:
         """Assign topics to new documents without refitting."""
         self._require_model()
-        embeddings = self._embedder().encode(
-            [doc.embedding_input for doc in documents]
-        )
+        embeddings = self._embedder().encode([doc.embedding_input for doc in documents])
         topics, probabilities = self._model.transform(
             [doc.text for doc in documents], embeddings=embeddings
         )
         return _assignments(documents, topics, probabilities)
 
-    def topics_over_time(self, *, nr_bins: int = 60) -> list[dict[str, Any]]:
+    def topics_over_time(self, *, nr_bins: int = 60) -> list[TopicTimeBin]:
         """Topic frequency and evolving words across time bins of the fit corpus."""
         self._require_model()
         dated = [
@@ -273,20 +305,20 @@ class TopicModeler:
             nr_bins=nr_bins,
         )
         return [
-            {
-                "topic_id": int(row.Topic),
-                "words": str(row.Words),
-                "frequency": int(row.Frequency),
-                "timestamp": row.Timestamp.isoformat(),
-            }
+            TopicTimeBin(
+                topic_id=int(row.Topic),
+                words=str(row.Words),
+                frequency=int(row.Frequency),
+                timestamp=row.Timestamp.isoformat(),
+            )
             for row in frame.itertuples()
         ]
 
-    def topic_summaries(self) -> list[dict[str, Any]]:
+    def topic_summaries(self) -> list[TopicSummaryRow]:
         """One row per topic: id, generated name, size, and top words."""
         self._require_model()
         info = self._model.get_topic_info()
-        summaries = []
+        summaries: list[TopicSummaryRow] = []
         for row in info.itertuples():
             topic_id = int(row.Topic)
             words = dedupe_terms(
@@ -296,14 +328,39 @@ class TopicModeler:
             if topic_id != -1 and words:
                 name = f"{topic_id}_{keyword_label(words).replace(' ', '_')}"
             summaries.append(
-                {
-                    "topic_id": topic_id,
-                    "name": name,
-                    "size": int(row.Count),
-                    "top_words": words,
-                }
+                TopicSummaryRow(
+                    topic_id=topic_id, name=name, size=int(row.Count), top_words=words
+                )
             )
         return summaries
+
+    def document_embeddings(self) -> np.ndarray:
+        """Embeddings of the fitted documents, in fit order."""
+        self._require_model()
+        if self._embeddings is None:
+            raise RuntimeError(
+                "embeddings are only available on a freshly fitted model"
+            )
+        return self._embeddings
+
+    def topic_vectors(self, summaries: list[TopicSummaryRow]) -> list[TopicVector]:
+        """Centroid embedding per topic, joined with the summaries' text fields."""
+        self._require_model()
+        embeddings = np.asarray(self._model.topic_embeddings_)
+        rows = {
+            topic_id: row
+            for row, topic_id in enumerate(sorted(self._model.get_topics()))
+        }
+        return [
+            TopicVector(
+                topic_id=summary.topic_id,
+                size=summary.size,
+                label=summary.label or summary.name,
+                top_words=summary.top_words,
+                vector=embeddings[rows[summary.topic_id]],
+            )
+            for summary in summaries
+        ]
 
     def representative_docs(self) -> dict[int, list[str]]:
         """Most representative document texts per topic (for labeling)."""
@@ -323,12 +380,8 @@ class TopicModeler:
 
     @classmethod
     def load(cls, path: Path | str, **kwargs: Any) -> TopicModeler:
-        from bertopic import BERTopic
-
         modeler = cls(**kwargs)
-        modeler._model = BERTopic.load(
-            str(path), embedding_model=modeler._embedder()
-        )
+        modeler._model = BERTopic.load(str(path), embedding_model=modeler._embedder())
         return modeler
 
     def _require_model(self) -> None:

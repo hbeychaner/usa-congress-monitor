@@ -25,6 +25,8 @@ from pydantic import (
     field_validator,
 )
 
+from cdm.store.opensearch import bulk_upsert
+
 FIRST_CONGRESS = 113
 
 
@@ -362,8 +364,6 @@ class VoteIngestor:
         self.voteview = voteview
 
     def ingest_congress(self, congress: int, *, refresh: bool = False) -> int:
-        from cdm.store.opensearch import bulk_upsert
-
         total = 0
         for chamber in Chamber:
             paths = {

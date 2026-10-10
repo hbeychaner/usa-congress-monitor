@@ -20,6 +20,7 @@ dependencies = [
     "sqlalchemy>=2.0,<3",
     "bertopic>=0.17",
     "sentence-transformers>=3",
+    "pydantic-settings>=2.15.0",
 ]
 
 [project.optional-dependencies]

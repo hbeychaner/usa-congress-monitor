@@ -6,7 +6,7 @@ from typing import Any
 
 from elasticsearch import Elasticsearch
 
-from cdm.backend.services.member_service import get_member_summaries
+from cdm.backend.services.member_service import MemberService
 from cdm.contracts.api import SimilarMember, SimilarMembersResponse
 from cdm.graph.models import (
     CongressEdgeStats,
@@ -16,20 +16,14 @@ from cdm.graph.models import (
     Signal,
 )
 from cdm.graph.store import GraphStore
-from cdm.store.client import get_opensearch_client
 
 
 class GraphService:
     """Answers edge queries against the live graph version of each signal."""
 
-    def __init__(self, client: Elasticsearch | None = None) -> None:
-        self._client = client
-
-    @property
-    def client(self) -> Elasticsearch:
-        if self._client is None:
-            self._client = get_opensearch_client()
-        return self._client
+    def __init__(self, client: Elasticsearch, members: MemberService) -> None:
+        self.client = client
+        self._members = members
 
     @property
     def store(self) -> GraphStore:
@@ -101,7 +95,7 @@ class GraphService:
                 member_id=bioguide_id, signal=signal, congress=congress, similar=[]
             )
         edges = self.edges(version, signal, [bioguide_id], congress, limit)
-        members = get_member_summaries([edge.neighbor for edge in edges])
+        members = self._members.get_summaries([edge.neighbor for edge in edges])
         similar = [
             SimilarMember(member=members[edge.neighbor], **self._stats(edge, congress))
             for edge in edges

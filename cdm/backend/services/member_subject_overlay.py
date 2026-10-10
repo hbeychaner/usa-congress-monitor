@@ -6,7 +6,6 @@ from elasticsearch import Elasticsearch, NotFoundError
 
 from cdm.backend.services.member_topic_overlay import MIN_BILLS, SPONSOR_FIELD
 from cdm.contracts.api import GraphSubjectLink, GraphSubjectNode
-from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
 
 SUBJECTS_PATH = "subjects.legislative_subjects"
@@ -21,8 +20,8 @@ class SubjectOverlay:
 
 
 class MemberSubjectOverlayBuilder:
-    def __init__(self, client: Elasticsearch | None = None) -> None:
-        self.client = client or get_opensearch_client()
+    def __init__(self, client: Elasticsearch) -> None:
+        self.client = client
 
     def _search(self, member_ids: list[str], congress: int | None) -> dict[str, object]:
         filters: list[dict[str, object]] = [

@@ -9,6 +9,7 @@ from datetime import datetime, time
 from enum import StrEnum
 from typing import Annotated, Any, Optional, Protocol, Union
 
+import requests
 from bs4 import BeautifulSoup
 from pydantic import (
     BaseModel,
@@ -987,8 +988,6 @@ class Amendment(BaseModel):
 
     def add_full_text(self, client: CDGClient) -> str:
         """Fetch and return the full amendment text from formatted text versions."""
-        import requests
-
         if not self.text_versions or not isinstance(self.text_versions, list):
             return ""
 
@@ -1222,8 +1221,6 @@ class Bill(EntityBase):
 
     def add_full_text(self, client: CDGClient) -> str:
         """Fetch and return the full bill text from formatted text versions."""
-        import requests
-
         if not self.text_versions or not isinstance(self.text_versions, list):
             return ""
 

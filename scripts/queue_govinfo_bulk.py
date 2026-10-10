@@ -9,12 +9,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cdm.config import get_config
+from cdm.container import Container
 from cdm.ingest.govinfo import GovInfoDiscovery
 from cdm.jobs.store import JobKind, JobStore
-from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
 from cdm.workers.tasks import submit_job
-from settings import JOB_DB_PATH
 
 
 def main() -> None:
@@ -22,6 +22,11 @@ def main() -> None:
     parser.add_argument("--congress", type=int, required=True)
     parser.add_argument("--outdir", default="data/full_history/govinfo")
     parser.add_argument("--queue", action="store_true")
+    parser.add_argument(
+        "--collections",
+        default="BILLSTATUS,BILLSUM,BILLS",
+        help="comma-separated GovInfo collections (BILLSUM/BILLS start at the 113th)",
+    )
     parser.add_argument(
         "--staging-version",
         type=int,
@@ -49,7 +54,12 @@ def main() -> None:
     if args.batch_size < 1:
         parser.error("--batch-size must be positive")
 
-    packages = GovInfoDiscovery().list_congress_packages(args.congress)
+    collections = tuple(
+        c.strip().upper() for c in args.collections.split(",") if c.strip()
+    )
+    packages = GovInfoDiscovery().list_congress_packages(
+        args.congress, collections=collections
+    )
     counts = Counter(package.collection for package in packages)
     print(f"Congress {args.congress}: {len(packages)} packages")
     for collection in sorted(counts):
@@ -60,10 +70,10 @@ def main() -> None:
 
     target_index = None
     if args.staging_version is not None:
-        target_index = IndexManager(get_opensearch_client()).create_versioned(
+        target_index = IndexManager(Container(get_config()).elastic_client).create_versioned(
             "legislation", args.staging_version
         )
-    job_store = JobStore(JOB_DB_PATH)
+    job_store = JobStore(get_config().ledger.job_db_path)
 
     package_jobs = []
     for package in packages:

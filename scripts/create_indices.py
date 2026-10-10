@@ -49,35 +49,28 @@ import os
 import sys
 from pathlib import Path
 
+from elasticsearch import Elasticsearch
+
 # ── ensure repo root is on sys.path ──────────────────────────────────────────
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+from cdm.config import get_config  # noqa: E402
+from cdm.store.index_manager import IndexManager  # noqa: E402
+
 
 def _load_env_defaults() -> dict:
-    """Load OpenSearch connection defaults from .env / settings."""
-    try:
-        import settings as _s  # root settings.py loads .env
-
-        return {
-            "api_key": getattr(_s, "ELASTIC_API_KEY", None)
-            or os.environ.get("ELASTIC_API_KEY"),
-            "url": getattr(_s, "ELASTIC_API_URL", None)
-            or os.environ.get("ELASTIC_API_URL", "http://localhost:9200"),
-            "password": os.environ.get("ES_LOCAL_PASSWORD", "admin"),
-        }
-    except ImportError:
-        return {
-            "api_key": os.environ.get("ELASTIC_API_KEY"),
-            "url": os.environ.get("ELASTIC_API_URL", "http://localhost:9200"),
-            "password": os.environ.get("ES_LOCAL_PASSWORD", "admin"),
-        }
+    """Load OpenSearch connection defaults from the application config."""
+    elastic = get_config().elastic
+    return {
+        "api_key": elastic.elastic_api_key or None,
+        "url": elastic.elastic_api_url or "http://localhost:9200",
+        "password": os.environ.get("ES_LOCAL_PASSWORD", "admin"),
+    }
 
 
 def _make_client(url: str, user: str, password: str, api_key: str | None = None):
-    from elasticsearch import Elasticsearch
-
     if api_key:
         return Elasticsearch(
             url, api_key=api_key, verify_certs=False, ssl_show_warn=False
@@ -167,8 +160,6 @@ def main() -> None:
     args = parser.parse_args()
 
     client = _make_client(args.url, args.user, args.password, api_key=args.api_key)
-
-    from cdm.store.index_manager import IndexManager
 
     mgr = IndexManager(client, dry_run=args.dry_run)
 

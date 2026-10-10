@@ -5,41 +5,33 @@ from datetime import timedelta
 from celery import Celery
 from celery.schedules import crontab
 
-from settings import (
-    CELERY_INDEX_QUEUE,
-    CELERY_INGEST_QUEUE,
-    CELERY_TASK_QUEUE,
-    CELERY_TASK_SOFT_TIME_LIMIT,
-    CELERY_TASK_TIME_LIMIT,
-    RABBITMQ_PREFETCH,
-    RABBITMQ_URL,
-)
+from cdm.config import get_config
 
-celery_app = Celery("congress_tracker", broker=RABBITMQ_URL)
+celery_app = Celery("congress_tracker", broker=get_config().queue.rabbitmq_url)
 celery_app.conf.update(
-    task_default_queue=CELERY_TASK_QUEUE,
+    task_default_queue=get_config().queue.celery_task_queue,
     task_routes={
-        "cdm.workers.tasks.run_ingest_job": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.run_index_job": {"queue": CELERY_INDEX_QUEUE},
-        "cdm.workers.tasks.schedule_daily_ingest": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.schedule_coverage_gaps": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.schedule_static_refresh": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.schedule_govinfo_refresh": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.schedule_topic_training": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.schedule_vote_refresh": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.schedule_member_graph_build": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.trim_logs": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.recover_failed_ingest_jobs": {"queue": CELERY_INGEST_QUEUE},
-        "cdm.workers.tasks.run_retention_maintenance": {"queue": CELERY_INGEST_QUEUE},
+        "cdm.workers.tasks.run_ingest_job": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.run_index_job": {"queue": get_config().queue.celery_index_queue},
+        "cdm.workers.tasks.schedule_daily_ingest": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.schedule_coverage_gaps": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.schedule_static_refresh": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.schedule_govinfo_refresh": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.schedule_topic_training": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.schedule_vote_refresh": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.schedule_member_graph_build": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.trim_logs": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.recover_failed_ingest_jobs": {"queue": get_config().queue.celery_ingest_queue},
+        "cdm.workers.tasks.run_retention_maintenance": {"queue": get_config().queue.celery_ingest_queue},
     },
     task_queues=None,
-    worker_prefetch_multiplier=max(1, RABBITMQ_PREFETCH // 100),
+    worker_prefetch_multiplier=max(1, get_config().queue.rabbitmq_prefetch // 100),
     task_acks_late=True,
     task_reject_on_worker_lost=True,
     task_track_started=True,
     task_ignore_result=True,
-    task_soft_time_limit=CELERY_TASK_SOFT_TIME_LIMIT,
-    task_time_limit=CELERY_TASK_TIME_LIMIT,
+    task_soft_time_limit=get_config().queue.celery_task_soft_time_limit,
+    task_time_limit=get_config().queue.celery_task_time_limit,
     beat_schedule={
         "daily-congress-ingest": {
             "task": "cdm.workers.tasks.schedule_daily_ingest",

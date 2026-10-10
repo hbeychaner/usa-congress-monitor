@@ -1,19 +1,18 @@
-import os
 
 import pytest
 
+from cdm.config import get_config
 from cdm.data_collection.client import get_client
 from cdm.data_collection.endpoint_registry import get_spec
-from cdm.ingest.resource_config import get_config
+from cdm.ingest.resource_config import get_config as get_resource_config
 from cdm.ingest.runner import Resource
-from settings import CONGRESS_API_KEY
 
 pytestmark = pytest.mark.integration
 
 
 @pytest.fixture(scope="module")
 def live_client():
-    if not (os.getenv("CONGRESS_API_KEY") or CONGRESS_API_KEY):
+    if not get_config().congress_api.congress_api_key:
         pytest.skip("Congress.gov API key is not configured")
     return get_client()
 
@@ -31,7 +30,7 @@ def _assert_raw_keys_preserved(raw_record, model):
 def _fetch_first_record(client, resource):
     list_spec = get_spec(resource.list_spec_name())
     params = {}
-    config = get_config(resource)
+    config = get_resource_config(resource)
     if config.requires_congress:
         params["congress"] = 118
     if resource is Resource.SUMMARIES:

@@ -8,8 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cdm.config import get_config
 from cdm.jobs.store import JobStore
-from settings import JOB_DB_PATH
 
 
 def main() -> None:
@@ -19,7 +19,7 @@ def main() -> None:
     if args.limit < 1:
         parser.error("--limit must be positive")
 
-    store = JobStore(JOB_DB_PATH)
+    store = JobStore(get_config().ledger.job_db_path)
     jobs = store.jobs()
     print(f"Jobs: {len(jobs)} total")
     for job in jobs[: args.limit]:

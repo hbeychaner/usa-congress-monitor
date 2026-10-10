@@ -18,9 +18,12 @@ import sys
 from copy import deepcopy
 from pathlib import Path
 
+from elasticsearch.helpers import bulk, scan
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from cdm.store.client import get_opensearch_client
+from cdm.config import get_config
+from cdm.container import Container
 from cdm.store.index_manager import lemma_field_paths, load_definitions
 from cdm.store.indexer import _apply_lemmas
 from cdm.store.opensearch import read_alias
@@ -65,8 +68,6 @@ def process_index(
     client, name: str, *, batch_size: int, dry_run: bool, max_docs: int | None = None
 ) -> tuple[int, int]:
     """Return (scanned, updated) counts for index definition *name*."""
-    from elasticsearch.helpers import bulk, scan
-
     index = read_alias(name)
     roots = _root_fields(name)
     source_fields = roots + [f"{root}*" for root in roots]
@@ -122,7 +123,7 @@ def main() -> int:
     if unknown:
         print(f"no lemma fields defined for: {', '.join(unknown)}", file=sys.stderr)
         return 1
-    client = get_opensearch_client()
+    client = Container(get_config()).elastic_client
     for name in names:
         print(f"{name}: paths={['.'.join(p) for p in lemma_field_paths(name)]}")
         scanned, updated = process_index(

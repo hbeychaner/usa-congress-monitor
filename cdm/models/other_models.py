@@ -4,6 +4,7 @@ Each model includes per-field descriptions that explain what each attribute answ
 """
 
 import logging
+import re
 from datetime import datetime
 from enum import StrEnum
 from threading import Lock
@@ -2312,8 +2313,6 @@ class CommitteeCode(str):
     @classmethod
     def validate(cls, v):
         """Validate committee code format and normalize to lowercase."""
-        import re
-
         if not isinstance(v, str):
             raise TypeError("CommitteeCode must be a string")
         if not re.fullmatch(r"[a-zA-Z]{4}\d{2}", v):

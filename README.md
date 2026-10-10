@@ -170,7 +170,7 @@ process failure.
 
 ## Operations: Start / Restart / Kill Everything
 
-Local defaults (from `.env` / `settings.py`): RabbitMQ at
+Local defaults (from `.env` via `cdm/config`): RabbitMQ at
 `amqp://guest:guest@localhost:5672/`, Redis at `redis://localhost:6379/0`,
 OpenSearch/Elastic at `http://localhost:9200` (Kibana at `:5601`), backend API
 at `http://localhost:8000`, frontend dev server at `http://localhost:5173`.

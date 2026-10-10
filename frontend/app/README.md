@@ -86,10 +86,9 @@ was finished.
       `TopicsPage`), `Card` for section panels.
 - [x] `BillsPage.tsx` — same `TextField`/`Select`/`Table`/`Button` pagination
       pattern as `MemberSearchPage.tsx`.
-- [x] `BillDetailPage.tsx` — two-column `Grid` layout, `Card` per section,
-      `DataList` for the bill-record/available-records metadata lists.
-      Revisit with `Tabs` once more bill detail fields exist (see
-      `planning/FULL_DATA_INGEST_IMPLEMENTATION_PLAN.md`).
+- [x] `BillDetailPage.tsx` — header with key facts and latest action, a
+      `Tabs` card (Summary, Actions, Votes, Text, Related) beside a short
+      sidebar (people, committees, similar bills).
 - [x] `SearchPage.tsx` — `TextField` for the query, `Button variant="soft"`
       toggle group standing in for a "chip" filter (Radix Themes has no
       dedicated `ToggleGroup` in `@radix-ui/themes`), `Select` for the result

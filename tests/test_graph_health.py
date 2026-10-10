@@ -26,7 +26,7 @@ def _checker(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, pointers, edges: int = 5, topic_model: str | None = None
 ) -> GraphHealthChecker:
     monkeypatch.setattr(health_module, "GraphStore", lambda client: FakeStore(pointers, edges))
-    checker = GraphHealthChecker(None, GraphBuildRunner(tmp_path / "s.json"), now=NOW)
+    checker = GraphHealthChecker(None, "analysis", GraphBuildRunner(tmp_path / "s.json"), now=NOW)
     monkeypatch.setattr(checker, "_topic_model_version", lambda: topic_model)
     return checker
 

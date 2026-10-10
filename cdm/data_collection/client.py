@@ -17,11 +17,11 @@ from urllib.parse import urljoin
 import requests
 from pydantic import BaseModel, ValidationError
 
+from cdm.config import get_config
 from cdm.data_collection.id_strategy import apply_id_strategy
 from cdm.models.endpoint_spec import EndpointSpec
 from cdm.utils.logger import get_logger
 from cdm.utils.rate_limiter import TokenBucket
-from settings import CONGRESS_API_KEY, CONGRESS_STRICT_FIELD_CHECK
 
 # Default request rate used when no rate_limiter is injected. Matches the
 # previous hardcoded client-side throttle (5000 requests/hour).
@@ -574,7 +574,7 @@ class CDGClient:
                         f"Unprocessed fields for {model_cls.__name__} id={r.get('id')}: "
                         f"{sorted(unprocessed)}"
                     )
-                    if CONGRESS_STRICT_FIELD_CHECK:
+                    if get_config().congress_api.congress_strict_field_check:
                         raise ValueError(msg)
                     else:
                         logger.warning(msg)
@@ -649,11 +649,11 @@ class CDGClient:
 def get_client(api_key: str | None = None, **kwargs) -> CDGClient:
     """Return a configured :class:`CDGClient` instance.
 
-    If ``api_key`` is not provided the module-level ``CONGRESS_API_KEY`` is used.
+    If ``api_key`` is not provided the configured Congress API key is used.
     Additional keyword arguments (including ``rate_limiter``) are forwarded
     to the ``CDGClient`` constructor.
     """
-    key = api_key or CONGRESS_API_KEY
+    key = api_key or get_config().congress_api.congress_api_key
     return CDGClient(api_key=key, **kwargs)
 
 

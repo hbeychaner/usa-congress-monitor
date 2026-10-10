@@ -1,10 +1,6 @@
 from fastapi import APIRouter
 
-from cdm.backend.services.admin_service import (
-    get_admin_ingest_snapshot,
-    get_ingest_progress,
-    get_system_status,
-)
+from cdm.backend.dependencies import AdminServiceDep
 from cdm.contracts.api import (
     AdminIngestSnapshot,
     IngestProgressResponse,
@@ -20,12 +16,12 @@ graph_runner = GraphBuildRunner()
 
 @router.get("/topic-training", response_model=TopicTrainingStatus)
 def topic_training_status() -> TopicTrainingStatus:
-    return TopicTrainingStatus(**read_status())
+    return read_status()
 
 
 @router.post("/topic-training", response_model=TopicTrainingStatus)
 def topic_training_start() -> TopicTrainingStatus:
-    return TopicTrainingStatus(**start_training())
+    return start_training()
 
 
 @router.get("/member-graph", response_model=GraphBuildStatus)
@@ -39,15 +35,15 @@ def member_graph_build() -> GraphBuildStatus:
 
 
 @router.get("/ingest-progress", response_model=IngestProgressResponse)
-def ingest_progress() -> IngestProgressResponse:
-    return get_ingest_progress()
+def ingest_progress(service: AdminServiceDep) -> IngestProgressResponse:
+    return service.get_ingest_progress()
 
 
 @router.get("/ingest-snapshot", response_model=AdminIngestSnapshot)
-def ingest_snapshot() -> AdminIngestSnapshot:
-    return get_admin_ingest_snapshot()
+def ingest_snapshot(service: AdminServiceDep) -> AdminIngestSnapshot:
+    return service.get_admin_ingest_snapshot()
 
 
 @router.get("/system-status", response_model=SystemStatusResponse)
-def system_status() -> SystemStatusResponse:
-    return get_system_status()
+def system_status(service: AdminServiceDep) -> SystemStatusResponse:
+    return service.get_system_status()

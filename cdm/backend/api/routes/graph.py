@@ -1,26 +1,26 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Query
 
-from cdm.backend.services.neighborhood_service import (
-    NeighborhoodQuery,
-    NeighborhoodService,
-)
+from cdm.backend.dependencies import NeighborhoodServiceDep
+from cdm.backend.services.neighborhood_service import NeighborhoodQuery
 from cdm.contracts.api import NeighborhoodResponse
 from cdm.graph.models import PartyGroup, Signal
 from cdm.ingest.voteview import Chamber
 
 router = APIRouter(prefix="/graph", tags=["graph"])
-service = NeighborhoodService()
 
 
 @router.get("/neighborhood", response_model=NeighborhoodResponse)
 def neighborhood(
-    member: list[str] = Query(min_length=1, max_length=5),
+    service: NeighborhoodServiceDep,
+    member: Annotated[list[str], Query(min_length=1, max_length=5)],
     collaboration_weight: float = Query(default=1.0, ge=0, le=1),
     voting_weight: float = Query(default=0.6, ge=0, le=1),
     topic_weight: float = Query(default=0.3, ge=0, le=1),
     congress: int | None = Query(default=None, ge=1),
     limit: int = Query(default=15, ge=1, le=50),
-    party: list[PartyGroup] = Query(default=[]),
+    party: Annotated[list[PartyGroup] | None, Query()] = None,
     chamber: Chamber | None = None,
     include_topics: bool = False,
     topics_per_member: int = Query(default=3, ge=1, le=8),
@@ -37,7 +37,7 @@ def neighborhood(
             },
             congress=congress,
             limit=limit,
-            parties=set(party),
+            parties=set(party or []),
             chamber=chamber,
             include_topics=include_topics,
             topics_per_member=topics_per_member,

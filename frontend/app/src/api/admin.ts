@@ -4,6 +4,7 @@ export type TopicTrainingStatus = {
     state: 'idle' | 'running' | 'succeeded' | 'failed';
     started?: boolean | null;
     stage?: string | null;
+    progress?: number | null;
     message?: string | null;
     model_version?: string | null;
     started_at?: string | null;

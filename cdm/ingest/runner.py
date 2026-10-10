@@ -23,9 +23,11 @@ from sqlalchemy.exc import SQLAlchemyError
 
 # Ensure known specs are registered (importing the package imports submodules)
 import cdm.data_collection.specs  # noqa: F401
+from cdm.config import get_config
 from cdm.data_collection.client import get_client
 from cdm.data_collection.endpoint_registry import get_spec
-from cdm.data_collection.id_utils import canonical_id
+from cdm.data_collection.id_utils import canonical_id, parse_url_to_id
+from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
 from cdm.data_collection.utils import resolve_pagination
 from cdm.ingest.archive import SQLiteListCache
@@ -86,8 +88,6 @@ def _attempt_law_fallback(
     Returns True when a fallback item was successfully appended to
     `aggregated_items` (or deduplicated), otherwise False.
     """
-    from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
-
     bill_params = client.resolve_runtime_params_from_record(
         BILL_ITEM_SPEC, meta_mapping
     )
@@ -257,12 +257,7 @@ class IngestRunner:
         """Return (or create) a per-thread SDK client."""
         key = self.api_key
         if not key:
-            try:
-                from settings import CONGRESS_API_KEY  # root project settings
-
-                key = CONGRESS_API_KEY or None
-            except ImportError:
-                pass
+            key = get_config().congress_api.congress_api_key or None
         # Reuse the client stored on the current thread to avoid sharing Sessions.
         # Cache-key also includes the rate_limiter identity so that switching
         # runners (with a different shared TokenBucket) on a reused thread
@@ -391,8 +386,6 @@ class IngestRunner:
 
         if not item_data.get("referenceId"):
             try:
-                from cdm.data_collection.id_utils import parse_url_to_id
-
                 if item_data.get("url"):
                     item_data["referenceId"] = parse_url_to_id(str(item_data["url"]))
             except Exception:  # noqa: BLE001, S110 - reference ID enrichment is best effort.
@@ -463,8 +456,6 @@ class IngestRunner:
         # Prefer bill item endpoints for law resources to avoid known server-side
         # errors on the `/law/{congress}/{lawType}/{lawNumber}` item handler.
         if self.resource == Resource.LAW and not self.force_item_fetch:
-            from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
-
             logger.info(
                 "Resource=law: preferring bill item spec to avoid /law item 5xx"
             )

@@ -12,7 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from cdm.store.client import get_opensearch_client
+from cdm.config import get_config
+from cdm.container import Container
 from cdm.store.opensearch import write_alias
 
 SOURCE_URL = (
@@ -53,7 +54,7 @@ def main() -> None:
                 "geometry": feature["geometry"],
             }
             actions.append({"_op_type": "index", "_index": write_alias("district"), "_id": document["id"], "_source": document})
-    client = get_opensearch_client()
+    client = Container(get_config()).elastic_client
     indexed = 0
     errors = 0
     for ok, _ in streaming_bulk(

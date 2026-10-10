@@ -4,23 +4,32 @@ from __future__ import annotations
 
 from typing import Any
 
+from elasticsearch import Elasticsearch
+
+from cdm.config import ElasticConfig, get_config
+
+
+class ElasticClientFactory:
+    """Builds Elasticsearch clients from injected connection settings."""
+
+    def __init__(self, config: ElasticConfig) -> None:
+        self.config = config
+
+    def create(
+        self, *, url: str | None = None, api_key: str | None = None
+    ) -> Elasticsearch:
+        url = url or self.config.es_local_url
+        api_key = api_key or self.config.es_local_api_key
+        if not url:
+            raise ValueError("OpenSearch URL is not configured")
+        if not api_key:
+            raise ValueError("OpenSearch API key is not configured")
+        return Elasticsearch(url, api_key=api_key)
+
 
 def get_opensearch_client(*, url: str | None = None, api_key: str | None = None) -> Any:
-    """Create an Elasticsearch-compatible client from explicit or project config."""
-    from elasticsearch import Elasticsearch
-
-    if url is None or api_key is None:
-        from settings import ES_LOCAL_API_KEY, ES_LOCAL_URL
-
-        url = url or ES_LOCAL_URL
-        api_key = api_key or ES_LOCAL_API_KEY
-
-    if not url:
-        raise ValueError("OpenSearch URL is not configured")
-    if not api_key:
-        raise ValueError("OpenSearch API key is not configured")
-
-    return Elasticsearch(url, api_key=api_key)
+    """Client from the process-wide config; prefer injecting a client instead."""
+    return ElasticClientFactory(get_config().elastic).create(url=url, api_key=api_key)
 
 
 def check_opensearch_connection(client: Any) -> dict:

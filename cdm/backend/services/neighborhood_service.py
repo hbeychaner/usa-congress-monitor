@@ -7,7 +7,7 @@ from collections import defaultdict
 from pydantic import BaseModel, Field
 
 from cdm.backend.services.graph_service import GraphService
-from cdm.backend.services.member_service import get_member_summaries
+from cdm.backend.services.member_service import MemberService
 from cdm.backend.services.member_subject_overlay import MemberSubjectOverlayBuilder
 from cdm.backend.services.member_topic_overlay import MemberTopicOverlayBuilder
 from cdm.contracts.api import (
@@ -64,8 +64,17 @@ class SignalScaler:
 
 
 class NeighborhoodService:
-    def __init__(self, graph: GraphService | None = None) -> None:
-        self.graph = graph or GraphService()
+    def __init__(
+        self,
+        graph: GraphService,
+        members: MemberService,
+        topic_overlay: MemberTopicOverlayBuilder,
+        subject_overlay: MemberSubjectOverlayBuilder,
+    ) -> None:
+        self.graph = graph
+        self.members = members
+        self.topic_overlay = topic_overlay
+        self.subject_overlay = subject_overlay
 
     @staticmethod
     def _key(first: str, second: str) -> PairKey:
@@ -144,7 +153,7 @@ class NeighborhoodService:
                 if seed in seeds and other not in seeds:
                     candidates[seed][other] = blended
 
-        summaries = get_member_summaries(
+        summaries = self.members.get_summaries(
             query.seeds + sorted({other for ranked in candidates.values() for other in ranked})
         )
         kept: list[str] = []
@@ -186,12 +195,12 @@ class NeighborhoodService:
         ]
         links.sort(key=lambda link: link.score, reverse=True)
         overlay = (
-            MemberTopicOverlayBuilder().build(node_ids, query.congress, query.topics_per_member)
+            self.topic_overlay.build(node_ids, query.congress, query.topics_per_member)
             if query.include_topics
             else None
         )
         subjects = (
-            MemberSubjectOverlayBuilder().build(node_ids, query.congress, query.subjects_per_member)
+            self.subject_overlay.build(node_ids, query.congress, query.subjects_per_member)
             if query.include_subjects
             else None
         )

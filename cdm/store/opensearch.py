@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any, cast
 
+from elasticsearch.helpers import bulk
+
 INDEX_PREFIX = "congress"
 
 # Bill, summary, and text records all update the same bill document.
@@ -137,8 +139,6 @@ def bulk_upsert(
     replace: bool = False,
 ) -> dict:
     """Upsert records, or replace complete documents when ``replace`` is true."""
-    from elasticsearch.helpers import bulk
-
     documents = list(docs)
     index = target_index or write_alias(resource)
     merge_script = (

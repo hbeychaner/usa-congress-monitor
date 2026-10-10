@@ -416,7 +416,41 @@ class GovInfoBillStatusParser:
         return people
 
     @classmethod
-    def _committees(cls, root: ET.Element) -> list[dict[str, str]]:
+    def _activities(cls, element: ET.Element) -> list[dict[str, str]]:
+        activities = []
+        for container in element:
+            if cls._local_name(container.tag) != "activities":
+                continue
+            for item in container:
+                values = {
+                    "name": cls._direct_text(item, "name"),
+                    "date": cls._direct_text(item, "date"),
+                }
+                if any(values.values()):
+                    activities.append({k: v for k, v in values.items() if v})
+        return activities
+
+    @classmethod
+    def _committee_entry(cls, element: ET.Element) -> dict[str, Any]:
+        values: dict[str, Any] = {
+            "name": cls._direct_text(element, "name"),
+            "system_code": cls._direct_text(element, "systemCode"),
+            "chamber": cls._direct_text(element, "chamber"),
+            "type": cls._direct_text(element, "type"),
+            "activities": cls._activities(element),
+        }
+        subcommittees = [
+            cls._committee_entry(child)
+            for container in element
+            if cls._local_name(container.tag) == "subcommittees"
+            for child in container
+        ]
+        if subcommittees:
+            values["subcommittees"] = subcommittees
+        return {key: value for key, value in values.items() if value}
+
+    @classmethod
+    def _committees(cls, root: ET.Element) -> list[dict[str, Any]]:
         container = next(
             (
                 element
@@ -431,16 +465,9 @@ class GovInfoBillStatusParser:
         for element in container:
             if cls._local_name(element.tag) not in {"item", "committee"}:
                 continue
-            values: dict[str, Any] = {
-                "name": cls._first_text(element, "name"),
-                "system_code": cls._first_text(element, "systemCode"),
-                "chamber": cls._first_text(element, "chamber"),
-                "type": cls._first_text(element, "type"),
-            }
-            if any(values.values()):
-                committees.append({
-                    key: value for key, value in values.items() if value
-                })
+            values = cls._committee_entry(element)
+            if values:
+                committees.append(values)
         return committees
 
     @classmethod

@@ -18,7 +18,10 @@ from celery.signals import worker_init
 from kombu.exceptions import OperationalError
 from redis import Redis
 
+from cdm.config import get_config
+from cdm.container import Container
 from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
+from cdm.graph.runner import GraphBuildRunner
 from cdm.ingest.archive import JsonlRecordArchive, SQLiteQuarantineArchive
 from cdm.ingest.govinfo import (
     GovInfoBillsParser,
@@ -34,42 +37,36 @@ from cdm.ingest.pipeline import Pipeline, PipelineConfig
 from cdm.ingest.reconciliation import replay_govinfo_archives
 from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.ingest.resource_config import congress_scoped, date_windowed, static_resources
-from cdm.ingest.runner import IngestCancelledError
+from cdm.ingest.runner import IngestCancelledError, Resource
+from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
 from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
 from cdm.store.batch_indexing import index_streams
-from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
-from cdm.store.opensearch import resource_target
+from cdm.store.indexer import to_document
+from cdm.store.mapping_validation import validate_document
+from cdm.store.opensearch import bulk_upsert, resource_target
+from cdm.utils.archive_sweeper import OrphanArchiveSweeper
+from cdm.utils.log_trimmer import LogTrimmer
 from cdm.utils.rate_limiter import TokenBucket
+from cdm.utils.topic_training import start_training
 from cdm.workers.celery_app import celery_app
-from settings import (
-    CELERY_BULK_QUEUE,
-    CELERY_INDEX_QUEUE,
-    CELERY_INGEST_QUEUE,
-    CELERY_RETRY_BACKOFF_MAX,
-    CELERY_RETRY_MAX,
-    CELERY_RETRY_MAX_TRANSIENT,
-    COVERAGE_LOOKBACK_DAYS,
-    ES_LOCAL_API_KEY,
-    ES_LOCAL_URL,
-    GOVINFO_RATE_LIMIT_PER_HOUR,
-    INDEX_BATCH_DOCS,
-    INDEX_BATCH_JOBS,
-    JOB_DB_PATH,
-    REDIS_CONSUMER_GROUP,
-    REDIS_STREAM_MAXLEN,
-    REDIS_URL,
-    RETENTION_DAYS,
-)
 
 logger = logging.getLogger(__name__)
+
+_ARCHIVED_JOB_KINDS = frozenset({JobKind.INGEST.value, JobKind.GOVINFO_BULK.value})
+
+
+# Worker-wide composition root; shares one search client across tasks.
+@lru_cache(maxsize=1)
+def _container() -> Container:
+    return Container(get_config())
 
 
 # Legacy-window repair scans the whole ledger under a global lock, so it runs
 # once per worker boot (see _warm_store), never per task.
 @lru_cache(maxsize=1)
 def _store() -> JobStore:
-    return JobStore(JOB_DB_PATH, repair=False)
+    return JobStore(get_config().ledger.job_db_path, repair=False)
 
 
 @worker_init.connect
@@ -83,7 +80,7 @@ _CANCEL_POLL_INTERVAL = 60.0
 
 
 def _redis() -> Redis:
-    return Redis.from_url(REDIS_URL)
+    return Redis.from_url(get_config().redis.redis_url)
 
 
 _GOVINFO_SESSION: requests.Session | None = None
@@ -100,7 +97,7 @@ def _govinfo_session() -> requests.Session:
 def _govinfo_rate_limiter() -> TokenBucket:
     global _GOVINFO_RATE_LIMITER
     if _GOVINFO_RATE_LIMITER is None:
-        _GOVINFO_RATE_LIMITER = TokenBucket(rate_per_hour=GOVINFO_RATE_LIMIT_PER_HOUR)
+        _GOVINFO_RATE_LIMITER = TokenBucket(rate_per_hour=get_config().govinfo.govinfo_rate_limit_per_hour)
     return _GOVINFO_RATE_LIMITER
 
 
@@ -142,31 +139,31 @@ def submit_job(
             celery_app.send_task(
                 "cdm.workers.tasks.run_ingest_job",
                 args=[job_id],
-                queue=CELERY_INGEST_QUEUE,
+                queue=get_config().queue.celery_ingest_queue,
             )
         elif kind == JobKind.INDEX:
             celery_app.send_task(
                 "cdm.workers.tasks.run_index_job",
                 args=[job_id],
-                queue=CELERY_INDEX_QUEUE,
+                queue=get_config().queue.celery_index_queue,
             )
         elif kind == JobKind.GOVINFO_BULK:
             celery_app.send_task(
                 "cdm.workers.tasks.run_govinfo_bulk_job",
                 args=[job_id],
-                queue=CELERY_BULK_QUEUE,
+                queue=get_config().queue.celery_bulk_queue,
             )
         elif kind == JobKind.GOVINFO_BULK_BATCH:
             celery_app.send_task(
                 "cdm.workers.tasks.run_govinfo_bulk_batch",
                 args=[job_id],
-                queue=CELERY_BULK_QUEUE,
+                queue=get_config().queue.celery_bulk_queue,
             )
         elif kind == JobKind.RECONCILE:
             celery_app.send_task(
                 "cdm.workers.tasks.run_reconciliation_job",
                 args=[job_id],
-                queue=CELERY_INDEX_QUEUE,
+                queue=get_config().queue.celery_index_queue,
             )
     return job
 
@@ -246,12 +243,12 @@ def _retry(task: Any, job_id: str, exc: Exception) -> NoReturn:
         store.mark_failed(job_id, str(exc))
         raise exc
     store.mark_retrying(job_id, str(exc))
-    max_retries = CELERY_RETRY_MAX_TRANSIENT if _is_transient(exc) else CELERY_RETRY_MAX
+    max_retries = get_config().queue.celery_retry_max_transient if _is_transient(exc) else get_config().queue.celery_retry_max
     try:
         raise task.retry(
             exc=exc,
             countdown=min(
-                CELERY_RETRY_BACKOFF_MAX,
+                get_config().queue.celery_retry_backoff_max,
                 2 ** min(task.request.retries, 10),
             ),
             max_retries=max_retries,
@@ -280,7 +277,7 @@ def run_ingest_job(self, job_id: str) -> dict:
             stream = RedisRecordStream(
                 redis_client,
                 RedisRecordStream.stream_name(job_id, resource),
-                maxlen=REDIS_STREAM_MAXLEN,
+                maxlen=get_config().redis.redis_stream_maxlen,
             )
             stream.publish(resource, record)
 
@@ -332,8 +329,6 @@ def run_ingest_job(self, job_id: str) -> dict:
         )
         selected = None
         if resources:
-            from cdm.ingest.runner import Resource
-
             selected = [Resource(resource) for resource in resources]
         results = (
             Pipeline(config).run(selected) if selected else Pipeline(config).run_all()
@@ -358,7 +353,7 @@ def run_ingest_job(self, job_id: str) -> dict:
                         "resource": result.resource.value,
                         "batch_size": int(payload.get("index_batch_size", 500)),
                         "preserve_raw": bool(payload.get("preserve_raw", False)),
-                        "consumer_group": REDIS_CONSUMER_GROUP,
+                        "consumer_group": get_config().redis.redis_consumer_group,
                         "expected_count": result.published_count,
                         "archive_root": str(job_outdir),
                     }
@@ -424,7 +419,7 @@ def _process_govinfo_bulk_job(job_id: str) -> dict:
     archive = JsonlRecordArchive(outdir, int(job["attempts"]))
     archive.write(resource, record, record_id=package.package_id)
     stream_name = RedisRecordStream.stream_name(job_id, resource)
-    RedisRecordStream(_redis(), stream_name, maxlen=REDIS_STREAM_MAXLEN).publish(
+    RedisRecordStream(_redis(), stream_name, maxlen=get_config().redis.redis_stream_maxlen).publish(
         resource, record
     )
     index_job = submit_job(
@@ -434,11 +429,13 @@ def _process_govinfo_bulk_job(job_id: str) -> dict:
             "resource": resource,
             "batch_size": 1,
             "preserve_raw": True,
-            "consumer_group": REDIS_CONSUMER_GROUP,
+            "consumer_group": get_config().redis.redis_consumer_group,
             "expected_count": 1,
             "archive_root": str(outdir),
             "target_index": payload.get("target_index"),
             "replace": bool(payload.get("replace", False)),
+            # A re-parse must not collide with the previous run's succeeded index job.
+            "source_attempt": int(job["attempts"]),
         },
         dispatch=False,
     )
@@ -447,7 +444,7 @@ def _process_govinfo_bulk_job(job_id: str) -> dict:
         celery_app.send_task(
             "cdm.workers.tasks.run_index_job",
             args=[index_job["id"]],
-            queue=CELERY_INDEX_QUEUE,
+            queue=get_config().queue.celery_index_queue,
         )
     except (OperationalError, ConnectionError):
         # The durable index row remains queued for periodic recovery.
@@ -478,7 +475,7 @@ def run_govinfo_bulk_batch(self, batch_id: str) -> dict:
         celery_app.send_task(
             "cdm.workers.tasks.run_govinfo_bulk_job",
             args=[package_job_id],
-            queue=CELERY_BULK_QUEUE,
+            queue=get_config().queue.celery_bulk_queue,
         )
         dispatched.append(package_job_id)
     store.mark_succeeded(batch_id)
@@ -505,15 +502,15 @@ def run_index_job(self, job_id: str) -> dict:
         store.claim_queued(
             JobKind.INDEX.value,
             same_batch,
-            INDEX_BATCH_JOBS - 1,
+            get_config().indexing.index_batch_jobs - 1,
             exclude={job_id},
         )
-        if INDEX_BATCH_JOBS > 1
+        if get_config().indexing.index_batch_jobs > 1
         else []
     )
     jobs = {job_id: payload} | {str(other["id"]): other["payload"] for other in claimed}
     try:
-        client = get_opensearch_client(url=ES_LOCAL_URL, api_key=ES_LOCAL_API_KEY)
+        client = _container().elastic_client
         target, _ = resource_target(payload["resource"])
         target_index = payload.get("target_index")
         if target_index and not client.indices.exists(index=target_index):
@@ -526,7 +523,7 @@ def run_index_job(self, job_id: str) -> dict:
         if not target_index:
             IndexManager(client).create(target, exists_ok=True)
         for item in jobs.values():
-            item.setdefault("consumer_group", REDIS_CONSUMER_GROUP)
+            item.setdefault("consumer_group", get_config().redis.redis_consumer_group)
         outcomes = index_streams(
             _redis(),
             client,
@@ -535,7 +532,7 @@ def run_index_job(self, job_id: str) -> dict:
             target_index=target_index,
             replace=bool(payload.get("replace", False)),
             preserve_raw=bool(payload.get("preserve_raw", False)),
-            batch_docs=INDEX_BATCH_DOCS,
+            batch_docs=get_config().indexing.index_batch_docs,
         )
     except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
         for other in claimed:
@@ -587,10 +584,6 @@ def _replay_archive_into_index(client, payload: dict) -> int:
     archive_root = payload.get("archive_root")
     if not archive_root or not (Path(archive_root) / "records.sqlite3").exists():
         return 0
-    from cdm.store.indexer import to_document
-    from cdm.store.mapping_validation import validate_document
-    from cdm.store.opensearch import bulk_upsert
-
     resource = payload["resource"]
     records = JsonlRecordArchive(Path(archive_root), 0).records(resource)
     batch_size = int(payload.get("batch_size", 500))
@@ -629,7 +622,7 @@ def run_reconciliation_job(self, job_id: str) -> dict:
         return {"job_id": job_id, "skipped": True, "status": existing["status"]}
     payload = job["payload"]
     try:
-        client = get_opensearch_client(url=ES_LOCAL_URL, api_key=ES_LOCAL_API_KEY)
+        client = _container().elastic_client
         result = replay_govinfo_archives(
             Path(payload["archive_root"]),
             client,
@@ -701,7 +694,7 @@ def coverage_gap_payloads(now: datetime | None = None) -> list[dict[str, Any]]:
     current = now or datetime.now(UTC)
     if current.tzinfo is None:
         current = current.replace(tzinfo=UTC)
-    lookback_start = current - timedelta(days=COVERAGE_LOOKBACK_DAYS)
+    lookback_start = current - timedelta(days=get_config().ledger.coverage_lookback_days)
     store = _store()
     payloads = []
     for config in date_windowed():
@@ -802,17 +795,13 @@ def schedule_static_refresh() -> dict:
 @celery_app.task(name="cdm.workers.tasks.schedule_topic_training")
 def schedule_topic_training() -> dict:
     """Start a topic-model retrain unless one is already running."""
-    from cdm.utils.topic_training import start_training
-
     status = start_training()
-    return {"started": status["started"], "state": status["state"]}
+    return {"started": status.started, "state": status.state.value}
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_member_graph_build")
 def schedule_member_graph_build() -> dict:
     """Start a member graph rebuild unless one is already running."""
-    from cdm.graph.runner import GraphBuildRunner
-
     status = GraphBuildRunner().start()
     return {"started": status.started, "state": status.state.value}
 
@@ -820,10 +809,8 @@ def schedule_member_graph_build() -> dict:
 @celery_app.task(name="cdm.workers.tasks.schedule_vote_refresh")
 def schedule_vote_refresh() -> dict:
     """Refresh roll calls (both chambers) for the current Congress."""
-    from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
-
     congress = current_congress(datetime.now(UTC).year)
-    ingestor = VoteIngestor(get_opensearch_client(), VoteviewClient(Path("data/voteview")))
+    ingestor = VoteIngestor(_container().elastic_client, VoteviewClient(Path("data/voteview")))
     return {"congress": congress, "roll_calls": ingestor.ingest_congress(congress, refresh=True)}
 
 
@@ -921,7 +908,7 @@ def _queue_depth(queue: str) -> int | None:
 
 
 def _index_redispatch_budget() -> int:
-    depth = _queue_depth(CELERY_INDEX_QUEUE)
+    depth = _queue_depth(get_config().queue.celery_index_queue)
     if depth is None or depth >= _INDEX_LOW_WATERMARK:
         return 0
     return _INDEX_HIGH_WATERMARK - depth
@@ -1007,11 +994,11 @@ def recover_failed_ingest_jobs() -> dict:
             else:
                 task_name = "cdm.workers.tasks.run_govinfo_bulk_job"
             if job["kind"] == JobKind.INGEST:
-                queue = CELERY_INGEST_QUEUE
+                queue = get_config().queue.celery_ingest_queue
             elif job["kind"] in {JobKind.GOVINFO_BULK, JobKind.GOVINFO_BULK_BATCH}:
-                queue = CELERY_BULK_QUEUE
+                queue = get_config().queue.celery_bulk_queue
             else:
-                queue = CELERY_INDEX_QUEUE
+                queue = get_config().queue.celery_index_queue
             celery_app.send_task(
                 task_name,
                 args=[requeued["id"]],
@@ -1038,8 +1025,6 @@ def _stream_source_job_id(stream_name: str) -> str | None:
 @celery_app.task(name="cdm.workers.tasks.trim_logs")
 def trim_logs() -> dict:
     """Cap every log file at its newest lines."""
-    from cdm.utils.log_trimmer import LogTrimmer
-
     trimmed = LogTrimmer().trim_all()
     return {"trimmed": [result.model_dump() for result in trimmed]}
 
@@ -1054,7 +1039,7 @@ def run_retention_maintenance() -> dict:
     protected until that index job resolves.
     """
     store = _store()
-    cutoff = (datetime.now(UTC) - timedelta(days=RETENTION_DAYS)).isoformat()
+    cutoff = (datetime.now(UTC) - timedelta(days=get_config().ledger.retention_days)).isoformat()
 
     protected: set[str] = set()
     for job in store.unfinished(JobKind.INDEX.value):
@@ -1098,7 +1083,7 @@ def run_retention_maintenance() -> dict:
     data_root = Path("data").resolve()
     archives_deleted = 0
     for job in pruned:
-        if job["kind"] != JobKind.INGEST.value:
+        if job["kind"] not in _ARCHIVED_JOB_KINDS:
             continue
         outdir = job["payload"].get("outdir")
         if not outdir:
@@ -1108,12 +1093,19 @@ def run_retention_maintenance() -> dict:
             shutil.rmtree(job_dir, ignore_errors=True)
             archives_deleted += 1
 
+    # Directories left behind by jobs pruned before archive cleanup covered them.
+    orphan_sweep = OrphanArchiveSweeper(
+        get_config().govinfo.govinfo_archive_root, f"{JobKind.GOVINFO_BULK.value}:"
+    ).sweep(store.all_ids())
+
     vacuumed = store.vacuum() if pruned else False
     store.checkpoint_wal()
     return {
         "pruned_jobs": len(pruned),
         "streams_deleted": streams_deleted,
         "archives_deleted": archives_deleted,
+        "orphan_archives_deleted": orphan_sweep.directories_removed,
+        "orphan_bytes_freed": orphan_sweep.bytes_freed,
         "vacuumed": vacuumed,
         "protected": sorted(protected),
     }

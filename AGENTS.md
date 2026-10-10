@@ -9,10 +9,19 @@
 - Full type annotations on all signatures, including return types; no bare `Any` where a concrete type or Protocol exists.
 - Prefer SQLAlchemy Core/ORM expressions over raw SQL strings.
 - One-line comments only, and only for what the code cannot show.
+- No lazy imports, and centralized configuration when contants are needed. If a constant is added or already exists in a python file and it's read as part of another task, move to a configuration class or object. 
+- Prefer dependency injection anywhere possible instead of procedural code that passes parameters through multiple levels of functional depth.
+
+## Configuration and dependency injection
+
+- Application settings live in `cdm/config` (pydantic-settings sections, `get_config()`); do not add new module-level constants to `settings.py`. Constants used by only one or two functions may stay beside them.
+- Classes receive collaborators (clients, stores, config sections) through their constructors and never read config or build clients themselves.
+- `cdm/container.py` (`Container`) is the composition root for scripts and workers; `cdm/backend/dependencies.py` provides FastAPI `Depends` providers. Tests inject fakes directly or override the container.
+- Legacy modules still importing `settings` are migrated when they are otherwise changed.
 
 ## Applying this guidance
 
-These rules apply to new and modified code. Do not rewrite legacy modules just to conform; migrate them when they are otherwise being changed.
+These rules apply to new and modified code as well as legacy modules. Rewrite legacy modules to conform; migrate them when they are otherwise being changed.
 
 ## Reference implementation
 

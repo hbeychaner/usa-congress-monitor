@@ -1,4 +1,4 @@
-import { Badge, Button, Callout, Card, Flex, Heading, Text } from '@radix-ui/themes';
+import { Badge, Button, Callout, Card, Flex, Heading, Progress, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 
 import { fetchTopicTraining, startTopicTraining, type TopicTrainingStatus } from '../api/admin';
@@ -30,7 +30,7 @@ export function TopicTrainingCard() {
       }
     }
     load();
-    const timer = window.setInterval(load, 15000);
+    const timer = window.setInterval(load, 5000);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
@@ -66,6 +66,14 @@ export function TopicTrainingCard() {
         <Text size="2" color="gray">
           Retrains on every bill and rewrites topics and assignments. Runs automatically every Sunday at 06:00 and takes a while on CPU.
         </Text>
+        {running ? (
+          <Flex direction="column" gap="1">
+            <Progress value={Math.round((status?.progress ?? 0) * 100)} />
+            <Text size="1" color="gray">
+              {Math.round((status?.progress ?? 0) * 100)}%{status?.stage ? ` · ${status.stage}` : ''}
+            </Text>
+          </Flex>
+        ) : null}
         {status ? (
           <Flex gap="5" wrap="wrap">
             {status.stage ? <Text size="2"><Text weight="bold">Stage:</Text> {status.stage}</Text> : null}

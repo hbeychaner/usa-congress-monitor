@@ -7,6 +7,8 @@ import threading
 from collections.abc import Sequence
 from typing import Any
 
+import spacy
+
 logger = logging.getLogger(__name__)
 
 SPACY_MODEL = "en_core_web_md"
@@ -22,8 +24,6 @@ def _get_nlp() -> Any:
     if _nlp is None:
         with _lock:
             if _nlp is None:
-                import spacy
-
                 try:
                     # parser/ner are not needed for lemmas; md lemmatizer
                     # requires tok2vec + tagger + attribute_ruler.

@@ -31,7 +31,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cdm.ingest.pipeline import Pipeline, PipelineConfig
-from cdm.ingest.resource_config import RESOURCE_CONFIGS
+from cdm.ingest.resource_config import (
+    RESOURCE_CONFIGS,
+    congress_scoped,
+    date_windowed,
+    static_resources,
+)
 from cdm.ingest.runner import Resource
 
 
@@ -151,12 +156,6 @@ def _resolve_resources(args: argparse.Namespace) -> list[Resource]:
                 )
                 sys.exit(1)
         return resolved
-
-    from cdm.ingest.resource_config import (
-        congress_scoped,
-        date_windowed,
-        static_resources,
-    )
 
     if args.scope == "date_window":
         return [c.resource for c in date_windowed()]

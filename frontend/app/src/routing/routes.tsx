@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AdminIngestPage } from '../pages/AdminIngestPage';
 import { BillDetailPage } from '../pages/BillDetailPage';
 import { BillsPage } from '../pages/BillsPage';
+import { CommitteeDetailPage } from '../pages/CommitteeDetailPage';
 import { HomePage } from '../pages/HomePage';
 import { MemberGraphPage } from '../pages/MemberGraphPage';
 import { MemberProfilePage } from '../pages/MemberProfilePage';
@@ -25,6 +26,7 @@ export function AppRoutes() {
       <Route path="/graph" element={<MemberGraphPage />} />
       <Route path="/bills" element={<BillsPage />} />
       <Route path="/bills/:billId" element={<BillDetailPage />} />
+      <Route path="/committees/:systemCode" element={<CommitteeDetailPage />} />
       <Route path="/topics" element={<TopicsPage />} />
       <Route path="/topics/:topicId" element={<TopicDetailPage />} />
       <Route path="/search" element={<SearchPage />} />

@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from pydantic import BaseModel, Field
 
 from cdm.graph.models import PartyGroup, Signal
@@ -96,6 +98,7 @@ class TopicSummary(BaseModel):
     label: str
     size: int
     top_words: list[str] = Field(default_factory=list)
+    metasubject_id: int | None = None
 
 
 class TopicsResponse(BaseModel):
@@ -118,6 +121,37 @@ class TopicTrendSeries(BaseModel):
 
 class TopicTrendsResponse(BaseModel):
     series: list[TopicTrendSeries]
+    model_version: str | None = None
+
+
+class MetasubjectSummary(BaseModel):
+    metasubject_id: int
+    name: str
+    size: int
+    top_words: list[str] = Field(default_factory=list)
+    topic_ids: list[int] = Field(default_factory=list)
+
+
+class MetasubjectsResponse(BaseModel):
+    metasubjects: list[MetasubjectSummary]
+    model_version: str | None = None
+
+
+class MetasubjectTrendSeries(BaseModel):
+    metasubject_id: int
+    label: str
+    points: list[TopicTrendPoint]
+
+
+class MetasubjectTrendsResponse(BaseModel):
+    series: list[MetasubjectTrendSeries]
+    model_version: str | None = None
+
+
+class MetasubjectDetailResponse(BaseModel):
+    metasubject: MetasubjectSummary
+    topics: list[TopicSummary] = Field(default_factory=list)
+    trend: list[TopicTrendPoint] = Field(default_factory=list)
     model_version: str | None = None
 
 
@@ -162,11 +196,19 @@ class MemberTopicsResponse(BaseModel):
     policy_areas: list[TopicItem] = Field(default_factory=list)
 
 
+class TrainingState(StrEnum):
+    IDLE = "idle"
+    RUNNING = "running"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+
+
 class TopicTrainingStatus(BaseModel):
-    state: str = "idle"
+    state: TrainingState = TrainingState.IDLE
     started: bool | None = None
     pid: int | None = None
     stage: str | None = None
+    progress: float | None = None
     message: str | None = None
     model_version: str | None = None
     started_at: str | None = None
@@ -254,6 +296,42 @@ class BillsResponse(BaseModel):
     total: int
     page: int = 1
     limit: int = 50
+
+
+class SimilarBill(BaseModel):
+    bill_id: str
+    title: str
+    congress: int | None = None
+    score: float
+
+
+class CommitteeActivity(BaseModel):
+    name: str
+    date: str | None = None
+
+
+class CommitteeBill(BaseModel):
+    bill_id: str
+    title: str
+    congress: int | None = None
+    chamber: str | None = None
+    activities: list[CommitteeActivity] = Field(default_factory=list)
+
+
+class CommitteeDetailResponse(BaseModel):
+    system_code: str
+    name: str
+    chamber: str | None = None
+    committee_type: str | None = None
+    total: int
+    page: int = 1
+    limit: int = 50
+    bills: list[CommitteeBill] = Field(default_factory=list)
+
+
+class SimilarBillsResponse(BaseModel):
+    bill_id: str
+    similar: list[SimilarBill] = Field(default_factory=list)
 
 
 class BillDetail(BaseModel):

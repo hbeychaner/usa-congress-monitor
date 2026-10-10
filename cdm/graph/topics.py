@@ -19,7 +19,6 @@ from pydantic import BaseModel, ConfigDict
 from cdm.graph.models import BillSignature, CongressEdgeStats, MemberEdge, Signal
 from cdm.utils.topic_terms import dedupe_terms, keyword_label
 
-ANALYSIS_INDEX = "congress-analysis-topics"
 OUTLIER_TOPIC = -1
 
 Matrix = NDArray[np.float32]
@@ -38,12 +37,13 @@ class TopicSettings(BaseModel):
 class TopicModelReader:
     """Reads the latest topic model's labels and bill assignments."""
 
-    def __init__(self, client: Elasticsearch) -> None:
+    def __init__(self, client: Elasticsearch, index: str) -> None:
         self.client = client
+        self.index = index
 
     def latest_version(self) -> str | None:
         response = self.client.search(
-            index=ANALYSIS_INDEX,
+            index=self.index,
             size=1,
             query={"term": {"kind": "topic"}},
             sort=[{"trained_at": {"order": "desc"}}],
@@ -61,7 +61,7 @@ class TopicModelReader:
                 ]
             }
         }
-        for hit in scan(self.client, index=ANALYSIS_INDEX, query={"query": query}):
+        for hit in scan(self.client, index=self.index, query={"query": query}):
             yield hit["_source"]
 
     def assignments(self, version: str) -> dict[str, int]:

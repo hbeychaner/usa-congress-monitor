@@ -14,13 +14,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cdm.config import get_config
+from cdm.container import Container
 from cdm.ingest.voteview import (
     FIRST_CONGRESS,
     VoteIngestor,
     VoteviewClient,
     current_congress,
 )
-from cdm.store.client import get_opensearch_client
 from cdm.store.index_manager import IndexManager
 
 CACHE_DIR = Path("data/voteview")
@@ -32,7 +33,7 @@ def main() -> None:
     parser.add_argument("--refresh", action="store_true", help="Re-download the CSVs")
     args = parser.parse_args()
 
-    client = get_opensearch_client()
+    client = Container(get_config()).elastic_client
     IndexManager(client).create("rollcall")
     ingestor = VoteIngestor(client, VoteviewClient(CACHE_DIR))
     current = current_congress(datetime.now(UTC).year)

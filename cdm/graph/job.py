@@ -18,8 +18,11 @@ from cdm.graph.voting import VotingGraphBuilder
 class GraphBuildJob:
     """Runs the requested signal builds and records stage, versions and outcome."""
 
-    def __init__(self, client: Elasticsearch, runner: GraphBuildRunner | None = None) -> None:
+    def __init__(
+        self, client: Elasticsearch, analysis_index: str, runner: GraphBuildRunner | None = None
+    ) -> None:
         self.client = client
+        self.analysis_index = analysis_index
         self.store = GraphStore(client)
         self.runner = runner
 
@@ -41,7 +44,7 @@ class GraphBuildJob:
         return VotingGraphBuilder(rolls, version).build()
 
     def _topic_edges(self, version: str) -> Iterator[MemberEdge]:
-        model = TopicModelReader(self.client)
+        model = TopicModelReader(self.client, self.analysis_index)
         topic_version = model.latest_version()
         if topic_version is None:
             raise RuntimeError("no trained topic model; run topic training first")

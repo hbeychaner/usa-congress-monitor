@@ -18,25 +18,20 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cdm.config import get_config
 from cdm.jobs.store import JobKind, JobStore
 from cdm.workers.celery_app import celery_app
-from settings import (
-    CELERY_BULK_QUEUE,
-    CELERY_INDEX_QUEUE,
-    CELERY_INGEST_QUEUE,
-    JOB_DB_PATH,
-)
 
 _TASK_AND_QUEUE = {
-    JobKind.INGEST.value: ("cdm.workers.tasks.run_ingest_job", CELERY_INGEST_QUEUE),
-    JobKind.INDEX.value: ("cdm.workers.tasks.run_index_job", CELERY_INDEX_QUEUE),
+    JobKind.INGEST.value: ("cdm.workers.tasks.run_ingest_job", get_config().queue.celery_ingest_queue),
+    JobKind.INDEX.value: ("cdm.workers.tasks.run_index_job", get_config().queue.celery_index_queue),
     JobKind.GOVINFO_BULK.value: (
         "cdm.workers.tasks.run_govinfo_bulk_job",
-        CELERY_BULK_QUEUE,
+        get_config().queue.celery_bulk_queue,
     ),
     JobKind.GOVINFO_BULK_BATCH.value: (
         "cdm.workers.tasks.run_govinfo_bulk_batch",
-        CELERY_BULK_QUEUE,
+        get_config().queue.celery_bulk_queue,
     ),
 }
 
@@ -80,7 +75,7 @@ def main() -> None:
     if unknown:
         raise SystemExit(f"Unknown job kind(s): {', '.join(unknown)}")
 
-    store = JobStore(JOB_DB_PATH)
+    store = JobStore(get_config().ledger.job_db_path)
     total_dispatched = 0
     for kind in kinds:
         task_name, queue = _TASK_AND_QUEUE[kind]

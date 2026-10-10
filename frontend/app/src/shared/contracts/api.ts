@@ -1332,6 +1332,8 @@ export interface components {
             pid?: number | null;
             /** Stage */
             stage?: string | null;
+            /** Progress */
+            progress?: number | null;
             /** Message */
             message?: string | null;
             /** Model Version */

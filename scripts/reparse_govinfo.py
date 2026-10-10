@@ -19,9 +19,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from sqlalchemy import select, update
 
+from cdm.config import get_config
 from cdm.jobs.store import _JOBS, JobStatus, JobStore, _now
 from cdm.workers.celery_app import celery_app
-from settings import CELERY_BULK_QUEUE, JOB_DB_PATH
 
 
 def parse_args() -> argparse.Namespace:
@@ -30,6 +30,17 @@ def parse_args() -> argparse.Namespace:
         "--collections",
         default="BILLSTATUS",
         help="Comma-separated GovInfo collections to re-parse (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--congresses",
+        type=int,
+        nargs="*",
+        help="Only re-parse jobs for these Congress numbers (default: all)",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        help="Re-parse at most this many packages (pilot runs)",
     )
     parser.add_argument(
         "--batch-size",
@@ -51,10 +62,16 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _matches(payload: dict, collections: set[str], congresses: list[int] | None) -> bool:
+    if payload.get("collection", "").upper() not in collections:
+        return False
+    return not congresses or payload.get("congress") in congresses
+
+
 def main() -> int:
     args = parse_args()
     collections = {c.strip().upper() for c in args.collections.split(",") if c.strip()}
-    store = JobStore(JOB_DB_PATH)
+    store = JobStore(get_config().ledger.job_db_path)
 
     with store.engine.connect() as connection:
         rows = connection.execute(
@@ -63,11 +80,13 @@ def main() -> int:
                 & (_JOBS.c.status == JobStatus.SUCCEEDED.value)
             )
         ).fetchall()
-    job_ids = [
-        row.id
-        for row in rows
-        if json.loads(row.payload).get("collection", "").upper() in collections
-    ]
+    # Several jobs can exist per package; one re-parse per package is enough.
+    jobs_by_package: dict[str, str] = {}
+    for row in rows:
+        payload = json.loads(row.payload)
+        if _matches(payload, collections, args.congresses):
+            jobs_by_package.setdefault(payload.get("package_id") or row.id, row.id)
+    job_ids = list(jobs_by_package.values())[: args.limit]
     print(f"Matched {len(job_ids)} succeeded jobs in collections {sorted(collections)}")
     if args.dry_run or not job_ids:
         return 0
@@ -89,7 +108,7 @@ def main() -> int:
             celery_app.send_task(
                 "cdm.workers.tasks.run_govinfo_bulk_job",
                 args=[job_id],
-                queue=CELERY_BULK_QUEUE,
+                queue=get_config().queue.celery_bulk_queue,
             )
         dispatched += len(batch)
         print(f"Requeued {dispatched}/{len(job_ids)}", flush=True)

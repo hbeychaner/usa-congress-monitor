@@ -1,4 +1,4 @@
-import { Avatar, Badge, Button, Card, DataList, Flex, Heading, Progress, SegmentedControl, Table, Text } from '@radix-ui/themes';
+import { Avatar, Badge, Button, Card, DataList, Flex, Heading, SegmentedControl, Table, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -239,38 +239,38 @@ export function MemberProfilePage() {
             <Text as="p" color="gray">No modeled topic assignments yet — topics appear after the topic model is trained.</Text>
           )}
           {memberTopics && memberTopics.subjects.length > 0 ? (
-              <Flex direction="column" gap="1">
-                <Heading size="3" mt="2">CRS Subjects</Heading>
-                <HorizontalBarChart
-                  data={memberTopics.subjects.map((subject) => ({ label: subject.label, value: subject.weight }))}
-                  formatValue={formatPercent}
-                  onBarClick={(label) => navigate(`/bills?subject=${encodeURIComponent(label)}`)}
-                />
-              </Flex>
-            ) : null}
-            {memberTopics && memberTopics.trend.length > 0 ? (
-              <Flex direction="column" gap="1">
-                <Heading size="3" mt="2">Topics Over Time</Heading>
-                {Object.entries(
-                  memberTopics.trend.reduce<Record<string, typeof memberTopics.trend>>((acc, point) => {
-                    (acc[point.period] ??= []).push(point);
-                    return acc;
-                  }, {}),
-                ).map(([period, points]) => (
-                  <Flex key={period} align="center" gap="2" wrap="wrap">
-                    <Text size="1" weight="bold" style={{ width: 70 }}>{period}</Text>
-                    {points
-                      .sort((a, b) => b.count - a.count)
-                      .slice(0, 6)
-                      .map((point) => (
-                        <Badge key={`${period}:${point.topic_id}`} variant="soft" style={{ textTransform: 'capitalize' }} asChild>
-                          <Link to={`/topics/${point.topic_id}`}>{point.label} × {point.count}</Link>
-                        </Badge>
-                      ))}
-                  </Flex>
-                ))}
-              </Flex>
-            ) : null}
+            <Flex direction="column" gap="1">
+              <Heading size="3" mt="2">CRS Subjects</Heading>
+              <HorizontalBarChart
+                data={memberTopics.subjects.map((subject) => ({ label: subject.label, value: subject.weight }))}
+                formatValue={formatPercent}
+                onBarClick={(label) => navigate(`/bills?subject=${encodeURIComponent(label)}`)}
+              />
+            </Flex>
+          ) : null}
+          {memberTopics && memberTopics.trend.length > 0 ? (
+            <Flex direction="column" gap="1">
+              <Heading size="3" mt="2">Topics Over Time</Heading>
+              {Object.entries(
+                memberTopics.trend.reduce<Record<string, typeof memberTopics.trend>>((acc, point) => {
+                  (acc[point.period] ??= []).push(point);
+                  return acc;
+                }, {}),
+              ).map(([period, points]) => (
+                <Flex key={period} align="center" gap="2" wrap="wrap">
+                  <Text size="1" weight="bold" style={{ width: 70 }}>{period}</Text>
+                  {points
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 6)
+                    .map((point) => (
+                      <Badge key={`${period}:${point.topic_id}`} variant="soft" style={{ textTransform: 'capitalize' }} asChild>
+                        <Link to={`/topics/${point.topic_id}`}>{point.label} × {point.count}</Link>
+                      </Badge>
+                    ))}
+                </Flex>
+              ))}
+            </Flex>
+          ) : null}
         </Flex>
       </Card>
 
@@ -353,23 +353,6 @@ export function MemberProfilePage() {
         ) : (
           <Text as="p" color="gray">No indexed activity for this member.</Text>
         )}
-      </Card>
-
-      <Card size="3">
-        <Heading size="4" mb="2">Topic Profile</Heading>
-        {profile.topics.length > 0 ? (
-          <Flex direction="column" gap="3">
-            {profile.topics.map((topic) => (
-              <Flex direction="column" gap="1" key={topic.label}>
-                <Flex justify="between">
-                  <Text>{topic.label}</Text>
-                  <Text weight="bold">{Math.round(topic.weight * 100)}%</Text>
-                </Flex>
-                <Progress value={Math.round(topic.weight * 100)} />
-              </Flex>
-            ))}
-          </Flex>
-        ) : <Text as="p" color="gray">No indexed topic associations for this member.</Text>}
       </Card>
     </Flex>
   );

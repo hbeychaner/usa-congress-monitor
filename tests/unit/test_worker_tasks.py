@@ -3,6 +3,7 @@ from typing import Any, cast
 
 import pytest
 
+from cdm.config import get_config
 from cdm.jobs.store import JobKind, JobStatus
 from cdm.workers import tasks
 
@@ -129,7 +130,7 @@ def test_recovery_requeues_stale_queued_govinfo_package(monkeypatch):
         (
             "cdm.workers.tasks.run_govinfo_bulk_job",
             [job["id"]],
-            tasks.CELERY_BULK_QUEUE,
+            get_config().queue.celery_bulk_queue,
         )
     ]
 
@@ -160,7 +161,7 @@ def test_recovery_requeues_stale_queued_ingest_job(monkeypatch):
         (
             "cdm.workers.tasks.run_ingest_job",
             [job["id"]],
-            tasks.CELERY_INGEST_QUEUE,
+            get_config().queue.celery_ingest_queue,
         )
     ]
 
@@ -243,7 +244,7 @@ def test_recovery_requeues_stale_active_job(monkeypatch):
         (
             "cdm.workers.tasks.run_ingest_job",
             [job["id"]],
-            tasks.CELERY_INGEST_QUEUE,
+            get_config().queue.celery_ingest_queue,
         )
     ]
 
@@ -285,7 +286,7 @@ def test_govinfo_batch_fans_out_package_jobs(monkeypatch):
         (
             "cdm.workers.tasks.run_govinfo_bulk_job",
             [package_id],
-            tasks.CELERY_BULK_QUEUE,
+            get_config().queue.celery_bulk_queue,
         )
         for package_id in package_ids
     ]
@@ -440,7 +441,7 @@ def test_index_job_archive_fallback_replays_missing_stream(tmp_path, monkeypatch
         upserts.extend(documents)
         return {"updated": len(documents), "errors": False}
 
-    monkeypatch.setattr("cdm.store.opensearch.bulk_upsert", fake_bulk_upsert)
+    monkeypatch.setattr("cdm.workers.tasks.bulk_upsert", fake_bulk_upsert)
 
     payload = {
         "resource": "bill",

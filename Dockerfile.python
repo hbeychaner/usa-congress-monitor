@@ -14,7 +14,6 @@ COPY pyproject.toml uv.lock requirements.txt ./
 
 # Copy project package so editable installs/import paths are available.
 COPY cdm ./cdm
-COPY settings.py ./settings.py
 
 # Install Python dependencies with uv. `--no-sources` avoids local path
 # overrides from tool.uv.sources (e.g., ../pycongress) that do not exist in container.

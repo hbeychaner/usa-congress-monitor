@@ -7,8 +7,8 @@ place. Keep this module small and focused on configuration.
 
 from openai import OpenAI
 
+from cdm.config import get_config
 from cdm.utils.logger import get_logger
-from settings import OPENAI_API_KEY, TIMEOUT_SECS
 
 logger = get_logger(__name__)
 
@@ -22,5 +22,5 @@ def get_client() -> OpenAI:
     Returns:
         OpenAI: an initialized OpenAI client instance.
     """
-    client = OpenAI(api_key=OPENAI_API_KEY, timeout=TIMEOUT_SECS, max_retries=5)
+    client = OpenAI(api_key=get_config().openai.openai_api_key, timeout=get_config().congress_api.timeout_secs, max_retries=5)
     return client

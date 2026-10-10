@@ -1,6 +1,8 @@
 from datetime import UTC, datetime
 from typing import Any
 
+from cdm.backend.services.search_service import SearchService
+from cdm.backend.services.topic_service import TopicService
 from cdm.contracts.api import (
     ActivityItem,
     MemberActivityItem,
@@ -11,7 +13,6 @@ from cdm.contracts.api import (
     MemberSummary,
     MemberTerm,
 )
-from cdm.store.client import get_opensearch_client
 from cdm.store.opensearch import read_alias
 
 
@@ -124,154 +125,6 @@ def _member_detail(source: dict[str, Any], fallback_id: str = "") -> MemberDetai
     )
 
 
-def _recent_activity(bioguide_id: str, limit: int = 20) -> list[ActivityItem]:
-    response = get_opensearch_client().search(
-        index=read_alias("bill"),
-        body={
-            "size": limit,
-            "track_total_hits": False,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"source_type": "bill"}},
-                        {
-                            "bool": {
-                                "should": [
-                                    {"term": {"sponsor_bioguide_ids": bioguide_id}},
-                                    {"term": {"cosponsor_bioguide_ids": bioguide_id}},
-                                ],
-                                "minimum_should_match": 1,
-                            }
-                        },
-                    ]
-                }
-            },
-            "sort": [{"update_date": {"order": "desc", "missing": "_last"}}],
-        },
-    )
-    activity: list[ActivityItem] = []
-    for hit in response.get("hits", {}).get("hits", []):
-        source = hit.get("_source", {})
-        sponsor_ids = source.get("sponsor_bioguide_ids") or []
-        activity_type = "Sponsor" if bioguide_id in sponsor_ids else "Cosponsor"
-        activity.append(
-            ActivityItem(
-                bill_id=str(source.get("id") or hit.get("_id") or ""),
-                title=str(source.get("title") or "Untitled bill"),
-                activity_type=activity_type,
-                congress=int(source.get("congress") or 0),
-            )
-        )
-    return activity
-
-
-def list_members(
-    query: str | None,
-    state: str | None,
-    chamber: str | None,
-    party: str | None,
-    page: int,
-    limit: int,
-) -> MembersResponse:
-    filters: list[dict[str, Any]] = []
-    if state:
-        filters.append({"match": {"state": state.strip()}})
-    if party:
-        filters.append({"match": {"party_name": party.strip()}})
-    if chamber:
-        chamber_name = {
-            "house": "House of Representatives",
-            "senate": "Senate",
-        }.get(chamber.strip().lower(), chamber.strip())
-        filters.append({"match": {"terms.item.chamber": chamber_name}})
-    query_body: dict[str, Any] = {"bool": {"filter": filters}}
-    if query and query.strip():
-        text_should: list[dict[str, Any]] = [
-            {
-                "multi_match": {
-                    "query": query.strip(),
-                    "type": "cross_fields",
-                    "operator": "and",
-                    "fields": ["name^3", "full_name^3", "bioguide_id", "state"],
-                }
-            }
-        ]
-        query_body["bool"]["must"] = [
-            {"bool": {"should": text_should, "minimum_should_match": 1}}
-        ]
-    response = get_opensearch_client().search(
-        index=read_alias("member"),
-        body={
-            "from": (page - 1) * limit,
-            "size": limit,
-            "track_total_hits": True,
-            "query": query_body,
-            "sort": [{"_score": "desc"}, {"update_date": "desc"}, {"bioguide_id": "asc"}],
-        },
-    )
-    total = response.get("hits", {}).get("total", 0)
-    if isinstance(total, dict):
-        total = total.get("value", 0)
-    members = [
-        _member_summary(hit.get("_source", {}), str(hit.get("_id", "")))
-        for hit in response.get("hits", {}).get("hits", [])
-    ]
-    return MembersResponse(members=members, total=int(total), page=page, limit=limit)
-
-
-def get_member_profile(bioguide_id: str) -> MemberProfileResponse:
-    normalized_id = bioguide_id.strip().upper()
-    response = get_opensearch_client().search(
-        index=read_alias("member"),
-        body={
-            "size": 25,
-            "query": {
-                "bool": {
-                    "should": [
-                        {"term": {"bioguide_id": normalized_id}},
-                        {"wildcard": {"id": f"*{normalized_id}"}},
-                    ],
-                    "minimum_should_match": 1,
-                }
-            },
-        },
-    )
-    hits = response.get("hits", {}).get("hits", [])
-    if not hits:
-        raise ValueError(f"Member not found: {normalized_id}")
-
-    def richness(hit: dict) -> int:
-        source = hit.get("_source", {})
-        return sum(
-            bool(source.get(field))
-            for field in (
-                "name",
-                "full_name",
-                "party_name",
-                "state",
-                "terms",
-                "image_url",
-            )
-        )
-
-    source = max((hit.get("_source", {}) for hit in hits), key=richness)
-    display_name = (
-        source.get("name") or source.get("full_name") or source.get("direct_order_name")
-    )
-    if not display_name:
-        from cdm.backend.services.search_service import search_entities
-
-        matches = search_entities(normalized_id, "member", 1).results
-        display_name = matches[0].title if matches else normalized_id
-    from cdm.backend.services.topic_service import get_member_topics
-
-    return MemberProfileResponse(
-        member=_member_detail({**source, "name": display_name}, normalized_id),
-        recent_activity=_recent_activity(normalized_id),
-        topics=get_member_topics(normalized_id).topics[:10],
-    )
-
-
 def _member_link_query(bioguide_id: str, extra_filters: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "bool": {
@@ -353,63 +206,203 @@ _ACTIVITY_SOURCES: dict[str, dict[str, Any]] = {
 }
 
 
-def list_member_activity(
-    bioguide_id: str,
-    types: str | None = None,
-    page: int = 1,
-    limit: int = 25,
-) -> MemberActivityResponse:
-    """Merged, date-sorted member activity across all linked document types."""
-    normalized_id = bioguide_id.strip().upper()
-    selected = [t.strip().lower() for t in (types or "").split(",") if t.strip()]
-    selected = [t for t in selected if t in _ACTIVITY_SOURCES] or list(_ACTIVITY_SOURCES)
+class MemberService:
+    def __init__(
+        self, client: Any, search: SearchService, topics: TopicService
+    ) -> None:
+        self._client = client
+        self._search = search
+        self._topics = topics
 
-    client = get_opensearch_client()
-    fetch_size = min(page * limit, 10_000)
-    items: list[MemberActivityItem] = []
-    counts: dict[str, int] = {}
-    for doc_type in selected:
-        spec = _ACTIVITY_SOURCES[doc_type]
-        response = client.search(
-            index=read_alias(spec["resource"]),
+    def list_members(
+        self,
+        query: str | None,
+        state: str | None,
+        chamber: str | None,
+        party: str | None,
+        page: int,
+        limit: int,
+    ) -> MembersResponse:
+        filters: list[dict[str, Any]] = []
+        if state:
+            filters.append({"match": {"state": state.strip()}})
+        if party:
+            filters.append({"match": {"party_name": party.strip()}})
+        if chamber:
+            chamber_name = {
+                "house": "House of Representatives",
+                "senate": "Senate",
+            }.get(chamber.strip().lower(), chamber.strip())
+            filters.append({"match": {"terms.item.chamber": chamber_name}})
+        query_body: dict[str, Any] = {"bool": {"filter": filters}}
+        if query and query.strip():
+            text_should: list[dict[str, Any]] = [
+                {
+                    "multi_match": {
+                        "query": query.strip(),
+                        "type": "cross_fields",
+                        "operator": "and",
+                        "fields": ["name^3", "full_name^3", "bioguide_id", "state"],
+                    }
+                }
+            ]
+            query_body["bool"]["must"] = [
+                {"bool": {"should": text_should, "minimum_should_match": 1}}
+            ]
+        response = self._client.search(
+            index=read_alias("member"),
             body={
-                "size": fetch_size,
+                "from": (page - 1) * limit,
+                "size": limit,
                 "track_total_hits": True,
-                "_source": spec["fields"],
-                "query": _member_link_query(normalized_id, spec["filters"]),
-                "sort": [{spec["sort"]: {"order": "desc", "missing": "_last"}}],
+                "query": query_body,
+                "sort": [{"_score": "desc"}, {"update_date": "desc"}, {"bioguide_id": "asc"}],
             },
         )
-        hits = response.get("hits", {})
-        total = hits.get("total", 0)
-        counts[doc_type] = total.get("value", 0) if isinstance(total, dict) else int(total)
-        for hit in hits.get("hits", []):
-            item = spec["parse"](hit.get("_source", {}), normalized_id)
-            if item.id:
-                items.append(item)
+        total = response.get("hits", {}).get("total", 0)
+        if isinstance(total, dict):
+            total = total.get("value", 0)
+        members = [
+            _member_summary(hit.get("_source", {}), str(hit.get("_id", "")))
+            for hit in response.get("hits", {}).get("hits", [])
+        ]
+        return MembersResponse(members=members, total=int(total), page=page, limit=limit)
 
-    items.sort(key=lambda item: item.date or "", reverse=True)
-    start = (page - 1) * limit
-    return MemberActivityResponse(
-        items=items[start : start + limit],
-        total=sum(counts.values()),
-        counts=counts,
-        page=page,
-        limit=limit,
-    )
+    def get_profile(self, bioguide_id: str) -> MemberProfileResponse:
+        normalized_id = bioguide_id.strip().upper()
+        response = self._client.search(
+            index=read_alias("member"),
+            body={
+                "size": 25,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {"term": {"bioguide_id": normalized_id}},
+                            {"wildcard": {"id": f"*{normalized_id}"}},
+                        ],
+                        "minimum_should_match": 1,
+                    }
+                },
+            },
+        )
+        hits = response.get("hits", {}).get("hits", [])
+        if not hits:
+            raise ValueError(f"Member not found: {normalized_id}")
 
+        source = max((hit.get("_source", {}) for hit in hits), key=self._richness)
+        display_name = (
+            source.get("name")
+            or source.get("full_name")
+            or source.get("direct_order_name")
+        )
+        if not display_name:
+            matches = self._search.search_members(normalized_id, 1)
+            display_name = matches[0].title if matches else normalized_id
 
-def get_member_summaries(bioguide_ids: list[str]) -> dict[str, MemberSummary]:
-    """Summaries for the given ids; ids with no member document are omitted."""
-    if not bioguide_ids:
-        return {}
-    response = get_opensearch_client().mget(
-        index=read_alias("member"),
-        ids=[f"member:{bioguide_id}" for bioguide_id in bioguide_ids],
-    )
-    summaries: dict[str, MemberSummary] = {}
-    for doc in response["docs"]:
-        if doc.get("found"):
-            summary = _member_summary(doc["_source"])
-            summaries[summary.bioguide_id] = summary
-    return summaries
+        return MemberProfileResponse(
+            member=_member_detail({**source, "name": display_name}, normalized_id),
+            recent_activity=self._recent_activity(normalized_id),
+            topics=self._topics.get_member_topics(normalized_id).topics[:10],
+        )
+
+    def list_activity(
+        self,
+        bioguide_id: str,
+        types: str | None = None,
+        page: int = 1,
+        limit: int = 25,
+    ) -> MemberActivityResponse:
+        """Merged, date-sorted member activity across all linked document types."""
+        normalized_id = bioguide_id.strip().upper()
+        selected = [t.strip().lower() for t in (types or "").split(",") if t.strip()]
+        selected = [t for t in selected if t in _ACTIVITY_SOURCES] or list(_ACTIVITY_SOURCES)
+
+        fetch_size = min(page * limit, 10_000)
+        items: list[MemberActivityItem] = []
+        counts: dict[str, int] = {}
+        for doc_type in selected:
+            spec = _ACTIVITY_SOURCES[doc_type]
+            response = self._client.search(
+                index=read_alias(spec["resource"]),
+                body={
+                    "size": fetch_size,
+                    "track_total_hits": True,
+                    "_source": spec["fields"],
+                    "query": _member_link_query(normalized_id, spec["filters"]),
+                    "sort": [{spec["sort"]: {"order": "desc", "missing": "_last"}}],
+                },
+            )
+            hits = response.get("hits", {})
+            total = hits.get("total", 0)
+            counts[doc_type] = total.get("value", 0) if isinstance(total, dict) else int(total)
+            for hit in hits.get("hits", []):
+                item = spec["parse"](hit.get("_source", {}), normalized_id)
+                if item.id:
+                    items.append(item)
+
+        items.sort(key=lambda item: item.date or "", reverse=True)
+        start = (page - 1) * limit
+        return MemberActivityResponse(
+            items=items[start : start + limit],
+            total=sum(counts.values()),
+            counts=counts,
+            page=page,
+            limit=limit,
+        )
+
+    def get_summaries(self, bioguide_ids: list[str]) -> dict[str, MemberSummary]:
+        """Summaries for the given ids; ids with no member document are omitted."""
+        if not bioguide_ids:
+            return {}
+        response = self._client.mget(
+            index=read_alias("member"),
+            ids=[f"member:{bioguide_id}" for bioguide_id in bioguide_ids],
+        )
+        summaries: dict[str, MemberSummary] = {}
+        for doc in response["docs"]:
+            if doc.get("found"):
+                summary = _member_summary(doc["_source"])
+                summaries[summary.bioguide_id] = summary
+        return summaries
+
+    @staticmethod
+    def _richness(hit: dict[str, Any]) -> int:
+        source = hit.get("_source", {})
+        return sum(
+            bool(source.get(field))
+            for field in (
+                "name",
+                "full_name",
+                "party_name",
+                "state",
+                "terms",
+                "image_url",
+            )
+        )
+
+    def _recent_activity(self, bioguide_id: str, limit: int = 20) -> list[ActivityItem]:
+        response = self._client.search(
+            index=read_alias("bill"),
+            body={
+                "size": limit,
+                "track_total_hits": False,
+                "query": _member_link_query(
+                    bioguide_id, [{"term": {"source_type": "bill"}}]
+                ),
+                "sort": [{"update_date": {"order": "desc", "missing": "_last"}}],
+            },
+        )
+        activity: list[ActivityItem] = []
+        for hit in response.get("hits", {}).get("hits", []):
+            source = hit.get("_source", {})
+            sponsor_ids = source.get("sponsor_bioguide_ids") or []
+            activity_type = "Sponsor" if bioguide_id in sponsor_ids else "Cosponsor"
+            activity.append(
+                ActivityItem(
+                    bill_id=str(source.get("id") or hit.get("_id") or ""),
+                    title=str(source.get("title") or "Untitled bill"),
+                    activity_type=activity_type,
+                    congress=int(source.get("congress") or 0),
+                )
+            )
+        return activity

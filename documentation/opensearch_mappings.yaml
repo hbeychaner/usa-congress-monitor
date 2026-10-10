@@ -151,6 +151,24 @@ legislation:
           chamber: { type: keyword }
           type: { type: keyword }
           url: { type: keyword }
+          activities:
+            type: object
+            dynamic: false
+            properties:
+              name: { type: keyword }
+              date: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
+          subcommittees:
+            type: object
+            dynamic: false
+            properties:
+              system_code: { type: keyword }
+              name: { type: text }
+              activities:
+                type: object
+                dynamic: false
+                properties:
+                  name: { type: keyword }
+                  date: { type: date, format: "strict_date_optional_time||yyyy-MM-dd" }
       related_bills:
         type: nested
         dynamic: false

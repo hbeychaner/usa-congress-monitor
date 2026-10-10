@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from elasticsearch.helpers import scan, streaming_bulk
 
-from cdm.store.client import get_opensearch_client
+from cdm.config import get_config
+from cdm.container import Container
 from cdm.store.indexer import _bioguide_ids
 from cdm.store.opensearch import read_alias, write_alias
 
 
 def main() -> None:
-    client = get_opensearch_client()
+    client = Container(get_config()).elastic_client
     actions = []
     scanned = 0
     updated = 0
