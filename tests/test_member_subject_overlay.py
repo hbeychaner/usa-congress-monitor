@@ -1,6 +1,9 @@
 import pytest
 
-from cdm.backend.services.member_subject_overlay import MemberSubjectOverlayBuilder
+from cdm.backend.services.member_subject_overlay import (
+    MemberSubjectOverlayBuilder,
+    OverlayResponse,
+)
 
 
 def _response() -> dict:
@@ -17,7 +20,7 @@ def _response() -> dict:
 
 def test_overlay_keeps_top_subjects_with_min_bills(monkeypatch: pytest.MonkeyPatch) -> None:
     builder = MemberSubjectOverlayBuilder(client=object())  # type: ignore[arg-type]
-    monkeypatch.setattr(builder, "_search", lambda ids, congress: _response())
+    monkeypatch.setattr(builder, "_search", lambda ids, congress: OverlayResponse.model_validate(_response()))
 
     overlay = builder.build(["A", "B"], None, 2)
 

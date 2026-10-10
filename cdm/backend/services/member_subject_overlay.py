@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from elasticsearch import Elasticsearch, NotFoundError
+from pydantic import BaseModel
 
 from cdm.backend.services.member_topic_overlay import MIN_BILLS, SPONSOR_FIELD
 from cdm.contracts.api import GraphSubjectLink, GraphSubjectNode
@@ -11,6 +12,36 @@ from cdm.store.opensearch import read_alias
 SUBJECTS_PATH = "subjects.legislative_subjects"
 SUBJECT_FIELD = f"{SUBJECTS_PATH}.name"
 PER_MEMBER_BUCKETS = 50
+
+
+class SubjectBucket(BaseModel):
+    key: str
+    doc_count: int
+
+
+class SubjectNames(BaseModel):
+    buckets: list[SubjectBucket] = []
+
+
+class MemberSubjects(BaseModel):
+    names: SubjectNames = SubjectNames()
+
+
+class MemberBucket(BaseModel):
+    key: str
+    subjects: MemberSubjects = MemberSubjects()
+
+
+class MemberBuckets(BaseModel):
+    buckets: list[MemberBucket] = []
+
+
+class OverlayAggregations(BaseModel):
+    members: MemberBuckets = MemberBuckets()
+
+
+class OverlayResponse(BaseModel):
+    aggregations: OverlayAggregations = OverlayAggregations()
 
 
 class SubjectOverlay:
@@ -23,7 +54,7 @@ class MemberSubjectOverlayBuilder:
     def __init__(self, client: Elasticsearch) -> None:
         self.client = client
 
-    def _search(self, member_ids: list[str], congress: int | None) -> dict[str, object]:
+    def _search(self, member_ids: list[str], congress: int | None) -> OverlayResponse:
         filters: list[dict[str, object]] = [
             {"term": {"source_type": "bill"}},
             {"terms": {SPONSOR_FIELD: member_ids}},
@@ -42,24 +73,24 @@ class MemberSubjectOverlayBuilder:
             }
         }
         try:
-            return self.client.search(
+            response = self.client.search(
                 index=read_alias("bill"),
                 body={"size": 0, "query": {"bool": {"filter": filters}}, "aggs": aggs},
-            ).body
+            )
         except NotFoundError:
-            return {}
+            return OverlayResponse()
+        return OverlayResponse.model_validate(response.body)
 
     def build(self, member_ids: list[str], congress: int | None, per_member: int) -> SubjectOverlay:
         if not member_ids:
             return SubjectOverlay([], [])
         response = self._search(member_ids, congress)
         links: list[GraphSubjectLink] = []
-        for member in response.get("aggregations", {}).get("members", {}).get("buckets", []):
-            names = member["subjects"]["names"]["buckets"]
-            for bucket in names[:per_member]:
-                if bucket["doc_count"] >= MIN_BILLS:
+        for member in response.aggregations.members.buckets:
+            for bucket in member.subjects.names.buckets[:per_member]:
+                if bucket.doc_count >= MIN_BILLS:
                     links.append(
-                        GraphSubjectLink(member=str(member["key"]), subject=str(bucket["key"]), bills=int(bucket["doc_count"]))
+                        GraphSubjectLink(member=member.key, subject=bucket.key, bills=bucket.doc_count)
                     )
         nodes = [GraphSubjectNode(name=name) for name in sorted({link.subject for link in links})]
         return SubjectOverlay(nodes, links)

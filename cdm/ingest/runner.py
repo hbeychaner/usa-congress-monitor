@@ -388,7 +388,7 @@ class IngestRunner:
             try:
                 if item_data.get("url"):
                     item_data["referenceId"] = UrlIdParser.parse(str(item_data["url"]))
-            except Exception:  # noqa: BLE001, S110 - reference ID enrichment is best effort.
+            except Exception:  # noqa: BLE001 - reference ID enrichment is best effort.
                 pass
 
         return item_data

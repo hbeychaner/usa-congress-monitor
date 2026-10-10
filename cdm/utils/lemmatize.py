@@ -68,6 +68,6 @@ def try_lemmatize_query(text: str) -> str:
         return ""
     try:
         return lemmatize_text(text)
-    except Exception:
+    except (RuntimeError, ImportError, ValueError):
         logger.warning("Query lemmatization unavailable; skipping lemma clauses")
         return ""

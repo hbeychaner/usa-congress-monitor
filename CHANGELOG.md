@@ -46,6 +46,8 @@
 
 ### Changed
 
+- Resolved remaining pyright/ruff findings: typed `SimilarMember` construction, Pydantic aggregation models for the member subject overlay, `Self` return for `AgreementCounts.__iadd__`, and specs registry import ordering pinned with `isort: skip_file`.
+
 - Typing sweep: `JsonObject`/`JsonValue` (covariant) and `Elasticsearch` client types replace most `dict[str, Any]`/`Any` in ingest, store, models, and job code; Elasticsearch responses are read via `.body`; `JobStore` returns typed `JobRow`/`PrunedJob`.
 - `cdm/data_collection` helpers are classes: `UrlIdParser`, `CanonicalIdBuilder`, `PaginationResolver`, `IdStrategyApplier` (injected into `CDGClient`), and `SpecRegistry` (module aliases kept for spec registration).
 

@@ -17,7 +17,7 @@ Typical usage
 from __future__ import annotations
 
 from copy import deepcopy
-from functools import lru_cache
+from functools import cache, lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -81,7 +81,7 @@ def load_definitions() -> dict[str, dict]:
     return definitions
 
 
-@lru_cache(maxsize=None)
+@cache
 def lemma_field_paths(name: str) -> tuple[tuple[str, ...], ...]:
     """Dotted paths of text fields in index *name* that carry lemma siblings."""
     definition = load_definitions().get(name)

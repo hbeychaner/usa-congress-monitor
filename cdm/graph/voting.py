@@ -8,6 +8,7 @@ member, all-time and per Congress.
 from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
+from typing import Self
 
 import numpy as np
 from numpy.typing import NDArray
@@ -40,7 +41,7 @@ class AgreementCounts:
         self.shared += shared
         self.agreed += (votes @ votes.T + shared) / 2
 
-    def __iadd__(self, other: AgreementCounts) -> AgreementCounts:
+    def __iadd__(self, other: AgreementCounts) -> Self:
         self.shared += other.shared
         self.agreed += other.agreed
         return self

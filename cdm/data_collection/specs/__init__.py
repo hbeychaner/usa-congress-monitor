@@ -3,6 +3,8 @@
 Importing submodules registers their EndpointSpecs via side-effects.
 """
 
+# ruff: isort: skip_file
+
 from . import (
     amendment_specs,
     bill_specs,
@@ -21,7 +23,7 @@ from . import (
     nomination_specs,
     treaty_specs,
 )
-from . import congress_list_specs  # noqa: E402  (must follow the specs it derives from)
+from . import congress_list_specs  # must follow the specs it derives from
 
 __all__ = [
     "amendment_specs",
@@ -30,6 +32,7 @@ __all__ = [
     "committee_report_specs",
     "committee_specs",
     "communication_specs",
+    "congress_list_specs",
     "congress_specs",
     "crsreport_specs",
     "daily_congressional_record_specs",

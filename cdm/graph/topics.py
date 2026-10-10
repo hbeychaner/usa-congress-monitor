@@ -165,7 +165,7 @@ class TopicGraphBuilder:
         if not by_congress:
             return
 
-        total = sum(by_congress.values())
+        total: Matrix = np.sum(list(by_congress.values()), axis=0)
         document_frequency = (total > 0).sum(axis=0)
         idf = (np.log((1 + len(members)) / (1 + document_frequency)) + 1).astype(np.float32)
         total_vectors = self._vectors(total, idf)

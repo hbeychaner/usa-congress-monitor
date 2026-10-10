@@ -7,7 +7,7 @@ from typing import Any
 from elasticsearch import Elasticsearch
 
 from cdm.backend.services.member_service import MemberService
-from cdm.contracts.api import SimilarMember, SimilarMembersResponse
+from cdm.contracts.api import MemberSummary, SimilarMember, SimilarMembersResponse
 from cdm.graph.models import (
     CongressEdgeStats,
     DocumentKind,
@@ -97,7 +97,7 @@ class GraphService:
         edges = self.edges(version, signal, [bioguide_id], congress, limit)
         members = self._members.get_summaries([edge.neighbor for edge in edges])
         similar = [
-            SimilarMember(member=members[edge.neighbor], **self._stats(edge, congress))
+            self._similar_member(members[edge.neighbor], edge, congress)
             for edge in edges
             if edge.neighbor in members
         ]
@@ -109,22 +109,23 @@ class GraphService:
             similar=similar,
         )
 
-    def _stats(
-        self, edge: MemberEdge, congress: int | None
-    ) -> dict[str, float | int | list[str]]:
+    def _similar_member(
+        self, member: MemberSummary, edge: MemberEdge, congress: int | None
+    ) -> SimilarMember:
         selected: list[CongressEdgeStats] = [
             stats
             for stats in edge.by_congress
             if congress is None or stats.congress == congress
         ]
-        return {
-            "score": self.score(edge, congress),
-            "member_sponsored": sum(stats.member_sponsored for stats in selected),
-            "neighbor_sponsored": sum(stats.neighbor_sponsored for stats in selected),
-            "co_signed": sum(stats.co_signed for stats in selected),
-            "shared_votes": sum(stats.shared_votes for stats in selected),
-            "agreed_votes": sum(stats.agreed_votes for stats in selected),
-            "shared_split_votes": sum(stats.shared_split_votes for stats in selected),
-            "agreed_split_votes": sum(stats.agreed_split_votes for stats in selected),
-            "shared_topics": edge.shared_topics,
-        }
+        return SimilarMember(
+            member=member,
+            score=self.score(edge, congress),
+            member_sponsored=sum(stats.member_sponsored for stats in selected),
+            neighbor_sponsored=sum(stats.neighbor_sponsored for stats in selected),
+            co_signed=sum(stats.co_signed for stats in selected),
+            shared_votes=sum(stats.shared_votes for stats in selected),
+            agreed_votes=sum(stats.agreed_votes for stats in selected),
+            shared_split_votes=sum(stats.shared_split_votes for stats in selected),
+            agreed_split_votes=sum(stats.agreed_split_votes for stats in selected),
+            shared_topics=edge.shared_topics,
+        )
