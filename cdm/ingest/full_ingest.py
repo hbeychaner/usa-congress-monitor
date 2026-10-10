@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
-from typing import Any
 
 from cdm.ingest.resource_config import (
     congress_scoped,
@@ -12,6 +11,7 @@ from cdm.ingest.resource_config import (
     static_resources,
 )
 from cdm.ingest.runner import Resource
+from cdm.utils.json_types import JsonObject
 
 
 def current_utc_date() -> date:
@@ -58,7 +58,7 @@ class FullIngestJob:
     """One idempotent ingest payload in a full-ingest plan."""
 
     label: str
-    payload: dict[str, Any]
+    payload: JsonObject
 
 
 def _timestamp(value: date, *, end_of_day: bool = False) -> str:
@@ -66,7 +66,7 @@ def _timestamp(value: date, *, end_of_day: bool = False) -> str:
     return f"{value.isoformat()}T{time}Z"
 
 
-def _base_payload(config: FullIngestConfig) -> dict[str, Any]:
+def _base_payload(config: FullIngestConfig) -> JsonObject:
     return {
         "outdir": config.outdir,
         "fetch_items": config.fetch_items,

@@ -82,7 +82,7 @@ def schedule_daily_ingest() -> JsonObject:
     container = _container()
     payload = container.daily_ingest_planner.payload(datetime.now(UTC).date())
     job = container.job_submitter.submit(JobKind.INGEST.value, payload.to_json())
-    return dict(job)
+    return {"job_id": job["id"], "status": job["status"]}
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_coverage_gaps")

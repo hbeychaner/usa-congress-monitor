@@ -17,7 +17,7 @@ from pydantic import (
     model_validator,
 )
 
-from cdm.data_collection.id_utils import parse_url_to_id
+from cdm.data_collection.id_utils import UrlIdParser
 from cdm.models.shared import CountUrl, EntityBase
 
 logger = logging.getLogger(__name__)
@@ -399,7 +399,7 @@ class Member(EntityBase):
         url = getattr(self, "url", None)
         if url:
             try:
-                return parse_url_to_id(str(url))
+                return UrlIdParser.parse(str(url))
             except (TypeError, ValueError):
                 logger.exception("Failed to parse URL to id in Member.build_id")
         try:

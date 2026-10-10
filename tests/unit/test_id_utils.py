@@ -1,11 +1,11 @@
 import json
 
-from cdm.data_collection.id_utils import canonical_id, parse_url_to_id
+from cdm.data_collection.id_utils import CanonicalIdBuilder, UrlIdParser
 
 
 def test_parse_url_to_id():
     url = "https://api.congress.gov/v3/bill/110/hconres/10?format=json"
-    assert parse_url_to_id(url) == "bill:110:hconres:10"
+    assert UrlIdParser.parse(url) == "bill:110:hconres:10"
 
 
 def test_canonical_id_from_bill_item():
@@ -13,18 +13,18 @@ def test_canonical_id_from_bill_item():
         items = json.load(f)
     assert len(items) > 0
     first = items[0]
-    assert canonical_id(first) == "bill:110:hconres:10"
+    assert CanonicalIdBuilder().build(first) == "bill:110:hconres:10"
 
 
 def test_canonical_id_person_bioguide():
     rec = {"bioguide_id": "L000551", "full_name": "Rep. Lee"}
-    assert canonical_id(rec) == "person:L000551"
+    assert CanonicalIdBuilder().build(rec) == "person:L000551"
 
 
 def test_canonical_id_amendment_like():
     rec = {"congress": 110, "number": "1", "purpose": "test", "type": "HAMDT"}
     # amendment fallback path should produce amendment:... id
-    cid = canonical_id(rec)
+    cid = CanonicalIdBuilder().build(rec)
     # allow either amendment: or bill: (some records normalize to bill composite)
     assert cid.startswith(("amendment:110:", "bill:110:"))
 
@@ -32,5 +32,5 @@ def test_canonical_id_amendment_like():
 def test_canonical_id_fallback_record():
     # empty/unknown records should return a record: fallback id
     rec = {"foo": "bar"}
-    cid = canonical_id(rec)
+    cid = CanonicalIdBuilder().build(rec)
     assert cid.startswith("record:")

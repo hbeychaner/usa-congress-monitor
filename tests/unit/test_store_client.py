@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import pytest
 
 from cdm.config import ElasticConfig
@@ -21,6 +23,6 @@ def test_factory_requires_api_key():
 def test_check_opensearch_connection_delegates_to_client():
     class FakeClient:
         def info(self):
-            return {"cluster_name": "test"}
+            return SimpleNamespace(body={"cluster_name": "test"})
 
     assert check_opensearch_connection(FakeClient()) == {"cluster_name": "test"}

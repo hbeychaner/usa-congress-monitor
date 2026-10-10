@@ -22,7 +22,7 @@ from pydantic import (
 )
 
 from cdm.data_collection.client import CDGClient
-from cdm.data_collection.id_utils import parse_url_to_id
+from cdm.data_collection.id_utils import UrlIdParser
 from cdm.models.people import Chamber, Member, Sponsor, SponsorRef
 from cdm.models.shared import (
     Activity,
@@ -34,6 +34,7 @@ from cdm.models.shared import (
     Title,
 )
 from cdm.models.validators import convert_law_type, normalize_chamber
+from cdm.utils.json_types import JsonObject
 
 logger = logging.getLogger(__name__)
 
@@ -754,20 +755,20 @@ class Treaty(BaseModel):
     congress_considered: Annotated[int | None, Field(alias="congressConsidered")] = None
     number: int | None = None
     countries_parties: Annotated[
-        list[dict[str, Any]], Field(alias="countriesParties")
+        list[JsonObject], Field(alias="countriesParties")
     ] = []
     in_force_date: Annotated[str | None, Field(alias="inForceDate")] = None
-    index_terms: Annotated[list[dict[str, Any]], Field(alias="indexTerms")] = []
+    index_terms: Annotated[list[JsonObject], Field(alias="indexTerms")] = []
     old_number: Annotated[str | None, Field(alias="oldNumber")] = None
     old_number_display_name: Annotated[
         str | None, Field(alias="oldNumberDisplayName")
     ] = None
-    parts: dict[str, Any] = {}
-    related_docs: list[dict[str, Any]] = []
+    parts: JsonObject = {}
+    related_docs: list[JsonObject] = []
     resolution_text: str | None = None
     suffix: str | None = None
     topic: str | None = None
-    titles: list[dict[str, Any]] = []
+    titles: list[JsonObject] = []
     transmitted_date: Annotated[str | None, Field(alias="transmittedDate")] = None
     update_date: Annotated[str | None, Field(alias="updateDate")] = None
 
@@ -870,7 +871,7 @@ class BillMetadata(EntityBase):
         # fallback: try to parse URL into an id
         url = getattr(self, "url", None)
         if url:
-            return parse_url_to_id(str(url))
+            return UrlIdParser.parse(str(url))
         raise ValueError(
             "Could not build canonical id for BillMetadata: missing congress/type/number/url"
         )
@@ -1069,7 +1070,7 @@ class Amendment(BaseModel):
             url = getattr(self, "url", None)
             if url:
                 try:
-                    return parse_url_to_id(str(url))
+                    return UrlIdParser.parse(str(url))
                 except (TypeError, ValueError):
                     logger.exception("Failed to parse URL to id in build_id")
             mapping = self.model_dump() if hasattr(self, "model_dump") else dict(self)
@@ -1128,7 +1129,7 @@ class Bill(EntityBase):
     ] = None
     full_text: Annotated[str, Field(description="What the full bill text is.")] = ""
     detail_hydration: Annotated[
-        dict[str, dict[str, Any]],
+        dict[str, JsonObject],
         Field(description="Pagination and completeness metadata for bill details."),
     ] = Field(default_factory=dict)
 
@@ -1351,7 +1352,7 @@ class Bill(EntityBase):
     @staticmethod
     def _fetch_detail_collection_with_metadata(
         client: BillDetailClient, endpoint: str, key: str, max_pages: int
-    ) -> tuple[list[dict] | dict, dict[str, Any]]:
+    ) -> tuple[list[dict] | dict, JsonObject]:
         """Fetch a detail collection and return records with completeness metadata."""
         records: list[dict] = []
         next_endpoint: str | None = endpoint
@@ -1418,7 +1419,7 @@ class Bill(EntityBase):
             url = getattr(self, "url", None)
             if url:
                 try:
-                    return parse_url_to_id(str(url))
+                    return UrlIdParser.parse(str(url))
                 except (TypeError, ValueError):
                     logger.exception("Failed to parse URL to id in Bill.build_id")
             mapping = self.model_dump() if hasattr(self, "model_dump") else dict(self)
@@ -1506,11 +1507,11 @@ class CommitteePrint(BaseModel):
         str | None, Field(description="What type of committee print this is.")
     ] = None
     committees: Annotated[
-        list[dict[str, Any]] | None,
+        list[JsonObject] | None,
         Field(description="Committees associated with the print."),
     ] = None
     associated_bills: Annotated[
-        list[dict[str, Any]] | None,
+        list[JsonObject] | None,
         Field(
             default=None,
             alias="associatedBills",
@@ -1576,18 +1577,18 @@ class CommitteeMeeting(BaseModel):
         None
     )
     committees: Annotated[
-        list[dict[str, Any]] | None,
+        list[JsonObject] | None,
         Field(description="Committees holding the meeting."),
     ] = None
     continuations: Annotated[
-        list[dict[str, Any]] | None,
+        list[JsonObject] | None,
         Field(description="Continuation times for the meeting."),
     ] = None
     location: Annotated[
-        dict[str, Any] | None, Field(description="Meeting location details.")
+        JsonObject | None, Field(description="Meeting location details.")
     ] = None
     videos: Annotated[
-        list[dict[str, Any]] | None, Field(description="Available meeting videos.")
+        list[JsonObject] | None, Field(description="Available meeting videos.")
     ] = None
 
     model_config = ConfigDict(extra="allow", populate_by_name=True)

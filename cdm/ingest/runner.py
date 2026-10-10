@@ -26,10 +26,10 @@ import cdm.data_collection.specs  # noqa: F401
 from cdm.config import get_config
 from cdm.data_collection.client import get_client
 from cdm.data_collection.endpoint_registry import get_spec
-from cdm.data_collection.id_utils import canonical_id, parse_url_to_id
+from cdm.data_collection.id_utils import CanonicalIdBuilder, UrlIdParser
 from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
-from cdm.data_collection.utils import resolve_pagination
+from cdm.data_collection.utils import PaginationResolver
 from cdm.ingest.archive import SQLiteListCache
 from cdm.jobs.store import CoverageStage
 from cdm.utils.logger import get_logger
@@ -104,7 +104,7 @@ def _attempt_law_fallback(
     )
     # Ensure item has an id; let canonical_id raise if it cannot produce one
     if not item_data.get("id"):
-        item_data["id"] = canonical_id(item)
+        item_data["id"] = CanonicalIdBuilder().build(item)
     item_id = item_data.get("id")
     if item_id in seen_ids:
         logger.info("Skipping duplicate fallback item id=%s", item_id)
@@ -380,14 +380,14 @@ class IngestRunner:
 
         if not item_data.get("id"):
             try:
-                item_data["id"] = canonical_id(item)
+                item_data["id"] = CanonicalIdBuilder().build(item)
             except Exception:  # noqa: BLE001, S110 - ID enrichment is best effort.
                 pass
 
         if not item_data.get("referenceId"):
             try:
                 if item_data.get("url"):
-                    item_data["referenceId"] = parse_url_to_id(str(item_data["url"]))
+                    item_data["referenceId"] = UrlIdParser.parse(str(item_data["url"]))
             except Exception:  # noqa: BLE001, S110 - reference ID enrichment is best effort.
                 pass
 
@@ -640,7 +640,7 @@ class IngestRunner:
                     )
                     if self.record_sink is not None:
                         self.record_sink(self.resource.value, record)
-            meta = resolve_pagination(
+            meta = PaginationResolver().resolve(
                 parsed, records_len=len(records), offset=offset, page_size=page_limit
             )
             page_count += 1
@@ -737,7 +737,7 @@ class IngestRunner:
                 signature = self._bill_signature(meta_data)
                 return signature in archived_signatures
             try:
-                item_key = canonical_id(meta)
+                item_key = CanonicalIdBuilder().build(meta)
             except Exception:  # noqa: BLE001 - best effort dedupe only.
                 item_key = None
             return bool(item_key and self._normalize_record_id(item_key) in seen_ids)

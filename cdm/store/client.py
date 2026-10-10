@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from elasticsearch import Elasticsearch
 
 from cdm.config import ElasticConfig, get_config
+from cdm.utils.json_types import JsonObject
 
 
 class ElasticClientFactory:
@@ -27,11 +26,11 @@ class ElasticClientFactory:
         return Elasticsearch(url, api_key=api_key)
 
 
-def get_opensearch_client(*, url: str | None = None, api_key: str | None = None) -> Any:
+def get_opensearch_client(*, url: str | None = None, api_key: str | None = None) -> Elasticsearch:
     """Client from the process-wide config; prefer injecting a client instead."""
     return ElasticClientFactory(get_config().elastic).create(url=url, api_key=api_key)
 
 
-def check_opensearch_connection(client: Any) -> dict:
+def check_opensearch_connection(client: Elasticsearch) -> JsonObject:
     """Return cluster info, raising if the client cannot reach the cluster."""
-    return client.info()
+    return client.info().body

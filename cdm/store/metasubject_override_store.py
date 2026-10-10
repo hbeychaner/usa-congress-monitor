@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any
 
+from elasticsearch import Elasticsearch
 from pydantic import BaseModel, Field
 
+from cdm.utils.json_types import JsonObject
 from cdm.utils.metasubjects import MetasubjectOverrides
 
 OVERRIDE_SCAN_SIZE = 10000
@@ -30,7 +31,7 @@ class OverrideVersion(BaseModel):
 
 
 class MetasubjectOverrideStore:
-    def __init__(self, client: Any, index: str) -> None:
+    def __init__(self, client: Elasticsearch, index: str) -> None:
         self.client = client
         self.index = index
 
@@ -53,7 +54,7 @@ class MetasubjectOverrideStore:
         """Every stored edit, oldest first, optionally for one metasubject."""
         if not self.client.indices.exists(index=self.index):
             return []
-        query: dict[str, Any] = (
+        query: JsonObject = (
             {"term": {OverrideField.METASUBJECT_ID: metasubject_id}}
             if metasubject_id is not None
             else {"match_all": {}}

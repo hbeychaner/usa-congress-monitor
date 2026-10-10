@@ -46,6 +46,9 @@
 
 ### Changed
 
+- Typing sweep: `JsonObject`/`JsonValue` (covariant) and `Elasticsearch` client types replace most `dict[str, Any]`/`Any` in ingest, store, models, and job code; Elasticsearch responses are read via `.body`; `JobStore` returns typed `JobRow`/`PrunedJob`.
+- `cdm/data_collection` helpers are classes: `UrlIdParser`, `CanonicalIdBuilder`, `PaginationResolver`, `IdStrategyApplier` (injected into `CDGClient`), and `SpecRegistry` (module aliases kept for spec registration).
+
 - Worker code converted from module functions to injected classes:
   `cdm/workers/tasks.py` is now only thin Celery wrappers; logic lives in
   `IngestJobRunner`, `GovInfoPackageRunner`, `GovInfoBatchRunner`,

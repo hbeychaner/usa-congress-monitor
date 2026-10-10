@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from typing import Any
 
-from elasticsearch import NotFoundError
+from elasticsearch import Elasticsearch, NotFoundError
 
 from cdm.backend.services.subject_service import SubjectService
 from cdm.contracts.api import (
@@ -62,7 +62,7 @@ def _quarter(date: str) -> str:
 
 
 class TopicService:
-    def __init__(self, client: Any, analysis_index: str, subjects: SubjectService) -> None:
+    def __init__(self, client: Elasticsearch, analysis_index: str, subjects: SubjectService) -> None:
         self._client = client
         self._index = analysis_index
         self._subjects = subjects
@@ -415,7 +415,7 @@ class TopicService:
 
     def _search(self, body: dict[str, Any]) -> dict[str, Any] | None:
         try:
-            return self._client.search(index=self._index, body=body)
+            return self._client.search(index=self._index, body=body).body
         except NotFoundError:
             return None
 
@@ -477,7 +477,7 @@ class TopicService:
             response = self._client.mget(
                 index=read_alias("bill"),
                 body={"ids": bill_ids},
-                _source=["title"],
+                source_includes=["title"],
             )
         except NotFoundError:
             return {}

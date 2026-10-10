@@ -8,7 +8,6 @@ import threading
 import zlib
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 from sqlalchemy import (
     BLOB,
@@ -23,6 +22,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.engine import Engine
+
+from cdm.utils.json_types import JsonObject
 
 _ARCHIVE_METADATA = MetaData()
 _ARCHIVED_RECORDS = Table(
@@ -88,7 +89,7 @@ class SQLiteRecordArchive:
         _ARCHIVE_METADATA.create_all(self.engine)
 
     @staticmethod
-    def _record_id(record: dict[str, Any]) -> str:
+    def _record_id(record: JsonObject) -> str:
         identity = record.get("id") or record.get("url")
         # Legacy bill lists reuse the same canonical key for distinct entries.
         if (
@@ -106,7 +107,7 @@ class SQLiteRecordArchive:
     def write(
         self,
         resource: str,
-        record: dict[str, Any],
+        record: JsonObject,
         *,
         record_id: str | None = None,
     ) -> None:
@@ -125,7 +126,7 @@ class SQLiteRecordArchive:
                 )
             )
 
-    def write_many(self, resource: str, records: list[dict[str, Any]]) -> None:
+    def write_many(self, resource: str, records: list[JsonObject]) -> None:
         rows = [
             (
                 resource,
@@ -161,7 +162,7 @@ class SQLiteRecordArchive:
                 ).scalars()
             )
 
-    def records(self, resource: str) -> list[dict[str, Any]]:
+    def records(self, resource: str) -> list[JsonObject]:
         """Return archived records for *resource* for deterministic replay."""
         with self.engine.connect() as connection:
             payloads = connection.execute(
@@ -193,7 +194,7 @@ class SQLiteListCache:
         self.engine = _archive_engine(self.path)
         _CACHED_RECORDS.metadata.create_all(self.engine)
 
-    def write(self, offset: int, record: dict[str, Any]) -> None:
+    def write(self, offset: int, record: JsonObject) -> None:
         payload = zlib.compress(
             json.dumps(record, ensure_ascii=True, separators=(",", ":")).encode(),
             level=6,
@@ -206,7 +207,7 @@ class SQLiteListCache:
                 .values(page_offset=offset, record_id=record_id, payload=payload)
             )
 
-    def write_many(self, rows: list[tuple[int, dict[str, Any]]]) -> None:
+    def write_many(self, rows: list[tuple[int, JsonObject]]) -> None:
         values = [
             (
                 offset,
@@ -232,7 +233,7 @@ class SQLiteListCache:
                     )
                 )
 
-    def contains(self, offset: int, record: dict[str, Any]) -> bool:
+    def contains(self, offset: int, record: JsonObject) -> bool:
         record_id = SQLiteRecordArchive._record_id(record)
         with self.engine.connect() as connection:
             return (
@@ -280,7 +281,7 @@ class SQLiteQuarantineArchive:
     def write(
         self,
         resource: str,
-        record: dict[str, Any],
+        record: JsonObject,
         *,
         error: str,
         source_url: str | None = None,
@@ -307,7 +308,7 @@ class SQLiteQuarantineArchive:
                 )
             )
 
-    def records(self, resource: str | None = None) -> list[dict[str, Any]]:
+    def records(self, resource: str | None = None) -> list[JsonObject]:
         """Return quarantined payloads and validation metadata for replay."""
         statement = select(
             _QUARANTINED_RECORDS.c.resource,

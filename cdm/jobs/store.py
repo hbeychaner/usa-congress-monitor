@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import fcntl
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -24,7 +24,7 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
-from sqlalchemy.engine import Connection, Engine
+from sqlalchemy.engine import Connection, Engine, RowMapping
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import Select
 
@@ -111,6 +111,18 @@ Index(_INGEST_WINDOWS_STATUS_INDEX, _INGEST_WINDOWS.c.status)
 
 def _now() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def _decode_job(row: RowMapping) -> JobRow:
+    decoded = dict(row)
+    decoded["payload"] = json.loads(decoded["payload"])
+    return cast(JobRow, decoded)
+
+
+class PrunedJob(TypedDict):
+    id: str
+    kind: str
+    payload: JsonObject
 
 
 class JobRow(TypedDict):
@@ -260,9 +272,7 @@ class JobStore:
                 .mappings()
                 .one()
             )
-        result = dict(row)
-        result["payload"] = json.loads(result["payload"])
-        return result
+        return _decode_job(row)
 
     def create_govinfo_bulk_job(self, package: GovInfoPackage, *, outdir: Path | str) -> JobRow:
         """Create an idempotent durable job for one GovInfo package."""
@@ -292,7 +302,7 @@ class JobStore:
         now: str,
         status: str,
     ) -> None:
-        for resource in payload.get("resources") or []:
+        for resource in cast(Sequence[str], payload.get("resources") or ()):
             connection.execute(
                 sqlite_insert(_INGEST_WINDOWS)
                 .prefix_with("OR IGNORE")
@@ -318,9 +328,7 @@ class JobStore:
             )
         if row is None:
             raise KeyError(f"Unknown job {job_id}")
-        result = dict(row)
-        result["payload"] = json.loads(result["payload"])
-        return result
+        return _decode_job(row)
 
     def mark_running(self, job_id: str, *, update_windows: bool = True) -> JobRow | None:
         """Atomically claim a job for execution, returning ``None`` if already claimed.
@@ -369,7 +377,7 @@ class JobStore:
     def claim_queued(
         self,
         kind: str,
-        accept: Callable[[dict], bool],
+        accept: Callable[[JobRow], bool],
         limit: int,
         *,
         scan: int = 2000,
@@ -380,7 +388,7 @@ class JobStore:
         if limit < 1:
             return []
         now = _now()
-        claimed: list[dict] = []
+        claimed: list[JobRow] = []
         with self._transaction_lock(), self.engine.begin() as connection:
             rows = connection.execute(
                 select(_JOBS)
@@ -392,8 +400,7 @@ class JobStore:
             for row in rows:
                 if exclude and row["id"] in exclude:
                     continue
-                job = dict(row)
-                job["payload"] = json.loads(job["payload"])
+                job = _decode_job(row)
                 if not accept(job):
                     continue
                 claimed.append(job)
@@ -590,7 +597,7 @@ class JobStore:
         *,
         older_than: str,
         exclude_ids: set[str] | None = None,
-    ) -> list[JobRow]:
+    ) -> list[PrunedJob]:
         """Delete SUCCEEDED/CANCELLED jobs updated before ``older_than``.
 
         ``ingest_windows`` rows are intentionally preserved: they are the
@@ -611,7 +618,7 @@ class JobStore:
                 .where(_JOBS.c.updated_at < older_than)
             ).all()
             pruned = [
-                {"id": row.id, "kind": row.kind, "payload": json.loads(row.payload)}
+                PrunedJob(id=row.id, kind=row.kind, payload=json.loads(row.payload))
                 for row in rows
                 if row.id not in excluded
             ]
@@ -648,12 +655,7 @@ class JobStore:
         """
         with self.engine.connect() as connection:
             rows = connection.execute(statement).mappings().all()
-        results = []
-        for row in rows:
-            result = dict(row)
-            result["payload"] = json.loads(result["payload"])
-            results.append(result)
-        return results
+        return [_decode_job(row) for row in rows]
 
     def failed(self, kind: str | None = None) -> list[JobRow]:
         statement = select(_JOBS).where(_JOBS.c.status == JobStatus.FAILED.value)

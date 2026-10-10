@@ -7,7 +7,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, HttpUrl
 
-from cdm.data_collection.id_utils import parse_url_to_id
+from cdm.data_collection.id_utils import UrlIdParser
 
 
 class Format(BaseModel):
@@ -136,7 +136,7 @@ class EntityBase(BaseModel):
         # try extracting from a URL using the canonical URL parser
         url = getattr(self, "url", None)
         if url:
-            return parse_url_to_id(str(url))
+            return UrlIdParser.parse(str(url))
 
         raise ValueError(
             f"Could not build canonical id for {self.__class__.__name__}: no id-bioguide-congress/number-or-url present"

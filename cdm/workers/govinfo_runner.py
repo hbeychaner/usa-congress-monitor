@@ -43,7 +43,7 @@ class GovInfoCollection(StrEnum):
 
 
 class GovInfoRecordParser(Protocol):
-    def parse(self, content: bytes, package: GovInfoPackage) -> JsonObject: ...
+    def parse(self, xml: bytes | str, package: GovInfoPackage) -> JsonObject: ...
 
 
 class GovInfoCollectionSpec:

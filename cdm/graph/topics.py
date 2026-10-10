@@ -47,7 +47,7 @@ class TopicModelReader:
             size=1,
             query={"term": {"kind": "topic"}},
             sort=[{"trained_at": {"order": "desc"}}],
-            _source=["model_version"],
+            source_includes=["model_version"],
         )
         hits = response["hits"]["hits"]
         return hits[0]["_source"]["model_version"] if hits else None

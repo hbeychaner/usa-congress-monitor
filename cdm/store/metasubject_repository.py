@@ -4,14 +4,16 @@ from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
 from enum import StrEnum
-from typing import Any
 
+from elasticsearch import Elasticsearch
+
+from cdm.utils.json_types import JsonObject
 from cdm.utils.metasubjects import Metasubject, MetasubjectOverTimeRow
 
 MODEL_VERSION_FIELD = "model_version"
 LATEST_SCAN_SIZE = 200
 
-METASUBJECT_MAPPINGS: dict[str, Any] = {
+METASUBJECT_MAPPINGS: dict[str, dict[str, dict[str, str | bool]]] = {
     "properties": {
         "metasubject_id": {"type": "integer"},
         "metasubject_confidence": {"type": "float"},
@@ -29,7 +31,7 @@ class MetasubjectKind(StrEnum):
 
 
 class MetasubjectRepository:
-    def __init__(self, client: Any, index: str) -> None:
+    def __init__(self, client: Elasticsearch, index: str) -> None:
         self.client = client
         self.index = index
 
@@ -62,7 +64,7 @@ class MetasubjectRepository:
         trained_at: str,
         metasubjects: Sequence[Metasubject],
         over_time: Sequence[MetasubjectOverTimeRow],
-    ) -> Iterator[dict[str, Any]]:
+    ) -> Iterator[JsonObject]:
         common = {MODEL_VERSION_FIELD: model_version, "trained_at": trained_at}
         for group in metasubjects:
             yield {

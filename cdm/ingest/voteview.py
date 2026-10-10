@@ -13,7 +13,7 @@ from collections import Counter, defaultdict
 from collections.abc import Iterator
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import ClassVar
 
 import requests
 from elasticsearch import Elasticsearch
@@ -26,6 +26,7 @@ from pydantic import (
 )
 
 from cdm.store.opensearch import bulk_upsert
+from cdm.utils.json_types import JsonObject
 
 FIRST_CONGRESS = 113
 
@@ -311,7 +312,7 @@ class RollCallDocument(BaseModel):
                 if expected is not None and expected != position:
                     self.defector_ids.append(bioguide_id)
 
-    def to_index_document(self) -> dict[str, Any]:
+    def to_index_document(self) -> JsonObject:
         return self.model_dump(mode="json")
 
 

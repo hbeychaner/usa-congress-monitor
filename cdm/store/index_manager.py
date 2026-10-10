@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from elasticsearch import NotFoundError
+from elasticsearch import Elasticsearch, NotFoundError
 
 from cdm.store.opensearch import index_name, read_alias, write_alias
 
@@ -121,7 +121,7 @@ class IndexManager:
         When ``True``, log what *would* happen but make no API calls.
     """
 
-    def __init__(self, client: Any, *, dry_run: bool = False) -> None:
+    def __init__(self, client: Elasticsearch, *, dry_run: bool = False) -> None:
         self.client = client
         self.dry_run = dry_run
         self._defs: dict[str, dict] | None = None
@@ -241,7 +241,7 @@ class IndexManager:
             wait_for_completion=True,
             refresh=True,
             requests_per_second=-1,
-        )
+        ).body
         if result.get("failures"):
             raise RuntimeError(
                 f"Reindex from {source!r} to {target!r} reported failures: "

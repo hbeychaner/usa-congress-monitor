@@ -2,5 +2,10 @@
 
 from __future__ import annotations
 
-type JsonValue = str | int | float | bool | None | list[JsonValue] | dict[str, JsonValue]
+from collections.abc import Mapping, Sequence
+
+# Covariant containers let typed lists and dicts be used wherever JSON is expected.
+type JsonValue = (
+    str | int | float | bool | None | Sequence[JsonValue] | Mapping[str, JsonValue]
+)
 type JsonObject = dict[str, JsonValue]

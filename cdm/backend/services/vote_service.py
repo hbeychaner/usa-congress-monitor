@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from elasticsearch import Elasticsearch
+
 from cdm.contracts.api import BillVotesResponse, VotePartyTotals, VoteSummary
 from cdm.store.opensearch import read_alias
 
@@ -24,7 +26,7 @@ _BILL_TYPE_TO_LEGISLATION_TYPE = {
 class VoteService:
     """Roll-call vote lookups for bills."""
 
-    def __init__(self, client: Any) -> None:
+    def __init__(self, client: Elasticsearch) -> None:
         self._client = client
 
     def for_bill(self, bill_id: str, limit: int = 100) -> BillVotesResponse:

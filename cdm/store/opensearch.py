@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any, cast
+from typing import cast
 
+from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+
+from cdm.utils.json_types import JsonObject
 
 INDEX_PREFIX = "congress"
 
@@ -91,7 +94,7 @@ _TEXT_MERGE_SCRIPT = (
 )
 
 
-def bill_text_parent_action(doc: dict, index: str) -> dict[str, Any] | None:
+def bill_text_parent_action(doc: dict, index: str) -> JsonObject | None:
     """Return the parent-bill update action for a bill-text record."""
     congress = doc.get("congress")
     bill_type = str(doc.get("type") or "").lower()
@@ -131,7 +134,7 @@ def bill_text_parent_action(doc: dict, index: str) -> dict[str, Any] | None:
 
 
 def bulk_upsert(
-    client: Any,
+    client: Elasticsearch,
     resource: str,
     docs: Iterable[dict],
     *,
@@ -210,7 +213,7 @@ def bulk_upsert(
         }
 
     success, errors = bulk(client, actions, raise_on_error=False)
-    errors = cast(list[dict[str, Any]], errors)
+    errors = cast(list[JsonObject], errors)
     result = {
         "updated": success,
         "errors": bool(errors),

@@ -6,12 +6,13 @@ import hashlib
 from collections.abc import Iterable, Iterator
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any
 
 import numpy as np
-from elasticsearch import NotFoundError
+from elasticsearch import Elasticsearch, NotFoundError
 from elasticsearch.helpers import bulk, scan
 from pydantic import BaseModel, Field
+
+from cdm.utils.json_types import JsonObject
 
 KNN_CANDIDATE_FACTOR = 10
 
@@ -52,7 +53,7 @@ class EmbeddingStore:
 
     def __init__(
         self,
-        client: Any,
+        client: Elasticsearch,
         model: str,
         *,
         index: str,
@@ -111,7 +112,7 @@ class EmbeddingStore:
         return fresh
 
     def save(self, records: Iterable[EmbeddingRecord]) -> None:
-        def actions() -> Iterator[dict[str, Any]]:
+        def actions() -> Iterator[JsonObject]:
             for record in records:
                 yield {
                     "_index": self.index,

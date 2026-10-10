@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 from cdm.store.index_manager import MAPPING_VERSION, IndexManager, load_definitions
 
 
@@ -60,7 +62,7 @@ class FakeClient:
 
     def reindex(self, **kwargs):
         self.reindexed.append(kwargs)
-        return {"created": 3, "failures": []}
+        return SimpleNamespace(body={"created": 3, "failures": []})
 
     def search(self, index, body):
         return {

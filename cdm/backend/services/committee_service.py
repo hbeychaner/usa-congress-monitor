@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from elasticsearch import Elasticsearch
+
 from cdm.contracts.api import CommitteeActivity, CommitteeBill, CommitteeDetailResponse
 from cdm.store.opensearch import read_alias
 
@@ -13,7 +15,7 @@ _SOURCE_FIELDS = ["id", "title", "congress", "origin_chamber", "committees"]
 
 
 class CommitteeService:
-    def __init__(self, client: Any) -> None:
+    def __init__(self, client: Elasticsearch) -> None:
         self.client = client
 
     def detail(

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from elasticsearch import Elasticsearch
 
 from cdm.contracts.api import SimilarBill, SimilarBillsResponse
 from cdm.store.embedding_store import EmbeddingStore
@@ -10,7 +10,7 @@ from cdm.store.opensearch import read_alias
 
 
 class SimilarBillService:
-    def __init__(self, client: Any, store: EmbeddingStore) -> None:
+    def __init__(self, client: Elasticsearch, store: EmbeddingStore) -> None:
         self.client = client
         self.store = store
 

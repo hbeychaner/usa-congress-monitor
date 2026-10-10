@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 from pydantic import AliasChoices, BaseModel, Field, HttpUrl, model_validator
 
-from cdm.data_collection.id_utils import parse_url_to_id
+from cdm.data_collection.id_utils import UrlIdParser
 from cdm.models.shared import CountUrl, EntityBase, Format
 
 logger = logging.getLogger(__name__)
@@ -1629,7 +1629,7 @@ class BoundCongressionalRecordListItem(EntityBase, RecordTypeBase):
         # unique per-section `id`.
         if not values.get("reference_id") and values.get("url"):
             try:
-                values["reference_id"] = parse_url_to_id(str(values.get("url")))
+                values["reference_id"] = UrlIdParser.parse(str(values.get("url")))
             except (TypeError, ValueError):
                 logger.exception("Failed to parse reference id from URL")
         return values

@@ -71,7 +71,7 @@ def _job_snapshot(store: JobStore, window_minutes: int) -> dict[str, Any]:
         del kind
         failure_categories[category] += count
     latest_finished = max(
-        (job["finished_at"] for job in jobs if job.get("finished_at")),
+        (finished for job in jobs if (finished := job["finished_at"])),
         default=None,
     )
     return {

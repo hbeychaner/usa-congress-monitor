@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+
+from elasticsearch import Elasticsearch
 
 from cdm.backend.services.state_service import StateService
 from cdm.contracts.api import SearchResponse, SearchResultItem
 from cdm.store.opensearch import read_alias
+from cdm.utils.json_types import JsonObject
 from cdm.utils.lemmatize import try_lemmatize_query
 
 SUPPORTED_TYPES = {"member", "state", "bill"}
@@ -15,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class SearchService:
-    def __init__(self, client: Any, states: StateService) -> None:
+    def __init__(self, client: Elasticsearch, states: StateService) -> None:
         self._client = client
         self._states = states
 
@@ -148,8 +150,8 @@ class SearchService:
         return raw_id
 
     @staticmethod
-    def _member_query(query: str, size: int) -> dict[str, Any]:
-        should: list[dict[str, Any]] = [
+    def _member_query(query: str, size: int) -> JsonObject:
+        should: list[JsonObject] = [
             {"term": {"bioguide_id": {"value": query.upper(), "boost": 6}}},
             {"term": {"state_code": {"value": query.upper(), "boost": 4}}},
             {"match_phrase_prefix": {"name": {"query": query, "boost": 4}}},
@@ -185,8 +187,8 @@ class SearchService:
         }
 
     @staticmethod
-    def _bill_query(query: str, size: int) -> dict[str, Any]:
-        should: list[dict[str, Any]] = [
+    def _bill_query(query: str, size: int) -> JsonObject:
+        should: list[JsonObject] = [
             {"term": {"id": {"value": query.lower(), "boost": 6}}},
             {"term": {"number": {"value": query, "boost": 4}}},
             {"match_phrase_prefix": {"title": {"query": query, "boost": 3}}},

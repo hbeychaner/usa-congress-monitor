@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from pydantic import BaseModel
+from cdm.utils.json_types import JsonObject
 
 
 class ParsedResponse(BaseModel):
@@ -19,5 +20,5 @@ class ParsedResponse(BaseModel):
         records: The extracted list of record mappings for downstream processing.
     """
 
-    raw: dict[str, Any]
-    records: list[dict[str, Any]]
+    raw: JsonObject
+    records: list[JsonObject]

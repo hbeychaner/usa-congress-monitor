@@ -45,7 +45,7 @@ class MemberSubjectOverlayBuilder:
             return self.client.search(
                 index=read_alias("bill"),
                 body={"size": 0, "query": {"bool": {"filter": filters}}, "aggs": aggs},
-            )
+            ).body
         except NotFoundError:
             return {}
 

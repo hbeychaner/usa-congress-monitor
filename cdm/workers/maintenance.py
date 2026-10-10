@@ -14,7 +14,7 @@ from redis import Redis
 from cdm.config.app_config import GovInfoConfig, LedgerConfig, QueueConfig
 from cdm.ingest.govinfo import GovInfoDiscovery
 from cdm.jobs.payloads import GovInfoPackagePayload
-from cdm.jobs.store import JobKind, JobRow, JobStatus, JobStore
+from cdm.jobs.store import JobKind, JobRow, JobStatus, JobStore, PrunedJob
 from cdm.utils.archive_sweeper import OrphanArchiveSweeper
 from cdm.workers.dispatch import JobDispatcher, JobSubmitter
 from cdm.workers.failures import FailureClassifier
@@ -278,7 +278,7 @@ class RetentionService:
             return False
         return True
 
-    def _delete_archives(self, pruned: list[JobRow]) -> int:
+    def _delete_archives(self, pruned: list[PrunedJob]) -> int:
         # Per-job archive directories were the resume/replay source and are no
         # longer needed once indexing is settled.
         root = self._data_root.resolve()

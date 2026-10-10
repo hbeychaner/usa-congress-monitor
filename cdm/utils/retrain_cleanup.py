@@ -6,8 +6,8 @@ import shutil
 import time
 from datetime import timedelta
 from pathlib import Path
-from typing import Any
 
+from elasticsearch import Elasticsearch
 from pydantic import BaseModel, Field
 
 from cdm.store.embedding_store import EmbeddingStore
@@ -36,7 +36,7 @@ class RetrainCleanup:
 
     def __init__(
         self,
-        client: Any,
+        client: Elasticsearch,
         analysis_index: str,
         model_dir: Path,
         keep_versions: int = KEEP_MODEL_VERSIONS,

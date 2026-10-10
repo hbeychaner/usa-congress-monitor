@@ -75,7 +75,7 @@ class GovInfoPackagePayload(JobPayload):
     measure_type: str
     package_id: str
     url: str
-    session: str | None = None
+    session: int | None = None
     version_code: str | None = None
     outdir: str
     target_index: str | None = None

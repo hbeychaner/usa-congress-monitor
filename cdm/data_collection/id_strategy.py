@@ -1,164 +1,109 @@
-"""Spec-driven id/reference population helpers.
+"""Applies an endpoint's ``id_strategy`` to a coerced model instance.
 
-This module provides a small helper that applies an endpoint's
-`id_strategy` (when present) to a coerced Pydantic model instance.
-It is intentionally conservative: it will not raise on failures and
-prefers model-level `build_id()` when available.
+Conservative by design: failures are logged and the instance is returned
+unchanged rather than raised.
 """
 
 from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
-from typing import Any
 
 from pydantic import BaseModel
 
-from cdm.data_collection.id_utils import parse_url_to_id
-from cdm.models.endpoint_spec import ReferenceSource
+from cdm.data_collection.id_utils import UrlIdParser
+from cdm.models.endpoint_spec import EndpointSpec, ReferenceSource
 
 logger = logging.getLogger(__name__)
 
+type Node = object
 
-def _resolve_path(mapping: Mapping[str, Any] | BaseModel | None, path: str):
-    """Resolve a dotted path (supports list indices) from a mapping or model."""
-    if mapping is None or not path:
-        return None
-    if isinstance(mapping, BaseModel):
-        try:
-            mapping = mapping.model_dump()
-        except (AttributeError, TypeError, ValueError):
-            try:
-                mapping = vars(mapping)
-            except TypeError:
-                mapping = {}
 
-    parts = path.split(".")
-    v = mapping
-    for part in parts:
-        if v is None:
+class IdStrategyApplier:
+    """Populates ``reference_id`` and section-qualified ``id`` on instances."""
+
+    def __init__(self, url_parser: type[UrlIdParser] = UrlIdParser) -> None:
+        self._url_parser = url_parser
+
+    @staticmethod
+    def resolve_path(
+        source: Mapping[str, object] | BaseModel | None, path: str
+    ) -> Node:
+        """Resolve a dotted path (with list indices) from a mapping or model."""
+        if source is None or not path:
             return None
-        if isinstance(v, list):
-            if part.isdigit():
-                idx = int(part)
-                if 0 <= idx < len(v):
-                    v = v[idx]
-                else:
+        node: Node = source.model_dump() if isinstance(source, BaseModel) else source
+        for part in path.split("."):
+            if isinstance(node, list):
+                index = int(part) if part.isdigit() else len(node)
+                if index >= len(node):
                     return None
+                node = node[index]
+            elif isinstance(node, Mapping):
+                node = node.get(part)
             else:
                 return None
-        elif isinstance(v, dict):
-            v = v.get(part)
-        else:
-            return None
-    return v
+        return node
 
-
-def apply_id_strategy(
-    inst: BaseModel, original: Mapping[str, Any] | None, spec
-) -> BaseModel:
-    """Apply `spec.id_strategy` to `inst` and return possibly-updated instance.
-
-    - ensures `reference_id` (model field) is populated from URL when requested
-    - ensures `id` is unique by appending section start/end when present
-
-    This function never raises; failures are logged by callers instead.
-    """
-    strategy = getattr(spec, "id_strategy", None)
-    # nothing to do
-    if not strategy:
-        return inst
-
-    # allow either the typed IdStrategy model or a plain mapping
-    if isinstance(strategy, BaseModel):
-        strat = strategy.model_dump()
-    elif isinstance(strategy, dict):
-        strat = strategy
-    else:
-        # unknown shape
-        try:
-            strat = dict(strategy)
-        except (AttributeError, TypeError, ValueError):
-            logger.exception("Failed to coerce id_strategy to dict")
+    def apply[T: BaseModel](
+        self, inst: T, original: Mapping[str, object] | None, spec: EndpointSpec
+    ) -> T:
+        """Return ``inst`` with id updates from ``spec.id_strategy`` applied."""
+        strategy = spec.id_strategy
+        if strategy is None:
             return inst
-
-    updates: dict[str, Any] = {}
-
-    # reference id
-    try:
-        if strat.get("reference_from") == ReferenceSource.URL and not getattr(
-            inst, "reference_id", None
+        updates: dict[str, str] = {}
+        url = getattr(inst, "url", None)
+        if (
+            strategy.reference_from == ReferenceSource.URL
+            and url
+            and not getattr(inst, "reference_id", None)
         ):
-            # prefer explicit reference_id field if present
-            url = getattr(inst, "url", None)
-            if url:
-                try:
-                    updates["reference_id"] = parse_url_to_id(str(url))
-                except (TypeError, ValueError):
-                    logger.exception("Failed to parse reference id from url")
-    except (AttributeError, TypeError, ValueError):
-        logger.exception("Error applying reference_from id_strategy")
-
-    # base id: try existing id or model build_id
-    base_id = None
-    try:
-        if getattr(inst, "id", None):
-            base_id = str(inst.id)
-        else:
-            builder = getattr(inst, "build_id", None)
-            if callable(builder):
-                try:
-                    base_id = builder()
-                except (AttributeError, TypeError, ValueError):
-                    try:
-                        base_id = builder(inst)
-                    except (AttributeError, TypeError, ValueError):
-                        logger.exception("Error calling build_id on instance with arg")
-                        base_id = None
-            if not base_id:
-                # fallback to reference id parsed from url when available
-                url = getattr(inst, "url", None)
-                if url:
-                    base_id = parse_url_to_id(str(url))
-    except Exception:
-        logger.exception("Error resolving base id for instance: %s", inst)
-        base_id = None
-
-    # section bounds
-    try:
-        sb_path = strat.get("section_bounds")
-        if sb_path and base_id:
-            # resolve startPage/endPage from original record first, then instance
-            target = None
-            if original:
-                target = _resolve_path(original, sb_path)
-            if target is None:
-                target = _resolve_path(inst, sb_path)
-            if isinstance(target, dict):
-                sp = target.get("startPage")
-                ep = target.get("endPage")
-                if sp is not None and ep is not None:
-                    try:
-                        new_id = f"{base_id}:{int(sp)}:{int(ep)}"
-                        updates["id"] = new_id
-                    except Exception:
-                        logger.exception(
-                            "Failed to coerce section bounds to ints: %s/%s", sp, ep
-                        )
-    except Exception:
-        logger.exception("Error applying section bounds id_strategy: %s", strat)
-
-    if updates:
-        try:
-            inst = inst.model_copy(update=updates)
-        except Exception:
-            logger.exception(
-                "Failed to model_copy with id updates, falling back to setattr"
+            try:
+                updates["reference_id"] = self._url_parser.parse(str(url))
+            except (TypeError, ValueError):
+                logger.exception("Failed to parse reference id from url")
+        base_id = self._base_id(inst, url)
+        if strategy.section_bounds and base_id:
+            section_id = self._section_id(
+                inst, original, strategy.section_bounds, base_id
             )
-            for k, v in updates.items():
-                try:
-                    setattr(inst, k, v)
-                except (AttributeError, TypeError, ValueError):
-                    logger.exception("Failed to setattr %s on instance", k)
+            if section_id:
+                updates["id"] = section_id
+        return inst.model_copy(update=updates) if updates else inst
 
-    return inst
+    def _base_id(self, inst: BaseModel, url: object) -> str | None:
+        existing = getattr(inst, "id", None)
+        if existing:
+            return str(existing)
+        builder = getattr(inst, "build_id", None)
+        if callable(builder):
+            try:
+                built = builder()
+            except (AttributeError, TypeError, ValueError):
+                logger.exception("Error calling build_id on instance")
+                built = None
+            if built:
+                return str(built)
+        return self._url_parser.parse(str(url)) if url else None
+
+    def _section_id(
+        self,
+        inst: BaseModel,
+        original: Mapping[str, object] | None,
+        path: str,
+        base_id: str,
+    ) -> str | None:
+        target = self.resolve_path(original, path) if original else None
+        if target is None:
+            target = self.resolve_path(inst, path)
+        if not isinstance(target, Mapping):
+            return None
+        start, end = target.get("startPage"), target.get("endPage")
+        if start is None or end is None:
+            return None
+        try:
+            return f"{base_id}:{int(str(start))}:{int(str(end))}"
+        except (TypeError, ValueError):
+            logger.exception("Failed to coerce section bounds: %s/%s", start, end)
+            return None

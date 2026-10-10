@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 
-from cdm.data_collection.id_utils import parse_url_to_id
+from cdm.data_collection.id_utils import UrlIdParser
 from cdm.store.index_manager import lemma_field_paths
 from cdm.store.opensearch import resource_target
 from cdm.utils.lemmatize import lemmatize_texts
@@ -87,7 +87,7 @@ def to_document(
     if not doc.get("id"):
         if not doc.get("url"):
             raise ValueError(f"Cannot index {resource} record without id or url")
-        doc["id"] = parse_url_to_id(str(doc["url"]))
+        doc["id"] = UrlIdParser.parse(str(doc["url"]))
 
     reference_id = doc.get("reference_id") or doc.get("referenceId")
     doc.pop("referenceId", None)

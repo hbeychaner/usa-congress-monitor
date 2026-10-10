@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Any
 
+from elasticsearch import Elasticsearch
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
@@ -52,7 +52,7 @@ class Container:
         self.config = config
 
     @cached_property
-    def elastic_client(self) -> Any:
+    def elastic_client(self) -> Elasticsearch:
         return ElasticClientFactory(self.config.elastic).create()
 
     @cached_property

@@ -7,8 +7,8 @@ import re
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
+from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from pydantic import BaseModel
 
@@ -19,6 +19,7 @@ from cdm.ingest.govinfo import (
     GovInfoParseError,
 )
 from cdm.store.opensearch import write_alias
+from cdm.utils.json_types import JsonObject
 
 _FILE_NAME = re.compile(r"^BILLSTATUS-(?P<congress>\d+)(?P<type>[A-Za-z]+)\d+$")
 _REPLACE_COMMITTEES = "ctx._source.committees = params.committees"
@@ -40,7 +41,7 @@ class CommitteeUpdate:
     """The replacement committees list for one bill document."""
 
     bill_id: str
-    committees: list[dict[str, Any]]
+    committees: list[JsonObject]
 
 
 class BillStatusFiles:
@@ -66,7 +67,7 @@ class CommitteeActivityBackfill:
     """Replace each indexed bill's committees with the freshly parsed XML version."""
 
     def __init__(
-        self, client: Any, parser: GovInfoBillStatusParser, config: GovInfoConfig
+        self, client: Elasticsearch, parser: GovInfoBillStatusParser, config: GovInfoConfig
     ) -> None:
         self.client = client
         self.parser = parser
@@ -74,7 +75,7 @@ class CommitteeActivityBackfill:
 
     def run(self, files: Iterator[Path], limit: int | None = None) -> BackfillReport:
         report = BackfillReport()
-        pending: list[dict[str, Any]] = []
+        pending: list[JsonObject] = []
         for path in files:
             if limit is not None and report.files >= limit:
                 break
@@ -111,7 +112,7 @@ class CommitteeActivityBackfill:
             return None
         return CommitteeUpdate(bill_id=record["id"], committees=committees)
 
-    def _action(self, update: CommitteeUpdate) -> dict[str, Any]:
+    def _action(self, update: CommitteeUpdate) -> JsonObject:
         return {
             "_op_type": "update",
             "_index": write_alias("bill"),
@@ -123,7 +124,7 @@ class CommitteeActivityBackfill:
             },
         }
 
-    def _flush(self, pending: list[dict[str, Any]], report: BackfillReport) -> None:
+    def _flush(self, pending: list[JsonObject], report: BackfillReport) -> None:
         if not pending:
             return
         client = self.client.options(

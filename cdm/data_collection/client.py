@@ -18,7 +18,7 @@ import requests
 from pydantic import BaseModel, ValidationError
 
 from cdm.config import get_config
-from cdm.data_collection.id_strategy import apply_id_strategy
+from cdm.data_collection.id_strategy import IdStrategyApplier
 from cdm.models.endpoint_spec import EndpointSpec
 from cdm.utils.logger import get_logger
 from cdm.utils.rate_limiter import TokenBucket
@@ -90,6 +90,7 @@ class CDGClient:
         raise_on_error: bool = True,
         added_headers: dict[str, str] | None = None,
         rate_limiter: TokenBucket | None = None,
+        id_strategy: IdStrategyApplier | None = None,
     ) -> None:
         """Initialize the CDGClient.
 
@@ -107,6 +108,7 @@ class CDGClient:
                 preserving this client's previous standalone behavior.
         """
         self.base_url = urljoin(ROOT_URL, api_version) + "/"
+        self._id_strategy = id_strategy or IdStrategyApplier()
         self._session = requests.Session()
         self._session.headers.update({"User-Agent": "congress-tracker/1.0"})
         self._session.params = {"format": response_format}
@@ -551,7 +553,7 @@ class CDGClient:
             # Apply spec-driven id/reference strategy if available
             try:
                 if spec is not None:
-                    inst = apply_id_strategy(inst, r, spec)
+                    inst = self._id_strategy.apply(inst, r, spec)
             except (AttributeError, KeyError, TypeError, ValueError):
                 # Be conservative: do not fail coercion when strategy fails
                 logger.debug("id_strategy application failed for %s", model_cls)

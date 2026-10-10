@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any
 
+from elasticsearch import Elasticsearch
+
 from cdm.contracts.api import (
     ChamberTimeline,
     CongressGroup,
@@ -70,7 +72,7 @@ _STATE_CODES = {
 
 
 class StateService:
-    def __init__(self, client: Any) -> None:
+    def __init__(self, client: Elasticsearch) -> None:
         self._client = client
         self._districts: dict[str, dict[str, Any]] = {}
 
