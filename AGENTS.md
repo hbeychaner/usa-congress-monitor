@@ -11,6 +11,8 @@
 - One-line comments only, and only for what the code cannot show.
 - No lazy imports, and centralized configuration when contants are needed. If a constant is added or already exists in a python file and it's read as part of another task, move to a configuration class or object. 
 - Prefer dependency injection anywhere possible instead of procedural code that passes parameters through multiple levels of functional depth.
+- Never commit work that still has pydantic warnings or issues. Always scan for pydantic and ruff issues, and fix before committing. 
+- Update the CHANGELOG, README, and other documentation if that documentation is committed to the repository before every commit. 
 
 ## Configuration and dependency injection
 
