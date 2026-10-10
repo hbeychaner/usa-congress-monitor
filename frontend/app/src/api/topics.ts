@@ -92,6 +92,22 @@ export type MetasubjectTrendsResponse = {
   model_version: string | null;
 };
 
+export type RelatedMetasubject = {
+  metasubject_id: number;
+  name: string;
+  similarity: number;
+};
+
+export type MetasubjectDetailResponse = {
+  metasubject: MetasubjectSummary;
+  related: RelatedMetasubject[];
+  model_version: string | null;
+};
+
+export function fetchMetasubject(metasubjectId: number): Promise<MetasubjectDetailResponse> {
+  return apiGet<MetasubjectDetailResponse>(`/api/v1/topics/metasubjects/${metasubjectId}`);
+}
+
 export function fetchMetasubjectTrends(): Promise<MetasubjectTrendsResponse> {
   return apiGet<MetasubjectTrendsResponse>('/api/v1/topics/metasubjects/trends');
 }

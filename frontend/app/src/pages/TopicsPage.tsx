@@ -14,10 +14,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchPolicyAreaTrends, fetchSubjects } from '../api/subjects';
 import type { PolicyAreaTrendsResponse, SubjectsResponse } from '../api/subjects';
-import { fetchMetasubjectTrends, fetchTopicTrends, fetchTopics } from '../api/topics';
+import { fetchMetasubject, fetchMetasubjectTrends, fetchTopicTrends, fetchTopics } from '../api/topics';
 import type {
   MetasubjectTrendSeries,
   MetasubjectTrendsResponse,
+  RelatedMetasubject,
   TopicSummary,
   TopicTrendSeries,
   TopicTrendsResponse,
@@ -185,6 +186,7 @@ export function TopicsPage() {
   const [groupTrends, setGroupTrends] = useState<MetasubjectTrendsResponse | null>(null);
   const [groupView, setGroupView] = useState<GroupView>('count');
   const [groupFilter, setGroupFilter] = useState<number | null>(null);
+  const [related, setRelated] = useState<RelatedMetasubject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -201,6 +203,14 @@ export function TopicsPage() {
     fetchPolicyAreaTrends(10).then(setPolicyTrends).catch(() => setPolicyTrends(null));
     fetchMetasubjectTrends().then(setGroupTrends).catch(() => setGroupTrends(null));
   }, []);
+
+  useEffect(() => {
+    if (groupFilter === null) {
+      setRelated([]);
+      return;
+    }
+    fetchMetasubject(groupFilter).then((detail) => setRelated(detail.related)).catch(() => setRelated([]));
+  }, [groupFilter]);
 
   const topics = useMemo(() => data?.topics ?? [], [data]);
   const totalAssigned = useMemo(
@@ -349,6 +359,22 @@ export function TopicsPage() {
                 <Badge size="2" variant="soft" style={{ cursor: 'pointer' }} onClick={() => setGroupFilter(null)}>
                   {activeGroup.label} ✕
                 </Badge>
+              ) : null}
+              {activeGroup && related.length > 0 ? (
+                <Flex gap="2" align="center" wrap="wrap">
+                  <Text size="2" color="gray">Related:</Text>
+                  {related.map((item) => (
+                    <Badge
+                      key={item.metasubject_id}
+                      size="1"
+                      variant="outline"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setGroupFilter(item.metasubject_id)}
+                    >
+                      {item.name} ({Math.round(item.similarity * 100)}%)
+                    </Badge>
+                  ))}
+                </Flex>
               ) : null}
               <Flex gap="2" align="center">
                 <TextField.Root

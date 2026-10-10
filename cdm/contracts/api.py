@@ -132,6 +132,12 @@ class MetasubjectSummary(BaseModel):
     topic_ids: list[int] = Field(default_factory=list)
 
 
+class RelatedMetasubject(BaseModel):
+    metasubject_id: int
+    name: str
+    similarity: float
+
+
 class MetasubjectsResponse(BaseModel):
     metasubjects: list[MetasubjectSummary]
     model_version: str | None = None
@@ -150,6 +156,7 @@ class MetasubjectTrendsResponse(BaseModel):
 
 class MetasubjectDetailResponse(BaseModel):
     metasubject: MetasubjectSummary
+    related: list[RelatedMetasubject] = Field(default_factory=list)
     topics: list[TopicSummary] = Field(default_factory=list)
     trend: list[TopicTrendPoint] = Field(default_factory=list)
     model_version: str | None = None

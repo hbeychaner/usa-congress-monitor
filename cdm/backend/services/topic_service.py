@@ -10,6 +10,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from typing import Any
 
+import numpy as np
 from elasticsearch import Elasticsearch, NotFoundError
 
 from cdm.backend.services.subject_service import SubjectService
@@ -22,6 +23,7 @@ from cdm.contracts.api import (
     MetasubjectSummary,
     MetasubjectTrendSeries,
     MetasubjectTrendsResponse,
+    RelatedMetasubject,
     TopicAssignmentItem,
     TopicBill,
     TopicDetailResponse,
@@ -41,6 +43,7 @@ _METASUBJECT_KIND = "metasubject"
 _METASUBJECT_TREND_KIND = "metasubject_over_time"
 _METASUBJECT_LIMIT = 100
 _METASUBJECT_TREND_LIMIT = 10000
+_RELATED_METASUBJECT_LIMIT = 5
 
 
 def topic_label(name: str | None, topic_id: int) -> str:
@@ -62,18 +65,22 @@ def _quarter(date: str) -> str:
 
 
 class TopicService:
-    def __init__(self, client: Elasticsearch, analysis_index: str, subjects: SubjectService) -> None:
+    def __init__(
+        self, client: Elasticsearch, analysis_index: str, subjects: SubjectService
+    ) -> None:
         self._client = client
         self._index = analysis_index
         self._subjects = subjects
 
     def latest_model_version(self) -> tuple[str | None, str | None]:
-        response = self._search({
-            "size": 1,
-            "query": {"term": {"kind": "topic"}},
-            "sort": [{"trained_at": {"order": "desc"}}],
-            "_source": ["model_version", "trained_at"],
-        })
+        response = self._search(
+            {
+                "size": 1,
+                "query": {"term": {"kind": "topic"}},
+                "sort": [{"trained_at": {"order": "desc"}}],
+                "_source": ["model_version", "trained_at"],
+            }
+        )
         hits = self._hits(response)
         if not hits:
             return None, None
@@ -81,17 +88,19 @@ class TopicService:
         return source.get("model_version"), source.get("trained_at")
 
     def topic_summaries(self, model_version: str) -> dict[int, TopicSummary]:
-        response = self._search({
-            "size": 1000,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "topic"}},
-                        {"term": {"model_version": model_version}},
-                    ]
-                }
-            },
-        })
+        response = self._search(
+            {
+                "size": 1000,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": "topic"}},
+                            {"term": {"model_version": model_version}},
+                        ]
+                    }
+                },
+            }
+        )
         summaries: dict[int, TopicSummary] = {}
         for hit in self._hits(response):
             source = hit.get("_source", {})
@@ -120,19 +129,21 @@ class TopicService:
         pairs: list[tuple[str, int]] = []
         for start in range(0, len(bill_ids), _TERMS_CHUNK):
             chunk = bill_ids[start : start + _TERMS_CHUNK]
-            response = self._search({
-                "size": len(chunk),
-                "query": {
-                    "bool": {
-                        "filter": [
-                            {"term": {"kind": "assignment"}},
-                            {"term": {"model_version": model_version}},
-                            {"terms": {"doc_id": chunk}},
-                        ]
-                    }
-                },
-                "_source": ["doc_id", "topic_id"],
-            })
+            response = self._search(
+                {
+                    "size": len(chunk),
+                    "query": {
+                        "bool": {
+                            "filter": [
+                                {"term": {"kind": "assignment"}},
+                                {"term": {"model_version": model_version}},
+                                {"terms": {"doc_id": chunk}},
+                            ]
+                        }
+                    },
+                    "_source": ["doc_id", "topic_id"],
+                }
+            )
             for hit in self._hits(response):
                 source = hit.get("_source", {})
                 topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
@@ -147,20 +158,22 @@ class TopicService:
         pairs: list[tuple[str, int]] = []
         for start in range(0, len(bill_ids), _TERMS_CHUNK):
             chunk = bill_ids[start : start + _TERMS_CHUNK]
-            response = self._search({
-                "size": len(chunk),
-                "query": {
-                    "bool": {
-                        "filter": [
-                            {"term": {"kind": "assignment"}},
-                            {"term": {"model_version": model_version}},
-                            {"terms": {"doc_id": chunk}},
-                            {"exists": {"field": "metasubject_id"}},
-                        ]
-                    }
-                },
-                "_source": ["doc_id", "metasubject_id"],
-            })
+            response = self._search(
+                {
+                    "size": len(chunk),
+                    "query": {
+                        "bool": {
+                            "filter": [
+                                {"term": {"kind": "assignment"}},
+                                {"term": {"model_version": model_version}},
+                                {"terms": {"doc_id": chunk}},
+                                {"exists": {"field": "metasubject_id"}},
+                            ]
+                        }
+                    },
+                    "_source": ["doc_id", "metasubject_id"],
+                }
+            )
             for hit in self._hits(response):
                 source = hit.get("_source", {})
                 if source.get("doc_id") and source.get("metasubject_id") is not None:
@@ -212,8 +225,59 @@ class TopicService:
             metasubject_id, []
         )
         return MetasubjectDetailResponse(
-            metasubject=group, topics=topics, trend=trend, model_version=model_version
+            metasubject=group,
+            related=self.related_metasubjects(model_version, metasubject_id),
+            topics=topics,
+            trend=trend,
+            model_version=model_version,
         )
+
+    def related_metasubjects(
+        self, model_version: str, metasubject_id: int
+    ) -> list[RelatedMetasubject]:
+        """Other metasubjects ranked by cosine similarity of their centroids."""
+        response = self._search(
+            {
+                "size": _METASUBJECT_LIMIT,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": _METASUBJECT_KIND}},
+                            {"term": {"model_version": model_version}},
+                        ]
+                    }
+                },
+                "_source": ["metasubject_id", "name", "centroid"],
+            }
+        )
+        sources = [hit.get("_source", {}) for hit in self._hits(response)]
+        centroids = {
+            int(source["metasubject_id"]): np.asarray(
+                source["centroid"], dtype=np.float64
+            )
+            for source in sources
+            if source.get("centroid")
+        }
+        target = centroids.get(metasubject_id)
+        if target is None:
+            return []
+        names = {
+            int(source["metasubject_id"]): str(source.get("name") or "")
+            for source in sources
+        }
+        related = [
+            RelatedMetasubject(
+                metasubject_id=other_id,
+                name=names[other_id],
+                similarity=float(
+                    target @ vector / (np.linalg.norm(target) * np.linalg.norm(vector))
+                ),
+            )
+            for other_id, vector in centroids.items()
+            if other_id != metasubject_id
+        ]
+        related.sort(key=lambda item: item.similarity, reverse=True)
+        return related[:_RELATED_METASUBJECT_LIMIT]
 
     def list_topics(self) -> TopicsResponse:
         """All topics from the latest trained model, largest first."""
@@ -246,19 +310,21 @@ class TopicService:
             reverse=True,
         )[:size]
         top_ids = [topic.topic_id for topic in top]
-        response = self._search({
-            "size": 10000,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "topic_over_time"}},
-                        {"term": {"model_version": model_version}},
-                        {"terms": {"topic_id": top_ids}},
-                    ]
-                }
-            },
-            "sort": [{"timestamp": {"order": "asc"}}],
-        })
+        response = self._search(
+            {
+                "size": 10000,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": "topic_over_time"}},
+                            {"term": {"model_version": model_version}},
+                            {"terms": {"topic_id": top_ids}},
+                        ]
+                    }
+                },
+                "sort": [{"timestamp": {"order": "asc"}}],
+            }
+        )
         points: dict[int, list[TopicTrendPoint]] = defaultdict(list)
         for hit in self._hits(response):
             source = hit.get("_source", {})
@@ -292,19 +358,21 @@ class TopicService:
         if topic is None:
             return None
 
-        trend_response = self._search({
-            "size": 500,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "topic_over_time"}},
-                        {"term": {"model_version": model_version}},
-                        {"term": {"topic_id": topic_id}},
-                    ]
-                }
-            },
-            "sort": [{"timestamp": {"order": "asc"}}],
-        })
+        trend_response = self._search(
+            {
+                "size": 500,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": "topic_over_time"}},
+                            {"term": {"model_version": model_version}},
+                            {"term": {"topic_id": topic_id}},
+                        ]
+                    }
+                },
+                "sort": [{"timestamp": {"order": "asc"}}],
+            }
+        )
         trend = [
             TopicTrendPoint(
                 timestamp=str(source.get("timestamp")),
@@ -315,20 +383,22 @@ class TopicService:
             if (source := hit.get("_source", {})).get("timestamp")
         ]
 
-        assignment_response = self._search({
-            "size": top_bills,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "assignment"}},
-                        {"term": {"model_version": model_version}},
-                        {"term": {"topic_id": topic_id}},
-                    ]
-                }
-            },
-            "sort": [{"probability": {"order": "desc"}}],
-            "_source": ["doc_id", "probability"],
-        })
+        assignment_response = self._search(
+            {
+                "size": top_bills,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": "assignment"}},
+                            {"term": {"model_version": model_version}},
+                            {"term": {"topic_id": topic_id}},
+                        ]
+                    }
+                },
+                "sort": [{"probability": {"order": "desc"}}],
+                "_source": ["doc_id", "probability"],
+            }
+        )
         assignments = [
             (str(source.get("doc_id")), float(source.get("probability") or 0.0))
             for hit in self._hits(assignment_response)
@@ -348,19 +418,21 @@ class TopicService:
         model_version, _ = self.latest_model_version()
         if not model_version:
             return BillTopicsResponse(bill_id=bill_id)
-        response = self._search({
-            "size": 10,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": "assignment"}},
-                        {"term": {"model_version": model_version}},
-                        {"term": {"doc_id": bill_id}},
-                    ]
-                }
-            },
-            "sort": [{"probability": {"order": "desc"}}],
-        })
+        response = self._search(
+            {
+                "size": 10,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": "assignment"}},
+                            {"term": {"model_version": model_version}},
+                            {"term": {"doc_id": bill_id}},
+                        ]
+                    }
+                },
+                "sort": [{"probability": {"order": "desc"}}],
+            }
+        )
         summaries = self.topic_summaries(model_version)
         topics = []
         for hit in self._hits(response):
@@ -452,19 +524,23 @@ class TopicService:
             return []
         return response.get("hits", {}).get("hits", [])
 
-    def metasubject_summaries(self, model_version: str) -> dict[int, MetasubjectSummary]:
-        response = self._search({
-            "size": _METASUBJECT_LIMIT,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"term": {"kind": _METASUBJECT_KIND}},
-                        {"term": {"model_version": model_version}},
-                    ]
-                }
-            },
-            "_source": ["metasubject_id", "name", "size", "top_words", "topic_ids"],
-        })
+    def metasubject_summaries(
+        self, model_version: str
+    ) -> dict[int, MetasubjectSummary]:
+        response = self._search(
+            {
+                "size": _METASUBJECT_LIMIT,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": _METASUBJECT_KIND}},
+                            {"term": {"model_version": model_version}},
+                        ]
+                    }
+                },
+                "_source": ["metasubject_id", "name", "size", "top_words", "topic_ids"],
+            }
+        )
         summaries = [
             MetasubjectSummary.model_validate(hit.get("_source", {}))
             for hit in self._hits(response)
@@ -481,11 +557,13 @@ class TopicService:
         ]
         if metasubject_ids is not None:
             filters.append({"terms": {"metasubject_id": metasubject_ids}})
-        response = self._search({
-            "size": _METASUBJECT_TREND_LIMIT,
-            "query": {"bool": {"filter": filters}},
-            "sort": [{"timestamp": {"order": "asc"}}],
-        })
+        response = self._search(
+            {
+                "size": _METASUBJECT_TREND_LIMIT,
+                "query": {"bool": {"filter": filters}},
+                "sort": [{"timestamp": {"order": "asc"}}],
+            }
+        )
         points: dict[int, list[TopicTrendPoint]] = defaultdict(list)
         for hit in self._hits(response):
             source = hit.get("_source", {})
@@ -528,8 +606,16 @@ class TopicService:
                                 {
                                     "bool": {
                                         "should": [
-                                            {"term": {"sponsor_bioguide_ids": bioguide_id}},
-                                            {"term": {"cosponsor_bioguide_ids": bioguide_id}},
+                                            {
+                                                "term": {
+                                                    "sponsor_bioguide_ids": bioguide_id
+                                                }
+                                            },
+                                            {
+                                                "term": {
+                                                    "cosponsor_bioguide_ids": bioguide_id
+                                                }
+                                            },
                                         ],
                                         "minimum_should_match": 1,
                                     }

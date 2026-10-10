@@ -1194,6 +1194,8 @@ export interface components {
         /** MetasubjectDetailResponse */
         MetasubjectDetailResponse: {
             metasubject: components["schemas"]["MetasubjectSummary"];
+            /** Related */
+            related?: components["schemas"]["RelatedMetasubject"][];
             /** Topics */
             topics?: components["schemas"]["TopicSummary"][];
             /** Trend */
@@ -1294,6 +1296,15 @@ export interface components {
              * @default 0
              */
             total_bills: number;
+        };
+        /** RelatedMetasubject */
+        RelatedMetasubject: {
+            /** Metasubject Id */
+            metasubject_id: number;
+            /** Name */
+            name: string;
+            /** Similarity */
+            similarity: number;
         };
         /** SearchResponse */
         SearchResponse: {
