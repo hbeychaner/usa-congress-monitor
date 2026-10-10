@@ -31,7 +31,7 @@ from cdm.store.client import ElasticClientFactory
 from cdm.store.embedding_store import EmbeddingStore
 from cdm.store.metasubject_override_store import MetasubjectOverrideStore
 from cdm.store.metasubject_repository import MetasubjectRepository
-from cdm.utils.metasubject_namer import OllamaMetasubjectNamer
+from cdm.utils.metasubject_namer import OllamaMetasubjectNamer, OllamaNameDisambiguator
 from cdm.utils.metasubjects import (
     LargestTopicNamer,
     Metasubject,
@@ -39,6 +39,7 @@ from cdm.utils.metasubjects import (
     MetasubjectBuilder,
     MetasubjectNamer,
     MetasubjectOverrides,
+    NameDisambiguator,
     StableIdMatcher,
 )
 from cdm.utils.ollama_client import OllamaClient
@@ -92,8 +93,14 @@ class Container:
             return OllamaMetasubjectNamer(self.ollama_client)
         return LargestTopicNamer()
 
+    def metasubject_disambiguator(self, *, use_llm: bool) -> NameDisambiguator | None:
+        return OllamaNameDisambiguator(self.ollama_client) if use_llm else None
+
     def metasubject_builder(
-        self, namer: MetasubjectNamer, overrides: MetasubjectOverrides | None = None
+        self,
+        namer: MetasubjectNamer,
+        overrides: MetasubjectOverrides | None = None,
+        disambiguator: NameDisambiguator | None = None,
     ) -> MetasubjectBuilder:
         settings = self.config.metasubject
         return MetasubjectBuilder(
@@ -101,6 +108,7 @@ class Container:
             StableIdMatcher(settings.metasubject_match_min_similarity),
             settings.metasubject_target_groups,
             overrides,
+            disambiguator,
         )
 
     def metasubject_assigner(

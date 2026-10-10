@@ -112,7 +112,7 @@ class MetasubjectConfig(_Section):
     # A retrained group keeps its id when its centroid is at least this similar.
     metasubject_match_min_similarity: float = 0.85
     # Bills below this similarity to their centroid are flagged low confidence.
-    metasubject_low_confidence_similarity: float = 0.35
+    metasubject_low_confidence_similarity: float = 0.5
 
 
 class ApiConfig(_Section):

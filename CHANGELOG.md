@@ -4,6 +4,8 @@
 
 ### Added
 
+- Metasubject builder resolves duplicate names after naming: the largest group (or any override-pinned group) keeps the name and the rest are renamed by a second Ollama pass that sees example topics from every colliding group, with a deterministic fallback.
+
 - Member graph metasubject overlay: `include_metasubjects` / `metasubjects_per_member` on `/graph/neighborhood` return each member's dominant metasubjects (from sponsored-bill assignments), with a "Show metasubjects" toggle and detail panels on the graph page.
 - `SponsoredBillReader` shares the sponsored-bill lookup between the topic and metasubject overlay builders (constructor-injected).
 

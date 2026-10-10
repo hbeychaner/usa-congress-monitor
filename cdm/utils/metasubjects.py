@@ -50,6 +50,24 @@ class MetasubjectNamer(Protocol):
     def name(self, members: Sequence[TopicVector]) -> str: ...
 
 
+class NamedGroup(BaseModel):
+    """A named group with the topics that define it, for name disambiguation."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    metasubject_id: int
+    name: str
+    members: list[TopicVector]
+
+
+class NameDisambiguator(Protocol):
+    def rename(
+        self, colliding: Sequence[NamedGroup], taken: set[str]
+    ) -> dict[int, str]:
+        """New names for *colliding* groups that share a name, avoiding *taken*."""
+        ...
+
+
 class MetasubjectOverrides(BaseModel):
     """Hand-curated names that win over generated and carried-over ones."""
 
@@ -112,7 +130,9 @@ class MetasubjectBuilder:
         matcher: StableIdMatcher,
         target_groups: int,
         overrides: MetasubjectOverrides | None = None,
+        disambiguator: NameDisambiguator | None = None,
     ) -> None:
+        self.disambiguator = disambiguator
         self.namer = namer
         self.matcher = matcher
         self.target_groups = target_groups
@@ -148,12 +168,14 @@ class MetasubjectBuilder:
         matches = self.matcher.match(centroids, previous)
         next_id = max((p.metasubject_id for p in previous), default=0) + 1
         results: list[Metasubject] = []
+        members_of: dict[int, list[TopicVector]] = {}
         for members, centroid, match in zip(groups, centroids, matches):
             if match is None:
                 metasubject_id, name = next_id, self.namer.name(members)
                 next_id += 1
             else:
                 metasubject_id, name = match.metasubject_id, match.name
+            members_of[metasubject_id] = list(members)
             ranked = sorted(members, key=lambda topic: topic.size, reverse=True)
             name = self.overrides.names.get(metasubject_id, name)
             words = dedupe_terms(word for topic in ranked for word in topic.top_words)
@@ -167,7 +189,39 @@ class MetasubjectBuilder:
                     centroid=centroid.tolist(),
                 )
             )
+        self._resolve_duplicates(results, members_of)
         return sorted(results, key=lambda group: group.size, reverse=True)
+
+    def _resolve_duplicates(
+        self, results: list[Metasubject], members_of: dict[int, list[TopicVector]]
+    ) -> None:
+        """Rename groups that share a name; hand-set override names stay fixed."""
+        if self.disambiguator is None:
+            return
+        by_name: dict[str, list[Metasubject]] = defaultdict(list)
+        for group in results:
+            by_name[group.name.casefold()].append(group)
+        for same in by_name.values():
+            if len(same) < 2:
+                continue
+            pinned = [g for g in same if g.metasubject_id in self.overrides.names]
+            movable = [g for g in same if g not in pinned]
+            if not pinned:
+                movable = sorted(same, key=lambda g: g.size, reverse=True)[1:]
+            taken = {g.name.casefold() for g in results if g not in movable}
+            renamed = self.disambiguator.rename(
+                [
+                    NamedGroup(
+                        metasubject_id=g.metasubject_id,
+                        name=g.name,
+                        members=members_of[g.metasubject_id],
+                    )
+                    for g in movable
+                ],
+                taken,
+            )
+            for group in movable:
+                group.name = renamed.get(group.metasubject_id, group.name)
 
 
 def topic_to_metasubject(metasubjects: Sequence[Metasubject]) -> dict[int, int]:

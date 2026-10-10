@@ -274,7 +274,9 @@ def run(args: argparse.Namespace, report) -> None:
     previous = repository.latest() if client.indices.exists(index=analysis_index) else []
     namer = container.metasubject_namer(use_llm=not args.no_llm_labels)
     metasubjects = container.metasubject_builder(
-        namer, container.metasubject_override_store.current()
+        namer,
+        container.metasubject_override_store.current(),
+        container.metasubject_disambiguator(use_llm=not args.no_llm_labels),
     ).build(modeler.topic_vectors(summaries), previous)
     topic_groups = topic_to_metasubject(metasubjects)
     for topic in summaries:
