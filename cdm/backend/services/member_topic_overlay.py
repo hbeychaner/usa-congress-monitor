@@ -4,14 +4,10 @@ from __future__ import annotations
 
 from collections import Counter
 
-from elasticsearch import Elasticsearch, NotFoundError
-from elasticsearch.helpers import scan
-
+from cdm.backend.services.sponsored_bills import SponsoredBillReader
 from cdm.backend.services.topic_service import TopicService
 from cdm.contracts.api import GraphTopicLink, GraphTopicNode
-from cdm.store.opensearch import read_alias
 
-SPONSOR_FIELD = "sponsor_bioguide_ids"
 MIN_BILLS = 2
 
 
@@ -22,36 +18,15 @@ class TopicOverlay:
 
 
 class MemberTopicOverlayBuilder:
-    def __init__(self, client: Elasticsearch, topics: TopicService) -> None:
-        self.client = client
+    def __init__(self, bills: SponsoredBillReader, topics: TopicService) -> None:
+        self.bills = bills
         self.topics = topics
-
-    def _sponsored_bills(self, member_ids: list[str], congress: int | None) -> dict[str, list[str]]:
-        filters: list[dict[str, object]] = [
-            {"term": {"source_type": "bill"}},
-            {"terms": {SPONSOR_FIELD: member_ids}},
-        ]
-        if congress:
-            filters.append({"term": {"congress": congress}})
-        bills: dict[str, list[str]] = {}
-        try:
-            for hit in scan(
-                self.client,
-                index=read_alias("bill"),
-                query={"query": {"bool": {"filter": filters}}, "_source": [SPONSOR_FIELD]},
-            ):
-                for sponsor in hit["_source"].get(SPONSOR_FIELD) or []:
-                    if sponsor in member_ids:
-                        bills.setdefault(sponsor, []).append(hit["_id"])
-        except NotFoundError:
-            return {}
-        return bills
 
     def build(self, member_ids: list[str], congress: int | None, per_member: int) -> TopicOverlay:
         version, _ = self.topics.latest_model_version()
         if not version or not member_ids:
             return TopicOverlay([], [])
-        bills = self._sponsored_bills(member_ids, congress)
+        bills = self.bills.by_member(member_ids, congress)
         all_bills = sorted({bill for ids in bills.values() for bill in ids})
         topic_of = dict(self.topics.member_assignments(all_bills, version))
         links: list[GraphTopicLink] = []

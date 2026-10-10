@@ -545,6 +545,18 @@ class GraphSubjectLink(BaseModel):
     bills: int
 
 
+class GraphMetasubjectNode(BaseModel):
+    metasubject_id: int
+    name: str
+
+
+class GraphMetasubjectLink(BaseModel):
+    member: str
+    metasubject_id: int
+    share: float
+    bills: int
+
+
 class NeighborhoodResponse(BaseModel):
     seeds: list[str]
     congress: int | None = None
@@ -555,3 +567,5 @@ class NeighborhoodResponse(BaseModel):
     topic_links: list[GraphTopicLink] = Field(default_factory=list)
     subject_nodes: list[GraphSubjectNode] = Field(default_factory=list)
     subject_links: list[GraphSubjectLink] = Field(default_factory=list)
+    metasubject_nodes: list[GraphMetasubjectNode] = Field(default_factory=list)
+    metasubject_links: list[GraphMetasubjectLink] = Field(default_factory=list)

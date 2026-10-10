@@ -140,13 +140,40 @@ class TopicService:
                     pairs.append((str(source["doc_id"]), topic_id))
         return pairs
 
+    def member_metasubject_assignments(
+        self, bill_ids: list[str], model_version: str
+    ) -> list[tuple[str, int]]:
+        """(bill_id, metasubject_id) pairs, including outlier bills, under *model_version*."""
+        pairs: list[tuple[str, int]] = []
+        for start in range(0, len(bill_ids), _TERMS_CHUNK):
+            chunk = bill_ids[start : start + _TERMS_CHUNK]
+            response = self._search({
+                "size": len(chunk),
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": "assignment"}},
+                            {"term": {"model_version": model_version}},
+                            {"terms": {"doc_id": chunk}},
+                            {"exists": {"field": "metasubject_id"}},
+                        ]
+                    }
+                },
+                "_source": ["doc_id", "metasubject_id"],
+            })
+            for hit in self._hits(response):
+                source = hit.get("_source", {})
+                if source.get("doc_id") and source.get("metasubject_id") is not None:
+                    pairs.append((str(source["doc_id"]), int(source["metasubject_id"])))
+        return pairs
+
     def list_metasubjects(self) -> MetasubjectsResponse:
         """Metasubjects of the latest trained model, largest first."""
         model_version, _ = self.latest_model_version()
         if not model_version:
             return MetasubjectsResponse(metasubjects=[])
         return MetasubjectsResponse(
-            metasubjects=list(self._metasubject_summaries(model_version).values()),
+            metasubjects=list(self.metasubject_summaries(model_version).values()),
             model_version=model_version,
         )
 
@@ -162,7 +189,7 @@ class TopicService:
                 label=group.name,
                 points=points[group.metasubject_id],
             )
-            for group in self._metasubject_summaries(model_version).values()
+            for group in self.metasubject_summaries(model_version).values()
             if points.get(group.metasubject_id)
         ]
         return MetasubjectTrendsResponse(series=series, model_version=model_version)
@@ -172,7 +199,7 @@ class TopicService:
         model_version, _ = self.latest_model_version()
         if not model_version:
             return None
-        group = self._metasubject_summaries(model_version).get(metasubject_id)
+        group = self.metasubject_summaries(model_version).get(metasubject_id)
         if group is None:
             return None
         topics = [
@@ -425,7 +452,7 @@ class TopicService:
             return []
         return response.get("hits", {}).get("hits", [])
 
-    def _metasubject_summaries(self, model_version: str) -> dict[int, MetasubjectSummary]:
+    def metasubject_summaries(self, model_version: str) -> dict[int, MetasubjectSummary]:
         response = self._search({
             "size": _METASUBJECT_LIMIT,
             "query": {

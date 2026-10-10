@@ -1,6 +1,7 @@
 import pytest
 
 from cdm.backend.services.member_topic_overlay import MemberTopicOverlayBuilder
+from cdm.backend.services.sponsored_bills import SponsoredBillReader
 from cdm.backend.services.topic_service import TopicService
 from cdm.contracts.api import TopicSummary
 
@@ -24,8 +25,9 @@ class FakeTopics(TopicService):
 
 
 def test_overlay_links_top_topics_with_min_bills(monkeypatch: pytest.MonkeyPatch) -> None:
-    builder = MemberTopicOverlayBuilder(object(), FakeTopics())  # type: ignore[arg-type]
-    monkeypatch.setattr(builder, "_sponsored_bills", lambda ids, congress: {"A": ["b1", "b2", "b3", "b4"], "B": ["b5"]})
+    reader = SponsoredBillReader(object())  # type: ignore[arg-type]
+    monkeypatch.setattr(reader, "by_member", lambda ids, congress: {"A": ["b1", "b2", "b3", "b4"], "B": ["b5"]})
+    builder = MemberTopicOverlayBuilder(reader, FakeTopics())
 
     overlay = builder.build(["A", "B"], None, 3)
 

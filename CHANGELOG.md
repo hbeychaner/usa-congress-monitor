@@ -4,6 +4,9 @@
 
 ### Added
 
+- Member graph metasubject overlay: `include_metasubjects` / `metasubjects_per_member` on `/graph/neighborhood` return each member's dominant metasubjects (from sponsored-bill assignments), with a "Show metasubjects" toggle and detail panels on the graph page.
+- `SponsoredBillReader` shares the sponsored-bill lookup between the topic and metasubject overlay builders (constructor-injected).
+
 - CRS subject tracking as a human-annotated complement to modeled topics:
   `GET /api/v1/subjects` aggregates legislative subjects and policy areas,
   `/bills/recent` accepts a `subject` filter, and member topic responses now

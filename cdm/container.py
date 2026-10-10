@@ -12,12 +12,16 @@ from cdm.backend.services.admin_service import AdminService
 from cdm.backend.services.bill_service import BillService
 from cdm.backend.services.committee_service import CommitteeService
 from cdm.backend.services.graph_service import GraphService
+from cdm.backend.services.member_metasubject_overlay import (
+    MemberMetasubjectOverlayBuilder,
+)
 from cdm.backend.services.member_service import MemberService
 from cdm.backend.services.member_subject_overlay import MemberSubjectOverlayBuilder
 from cdm.backend.services.member_topic_overlay import MemberTopicOverlayBuilder
 from cdm.backend.services.neighborhood_service import NeighborhoodService
 from cdm.backend.services.search_service import SearchService
 from cdm.backend.services.similar_bill_service import SimilarBillService
+from cdm.backend.services.sponsored_bills import SponsoredBillReader
 from cdm.backend.services.state_service import StateService
 from cdm.backend.services.subject_service import SubjectService
 from cdm.backend.services.topic_service import TopicService
@@ -159,10 +163,15 @@ class Container:
         return GraphService(self.elastic_client, self.member_service)
 
     @cached_property
+    def sponsored_bills(self) -> SponsoredBillReader:
+        return SponsoredBillReader(self.elastic_client)
+
+    @cached_property
     def neighborhood_service(self) -> NeighborhoodService:
         return NeighborhoodService(
             self.graph_service,
             self.member_service,
-            MemberTopicOverlayBuilder(self.elastic_client, self.topic_service),
+            MemberTopicOverlayBuilder(self.sponsored_bills, self.topic_service),
             MemberSubjectOverlayBuilder(self.elastic_client),
+            MemberMetasubjectOverlayBuilder(self.sponsored_bills, self.topic_service),
         )

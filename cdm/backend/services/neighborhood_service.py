@@ -7,6 +7,9 @@ from collections import defaultdict
 from pydantic import BaseModel, Field
 
 from cdm.backend.services.graph_service import GraphService
+from cdm.backend.services.member_metasubject_overlay import (
+    MemberMetasubjectOverlayBuilder,
+)
 from cdm.backend.services.member_service import MemberService
 from cdm.backend.services.member_subject_overlay import MemberSubjectOverlayBuilder
 from cdm.backend.services.member_topic_overlay import MemberTopicOverlayBuilder
@@ -37,6 +40,8 @@ class NeighborhoodQuery(BaseModel):
     topics_per_member: int = 3
     include_subjects: bool = False
     subjects_per_member: int = 3
+    include_metasubjects: bool = False
+    metasubjects_per_member: int = 3
 
     @property
     def signals(self) -> list[Signal]:
@@ -70,11 +75,13 @@ class NeighborhoodService:
         members: MemberService,
         topic_overlay: MemberTopicOverlayBuilder,
         subject_overlay: MemberSubjectOverlayBuilder,
+        metasubject_overlay: MemberMetasubjectOverlayBuilder,
     ) -> None:
         self.graph = graph
         self.members = members
         self.topic_overlay = topic_overlay
         self.subject_overlay = subject_overlay
+        self.metasubject_overlay = metasubject_overlay
 
     @staticmethod
     def _key(first: str, second: str) -> PairKey:
@@ -204,6 +211,11 @@ class NeighborhoodService:
             if query.include_subjects
             else None
         )
+        metasubjects = (
+            self.metasubject_overlay.build(node_ids, query.congress, query.metasubjects_per_member)
+            if query.include_metasubjects
+            else None
+        )
         return NeighborhoodResponse(
             seeds=query.seeds,
             congress=query.congress,
@@ -221,4 +233,6 @@ class NeighborhoodService:
             topic_links=overlay.links if overlay else [],
             subject_nodes=subjects.nodes if subjects else [],
             subject_links=subjects.links if subjects else [],
+            metasubject_nodes=metasubjects.nodes if metasubjects else [],
+            metasubject_links=metasubjects.links if metasubjects else [],
         )

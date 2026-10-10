@@ -57,7 +57,7 @@ def service() -> NeighborhoodService:
         "C": _summary("C", "Republican", "House of Representatives"),
     }
     return NeighborhoodService(
-        FakeGraph(), FakeMembers(members), None, None  # type: ignore[arg-type]
+        FakeGraph(), FakeMembers(members), None, None, None  # type: ignore[arg-type]
     )
 
 

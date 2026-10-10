@@ -5,7 +5,8 @@ from __future__ import annotations
 from elasticsearch import Elasticsearch, NotFoundError
 from pydantic import BaseModel
 
-from cdm.backend.services.member_topic_overlay import MIN_BILLS, SPONSOR_FIELD
+from cdm.backend.services.member_topic_overlay import MIN_BILLS
+from cdm.backend.services.sponsored_bills import SPONSOR_FIELD
 from cdm.contracts.api import GraphSubjectLink, GraphSubjectNode
 from cdm.store.opensearch import read_alias
 
