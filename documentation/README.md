@@ -176,12 +176,13 @@ cdm/                    — Congress Data Model (core library)
     archive.py          — Compressed SQLite record archives and list caches
     checkpoint.py       — Resume state tracking
   jobs/store.py         — SQLite job ledger and idempotency store
-  workers/              — Celery app, beat schedule, and task wrappers
+  workers/              — Celery app, beat schedule, thin task wrappers (tasks.py), and
+                          injected runners/planners/services wired by runtime.WorkerContainer
   store/                — OpenSearch integration
     index_manager.py    — Loads opensearch_mappings.yaml, manages indices
     opensearch.py       — Bulk upsert helpers
     indexer.py          — Transforms records into OpenSearch documents
-    redis_indexing.py    — Redis Stream consumer and bulk indexing runner
+    batch_indexing.py   — StreamIndexer: Redis Stream consumer and bulk indexing
   backend/              — FastAPI app (bill/member/search/state/admin services)
   contracts/            — API request/response schemas used by cdm/backend
 

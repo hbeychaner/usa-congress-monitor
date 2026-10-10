@@ -1,8 +1,14 @@
 from datetime import UTC, datetime
 from types import SimpleNamespace
 
+from cdm.config import get_config
 from cdm.jobs.store import JobStatus
-from cdm.workers import tasks
+from cdm.workers.planners import CoverageGapPlanner
+
+
+def _payloads(rows, now):
+    planner = CoverageGapPlanner(FakeStore(rows), get_config().ledger)
+    return [payload.to_json() for payload in planner.payloads(now)]
 
 
 class FakeStore:
@@ -10,15 +16,12 @@ class FakeStore:
         self.rows = rows
 
     def coverage(self, resource):
-        return self.rows.get(resource, [])
+        return [{"window_start": None, **row} for row in self.rows.get(resource, [])]
 
 
 def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
     now = datetime(2026, 8, 25, 12, tzinfo=UTC)
-    monkeypatch.setattr(
-        tasks,
-        "_store",
-        lambda: FakeStore({
+    rows = {
             "bill": [
                 {
                     "status": JobStatus.SUCCEEDED.value,
@@ -31,11 +34,9 @@ def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
                     "window_end": "2026-08-25T01:00:00Z",
                 }
             ],
-        }),
-    )
+        }
     monkeypatch.setattr(
-        tasks,
-        "date_windowed",
+        "cdm.workers.planners.date_windowed",
         lambda: [
             SimpleNamespace(
                 resource=SimpleNamespace(value="bill"), fetch_items_default=False
@@ -46,7 +47,7 @@ def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
         ],
     )
 
-    payloads = tasks.coverage_gap_payloads(now)
+    payloads = _payloads(rows, now)
 
     assert payloads == [
         {
@@ -67,10 +68,7 @@ def test_coverage_gap_payloads_only_returns_stale_resources(monkeypatch):
 
 def test_coverage_gap_payloads_handle_mixed_naive_and_aware_window_ends(monkeypatch):
     now = datetime(2026, 8, 25, 12, tzinfo=UTC)
-    monkeypatch.setattr(
-        tasks,
-        "_store",
-        lambda: FakeStore({
+    rows = {
             "bill": [
                 {
                     "status": JobStatus.SUCCEEDED.value,
@@ -81,11 +79,9 @@ def test_coverage_gap_payloads_handle_mixed_naive_and_aware_window_ends(monkeypa
                     "window_end": "2026-08-23T11:59:59Z",
                 },
             ],
-        }),
-    )
+        }
     monkeypatch.setattr(
-        tasks,
-        "date_windowed",
+        "cdm.workers.planners.date_windowed",
         lambda: [
             SimpleNamespace(
                 resource=SimpleNamespace(value="bill"), fetch_items_default=False
@@ -93,7 +89,7 @@ def test_coverage_gap_payloads_handle_mixed_naive_and_aware_window_ends(monkeypa
         ],
     )
 
-    payloads = tasks.coverage_gap_payloads(now)
+    payloads = _payloads(rows, now)
 
     assert len(payloads) == 1
     assert payloads[0]["from_date"] == "2026-08-23T11:59:59Z"
@@ -101,21 +97,16 @@ def test_coverage_gap_payloads_handle_mixed_naive_and_aware_window_ends(monkeypa
 
 def test_coverage_gap_payloads_ignore_incomplete_windows(monkeypatch):
     now = datetime(2026, 8, 25, 12, tzinfo=UTC)
-    monkeypatch.setattr(
-        tasks,
-        "_store",
-        lambda: FakeStore({
+    rows = {
             "bill": [
                 {
                     "status": JobStatus.RUNNING.value,
                     "window_end": "2026-08-20T00:00:00Z",
                 }
             ]
-        }),
-    )
+        }
     monkeypatch.setattr(
-        tasks,
-        "date_windowed",
+        "cdm.workers.planners.date_windowed",
         lambda: [
             SimpleNamespace(
                 resource=SimpleNamespace(value="bill"), fetch_items_default=True
@@ -123,4 +114,4 @@ def test_coverage_gap_payloads_ignore_incomplete_windows(monkeypatch):
         ],
     )
 
-    assert tasks.coverage_gap_payloads(now) == []
+    assert _payloads(rows, now) == []

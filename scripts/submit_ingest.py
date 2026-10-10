@@ -8,7 +8,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from cdm.workers.tasks import submit_job
+from cdm.config import get_config
+from cdm.jobs.store import JobKind
+from cdm.workers.runtime import WorkerContainer
 
 
 def parse_args() -> argparse.Namespace:
@@ -46,7 +48,7 @@ def main() -> None:
         "index_batch_size": args.index_batch_size,
         "preserve_raw": args.preserve_raw,
     }
-    job = submit_job("ingest", payload)
+    job = WorkerContainer(get_config()).job_submitter.submit(JobKind.INGEST.value, payload)
     print(f"{job['id']}\t{job['status']}")
 
 

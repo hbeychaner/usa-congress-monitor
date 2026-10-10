@@ -10,11 +10,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cdm.config import get_config
-from cdm.container import Container
 from cdm.ingest.govinfo import GovInfoDiscovery
-from cdm.jobs.store import JobKind, JobStore
+from cdm.jobs.store import JobKind
 from cdm.store.index_manager import IndexManager
-from cdm.workers.tasks import submit_job
+from cdm.workers.runtime import WorkerContainer
 
 
 def main() -> None:
@@ -68,18 +67,19 @@ def main() -> None:
         print("Dry run: pass --queue to create durable package jobs.")
         return
 
+    container = WorkerContainer(get_config())
     target_index = None
     if args.staging_version is not None:
-        target_index = IndexManager(Container(get_config()).elastic_client).create_versioned(
+        target_index = IndexManager(container.elastic_client).create_versioned(
             "legislation", args.staging_version
         )
-    job_store = JobStore(get_config().ledger.job_db_path)
+    submitter = container.job_submitter
 
     package_jobs = []
     for package in packages:
         package_jobs.append(
-            submit_job(
-                "govinfo_bulk",
+            submitter.submit(
+                JobKind.GOVINFO_BULK.value,
                 {
                     "collection": package.collection,
                     "congress": package.congress,
@@ -92,7 +92,6 @@ def main() -> None:
                     "target_index": target_index,
                     "replace": args.replace,
                 },
-                store=job_store,
                 dispatch_existing=False,
                 dispatch=args.no_batch,
             )
@@ -105,13 +104,12 @@ def main() -> None:
 
     for offset in range(0, len(package_jobs), args.batch_size):
         batch_jobs = package_jobs[offset : offset + args.batch_size]
-        batch = submit_job(
+        batch = submitter.submit(
             JobKind.GOVINFO_BULK_BATCH.value,
             {
                 "job_ids": [job["id"] for job in batch_jobs],
                 "batch_size": len(batch_jobs),
             },
-            store=job_store,
         )
         print(f"{batch['id']}\t{batch['status']}\tpackages={len(batch_jobs)}")
 

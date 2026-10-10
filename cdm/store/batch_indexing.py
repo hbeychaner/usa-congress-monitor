@@ -3,52 +3,139 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import cast
 
-from cdm.ingest.redis_stream import RedisRecordStream
+from elasticsearch import Elasticsearch
+from pydantic import BaseModel
+from redis import Redis
+
+from cdm.ingest.redis_stream import RedisRecordStream, StreamEntry
+from cdm.jobs.payloads import IndexPayload
 from cdm.store.indexer import to_document
 from cdm.store.mapping_validation import validate_document
 from cdm.store.opensearch import bulk_upsert
 
 
-def index_streams(
-    redis_client: Any,
-    opensearch_client: Any,
-    payloads: dict[str, dict[str, Any]],
-    *,
-    resource: str,
-    target_index: str | None,
-    replace: bool,
-    preserve_raw: bool,
-    batch_docs: int,
-) -> dict[str, dict[str, Any] | Exception]:
-    """Drain each job's stream, flushing one bulk per ``batch_docs`` documents.
+class IndexOutcome(BaseModel):
+    stream: str
+    resource: str
+    indexed: int
+    batches: int
+    pending: int
+    stream_length: int
+    status: str = "completed"
+    replayed_from_archive: int | None = None
+
+
+class StreamIndexer:
+    """Drains job streams, flushing one bulk per ``batch_docs`` documents.
 
     Streams are acknowledged only after their bulk succeeds. A failed bulk
     fails every job that contributed to it and leaves those entries pending
     for redelivery.
     """
-    consumer = f"worker-{os.getpid()}"
-    failed: dict[str, Exception] = {}
-    indexed: dict[str, int] = dict.fromkeys(payloads, 0)
-    batches: dict[str, int] = dict.fromkeys(payloads, 0)
-    streams = {
-        job_id: RedisRecordStream(redis_client, payload["stream"])
-        for job_id, payload in payloads.items()
-    }
-    buffer: list[tuple[str, str, dict[str, Any]]] = []
 
-    def flush() -> None:
-        if not buffer:
+    def __init__(
+        self,
+        redis_client: Redis,
+        opensearch_client: Elasticsearch,
+        *,
+        batch_docs: int,
+        default_group: str,
+    ) -> None:
+        self.redis = redis_client
+        self.client = opensearch_client
+        self.batch_docs = batch_docs
+        self._default_group = default_group
+
+    def group(self, payload: IndexPayload) -> str:
+        return payload.consumer_group or self._default_group
+
+    def index(
+        self,
+        payloads: dict[str, IndexPayload],
+        *,
+        resource: str,
+        target_index: str | None,
+        replace: bool,
+        preserve_raw: bool,
+    ) -> dict[str, IndexOutcome | Exception]:
+        return _IndexRun(
+            self, payloads, resource, target_index, replace, preserve_raw
+        ).execute()
+
+
+class _IndexRun:
+    """State of one ``StreamIndexer.index`` call."""
+
+    def __init__(
+        self,
+        owner: StreamIndexer,
+        payloads: dict[str, IndexPayload],
+        resource: str,
+        target_index: str | None,
+        replace: bool,
+        preserve_raw: bool,
+    ) -> None:
+        self._owner = owner
+        self._payloads = payloads
+        self._resource = resource
+        self._target_index = target_index
+        self._replace = replace
+        self._preserve_raw = preserve_raw
+        self._failed: dict[str, Exception] = {}
+        self._indexed = dict.fromkeys(payloads, 0)
+        self._batches = dict.fromkeys(payloads, 0)
+        self._streams = {
+            job_id: RedisRecordStream(owner.redis, payload.stream)
+            for job_id, payload in payloads.items()
+        }
+        self._buffer: list[tuple[str, str, dict[str, object]]] = []
+
+    def execute(self) -> dict[str, IndexOutcome | Exception]:
+        consumer = f"worker-{os.getpid()}"
+        for job_id, payload in self._payloads.items():
+            self._drain(job_id, payload, consumer)
+        self._flush()
+        return {job_id: self._outcome(job_id) for job_id in self._payloads}
+
+    def _drain(self, job_id: str, payload: IndexPayload, consumer: str) -> None:
+        group = self._owner.group(payload)
+        try:
+            while job_id not in self._failed:
+                entries = self._streams[job_id].read_batch(
+                    group, count=payload.batch_size, consumer=consumer, block_ms=None
+                )
+                if not entries:
+                    break
+                for entry_id, entry in entries:
+                    self._buffer.append((job_id, entry_id, self._document(entry)))
+                if len(self._buffer) >= self._owner.batch_docs:
+                    self._flush()
+        except Exception as exc:  # noqa: BLE001 - attributed to this job.
+            self._failed.setdefault(job_id, exc)
+
+    def _document(self, entry: StreamEntry) -> dict[str, object]:
+        document = to_document(
+            entry.record,
+            self._resource,
+            preserve_raw=self._preserve_raw,
+            ingest_metadata=entry.ingest_metadata,
+        )
+        validate_document(document, self._resource)
+        return document
+
+    def _flush(self) -> None:
+        if not self._buffer:
             return
-        owners = {job_id for job_id, _, _ in buffer}
+        owners = {job_id for job_id, _, _ in self._buffer}
         try:
             result = bulk_upsert(
-                opensearch_client,
-                resource,
-                [document for _, _, document in buffer],
-                target_index=target_index,
-                replace=replace,
+                self._owner.client,
+                self._resource,
+                [document for _, _, document in self._buffer],
+                target_index=self._target_index,
+                replace=self._replace,
             )
             if result.get("errors"):
                 raise RuntimeError(
@@ -57,62 +144,36 @@ def index_streams(
                 )
         except Exception as exc:  # noqa: BLE001 - attributed to the owning jobs.
             for job_id in owners:
-                failed.setdefault(job_id, exc)
-            buffer.clear()
+                self._failed.setdefault(job_id, exc)
+            self._buffer.clear()
             return
         acked: dict[str, list[str]] = {}
-        for job_id, entry_id, _ in buffer:
+        for job_id, entry_id, _ in self._buffer:
             acked.setdefault(job_id, []).append(entry_id)
         for job_id, entry_ids in acked.items():
-            group = payloads[job_id].get("consumer_group", "congress-indexers")
-            streams[job_id].acknowledge(group, entry_ids)
-            indexed[job_id] += len(entry_ids)
-            batches[job_id] += 1
-        buffer.clear()
+            group = self._owner.group(self._payloads[job_id])
+            self._streams[job_id].acknowledge(group, entry_ids)
+            self._indexed[job_id] += len(entry_ids)
+            self._batches[job_id] += 1
+        self._buffer.clear()
 
-    for job_id, payload in payloads.items():
-        group = payload.get("consumer_group", "congress-indexers")
-        count = int(payload.get("batch_size", 500))
+    def _outcome(self, job_id: str) -> IndexOutcome | Exception:
+        if job_id in self._failed:
+            return self._failed[job_id]
+        payload = self._payloads[job_id]
+        redis = self._owner.redis
         try:
-            while job_id not in failed:
-                entries = streams[job_id].read_batch(
-                    group, count=count, consumer=consumer, block_ms=None
-                )
-                if not entries:
-                    break
-                for entry_id, entry in entries:
-                    document = to_document(
-                        entry["record"],
-                        resource,
-                        preserve_raw=preserve_raw,
-                        ingest_metadata=entry.get("ingest_metadata"),
-                    )
-                    validate_document(document, resource)
-                    buffer.append((job_id, entry_id, document))
-                if len(buffer) >= batch_docs:
-                    flush()
-        except Exception as exc:  # noqa: BLE001 - attributed to this job.
-            failed.setdefault(job_id, exc)
-    flush()
-
-    results: dict[str, dict[str, Any] | Exception] = {}
-    for job_id, payload in payloads.items():
-        if job_id in failed:
-            results[job_id] = failed[job_id]
-            continue
-        group = payload.get("consumer_group", "congress-indexers")
-        try:
-            results[job_id] = {
-                "stream": payload["stream"],
-                "resource": resource,
-                "indexed": indexed[job_id],
-                "batches": batches[job_id],
-                "pending": int(
-                    redis_client.xpending(payload["stream"], group)["pending"]
-                ),
-                "stream_length": int(redis_client.xlen(payload["stream"])),
-                "status": "completed",
-            }
+            pending = cast(
+                "dict[str, int]",
+                redis.xpending(payload.stream, self._owner.group(payload)),
+            )
+            return IndexOutcome(
+                stream=payload.stream,
+                resource=self._resource,
+                indexed=self._indexed[job_id],
+                batches=self._batches[job_id],
+                pending=int(pending["pending"]),
+                stream_length=int(cast("int", redis.xlen(payload.stream))),
+            )
         except Exception as exc:  # noqa: BLE001
-            results[job_id] = exc
-    return results
+            return exc

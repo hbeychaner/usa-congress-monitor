@@ -2,7 +2,12 @@ from datetime import date
 
 import requests
 
-from cdm.workers.tasks import _is_retryable_error, _is_transient, daily_ingest_payload
+from cdm.workers.failures import FailureClassifier
+from cdm.workers.planners import DailyIngestPlanner
+
+CLASSIFIER = FailureClassifier()
+_is_transient = CLASSIFIER.is_transient
+_is_retryable_error = CLASSIFIER.is_retryable_error
 
 
 def _http_error(status_code: int) -> requests.HTTPError:
@@ -37,7 +42,7 @@ def test_recovery_only_targets_transient_error_messages():
 
 
 def test_daily_payload_uses_overlapping_incremental_resources():
-    payload = daily_ingest_payload(date(2025, 6, 15))
+    payload = DailyIngestPlanner().payload(date(2025, 6, 15)).to_json()
 
     assert payload["mode"] == "daily_incremental"
     assert payload["resources"] == sorted(payload["resources"])

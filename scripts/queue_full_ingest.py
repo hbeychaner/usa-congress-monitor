@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from cdm.config import get_config
 from cdm.ingest.full_ingest import (
     FullIngestConfig,
     FullIngestJob,
@@ -17,7 +18,8 @@ from cdm.ingest.full_ingest import (
     plan_full_ingest,
     smoke_job,
 )
-from cdm.workers.tasks import submit_job
+from cdm.jobs.store import JobKind
+from cdm.workers.runtime import WorkerContainer
 
 
 def _date(value: str) -> date:
@@ -84,8 +86,9 @@ def main() -> None:
     # backfill (potentially thousands of jobs) doesn't flood the broker in one
     # burst; the ingest worker only consumes a handful of jobs concurrently
     # anyway, so pacing dispatch costs nothing and is easy to Ctrl-C mid-run.
+    submitter = WorkerContainer(get_config()).job_submitter
     for index, job in enumerate(jobs, start=1):
-        record = submit_job("ingest", job.payload)
+        record = submitter.submit(JobKind.INGEST.value, job.payload)
         print(f"{job.label}\t{record['id']}\t{record['status']}")
         if args.batch_size > 0 and index % args.batch_size == 0 and index < len(jobs):
             time.sleep(args.batch_delay)

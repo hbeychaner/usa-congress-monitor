@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Any
+from typing import TypedDict, cast
 
 from sqlalchemy import (
     Boolean,
@@ -24,8 +24,12 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.pool import NullPool
+from sqlalchemy.sql import Select
+
+from cdm.ingest.govinfo import GovInfoPackage
+from cdm.utils.json_types import JsonObject
 
 
 class JobKind(StrEnum):
@@ -109,8 +113,40 @@ def _now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def _row_dict(row: Any) -> dict:
-    return dict(row._mapping)
+class JobRow(TypedDict):
+    """A ledger row with its payload decoded."""
+
+    id: str
+    kind: str
+    idempotency_key: str
+    payload: JsonObject
+    status: str
+    attempts: int
+    last_error: str | None
+    created_at: str
+    updated_at: str
+    started_at: str | None
+    finished_at: str | None
+
+
+class CoverageRow(TypedDict):
+    """An ingest-window ledger row."""
+
+    job_id: str
+    resource: str
+    window_start: str | None
+    window_end: str | None
+    congress: int | None
+    status: str
+    fetch_items: bool
+    discovered_count: int
+    hydrated_count: int
+    target_count: int
+    checkpoint_offset: int | None
+    last_started_at: str | None
+    last_progress_at: str | None
+    completed_at: str | None
+    last_error: str | None
 
 
 class JobStore:
@@ -197,7 +233,7 @@ class JobStore:
             finally:
                 fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
-    def create(self, kind: str, idempotency_key: str, payload: dict[str, Any]) -> dict:
+    def create(self, kind: str, idempotency_key: str, payload: JsonObject) -> JobRow:
         now = _now()
         job_id = idempotency_key
         with self._transaction_lock(), self.engine.begin() as connection:
@@ -228,7 +264,7 @@ class JobStore:
         result["payload"] = json.loads(result["payload"])
         return result
 
-    def create_govinfo_bulk_job(self, package: Any, *, outdir: Path | str) -> dict:
+    def create_govinfo_bulk_job(self, package: GovInfoPackage, *, outdir: Path | str) -> JobRow:
         """Create an idempotent durable job for one GovInfo package."""
         payload = {
             "collection": str(package.collection),
@@ -250,9 +286,9 @@ class JobStore:
 
     @staticmethod
     def _register_ingest_windows(
-        connection: Any,
+        connection: Connection,
         job_id: str,
-        payload: dict[str, Any],
+        payload: JsonObject,
         now: str,
         status: str,
     ) -> None:
@@ -272,7 +308,7 @@ class JobStore:
                 )
             )
 
-    def get(self, job_id: str) -> dict:
+    def get(self, job_id: str) -> JobRow:
         with self.engine.connect() as connection:
             row = (
                 connection
@@ -286,7 +322,7 @@ class JobStore:
         result["payload"] = json.loads(result["payload"])
         return result
 
-    def mark_running(self, job_id: str, *, update_windows: bool = True) -> dict | None:
+    def mark_running(self, job_id: str, *, update_windows: bool = True) -> JobRow | None:
         """Atomically claim a job for execution, returning ``None`` if already claimed.
 
         RUNNING is intentionally excluded from the claimable source statuses so
@@ -338,7 +374,7 @@ class JobStore:
         *,
         scan: int = 2000,
         exclude: set[str] | None = None,
-    ) -> list[dict]:
+    ) -> list[JobRow]:
         """Atomically move up to ``limit`` QUEUED jobs of ``kind`` accepted by
         ``accept`` to RUNNING, oldest first, and return them."""
         if limit < 1:
@@ -377,7 +413,7 @@ class JobStore:
                 )
         return claimed
 
-    def mark_succeeded(self, job_id: str) -> dict:
+    def mark_succeeded(self, job_id: str) -> JobRow:
         now = _now()
         with self._transaction_lock(), self.engine.begin() as connection:
             connection.execute(
@@ -405,7 +441,7 @@ class JobStore:
             )
         return self.get(job_id)
 
-    def mark_failed(self, job_id: str, error: str) -> dict:
+    def mark_failed(self, job_id: str, error: str) -> JobRow:
         now = _now()
         with self._transaction_lock(), self.engine.begin() as connection:
             connection.execute(
@@ -431,7 +467,7 @@ class JobStore:
             )
         return self.get(job_id)
 
-    def cancel(self, job_id: str, reason: str) -> dict:
+    def cancel(self, job_id: str, reason: str) -> JobRow:
         """Cancel a queued or running job while preserving an audit reason."""
         now = _now()
         with self._transaction_lock(), self.engine.begin() as connection:
@@ -464,7 +500,7 @@ class JobStore:
             )
         return self.get(job_id)
 
-    def mark_retrying(self, job_id: str, error: str) -> dict:
+    def mark_retrying(self, job_id: str, error: str) -> JobRow:
         now = _now()
         with self._transaction_lock(), self.engine.begin() as connection:
             connection.execute(
@@ -487,7 +523,7 @@ class JobStore:
             )
         return self.get(job_id)
 
-    def coverage(self, resource: str | None = None) -> list[dict]:
+    def coverage(self, resource: str | None = None) -> list[CoverageRow]:
         statement = select(_INGEST_WINDOWS).order_by(
             _INGEST_WINDOWS.c.window_start,
             _INGEST_WINDOWS.c.window_end,
@@ -496,9 +532,12 @@ class JobStore:
         if resource:
             statement = statement.where(_INGEST_WINDOWS.c.resource == resource)
         with self.engine.connect() as connection:
-            return [_row_dict(row) for row in connection.execute(statement)]
+            return [
+                cast(CoverageRow, dict(row))
+                for row in connection.execute(statement).mappings()
+            ]
 
-    def update_coverage(self, job_id: str, resource: str, **fields: Any) -> None:
+    def update_coverage(self, job_id: str, resource: str, **fields: int | str | None) -> None:
         allowed = {
             "discovered_count": _INGEST_WINDOWS.c.discovered_count,
             "hydrated_count": _INGEST_WINDOWS.c.hydrated_count,
@@ -523,7 +562,7 @@ class JobStore:
                 .values(values)
             )
 
-    def requeue(self, job_id: str) -> dict:
+    def requeue(self, job_id: str) -> JobRow:
         """Move a job back to QUEUED, also refreshing an already-QUEUED job's timestamp.
 
         Refreshing the timestamp on a no-op QUEUED->QUEUED transition lets
@@ -551,7 +590,7 @@ class JobStore:
         *,
         older_than: str,
         exclude_ids: set[str] | None = None,
-    ) -> list[dict]:
+    ) -> list[JobRow]:
         """Delete SUCCEEDED/CANCELLED jobs updated before ``older_than``.
 
         ``ingest_windows`` rows are intentionally preserved: they are the
@@ -602,7 +641,7 @@ class JobStore:
         except Exception:  # noqa: BLE001 - VACUUM is opportunistic maintenance.
             return False
 
-    def _fetch(self, statement: Any) -> list[dict]:
+    def _fetch(self, statement: Select[tuple[object, ...]]) -> list[JobRow]:
         """Execute a ``select(_JOBS)`` statement and decode payloads in one round trip.
 
         Avoids the N+1 pattern of selecting ids then calling ``get()`` per row.
@@ -616,14 +655,14 @@ class JobStore:
             results.append(result)
         return results
 
-    def failed(self, kind: str | None = None) -> list[dict]:
+    def failed(self, kind: str | None = None) -> list[JobRow]:
         statement = select(_JOBS).where(_JOBS.c.status == JobStatus.FAILED.value)
         if kind:
             statement = statement.where(_JOBS.c.kind == kind)
         statement = statement.order_by(_JOBS.c.updated_at)
         return self._fetch(statement)
 
-    def unfinished(self, kind: str | None = None) -> list[dict]:
+    def unfinished(self, kind: str | None = None) -> list[JobRow]:
         """Return jobs that are not in a successful/cancelled terminal state."""
         statement = select(_JOBS).where(
             _JOBS.c.status.in_([
@@ -649,7 +688,7 @@ class JobStore:
                 ).scalars()
             )
 
-    def stale_active(self, cutoff: str) -> list[dict]:
+    def stale_active(self, cutoff: str) -> list[JobRow]:
         """Return RUNNING/RETRYING jobs stranded past ``cutoff`` (e.g. a worker crash)."""
         statement = (
             select(_JOBS)
@@ -663,7 +702,7 @@ class JobStore:
 
     def stale_queued(
         self, kinds: tuple[str, ...], cutoff: str, limit: int
-    ) -> list[dict]:
+    ) -> list[JobRow]:
         """Return up to ``limit`` QUEUED jobs of ``kinds`` stale past ``cutoff``.
 
         This is a rare safety net for dispatch messages lost to broker hiccups;
@@ -680,14 +719,14 @@ class JobStore:
         )
         return self._fetch(statement)
 
-    def queued(self, kind: str | None = None) -> list[dict]:
+    def queued(self, kind: str | None = None) -> list[JobRow]:
         statement = select(_JOBS).where(_JOBS.c.status == JobStatus.QUEUED.value)
         if kind:
             statement = statement.where(_JOBS.c.kind == kind)
         statement = statement.order_by(_JOBS.c.created_at)
         return self._fetch(statement)
 
-    def jobs(self, kind: str | None = None) -> list[dict]:
+    def jobs(self, kind: str | None = None) -> list[JobRow]:
         """Return durable jobs ordered from newest to oldest."""
         statement = select(_JOBS).order_by(_JOBS.c.created_at.desc())
         if kind:

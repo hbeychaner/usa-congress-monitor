@@ -37,6 +37,8 @@ class CongressApiConfig(_Section):
     congress_api_url: str = ""
     congress_strict_field_check: bool = True
     timeout_secs: int = 30
+    # Shared per-ingest-job request budget.
+    ingest_rate_limit_per_hour: int = 4800
 
 
 class OpenAIConfig(_Section):

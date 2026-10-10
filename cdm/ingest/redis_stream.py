@@ -6,8 +6,17 @@ import json
 import os
 from typing import Any, cast
 
+from pydantic import BaseModel
 from redis import Redis
 from redis.exceptions import ResponseError
+
+from cdm.utils.json_types import JsonObject
+
+
+class StreamEntry(BaseModel):
+    resource: str
+    record: JsonObject
+    ingest_metadata: JsonObject | None = None
 
 
 class RedisRecordStream:
@@ -25,8 +34,8 @@ class RedisRecordStream:
     def publish(
         self,
         resource: str,
-        record: dict[str, Any],
-        ingest_metadata: dict[str, Any] | None = None,
+        record: JsonObject,
+        ingest_metadata: JsonObject | None = None,
     ) -> str:
         fields: dict[str, Any] = {
             "resource": resource,
@@ -62,7 +71,7 @@ class RedisRecordStream:
         consumer: str | None = None,
         block_ms: int | None = 1000,
         min_idle_ms: int = 60_000,
-    ) -> list[tuple[str, dict[str, Any]]]:
+    ) -> list[tuple[str, StreamEntry]]:
         if count < 1:
             raise ValueError("count must be positive")
         consumer = consumer or f"consumer-{os.getpid()}"
@@ -103,8 +112,8 @@ class RedisRecordStream:
     @staticmethod
     def _decode_entries(
         entries: list[tuple[Any, dict[Any, Any]]],
-    ) -> list[tuple[str, dict[str, Any]]]:
-        decoded: list[tuple[str, dict[str, Any]]] = []
+    ) -> list[tuple[str, StreamEntry]]:
+        decoded: list[tuple[str, StreamEntry]] = []
         for entry_id, fields in entries:
             normalized = {
                 (key.decode() if isinstance(key, bytes) else key): value
@@ -119,10 +128,10 @@ class RedisRecordStream:
                     ingest_metadata = None
             decoded.append((
                 entry_id.decode() if isinstance(entry_id, bytes) else entry_id,
-                {
-                    "resource": resource,
-                    "record": record,
-                    "ingest_metadata": ingest_metadata,
-                },
+                StreamEntry(
+                    resource=resource,
+                    record=record,
+                    ingest_metadata=ingest_metadata,
+                ),
             ))
         return decoded

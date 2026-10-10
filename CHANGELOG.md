@@ -46,6 +46,23 @@
 
 ### Changed
 
+- Worker code converted from module functions to injected classes:
+  `cdm/workers/tasks.py` is now only thin Celery wrappers; logic lives in
+  `IngestJobRunner`, `GovInfoPackageRunner`, `GovInfoBatchRunner`,
+  `IndexJobRunner`, `ReconciliationRunner`, the planners (`DailyIngestPlanner`,
+  `CoverageGapPlanner`, `StaticRefreshPlanner`), `JobRecoveryService`,
+  `RetentionService`, `JobDispatcher`, and `JobSubmitter`, wired by
+  `WorkerContainer` (`cdm/workers/runtime.py`). Job payloads are Pydantic
+  models (`cdm/jobs/payloads.py`) that serialize to the same JSON, so ledger job
+  ids are unchanged. `submit_job` and `index_streams` were replaced by
+  `JobSubmitter.submit` and `StreamIndexer`; the unused
+  `cdm/store/redis_indexing.py` was removed. Recovery now routes every job kind
+  to its own task and queue (reconcile jobs were previously sent to the
+  GovInfo task).
+- Typed ledger rows (`JobRow`, `CoverageRow`) and JSON aliases
+  (`cdm/utils/json_types.py`) replace `dict[str, Any]` in the job store and
+  Redis stream code.
+
 - Transient-error detection for worker jobs now unwraps
   `GovInfoDownloadError.__cause__` (requests SSL/connection/timeout errors were
   previously classified permanent), and the failed-job recovery sweep

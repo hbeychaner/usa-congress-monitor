@@ -4,18 +4,55 @@ from typing import Any, cast
 import pytest
 
 from cdm.config import get_config
+from cdm.jobs.payloads import IndexPayload
 from cdm.jobs.store import JobKind, JobStatus
 from cdm.workers import tasks
+from cdm.workers.dispatch import JobDispatcher
+from cdm.workers.failures import FailureClassifier
+from cdm.workers.index_runner import ArchiveReplayer
+from cdm.workers.ingest_runner import IngestJobRunner
+from cdm.workers.maintenance import JobRecoveryService, RetentionService
+from cdm.workers.runtime import WorkerContainer
+
+
+class FakeCeleryApp:
+    def __init__(self, dispatched):
+        self.dispatched = dispatched
+
+    def send_task(self, name, *, args, queue):
+        self.dispatched.append((name, args, queue))
+
+
+class FakeProbe:
+    def __init__(self, depth=None):
+        self.value = depth
+
+    def depth(self, queue):
+        return self.value
+
+
+def _install(monkeypatch, dispatched=None, probe_depth=None, **overrides):
+    """Make tasks use a WorkerContainer whose providers are replaced by fakes."""
+    config = get_config()
+    container = WorkerContainer(config)
+    container.__dict__["job_dispatcher"] = JobDispatcher(
+        cast(Any, FakeCeleryApp([] if dispatched is None else dispatched)),
+        config.queue,
+    )
+    container.__dict__["queue_depth_probe"] = FakeProbe(probe_depth)
+    container.__dict__.update(overrides)
+    monkeypatch.setattr(tasks, "_container", lambda: container)
+    return container
 
 
 def test_denormalized_summaries_are_not_queued_for_direct_indexing():
-    assert not tasks._should_queue_index_job("summaries")
-    assert tasks._should_queue_index_job("bill")
+    assert not IngestJobRunner.should_queue_index_job("summaries")
+    assert IngestJobRunner.should_queue_index_job("bill")
 
 
 def test_soft_time_limit_failures_are_retryable():
-    assert tasks._is_retryable_error("SoftTimeLimitExceeded()")
-    assert not tasks._is_retryable_error("ValueError: bad payload")
+    assert FailureClassifier().is_retryable_error("SoftTimeLimitExceeded()")
+    assert not FailureClassifier().is_retryable_error("ValueError: bad payload")
 
 
 class FakeLock:
@@ -75,7 +112,7 @@ class FakeStore:
 
 def test_recovery_skips_when_another_sweep_holds_lock(monkeypatch):
     lock = FakeLock(acquired=False)
-    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
+    _install(monkeypatch, job_store=FakeStore(), redis_client=FakeRedis(lock))
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
 
@@ -87,12 +124,8 @@ def test_recovery_releases_lock_after_sweep(monkeypatch):
     lock = FakeLock(acquired=True)
     store = FakeStore()
     dispatched = []
-    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(
-        tasks.celery_app,
-        "send_task",
-        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    _install(
+        monkeypatch, dispatched, job_store=store, redis_client=FakeRedis(lock)
     )
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
@@ -114,12 +147,8 @@ def test_recovery_requeues_stale_queued_govinfo_package(monkeypatch):
     }
     store = FakeStore(queued=[job])
     dispatched = []
-    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(
-        tasks.celery_app,
-        "send_task",
-        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    _install(
+        monkeypatch, dispatched, job_store=store, redis_client=FakeRedis(lock)
     )
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
@@ -146,12 +175,8 @@ def test_recovery_requeues_stale_queued_ingest_job(monkeypatch):
     }
     store = FakeStore(queued=[job])
     dispatched = []
-    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(
-        tasks.celery_app,
-        "send_task",
-        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    _install(
+        monkeypatch, dispatched, job_store=store, redis_client=FakeRedis(lock)
     )
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
@@ -177,18 +202,14 @@ def test_recovery_caps_orphaned_queued_jobs_per_tick(monkeypatch):
             "updated_at": stale,
             "payload": {},
         }
-        for i in range(tasks._ORPHAN_RECOVERY_BATCH_LIMIT + 10)
+        for i in range(JobRecoveryService.ORPHAN_BATCH_LIMIT + 10)
     ]
     store = FakeStore(queued=jobs)
     dispatched = []
-    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(tasks, "_index_redispatch_budget", lambda: 25)
-    monkeypatch.setattr(
-        tasks.celery_app,
-        "send_task",
-        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    _install(
+        monkeypatch, dispatched, job_store=store, redis_client=FakeRedis(lock)
     )
+    monkeypatch.setattr(JobRecoveryService, "index_redispatch_budget", lambda self: 25)
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
 
@@ -210,9 +231,12 @@ def test_recovery_skips_index_redispatch_when_queue_is_deep(monkeypatch):
         for i in range(10)
     ]
     store = FakeStore(queued=jobs)
-    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(tasks, "_queue_depth", lambda queue: 10_000)
+    _install(
+        monkeypatch,
+        probe_depth=10_000,
+        job_store=store,
+        redis_client=FakeRedis(lock),
+    )
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
 
@@ -229,12 +253,8 @@ def test_recovery_requeues_stale_active_job(monkeypatch):
     }
     store = FakeStore(active=[job])
     dispatched = []
-    monkeypatch.setattr(tasks, "_redis", lambda: FakeRedis(lock))
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(
-        tasks.celery_app,
-        "send_task",
-        lambda name, *, args, queue: dispatched.append((name, args, queue)),
+    _install(
+        monkeypatch, dispatched, job_store=store, redis_client=FakeRedis(lock)
     )
 
     result = cast(Any, tasks.recover_failed_ingest_jobs).run()
@@ -268,12 +288,7 @@ def test_govinfo_batch_fans_out_package_jobs(monkeypatch):
 
     store = BatchStore()
     dispatched = []
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(
-        tasks.celery_app,
-        "send_task",
-        lambda name, *, args, queue: dispatched.append((name, args, queue)),
-    )
+    _install(monkeypatch, dispatched, job_store=store)
 
     result = cast(Any, tasks.run_govinfo_bulk_batch).run("govinfo_bulk_batch:one")
 
@@ -294,16 +309,16 @@ def test_govinfo_batch_fans_out_package_jobs(monkeypatch):
 
 def test_stream_source_job_id_handles_colons_in_job_ids():
     assert (
-        tasks._stream_source_job_id(
+        RetentionService.stream_source_job_id(
             "congress:ingest:manual-recovery:historical-bill:congress-116:20260907-v1:bill"
         )
         == "manual-recovery:historical-bill:congress-116:20260907-v1"
     )
     assert (
-        tasks._stream_source_job_id("congress:ingest:govinfo_bulk:abc123:bill_text")
+        RetentionService.stream_source_job_id("congress:ingest:govinfo_bulk:abc123:bill_text")
         == "govinfo_bulk:abc123"
     )
-    assert tasks._stream_source_job_id("other:prefix:x") is None
+    assert RetentionService.stream_source_job_id("other:prefix:x") is None
 
 
 class FakeRetentionRedis:
@@ -366,8 +381,7 @@ def test_retention_prunes_old_terminal_jobs_and_artifacts(tmp_path, monkeypatch)
         f"congress:ingest:{active['id']}:bill",
         "congress:ingest:ghost-job:bill",
     ])
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(tasks, "_redis", lambda: redis)
+    _install(monkeypatch, job_store=store, redis_client=redis)
 
     result = cast(Any, tasks.run_retention_maintenance).run()
 
@@ -411,8 +425,7 @@ def test_retention_protects_jobs_referenced_by_unfinished_index_jobs(
     store.mark_failed(index_job["id"], "Indexed 0 records, expected 10")
 
     redis = FakeRetentionRedis([f"congress:ingest:{source['id']}:bill"])
-    monkeypatch.setattr(tasks, "_store", lambda: store)
-    monkeypatch.setattr(tasks, "_redis", lambda: redis)
+    _install(monkeypatch, job_store=store, redis_client=redis)
 
     result = cast(Any, tasks.run_retention_maintenance).run()
 
@@ -441,7 +454,7 @@ def test_index_job_archive_fallback_replays_missing_stream(tmp_path, monkeypatch
         upserts.extend(documents)
         return {"updated": len(documents), "errors": False}
 
-    monkeypatch.setattr("cdm.workers.tasks.bulk_upsert", fake_bulk_upsert)
+    monkeypatch.setattr("cdm.workers.index_runner.bulk_upsert", fake_bulk_upsert)
 
     payload = {
         "resource": "bill",
@@ -449,7 +462,9 @@ def test_index_job_archive_fallback_replays_missing_stream(tmp_path, monkeypatch
         "batch_size": 1,
         "stream": "congress:ingest:job:bill",
     }
-    replayed = tasks._replay_archive_into_index(object(), payload)
+    replayed = ArchiveReplayer(cast(Any, object())).replay(
+        IndexPayload.model_validate(payload)
+    )
 
     assert replayed == 2
     assert {doc["id"] for doc in upserts} == {"bill:119:hr:1", "bill:119:hr:2"}
@@ -457,5 +472,7 @@ def test_index_job_archive_fallback_replays_missing_stream(tmp_path, monkeypatch
 
 def test_index_job_archive_fallback_skips_when_archive_missing(tmp_path):
     payload = {"resource": "bill", "archive_root": str(tmp_path / "nope")}
-    assert tasks._replay_archive_into_index(object(), payload) == 0
-    assert tasks._replay_archive_into_index(object(), {"resource": "bill"}) == 0
+    replayer = ArchiveReplayer(cast(Any, object()))
+    missing = IndexPayload(stream="s", resource="bill", archive_root=payload["archive_root"])
+    assert replayer.replay(missing) == 0
+    assert replayer.replay(IndexPayload(stream="s", resource="bill")) == 0

@@ -2,1110 +2,159 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
-import logging
-import shutil
-import time
-from datetime import UTC, datetime, timedelta
+from collections.abc import Callable
+from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import NoReturn
 
-import requests
-from celery.exceptions import MaxRetriesExceededError
 from celery.signals import worker_init
-from kombu.exceptions import OperationalError
-from redis import Redis
 
 from cdm.config import get_config
-from cdm.container import Container
-from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
 from cdm.graph.runner import GraphBuildRunner
-from cdm.ingest.archive import JsonlRecordArchive, SQLiteQuarantineArchive
-from cdm.ingest.govinfo import (
-    GovInfoBillsParser,
-    GovInfoBillStatusParser,
-    GovInfoBillSummaryParser,
-    GovInfoDiscovery,
-    GovInfoDownloader,
-    GovInfoDownloadError,
-    GovInfoManifestStore,
-    GovInfoPackage,
-)
-from cdm.ingest.pipeline import Pipeline, PipelineConfig
-from cdm.ingest.reconciliation import replay_govinfo_archives
-from cdm.ingest.redis_stream import RedisRecordStream
-from cdm.ingest.resource_config import congress_scoped, date_windowed, static_resources
-from cdm.ingest.runner import IngestCancelledError, Resource
 from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
-from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
-from cdm.store.batch_indexing import index_streams
-from cdm.store.index_manager import IndexManager
-from cdm.store.indexer import to_document
-from cdm.store.mapping_validation import validate_document
-from cdm.store.opensearch import bulk_upsert, resource_target
-from cdm.utils.archive_sweeper import OrphanArchiveSweeper
+from cdm.jobs.store import JobKind
+from cdm.utils.json_types import JsonObject
 from cdm.utils.log_trimmer import LogTrimmer
-from cdm.utils.rate_limiter import TokenBucket
 from cdm.utils.topic_training import start_training
 from cdm.workers.celery_app import celery_app
+from cdm.workers.dispatch import TaskName
+from cdm.workers.results import JobResult
+from cdm.workers.runtime import WorkerContainer
 
-logger = logging.getLogger(__name__)
-
-_ARCHIVED_JOB_KINDS = frozenset({JobKind.INGEST.value, JobKind.GOVINFO_BULK.value})
+VOTEVIEW_DIR = Path("data/voteview")
 
 
-# Worker-wide composition root; shares one search client across tasks.
+# Worker-wide composition root; shares one set of clients across tasks.
 @lru_cache(maxsize=1)
-def _container() -> Container:
-    return Container(get_config())
-
-
-# Legacy-window repair scans the whole ledger under a global lock, so it runs
-# once per worker boot (see _warm_store), never per task.
-@lru_cache(maxsize=1)
-def _store() -> JobStore:
-    return JobStore(get_config().ledger.job_db_path, repair=False)
+def _container() -> WorkerContainer:
+    return WorkerContainer(get_config())
 
 
 @worker_init.connect
-def _warm_store(**_: Any) -> None:
+def warm_store(**_: object) -> None:
     """Build the store in the parent so forked children inherit it."""
-    _store().repair_legacy_windows()
+    _container().job_store.repair_legacy_windows()
 
 
-# Seconds between ledger status polls inside the ingest progress callback.
-_CANCEL_POLL_INTERVAL = 60.0
-
-
-def _redis() -> Redis:
-    return Redis.from_url(get_config().redis.redis_url)
-
-
-_GOVINFO_SESSION: requests.Session | None = None
-_GOVINFO_RATE_LIMITER: TokenBucket | None = None
-
-
-def _govinfo_session() -> requests.Session:
-    global _GOVINFO_SESSION
-    if _GOVINFO_SESSION is None:
-        _GOVINFO_SESSION = requests.Session()
-    return _GOVINFO_SESSION
-
-
-def _govinfo_rate_limiter() -> TokenBucket:
-    global _GOVINFO_RATE_LIMITER
-    if _GOVINFO_RATE_LIMITER is None:
-        _GOVINFO_RATE_LIMITER = TokenBucket(rate_per_hour=get_config().govinfo.govinfo_rate_limit_per_hour)
-    return _GOVINFO_RATE_LIMITER
-
-
-def _job_id(kind: str, payload: dict[str, Any]) -> str:
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    digest = hashlib.sha256(encoded.encode()).hexdigest()[:24]
-    return f"{kind}:{digest}"
-
-
-_NON_INDEXED_RESOURCES = frozenset({"summaries"})
-
-
-def _should_queue_index_job(resource: str) -> bool:
-    return resource not in _NON_INDEXED_RESOURCES
-
-
-def submit_job(
-    kind: str,
-    payload: dict[str, Any],
-    *,
-    store: JobStore | None = None,
-    dispatch_existing: bool = True,
-    dispatch: bool = True,
-) -> dict:
-    job_id = _job_id(kind, payload)
-    job_store = store or _store()
-    existing = None
-    if not dispatch_existing:
-        try:
-            existing = job_store.get(job_id)
-        except KeyError:
-            pass
-    job = job_store.create(kind, job_id, payload)
-    should_dispatch = dispatch and (
-        existing is None or job["status"] == JobStatus.FAILED
-    )
-    if should_dispatch and job["status"] in {JobStatus.QUEUED, JobStatus.FAILED}:
-        if kind == JobKind.INGEST:
-            celery_app.send_task(
-                "cdm.workers.tasks.run_ingest_job",
-                args=[job_id],
-                queue=get_config().queue.celery_ingest_queue,
-            )
-        elif kind == JobKind.INDEX:
-            celery_app.send_task(
-                "cdm.workers.tasks.run_index_job",
-                args=[job_id],
-                queue=get_config().queue.celery_index_queue,
-            )
-        elif kind == JobKind.GOVINFO_BULK:
-            celery_app.send_task(
-                "cdm.workers.tasks.run_govinfo_bulk_job",
-                args=[job_id],
-                queue=get_config().queue.celery_bulk_queue,
-            )
-        elif kind == JobKind.GOVINFO_BULK_BATCH:
-            celery_app.send_task(
-                "cdm.workers.tasks.run_govinfo_bulk_batch",
-                args=[job_id],
-                queue=get_config().queue.celery_bulk_queue,
-            )
-        elif kind == JobKind.RECONCILE:
-            celery_app.send_task(
-                "cdm.workers.tasks.run_reconciliation_job",
-                args=[job_id],
-                queue=get_config().queue.celery_index_queue,
-            )
-    return job
-
-
-def _is_transient(exc: Exception) -> bool:
-    # Download failures wrap the network cause; classify by the cause.
-    if isinstance(exc, GovInfoDownloadError) and isinstance(exc.__cause__, Exception):
-        return _is_transient(exc.__cause__)
-    if isinstance(exc, requests.HTTPError):
-        response = exc.response
-        return response is not None and (
-            response.status_code == 429 or response.status_code >= 500
-        )
-    message = str(exc).lower()
-    if any(marker in message for marker in _TRANSIENT_MARKERS):
-        return True
-    return isinstance(exc, (requests.ConnectionError, requests.Timeout))
-
-
-# Infrastructure hiccups that heal on their own; retrying is always safe
-# because indexing is idempotent and unacked stream entries are redelivered.
-_TRANSIENT_MARKERS = (
-    "database is locked",
-    "disk i/o error",
-    "version_conflict_engine_exception",
-    "authentication",
-    "connectionerror",
-    "connection timed out",
-    "connectiontimeout",
-    "too_many_requests",
-    "es_rejected_execution",
-    "circuit_breaking",
-    "cluster_block",
-    "no_shard_available",
-    "unavailable_shards_exception",
-    "still has",
-    "transporterror(5",
-    "transporterror(429",
-)
-
-
-def _is_retryable_error(error: str | None) -> bool:
-    if not error:
-        return False
-    return (
-        error.startswith((
-            "server error: 5",
-            "server error: 429",
-            "HTTP 5",
-            "HTTP 429",
-        ))
-        or any(marker in error.lower() for marker in _TRANSIENT_MARKERS)
-        or any(
-            marker in error.lower()
-            for marker in (
-                "connectionerror",
-                "connection aborted",
-                "connection closed by server",
-                "database is locked",
-                "disk i/o error",
-                "timed out",
-                # Connection-level throttling by govinfo.gov surfaces as these.
-                "max retries exceeded",
-                "failed to resolve",
-                "sslerror",
-                # Resume dedupe banks progress across attempts, so a task that
-                # ran out of time budget is worth retrying from its archive.
-                "softtimelimitexceeded",
-            )
-        )
-    )
-
-
-def _retry(task: Any, job_id: str, exc: Exception) -> NoReturn:
-    store = _store()
-    if not _is_transient(exc):
-        store.mark_failed(job_id, str(exc))
-        raise exc
-    store.mark_retrying(job_id, str(exc))
-    max_retries = get_config().queue.celery_retry_max_transient if _is_transient(exc) else get_config().queue.celery_retry_max
+def _execute(task: object, job_id: str, run: Callable[[str], JobResult]) -> JsonObject:
+    """Run a job and hand failures to the retry policy."""
     try:
-        raise task.retry(
-            exc=exc,
-            countdown=min(
-                get_config().queue.celery_retry_backoff_max,
-                2 ** min(task.request.retries, 10),
-            ),
-            max_retries=max_retries,
-        )
-    except MaxRetriesExceededError:
-        store.mark_failed(job_id, str(exc))
-        raise
-
-
-@celery_app.task(bind=True, name="cdm.workers.tasks.run_ingest_job")
-def run_ingest_job(self, job_id: str) -> dict:
-    store = _store()
-    job = store.mark_running(job_id)
-    if job is None:
-        existing = store.get(job_id)
-        return {"job_id": job_id, "skipped": True, "status": existing["status"]}
-    payload = job["payload"]
-    try:
-        redis_client = _redis()
-        job_outdir = Path(payload["outdir"]) / job_id
-        archive = JsonlRecordArchive(job_outdir, int(job["attempts"]))
-        quarantine = SQLiteQuarantineArchive(job_outdir)
-        last_cancel_check = [time.monotonic()]
-
-        def publish_record(resource: str, record: dict) -> None:
-            stream = RedisRecordStream(
-                redis_client,
-                RedisRecordStream.stream_name(job_id, resource),
-                maxlen=get_config().redis.redis_stream_maxlen,
-            )
-            stream.publish(resource, record)
-
-        def update_progress(resource: str, stage: CoverageStage, values: dict) -> None:
-            del stage
-            store.update_coverage(job_id, resource, **values)
-            now = time.monotonic()
-            if now - last_cancel_check[0] >= _CANCEL_POLL_INTERVAL:
-                last_cancel_check[0] = now
-                current = store.get(job_id)
-                if current and current["status"] == JobStatus.CANCELLED.value:
-                    raise IngestCancelledError(job_id)
-
-        def quarantine_validation_failure(
-            resource: str,
-            record: dict,
-            error: str,
-            source_url: str | None,
-        ) -> None:
-            quarantine.write(
-                resource,
-                record,
-                error=error,
-                source_url=source_url,
-                record_id=str(record.get("id")) if record.get("id") else None,
-            )
-
-        resources = payload.get("resources")
-        config = PipelineConfig(
-            outdir=job_outdir,
-            from_date=payload.get("from_date"),
-            to_date=payload.get("to_date"),
-            congress=payload.get("congress"),
-            fetch_items=bool(payload.get("fetch_items", False)),
-            force_item_fetch=bool(payload.get("force_item_fetch", False)),
-            item_resources=frozenset(payload.get("item_resources") or ()),
-            max_pages=payload.get("max_pages"),
-            max_items=payload.get("max_items"),
-            list_page_size=int(payload.get("list_page_size", 250)),
-            max_skipped_list_pages=int(payload.get("max_skipped_list_pages", 0)),
-            concurrency=int(payload.get("concurrency", 1)),
-            rate_limiter=TokenBucket(rate_per_hour=4800),
-            api_key=payload.get("api_key"),
-            skip_errors=False,
-            record_sink=publish_record,
-            record_archive_sink=archive.write,
-            validation_failure_sink=quarantine_validation_failure,
-            progress_sink=update_progress,
-        )
-        selected = None
-        if resources:
-            selected = [Resource(resource) for resource in resources]
-        results = (
-            Pipeline(config).run(selected) if selected else Pipeline(config).run_all()
-        )
-        failed = [result for result in results if not result.success]
-        if failed:
-            raise RuntimeError(
-                "Ingest failed for: "
-                + ", ".join(result.resource.value for result in failed)
-            )
-
-        index_jobs = []
-        if payload.get("index", True):
-            for result in results:
-                if result.published_count and _should_queue_index_job(
-                    result.resource.value
-                ):
-                    index_payload = {
-                        "stream": RedisRecordStream.stream_name(
-                            job_id, result.resource.value
-                        ),
-                        "resource": result.resource.value,
-                        "batch_size": int(payload.get("index_batch_size", 500)),
-                        "preserve_raw": bool(payload.get("preserve_raw", False)),
-                        "consumer_group": get_config().redis.redis_consumer_group,
-                        "expected_count": result.published_count,
-                        "archive_root": str(job_outdir),
-                    }
-                    index_jobs.append(submit_job("index", index_payload)["id"])
-        store.mark_succeeded(job_id)
-        return {"job_id": job_id, "index_jobs": index_jobs}
-    except IngestCancelledError:
-        # Ledger already reflects the cancel; stop work without retrying.
-        return {"job_id": job_id, "cancelled": True}
+        return run(job_id).model_dump(mode="json", exclude_none=True)
     except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
-        _retry(self, job_id, exc)
+        _retry(task, job_id, exc)
 
 
-def _process_govinfo_bulk_job(job_id: str) -> dict:
-    """Download, normalize, archive, and queue one GovInfo package."""
-    store = _store()
-    job = store.mark_running(job_id, update_windows=False)
-    if job is None:
-        existing = store.get(job_id)
-        return {"job_id": job_id, "skipped": True, "status": existing["status"]}
-    payload = job["payload"]
-    package = GovInfoPackage(
-        package_id=payload["package_id"],
-        collection=payload["collection"],
-        congress=int(payload["congress"]),
-        measure_type=payload["measure_type"],
-        url=payload["url"],
-        session=payload.get("session"),
-        version_code=payload.get("version_code"),
-    )
-    outdir = Path(payload["outdir"]) / job_id
-    manifest = GovInfoManifestStore(outdir / "govinfo.sqlite3")
-    downloader = GovInfoDownloader(
-        outdir,
-        manifest_store=manifest,
-        session=_govinfo_session(),
-        rate_limiter=_govinfo_rate_limiter(),
-    )
-    artifact = downloader.download(package)
-    if package.collection == "BILLSTATUS":
-        record = GovInfoBillStatusParser().parse(artifact.read_bytes(), package)
-        resource = "bill"
-        parser_version = "govinfo-billstatus-v1"
-    elif package.collection == "BILLSUM":
-        record = GovInfoBillSummaryParser().parse(artifact.read_bytes(), package)
-        resource = "bill"
-        parser_version = "govinfo-billsum-v1"
-    elif package.collection == "BILLS":
-        record = GovInfoBillsParser().parse(artifact.read_bytes(), package)
-        resource = "bill_text"
-        parser_version = "govinfo-bills-v1"
-    else:
-        raise ValueError(f"Unsupported GovInfo collection: {package.collection}")
-    manifest.upsert(
-        package,
-        status="parsed",
-        path=str(artifact),
-        byte_count=artifact.stat().st_size,
-        sha256=GovInfoDownloader._sha256(artifact),
-        parser_version=parser_version,
-        fetched_at=GovInfoDownloader._now(),
-    )
-    archive = JsonlRecordArchive(outdir, int(job["attempts"]))
-    archive.write(resource, record, record_id=package.package_id)
-    stream_name = RedisRecordStream.stream_name(job_id, resource)
-    RedisRecordStream(_redis(), stream_name, maxlen=get_config().redis.redis_stream_maxlen).publish(
-        resource, record
-    )
-    index_job = submit_job(
-        JobKind.INDEX.value,
-        {
-            "stream": stream_name,
-            "resource": resource,
-            "batch_size": 1,
-            "preserve_raw": True,
-            "consumer_group": get_config().redis.redis_consumer_group,
-            "expected_count": 1,
-            "archive_root": str(outdir),
-            "target_index": payload.get("target_index"),
-            "replace": bool(payload.get("replace", False)),
-            # A re-parse must not collide with the previous run's succeeded index job.
-            "source_attempt": int(job["attempts"]),
-        },
-        dispatch=False,
-    )
-    store.mark_succeeded(job_id)
-    try:
-        celery_app.send_task(
-            "cdm.workers.tasks.run_index_job",
-            args=[index_job["id"]],
-            queue=get_config().queue.celery_index_queue,
-        )
-    except (OperationalError, ConnectionError):
-        # The durable index row remains queued for periodic recovery.
-        pass
-    return {"job_id": job_id, "index_jobs": [index_job["id"]], "resource": resource}
+def _retry(task: object, job_id: str, exc: Exception) -> NoReturn:
+    _container().task_retrier.handle(task, job_id, exc)  # type: ignore[arg-type]
 
 
-@celery_app.task(bind=True, name="cdm.workers.tasks.run_govinfo_bulk_job")
-def run_govinfo_bulk_job(self, job_id: str) -> dict:
+@celery_app.task(bind=True, name=TaskName.RUN_INGEST.value)
+def run_ingest_job(self: object, job_id: str) -> JsonObject:
+    return _execute(self, job_id, _container().ingest_runner.run)
+
+
+@celery_app.task(bind=True, name=TaskName.RUN_GOVINFO_BULK.value)
+def run_govinfo_bulk_job(self: object, job_id: str) -> JsonObject:
     """Run one durable GovInfo package job."""
-    try:
-        return _process_govinfo_bulk_job(job_id)
-    except Exception as exc:  # noqa: BLE001 - Celery must retry ordinary failures.
-        _retry(self, job_id, exc)
+    return _execute(self, job_id, _container().govinfo_package_runner.run)
 
 
-@celery_app.task(bind=True, name="cdm.workers.tasks.run_govinfo_bulk_batch")
-def run_govinfo_bulk_batch(self, batch_id: str) -> dict:
+@celery_app.task(bind=True, name=TaskName.RUN_GOVINFO_BATCH.value)
+def run_govinfo_bulk_batch(self: object, batch_id: str) -> JsonObject:
     """Fan out a durable batch into independently retryable package tasks."""
-    store = _store()
-    batch = store.mark_running(batch_id)
-    if batch is None:
-        existing = store.get(batch_id)
-        return {"job_id": batch_id, "skipped": True, "status": existing["status"]}
-
-    dispatched = []
-    for package_job_id in batch["payload"]["job_ids"]:
-        celery_app.send_task(
-            "cdm.workers.tasks.run_govinfo_bulk_job",
-            args=[package_job_id],
-            queue=get_config().queue.celery_bulk_queue,
-        )
-        dispatched.append(package_job_id)
-    store.mark_succeeded(batch_id)
-    return {"job_id": batch_id, "packages_dispatched": dispatched}
+    return _execute(self, batch_id, _container().govinfo_batch_runner.run)
 
 
-@celery_app.task(bind=True, name="cdm.workers.tasks.run_index_job")
-def run_index_job(self, job_id: str) -> dict:
-    store = _store()
-    job = store.mark_running(job_id)
-    if job is None:
-        existing = store.get(job_id)
-        return {"job_id": job_id, "skipped": True, "status": existing["status"]}
-    payload = job["payload"]
-
-    def same_batch(other: dict) -> bool:
-        candidate = other["payload"]
-        return all(
-            candidate.get(key) == payload.get(key)
-            for key in ("resource", "target_index", "replace", "preserve_raw")
-        )
-
-    claimed = (
-        store.claim_queued(
-            JobKind.INDEX.value,
-            same_batch,
-            get_config().indexing.index_batch_jobs - 1,
-            exclude={job_id},
-        )
-        if get_config().indexing.index_batch_jobs > 1
-        else []
-    )
-    jobs = {job_id: payload} | {str(other["id"]): other["payload"] for other in claimed}
-    try:
-        client = _container().elastic_client
-        target, _ = resource_target(payload["resource"])
-        target_index = payload.get("target_index")
-        if target_index and not client.indices.exists(index=target_index):
-            logger.warning(
-                "Staging index %s is gone; indexing %s via its write alias",
-                target_index,
-                payload["resource"],
-            )
-            target_index = None
-        if not target_index:
-            IndexManager(client).create(target, exists_ok=True)
-        for item in jobs.values():
-            item.setdefault("consumer_group", get_config().redis.redis_consumer_group)
-        outcomes = index_streams(
-            _redis(),
-            client,
-            jobs,
-            resource=payload["resource"],
-            target_index=target_index,
-            replace=bool(payload.get("replace", False)),
-            preserve_raw=bool(payload.get("preserve_raw", False)),
-            batch_docs=get_config().indexing.index_batch_docs,
-        )
-    except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
-        for other in claimed:
-            store.mark_failed(str(other["id"]), str(exc))
-        _retry(self, job_id, exc)
-
-    own_error: Exception | None = None
-    own_result: dict | None = None
-    for current_id, outcome in outcomes.items():
-        try:
-            if isinstance(outcome, Exception):
-                raise outcome
-            _finalize_index_job(client, jobs[current_id], outcome)
-            store.mark_succeeded(current_id)
-            if current_id == job_id:
-                own_result = outcome
-        except Exception as exc:  # noqa: BLE001
-            if current_id == job_id:
-                own_error = exc
-            else:
-                store.mark_failed(current_id, str(exc))
-    if own_error is not None:
-        _retry(self, job_id, own_error)
-    return {**(own_result or {}), "batched_jobs": len(jobs)}
+@celery_app.task(bind=True, name=TaskName.RUN_INDEX.value)
+def run_index_job(self: object, job_id: str) -> JsonObject:
+    return _execute(self, job_id, _container().index_runner.run)
 
 
-def _finalize_index_job(client, payload: dict, result: dict) -> None:
-    expected_count = payload.get("expected_count")
-    if result["pending"] != 0:
-        raise RuntimeError(
-            f"Redis stream still has {result['pending']} pending entries: "
-            f"{payload['stream']}"
-        )
-    if expected_count is not None and result["indexed"] < int(expected_count):
-        # The stream may have been trimmed or lost (Redis restart, maxlen
-        # eviction); the durable per-job archive is the fallback source.
-        replayed = _replay_archive_into_index(client, payload)
-        result["replayed_from_archive"] = replayed
-        if result["indexed"] + replayed < int(expected_count):
-            raise RuntimeError(
-                f"Indexed {result['indexed']} records "
-                f"(+{replayed} archive replays), expected at least "
-                f"{expected_count}: {payload['stream']}"
-            )
-
-
-def _replay_archive_into_index(client, payload: dict) -> int:
-    """Bulk-upsert archived records for an index job whose stream is gone."""
-    archive_root = payload.get("archive_root")
-    if not archive_root or not (Path(archive_root) / "records.sqlite3").exists():
-        return 0
-    resource = payload["resource"]
-    records = JsonlRecordArchive(Path(archive_root), 0).records(resource)
-    batch_size = int(payload.get("batch_size", 500))
-    preserve_raw = bool(payload.get("preserve_raw", False))
-    replayed = 0
-    for start in range(0, len(records), batch_size):
-        documents = [
-            to_document(record, resource, preserve_raw=preserve_raw)
-            for record in records[start : start + batch_size]
-        ]
-        for document in documents:
-            validate_document(document, resource)
-        result = bulk_upsert(
-            client,
-            resource,
-            documents,
-            target_index=payload.get("target_index"),
-            replace=bool(payload.get("replace", False)),
-        )
-        if result.get("errors"):
-            raise RuntimeError(
-                "OpenSearch bulk indexing failed during archive replay for "
-                f"{archive_root}: {result.get('error_details', [])}"
-            )
-        replayed += len(documents)
-    return replayed
-
-
-@celery_app.task(bind=True, name="cdm.workers.tasks.run_reconciliation_job")
-def run_reconciliation_job(self, job_id: str) -> dict:
+@celery_app.task(bind=True, name=TaskName.RUN_RECONCILIATION.value)
+def run_reconciliation_job(self: object, job_id: str) -> JsonObject:
     """Replay archived GovInfo records into a validated staging index."""
-    store = _store()
-    job = store.mark_running(job_id)
-    if job is None:
-        existing = store.get(job_id)
-        return {"job_id": job_id, "skipped": True, "status": existing["status"]}
-    payload = job["payload"]
-    try:
-        client = _container().elastic_client
-        result = replay_govinfo_archives(
-            Path(payload["archive_root"]),
-            client,
-            target_index=payload["target_index"],
-            report_path=Path(payload["report_path"]),
-            preserve_raw=bool(payload.get("preserve_raw", True)),
-        )
-        store.mark_succeeded(job_id)
-        return {"job_id": job_id, **result}
-    except Exception as exc:  # noqa: BLE001 - Celery must retry ordinary failures.
-        _retry(self, job_id, exc)
+    return _execute(self, job_id, _container().reconciliation_runner.run)
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_daily_ingest")
-def schedule_daily_ingest() -> dict:
-    payload = daily_ingest_payload(datetime.now(UTC).date())
-    return submit_job("ingest", payload)
-
-
-def _parse_utc(value: Any) -> datetime:
-    parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
-
-
-def _coverage_holes(
-    intervals: list[tuple[datetime, datetime]],
-    lookback_start: datetime,
-    current: datetime,
-) -> list[tuple[datetime, datetime]]:
-    """Return uncovered spans after the first covered window within the lookback.
-
-    Spans shorter than the freshness threshold are ignored; the trailing span up
-    to ``current`` is included once it exceeds 24 hours.
-    """
-    clipped = sorted(
-        (max(start, lookback_start), end)
-        for start, end in intervals
-        if end > lookback_start
-    )
-    if not clipped:
-        return []
-    holes = []
-    covered_to = clipped[0][1]
-    for start, end in clipped[1:]:
-        if start - covered_to > _MIN_GAP:
-            holes.append((covered_to, start))
-        covered_to = max(covered_to, end)
-    if current - covered_to > _MIN_GAP:
-        holes.append((covered_to, current))
-    return holes
-
-
-def _chunk_span(start: datetime, end: datetime) -> list[tuple[datetime, datetime]]:
-    chunks = []
-    while start < end:
-        stop = min(end, start + _GAP_CHUNK)
-        chunks.append((start, stop))
-        start = stop
-    return chunks
-
-
-_MIN_GAP = timedelta(hours=24)
-_GAP_CHUNK = timedelta(days=7)
-_GAP_JOBS_PER_RESOURCE = 4
-
-
-def coverage_gap_payloads(now: datetime | None = None) -> list[dict[str, Any]]:
-    """Build jobs for uncovered spans (interior holes and a stale tail)."""
-    current = now or datetime.now(UTC)
-    if current.tzinfo is None:
-        current = current.replace(tzinfo=UTC)
-    lookback_start = current - timedelta(days=get_config().ledger.coverage_lookback_days)
-    store = _store()
-    payloads = []
-    for config in date_windowed():
-        resource = config.resource.value
-        intervals = [
-            (
-                _parse_utc(row["window_start"])
-                if row.get("window_start")
-                else datetime.min.replace(tzinfo=UTC),
-                _parse_utc(row["window_end"]),
-            )
-            for row in store.coverage(resource)
-            if row["status"] == JobStatus.SUCCEEDED.value and row["window_end"]
-        ]
-        spans = [
-            chunk
-            for hole in _coverage_holes(intervals, lookback_start, current)
-            for chunk in _chunk_span(*hole)
-        ]
-        for span_start, span_end in spans[:_GAP_JOBS_PER_RESOURCE]:
-            payloads.append({
-                "outdir": "data/daily",
-                "resources": [resource],
-                "from_date": span_start
-                .replace(microsecond=0)
-                .isoformat()
-                .replace("+00:00", "Z"),
-                "to_date": span_end
-                .replace(microsecond=0)
-                .isoformat()
-                .replace("+00:00", "Z"),
-                # Scope to the current Congress: the bare list endpoints return
-                # records from ANY congress recently touched by Congress.gov
-                # backfills (e.g. 1978 bills with a 2026 updateDate).
-                "congress": (current.year - 1787) // 2,
-                "fetch_items": config.fetch_items_default,
-                # Bills default to list-only; gap windows are small enough to
-                # hydrate full detail (actions, cosponsors, subjects, text).
-                "item_resources": ["bill"],
-                "index": True,
-                "concurrency": 4,
-                "index_batch_size": 500,
-                "mode": "coverage_gap",
-            })
-    return payloads
+def schedule_daily_ingest() -> JsonObject:
+    container = _container()
+    payload = container.daily_ingest_planner.payload(datetime.now(UTC).date())
+    job = container.job_submitter.submit(JobKind.INGEST.value, payload.to_json())
+    return dict(job)
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_coverage_gaps")
-def schedule_coverage_gaps() -> dict:
+def schedule_coverage_gaps() -> JsonObject:
     """Queue idempotent jobs for date-windowed coverage gaps over 24 hours."""
-    queued = []
-    for payload in coverage_gap_payloads():
-        queued.append(submit_job(JobKind.INGEST.value, payload)["id"])
+    container = _container()
+    queued = [
+        container.job_submitter.submit(JobKind.INGEST.value, payload.to_json())["id"]
+        for payload in container.coverage_gap_planner.payloads()
+    ]
     return {"queued": queued, "count": len(queued)}
 
 
-# Static list endpoints ignore date filters, so refresh them weekly: a cheap
-# list-only pass over everything plus full hydration of the current Congress.
-def static_refresh_payloads(today) -> list[dict[str, Any]]:
-    stamp = today.isocalendar()
-    week = f"{stamp.year}-W{stamp.week:02d}"
-    congress = (today.year - 1787) // 2
-    payloads = []
-    for config in static_resources():
-        resource = config.resource.value
-        base = {
-            "outdir": "data/daily",
-            "resources": [resource],
-            "index": True,
-            "concurrency": 4,
-            "index_batch_size": 500,
-            "schedule_week": week,
-            # The API 500s on tail pages of some full-collection lists.
-            "max_skipped_list_pages": 100,
-        }
-        payloads.append(base | {"fetch_items": False, "mode": "static_refresh"})
-        if resource in CONGRESS_LISTABLE and config.fetch_items_default:
-            payloads.append(
-                base
-                | {
-                    "congress": congress,
-                    "fetch_items": True,
-                    "mode": "static_refresh_congress",
-                }
-            )
-    return payloads
-
-
 @celery_app.task(name="cdm.workers.tasks.schedule_static_refresh")
-def schedule_static_refresh() -> dict:
+def schedule_static_refresh() -> JsonObject:
+    container = _container()
     queued = [
-        submit_job(JobKind.INGEST.value, payload)["id"]
-        for payload in static_refresh_payloads(datetime.now(UTC).date())
+        container.job_submitter.submit(JobKind.INGEST.value, payload.to_json())["id"]
+        for payload in container.static_refresh_planner.payloads(
+            datetime.now(UTC).date()
+        )
     ]
     return {"queued": queued, "count": len(queued)}
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_topic_training")
-def schedule_topic_training() -> dict:
+def schedule_topic_training() -> JsonObject:
     """Start a topic-model retrain unless one is already running."""
     status = start_training()
     return {"started": status.started, "state": status.state.value}
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_member_graph_build")
-def schedule_member_graph_build() -> dict:
+def schedule_member_graph_build() -> JsonObject:
     """Start a member graph rebuild unless one is already running."""
     status = GraphBuildRunner().start()
     return {"started": status.started, "state": status.state.value}
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_vote_refresh")
-def schedule_vote_refresh() -> dict:
+def schedule_vote_refresh() -> JsonObject:
     """Refresh roll calls (both chambers) for the current Congress."""
     congress = current_congress(datetime.now(UTC).year)
-    ingestor = VoteIngestor(_container().elastic_client, VoteviewClient(Path("data/voteview")))
-    return {"congress": congress, "roll_calls": ingestor.ingest_congress(congress, refresh=True)}
+    ingestor = VoteIngestor(_container().elastic_client, VoteviewClient(VOTEVIEW_DIR))
+    return {
+        "congress": congress,
+        "roll_calls": ingestor.ingest_congress(congress, refresh=True),
+    }
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_govinfo_refresh")
-def schedule_govinfo_refresh() -> dict:
+def schedule_govinfo_refresh() -> JsonObject:
     """Queue GovInfo packages for the current Congress that have no job yet."""
-    congress = (datetime.now(UTC).year - 1787) // 2
-    store = _store()
-    queued = []
-    for package in GovInfoDiscovery().list_congress_packages(congress):
-        payload = {
-            "collection": package.collection,
-            "congress": package.congress,
-            "measure_type": package.measure_type,
-            "package_id": package.package_id,
-            "url": package.url,
-            "session": package.session,
-            "version_code": package.version_code,
-            "outdir": "data/full_history/govinfo",
-            "target_index": None,
-            "replace": False,
-        }
-        try:
-            store.get(_job_id(JobKind.GOVINFO_BULK.value, payload))
-            continue
-        except KeyError:
-            pass
-        queued.append(
-            submit_job(JobKind.GOVINFO_BULK.value, payload, store=store)["id"]
-        )
+    congress, queued = _container().govinfo_refresh_scheduler.run(datetime.now(UTC))
     return {"congress": congress, "queued": len(queued)}
 
 
-def daily_ingest_payload(today) -> dict:
-    """Build the bounded recurring-ingest payload for a UTC calendar day.
-
-    Date-capable resources are queried with a small overlap so late API
-    updates are discovered. Congress-scoped resources are limited to the
-    current Congress. Static resources are excluded because their endpoints
-    provide no server-side incremental filter.
-    """
-    start = today - timedelta(days=2)
-    from_date = start.isoformat() + "T00:00:00Z"
-    to_date = today.isoformat() + "T23:59:59Z"
-    resources = sorted({
-        config.resource.value for config in (*date_windowed(), *congress_scoped())
-    })
-    payload = {
-        "outdir": "data/daily",
-        "resources": resources,
-        "from_date": from_date,
-        "to_date": to_date,
-        "congress": (today.year - 1787) // 2,
-        "fetch_items": True,
-        # Bills default to list-only; daily windows are small enough to
-        # hydrate full detail (actions, cosponsors, subjects, text).
-        "item_resources": ["bill"],
-        "index": True,
-        "concurrency": 4,
-        "index_batch_size": 500,
-        "schedule_date": today.isoformat(),
-        "mode": "daily_incremental",
-    }
-    return payload
-
-
-# Redispatching an already-QUEUED job is a rare safety net for messages lost
-# to broker hiccups, not a routine driver of work. Keep the staleness window
-# long and the per-tick batch small so a stalled/absent consumer can never
-# turn recovery into a duplicate-message storm.
-_CRASH_RECOVERY_CUTOFF_MINUTES = 15
-_ORPHAN_RECOVERY_CUTOFF_MINUTES = 60
-_INGEST_ORPHAN_RECOVERY_CUTOFF_MINUTES = 24 * 60
-_ORPHAN_RECOVERY_BATCH_LIMIT = 25
-_ORPHAN_RECOVERABLE_KINDS = (
-    JobKind.GOVINFO_BULK.value,
-    JobKind.GOVINFO_BULK_BATCH.value,
-)
-# Index jobs are re-sent only when the broker queue is nearly empty, topping
-# it up to the high watermark, so a lost message heals without duplicate storms.
-_INDEX_LOW_WATERMARK = 500
-_INDEX_HIGH_WATERMARK = 2000
-_INDEX_QUEUED_CUTOFF_MINUTES = 5
-
-
-def _queue_depth(queue: str) -> int | None:
-    """Return the broker message count for *queue*, or None if unavailable."""
-    try:
-        with celery_app.connection_for_read() as connection:
-            channel = connection.default_channel
-            return int(channel.queue_declare(queue=queue, passive=True).message_count)
-    except Exception:  # noqa: BLE001 - dispatching is skipped when depth is unknown.
-        logger.warning("Could not read depth of queue %s", queue, exc_info=True)
-        return None
-
-
-def _index_redispatch_budget() -> int:
-    depth = _queue_depth(get_config().queue.celery_index_queue)
-    if depth is None or depth >= _INDEX_LOW_WATERMARK:
-        return 0
-    return _INDEX_HIGH_WATERMARK - depth
-
-
 @celery_app.task(name="cdm.workers.tasks.recover_failed_ingest_jobs")
-def recover_failed_ingest_jobs() -> dict:
-    """Requeue jobs stranded by a worker crash and redispatch rare orphaned jobs.
-
-    Crash recovery (RUNNING/RETRYING jobs whose worker died) runs every tick.
-    Redispatching QUEUED jobs is capped and uses a staleness window since a
-    normal queued job already has a message sitting in the broker. Ingest jobs
-    use a longer window because historical jobs can legitimately wait for a
-    day; this still repairs rows whose broker delivery was lost.
-    """
-    redis_client = _redis()
-    recovery_lock = redis_client.lock(
-        "congress:workers:recover_failed_ingest_jobs",
-        timeout=3600,
-        blocking=False,
-    )
-    if not recovery_lock.acquire():
-        return {"recovered": [], "skipped": "already_running"}
-
-    try:
-        store = _store()
-        recovered = []
-        now = datetime.now(UTC)
-        crash_cutoff = (
-            now - timedelta(minutes=_CRASH_RECOVERY_CUTOFF_MINUTES)
-        ).isoformat()
-        orphan_cutoff = (
-            now - timedelta(minutes=_ORPHAN_RECOVERY_CUTOFF_MINUTES)
-        ).isoformat()
-        candidates = [
-            *store.failed(),
-            *store.stale_active(crash_cutoff),
-            *store.stale_queued(
-                _ORPHAN_RECOVERABLE_KINDS, orphan_cutoff, _ORPHAN_RECOVERY_BATCH_LIMIT
-            ),
-            *store.stale_queued(
-                (JobKind.INGEST.value,),
-                (
-                    now - timedelta(minutes=_INGEST_ORPHAN_RECOVERY_CUTOFF_MINUTES)
-                ).isoformat(),
-                _ORPHAN_RECOVERY_BATCH_LIMIT,
-            ),
-        ]
-        index_budget = _index_redispatch_budget()
-        if index_budget:
-            candidates.extend(
-                store.stale_queued(
-                    (JobKind.INDEX.value,),
-                    (now - timedelta(minutes=_INDEX_QUEUED_CUTOFF_MINUTES)).isoformat(),
-                    index_budget,
-                )
-            )
-        batched_package_ids = {
-            package_id
-            for batch in store.jobs(JobKind.GOVINFO_BULK_BATCH.value)
-            if batch["status"]
-            in {JobStatus.QUEUED, JobStatus.RUNNING, JobStatus.RETRYING}
-            for package_id in batch["payload"].get("job_ids", [])
-        }
-        seen = set()
-        for job in candidates:
-            if job["id"] in seen:
-                continue
-            seen.add(job["id"])
-            if job["kind"] == JobKind.GOVINFO_BULK and job["id"] in batched_package_ids:
-                continue
-            if job["status"] == JobStatus.FAILED and not _is_retryable_error(
-                job["last_error"]
-            ):
-                continue
-            requeued = store.requeue(job["id"])
-            if job["kind"] == JobKind.INGEST:
-                task_name = "cdm.workers.tasks.run_ingest_job"
-            elif job["kind"] == JobKind.INDEX:
-                task_name = "cdm.workers.tasks.run_index_job"
-            elif job["kind"] == JobKind.GOVINFO_BULK_BATCH:
-                task_name = "cdm.workers.tasks.run_govinfo_bulk_batch"
-            else:
-                task_name = "cdm.workers.tasks.run_govinfo_bulk_job"
-            if job["kind"] == JobKind.INGEST:
-                queue = get_config().queue.celery_ingest_queue
-            elif job["kind"] in {JobKind.GOVINFO_BULK, JobKind.GOVINFO_BULK_BATCH}:
-                queue = get_config().queue.celery_bulk_queue
-            else:
-                queue = get_config().queue.celery_index_queue
-            celery_app.send_task(
-                task_name,
-                args=[requeued["id"]],
-                queue=queue,
-            )
-            recovered.append(requeued["id"])
-        return {"recovered": recovered}
-    finally:
-        recovery_lock.release()
-
-
-_STREAM_PREFIX = "congress:ingest:"
-
-
-def _stream_source_job_id(stream_name: str) -> str | None:
-    """Extract the ingest job id from ``congress:ingest:<job_id>:<resource>``."""
-    if not stream_name.startswith(_STREAM_PREFIX):
-        return None
-    remainder = stream_name[len(_STREAM_PREFIX) :]
-    job_id, _, _resource = remainder.rpartition(":")
-    return job_id or None
+def recover_failed_ingest_jobs() -> JsonObject:
+    """Requeue jobs stranded by a worker crash and redispatch rare orphaned jobs."""
+    result = _container().recovery_service.recover()
+    return result.model_dump(mode="json", exclude_none=True)
 
 
 @celery_app.task(name="cdm.workers.tasks.trim_logs")
-def trim_logs() -> dict:
+def trim_logs() -> JsonObject:
     """Cap every log file at its newest lines."""
     trimmed = LogTrimmer().trim_all()
     return {"trimmed": [result.model_dump() for result in trimmed]}
 
 
 @celery_app.task(name="cdm.workers.tasks.run_retention_maintenance")
-def run_retention_maintenance() -> dict:
-    """Prune old terminal jobs and their Redis streams and archive directories.
-
-    Coverage history (``ingest_windows``) is preserved so gap scheduling and
-    future historical backfills still see what was ingested. Jobs whose
-    streams or archives are still referenced by an unfinished index job are
-    protected until that index job resolves.
-    """
-    store = _store()
-    cutoff = (datetime.now(UTC) - timedelta(days=get_config().ledger.retention_days)).isoformat()
-
-    protected: set[str] = set()
-    for job in store.unfinished(JobKind.INDEX.value):
-        source_id = _stream_source_job_id(str(job["payload"].get("stream", "")))
-        if source_id:
-            protected.add(source_id)
-
-    pruned = store.prune_terminal_jobs(older_than=cutoff, exclude_ids=protected)
-    pruned_ids = {job["id"] for job in pruned}
-
-    # Streams are only a transport between ingest and indexing; once the
-    # source job is terminal (and no unfinished index job references it) the
-    # per-job archive is the durable replay source, so delete streams
-    # immediately instead of waiting out the ledger retention window.
-    redis_client = _redis()
-    existing_ids = store.all_ids()
-    terminal_ids = store.ids_with_status((
-        JobStatus.SUCCEEDED.value,
-        JobStatus.CANCELLED.value,
-    ))
-    streams_deleted = 0
-    for key in redis_client.scan_iter(match=f"{_STREAM_PREFIX}*", count=1000):
-        name = key.decode() if isinstance(key, bytes) else str(key)
-        source_id = _stream_source_job_id(name)
-        if source_id is None or source_id in protected:
-            continue
-        if source_id in pruned_ids or source_id in terminal_ids:
-            redis_client.delete(key)
-            streams_deleted += 1
-        elif source_id not in existing_ids:
-            # Re-check the ledger: a job created after the snapshot must not
-            # have its fresh stream deleted as an orphan.
-            try:
-                store.get(source_id)
-            except KeyError:
-                redis_client.delete(key)
-                streams_deleted += 1
-
-    # Remove per-job archive directories for pruned ingest jobs; they were the
-    # resume/replay source and are no longer needed once indexing is settled.
-    data_root = Path("data").resolve()
-    archives_deleted = 0
-    for job in pruned:
-        if job["kind"] not in _ARCHIVED_JOB_KINDS:
-            continue
-        outdir = job["payload"].get("outdir")
-        if not outdir:
-            continue
-        job_dir = (Path(outdir) / job["id"]).resolve()
-        if job_dir.is_dir() and job_dir.is_relative_to(data_root):
-            shutil.rmtree(job_dir, ignore_errors=True)
-            archives_deleted += 1
-
-    # Directories left behind by jobs pruned before archive cleanup covered them.
-    orphan_sweep = OrphanArchiveSweeper(
-        get_config().govinfo.govinfo_archive_root, f"{JobKind.GOVINFO_BULK.value}:"
-    ).sweep(store.all_ids())
-
-    vacuumed = store.vacuum() if pruned else False
-    store.checkpoint_wal()
-    return {
-        "pruned_jobs": len(pruned),
-        "streams_deleted": streams_deleted,
-        "archives_deleted": archives_deleted,
-        "orphan_archives_deleted": orphan_sweep.directories_removed,
-        "orphan_bytes_freed": orphan_sweep.bytes_freed,
-        "vacuumed": vacuumed,
-        "protected": sorted(protected),
-    }
+def run_retention_maintenance() -> JsonObject:
+    """Prune old terminal jobs and their Redis streams and archive directories."""
+    return _container().retention_service.run().model_dump(mode="json")
