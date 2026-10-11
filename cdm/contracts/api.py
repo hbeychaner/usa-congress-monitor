@@ -169,8 +169,15 @@ class TopicBill(BaseModel):
     probability: float
 
 
+class RelatedTopic(BaseModel):
+    topic_id: int
+    label: str
+    similarity: float
+
+
 class TopicDetailResponse(BaseModel):
     topic: TopicSummary
+    related: list[RelatedTopic] = Field(default_factory=list)
     model_version: str | None = None
     trend: list[TopicTrendPoint] = Field(default_factory=list)
     top_bills: list[TopicBill] = Field(default_factory=list)

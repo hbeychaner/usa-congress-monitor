@@ -1328,6 +1328,15 @@ export interface components {
             /** Similarity */
             similarity: number;
         };
+        /** RelatedTopic */
+        RelatedTopic: {
+            /** Topic Id */
+            topic_id: number;
+            /** Label */
+            label: string;
+            /** Similarity */
+            similarity: number;
+        };
         /** SearchResponse */
         SearchResponse: {
             /** Query */
@@ -1541,6 +1550,8 @@ export interface components {
         /** TopicDetailResponse */
         TopicDetailResponse: {
             topic: components["schemas"]["TopicSummary"];
+            /** Related */
+            related?: components["schemas"]["RelatedTopic"][];
             /** Model Version */
             model_version?: string | null;
             /** Trend */

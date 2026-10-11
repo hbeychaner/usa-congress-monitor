@@ -27,8 +27,15 @@ export type TopicBill = {
   probability: number;
 };
 
+export type RelatedTopic = {
+  topic_id: number;
+  label: string;
+  similarity: number;
+};
+
 export type TopicDetailResponse = {
   topic: TopicSummary;
+  related: RelatedTopic[];
   model_version: string | null;
   trend: TopicTrendPoint[];
   top_bills: TopicBill[];

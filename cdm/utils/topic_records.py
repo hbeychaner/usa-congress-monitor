@@ -12,6 +12,7 @@ class TopicSummaryRow(BaseModel):
     top_words: list[str] = Field(default_factory=list)
     label: str | None = None
     metasubject_id: int | None = None
+    centroid: list[float] | None = None
 
 
 class TopicTimeBin(BaseModel):

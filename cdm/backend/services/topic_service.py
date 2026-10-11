@@ -24,6 +24,7 @@ from cdm.contracts.api import (
     MetasubjectTrendSeries,
     MetasubjectTrendsResponse,
     RelatedMetasubject,
+    RelatedTopic,
     TopicAssignmentItem,
     TopicBill,
     TopicDetailResponse,
@@ -44,6 +45,8 @@ _METASUBJECT_TREND_KIND = "metasubject_over_time"
 _METASUBJECT_LIMIT = 100
 _METASUBJECT_TREND_LIMIT = 10000
 _RELATED_METASUBJECT_LIMIT = 5
+_RELATED_TOPIC_LIMIT = 10
+_TOPIC_LIMIT = 10000
 
 
 def topic_label(name: str | None, topic_id: int) -> str:
@@ -258,26 +261,75 @@ class TopicService:
             for source in sources
             if source.get("centroid")
         }
-        target = centroids.get(metasubject_id)
-        if target is None:
+        if metasubject_id not in centroids:
             return []
         names = {
             int(source["metasubject_id"]): str(source.get("name") or "")
             for source in sources
         }
-        related = [
+        return [
             RelatedMetasubject(
-                metasubject_id=other_id,
-                name=names[other_id],
-                similarity=float(
+                metasubject_id=other_id, name=names[other_id], similarity=similarity
+            )
+            for other_id, similarity in self._nearest(
+                metasubject_id, centroids, _RELATED_METASUBJECT_LIMIT
+            )
+        ]
+
+    @staticmethod
+    def _nearest(
+        target_id: int, centroids: dict[int, np.ndarray], limit: int
+    ) -> list[tuple[int, float]]:
+        """Other ids ranked by cosine similarity to the target's centroid."""
+        target = centroids[target_id]
+        ranked = [
+            (
+                other_id,
+                float(
                     target @ vector / (np.linalg.norm(target) * np.linalg.norm(vector))
                 ),
             )
             for other_id, vector in centroids.items()
-            if other_id != metasubject_id
+            if other_id != target_id
         ]
-        related.sort(key=lambda item: item.similarity, reverse=True)
-        return related[:_RELATED_METASUBJECT_LIMIT]
+        ranked.sort(key=lambda item: item[1], reverse=True)
+        return ranked[:limit]
+
+    def related_topics(
+        self, model_version: str, topic_id: int, summaries: dict[int, TopicSummary]
+    ) -> list[RelatedTopic]:
+        """Other topics ranked by cosine similarity of their centroids."""
+        response = self._search(
+            {
+                "size": _TOPIC_LIMIT,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"kind": "topic"}},
+                            {"term": {"model_version": model_version}},
+                        ]
+                    }
+                },
+                "_source": ["topic_id", "centroid"],
+            }
+        )
+        centroids = {
+            int(source["topic_id"]): np.asarray(source["centroid"], dtype=np.float64)
+            for source in (hit.get("_source", {}) for hit in self._hits(response))
+            if source.get("centroid") and int(source["topic_id"]) != _OUTLIER_TOPIC_ID
+        }
+        if topic_id not in centroids:
+            return []
+        return [
+            RelatedTopic(
+                topic_id=other_id,
+                label=summaries[other_id].label if other_id in summaries else f"Topic {other_id}",
+                similarity=similarity,
+            )
+            for other_id, similarity in self._nearest(
+                topic_id, centroids, _RELATED_TOPIC_LIMIT
+            )
+        ]
 
     def list_topics(self) -> TopicsResponse:
         """All topics from the latest trained model, largest first."""
@@ -410,7 +462,13 @@ class TopicService:
             for doc_id, probability in assignments
         ]
         return TopicDetailResponse(
-            topic=topic, model_version=model_version, trend=trend, top_bills=bills
+            topic=topic,
+            related=self.related_topics(
+                model_version, topic_id, self.topic_summaries(model_version)
+            ),
+            model_version=model_version,
+            trend=trend,
+            top_bills=bills,
         )
 
     def get_bill_topics(self, bill_id: str) -> BillTopicsResponse:
