@@ -90,7 +90,9 @@ def schedule_coverage_gaps() -> JsonObject:
     """Queue idempotent jobs for date-windowed coverage gaps over 24 hours."""
     container = _container()
     queued = [
-        container.job_submitter.submit(JobKind.INGEST.value, payload.to_json())["id"]
+        container.job_submitter.submit(
+            JobKind.INGEST.value, payload.to_json(), dispatch_existing=False
+        )["id"]
         for payload in container.coverage_gap_planner.payloads()
     ]
     return {"queued": queued, "count": len(queued)}

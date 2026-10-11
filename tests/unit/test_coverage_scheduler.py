@@ -100,7 +100,7 @@ def test_coverage_gap_payloads_ignore_incomplete_windows(monkeypatch):
     rows = {
             "bill": [
                 {
-                    "status": JobStatus.RUNNING.value,
+                    "status": JobStatus.FAILED.value,
                     "window_end": "2026-08-20T00:00:00Z",
                 }
             ]
@@ -115,3 +115,29 @@ def test_coverage_gap_payloads_ignore_incomplete_windows(monkeypatch):
     )
 
     assert _payloads(rows, now) == []
+
+
+def test_pending_windows_are_not_replanned(monkeypatch):
+    now = datetime(2026, 8, 25, 12, tzinfo=UTC)
+    monkeypatch.setattr(
+        "cdm.workers.planners.date_windowed",
+        lambda: [
+            SimpleNamespace(
+                resource=SimpleNamespace(value="bill"), fetch_items_default=False
+            )
+        ],
+    )
+    rows = {
+        "bill": [
+            {"status": JobStatus.SUCCEEDED.value, "window_end": "2026-08-20T00:00:00Z"},
+            {
+                "status": JobStatus.QUEUED.value,
+                "window_start": "2026-08-20T00:00:00Z",
+                "window_end": "2026-08-25T06:00:00Z",
+            },
+        ]
+    }
+
+    assert _payloads(rows, now) == []
+    rows["bill"][1]["status"] = JobStatus.FAILED.value
+    assert len(_payloads(rows, now)) == 1

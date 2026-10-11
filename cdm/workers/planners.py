@@ -67,6 +67,13 @@ class CoverageGapPlanner:
     MIN_GAP = timedelta(hours=24)
     CHUNK = timedelta(days=7)
     JOBS_PER_RESOURCE = 4
+    # Pending work counts as covered so waiting jobs are never planned twice.
+    COVERED_STATUSES = frozenset({
+        JobStatus.SUCCEEDED.value,
+        JobStatus.QUEUED.value,
+        JobStatus.RUNNING.value,
+        JobStatus.RETRYING.value,
+    })
 
     def __init__(self, store: JobStore, ledger: LedgerConfig) -> None:
         self._store = store
@@ -155,7 +162,7 @@ class CoverageGapPlanner:
                 _parse_utc(row["window_end"]),
             )
             for row in rows
-            if row["status"] == JobStatus.SUCCEEDED.value and row["window_end"]
+            if row["status"] in CoverageGapPlanner.COVERED_STATUSES and row["window_end"]
         ]
 
 
