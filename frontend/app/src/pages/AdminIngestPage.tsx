@@ -232,7 +232,7 @@ export function AdminIngestPage() {
                                         <Table.ColumnHeaderCell>Job</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Resource</Table.ColumnHeaderCell>
-                                        <Table.ColumnHeaderCell>Window</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Scope</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Completed</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Observed</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Target</Table.ColumnHeaderCell>
@@ -246,7 +246,7 @@ export function AdminIngestPage() {
                                             <Table.RowHeaderCell>{job.job_id.replace('ingest:', '').slice(0, 10)}</Table.RowHeaderCell>
                                             <Table.Cell><Badge variant="soft">{job.status}</Badge></Table.Cell>
                                             <Table.Cell>{job.resource}</Table.Cell>
-                                            <Table.Cell>{formatDate(job.from_date)} to {formatDate(job.to_date)}</Table.Cell>
+                                            <Table.Cell>{job.from_date || job.to_date ? `${formatDate(job.from_date)} to ${formatDate(job.to_date)}` : job.congress ? `Congress ${job.congress}` : 'All'}</Table.Cell>
                                             <Table.Cell>{job.hydrated.toLocaleString()}</Table.Cell>
                                             <Table.Cell>{job.discovered.toLocaleString()}</Table.Cell>
                                             <Table.Cell>{job.target.toLocaleString()}</Table.Cell>

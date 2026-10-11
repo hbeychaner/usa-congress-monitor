@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- Admin ingest job table shows "Congress N" in the Scope column for jobs without a date window.
+
 - `scripts/submit_ingest.py` accepts `--item-resources` so bills can be hydrated (bill detail fetches were silently skipped).
 
 - Member graph no longer returns a 500 (shown as "Failed to fetch") when several seeds and a large limit push an edge query past the 10,000-result window.
