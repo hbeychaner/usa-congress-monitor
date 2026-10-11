@@ -9,7 +9,10 @@ from redis import Redis
 
 from cdm.container import Container
 from cdm.ingest.govinfo import GovInfoDiscovery
+from cdm.ingest.record_library import RecordLibrary
+from cdm.ingest.stale_bills import IndexedBillStateReader
 from cdm.jobs.store import JobStore
+from cdm.store.opensearch import read_alias
 from cdm.utils.rate_limiter import TokenBucket
 from cdm.workers.celery_app import celery_app
 from cdm.workers.dispatch import JobDispatcher, JobSubmitter
@@ -77,6 +80,14 @@ class WorkerContainer(Container):
         )
 
     @cached_property
+    def bill_state_reader(self) -> IndexedBillStateReader:
+        return IndexedBillStateReader(self.elastic_client, read_alias("bill"))
+
+    @cached_property
+    def record_library(self) -> RecordLibrary:
+        return RecordLibrary(self.config.ledger.record_library_root)
+
+    @cached_property
     def ingest_runner(self) -> IngestJobRunner:
         return IngestJobRunner(
             self.job_store,
@@ -84,6 +95,8 @@ class WorkerContainer(Container):
             self.job_submitter,
             self.config.redis,
             self.config.congress_api,
+            self.bill_state_reader,
+            self.record_library,
         )
 
     @cached_property

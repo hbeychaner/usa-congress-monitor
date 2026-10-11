@@ -36,6 +36,7 @@ from cdm.ingest.resource_config import (
     static_resources,
 )
 from cdm.ingest.runner import FatalIngestError, IngestRunner, Resource
+from cdm.ingest.stale_bills import ItemFilter
 from cdm.jobs.store import CoverageStage
 from cdm.utils.rate_limiter import TokenBucket
 
@@ -74,6 +75,8 @@ class PipelineConfig:
     record_archive_sink: Callable[[str, dict], None] | None = None
     validation_failure_sink: Callable[[str, dict, str, str | None], None] | None = None
     progress_sink: Callable[[str, CoverageStage, dict], None] | None = None
+    # Restricts item fetches to listed items the filter accepts
+    item_filter: ItemFilter | None = None
     # API auth
     api_key: str | None = None
     # Whether to continue past errors in individual resources
@@ -205,6 +208,7 @@ class Pipeline:
                 record_archive_sink=self.config.record_archive_sink,
                 validation_failure_sink=self.config.validation_failure_sink,
                 progress_sink=self.config.progress_sink,
+                item_filter=self.config.item_filter,
             )
             counts = runner.run()
             result.list_count = int(counts["list_count"])

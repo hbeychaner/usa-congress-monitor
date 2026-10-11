@@ -31,6 +31,7 @@ from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 from cdm.data_collection.specs.congress_list_specs import CONGRESS_LISTABLE
 from cdm.data_collection.utils import PaginationResolver
 from cdm.ingest.archive import SQLiteListCache
+from cdm.ingest.stale_bills import ItemFilter
 from cdm.jobs.store import CoverageStage
 from cdm.utils.logger import get_logger
 from cdm.utils.rate_limiter import TokenBucket
@@ -224,6 +225,8 @@ class IngestRunner:
     validation_failure_sink: Callable[[str, dict, str, str | None], None] | None = (
         field(default=None, repr=False)
     )
+    # When set, only listed items it accepts are fetched in detail.
+    item_filter: ItemFilter | None = field(default=None, repr=False)
     # Guardrail for API pages that consistently return HTTP 5xx at a fixed offset.
     # We skip a bounded number of poisoned offsets and continue the ingest.
     max_skipped_list_pages: int = 0
@@ -745,8 +748,23 @@ class IngestRunner:
         pending = [
             (idx, meta) for idx, meta in pending if not _meta_already_archived(meta)
         ]
+        if self.item_filter is not None:
+            item_filter = self.item_filter
+            pending = [
+                (idx, meta) for idx, meta in pending if item_filter.needs_refresh(meta)
+            ]
         skipped_count = len(to_fetch_list) - len(pending)
         total = len(pending)
+        if self.item_filter is not None and self.progress_sink is not None:
+            self.progress_sink(
+                self.resource.value,
+                CoverageStage.HYDRATION,
+                {
+                    "discovered_count": len(all_models),
+                    "hydrated_count": 0,
+                    "target_count": total,
+                },
+            )
 
         concurrency = max(1, self.concurrency)
         logger.info(
@@ -777,7 +795,10 @@ class IngestRunner:
                         self.record_sink(self.resource.value, item_data)
                 with counters_lock:
                     successes[0] += 1
-                    hydrated_count = successes[0] + skipped_count
+                    # A filtered run reports only the work it actually does.
+                    hydrated_count = successes[0] + (
+                        0 if self.item_filter is not None else skipped_count
+                    )
                 if self.progress_sink is not None:
                     self.progress_sink(
                         self.resource.value,
@@ -785,7 +806,11 @@ class IngestRunner:
                         {
                             "discovered_count": len(all_models),
                             "hydrated_count": hydrated_count,
-                            "target_count": len(to_fetch_list),
+                            "target_count": (
+                                total
+                                if self.item_filter is not None
+                                else len(to_fetch_list)
+                            ),
                         },
                     )
                 if successes[0] % 100 == 0:

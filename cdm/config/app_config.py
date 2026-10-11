@@ -84,6 +84,8 @@ class LedgerConfig(_Section):
     retention_days: int = 30
     # Ledger windows older than this are not scanned for interior coverage holes.
     coverage_lookback_days: int = 30
+    # Latest copy of each refreshed record, kept outside job directories.
+    record_library_root: Path = Path("data/record_library")
 
 
 class GovInfoConfig(_Section):

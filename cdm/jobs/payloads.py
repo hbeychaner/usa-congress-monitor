@@ -43,6 +43,10 @@ class IngestPayload(JobPayload):
     index: bool = True
     index_batch_size: int = 500
     preserve_raw: bool = False
+    # Hydrate only bills that are new, newer upstream, or still skeletons.
+    refresh_stale: bool = False
+    # Also keep each fetched record in the durable record library.
+    retain_records: bool = False
     mode: IngestMode | None = None
     schedule_date: str | None = None
     schedule_week: str | None = None

@@ -184,6 +184,36 @@ class SQLiteRecordArchive:
             )
 
 
+class LatestRecordArchive(SQLiteRecordArchive):
+    """Same layout as a job archive, but a newer write replaces the stored record."""
+
+    def write(
+        self,
+        resource: str,
+        record: JsonObject,
+        *,
+        record_id: str | None = None,
+    ) -> None:
+        payload = zlib.compress(
+            json.dumps(record, ensure_ascii=True, separators=(",", ":")).encode(),
+            level=6,
+        )
+        statement = sqlite_insert(_ARCHIVED_RECORDS).values(
+            resource=resource,
+            record_id=record_id or self._record_id(record),
+            payload=payload,
+        )
+        statement = statement.on_conflict_do_update(
+            index_elements=(
+                _ARCHIVED_RECORDS.c.resource,
+                _ARCHIVED_RECORDS.c.record_id,
+            ),
+            set_={"payload": statement.excluded.payload},
+        )
+        with self._lock, self.engine.begin() as connection:
+            connection.execute(statement)
+
+
 class SQLiteListCache:
     """Store resumable list pages as compressed, deduplicated rows."""
 

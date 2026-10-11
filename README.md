@@ -72,6 +72,15 @@ Date filters are sent only to resources whose API endpoints support them.
 Amendments and other static/global resources are ingested without date filters;
 the resource catalog is the source of truth for this behavior.
 
+To refresh only bills whose upstream `updateDate` is newer than the indexed copy,
+and keep the refreshed records in a durable local library
+(`data/record_library/congress-N/records.sqlite3`):
+
+```bash
+uv run python scripts/submit_ingest.py --resources bill --congress 117 \
+    --fetch-items --item-resources bill --refresh-stale --retain-records
+```
+
 ## Queue A Full Ingest
 
 Start the supervised services, run the bounded smoke job, then queue the

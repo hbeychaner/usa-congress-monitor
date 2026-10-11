@@ -4,6 +4,8 @@
 
 ### Added
 
+- Stale-bill refresh: `submit_ingest.py --refresh-stale` lists a Congress, compares each bill's list `updateDate` with the indexed `update_date`, and hydrates only changed bills or never-hydrated skeletons; admin progress targets just those bills.
+- Record library: `--retain-records` upserts every fetched record into `data/record_library/congress-N/records.sqlite3` (latest write wins, outside job retention) for future reindexing.
 - Admin ingest job table shows per-job speed (items/hour since start) and ETA, and a single `completed / total` progress indicator instead of the Observed/Target/Remaining columns.
 
 - Topic page "Related Topics" chart: nearest topics by embedding-centroid similarity. Training now stores each topic's `centroid`; the current model was backfilled from its saved embeddings.

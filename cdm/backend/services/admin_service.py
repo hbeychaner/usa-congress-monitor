@@ -10,6 +10,7 @@ from elastic_transport import TransportError
 from elasticsearch import Elasticsearch
 from sqlalchemy import (
     Column,
+    Integer,
     MetaData,
     String,
     Table,
@@ -56,6 +57,8 @@ _INGEST_WINDOWS_TABLE = Table(
     Column("job_id", String),
     Column("resource", String),
     Column("last_progress_at", String),
+    Column("hydrated_count", Integer),
+    Column("target_count", Integer),
 )
 
 _PROGRESS_STALE_AFTER_SECONDS = 120
@@ -71,6 +74,7 @@ class _ActiveJob:
     from_date: str | None
     to_date: str | None
     fetch_items: bool
+    refresh_stale: bool
     started_at: datetime | None
 
 
@@ -142,6 +146,7 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
                 from_date=payload.get("from_date"),
                 to_date=payload.get("to_date"),
                 fetch_items=bool(payload.get("fetch_items", False)),
+                refresh_stale=bool(payload.get("refresh_stale", False)),
                 started_at=_parse_timestamp(row["started_at"]),
             )
         )
@@ -179,6 +184,24 @@ def _latest_progress_at(conn: Connection, job: _ActiveJob) -> str | None:
             & (_INGEST_WINDOWS_TABLE.c.resource == job.resource)
         )
     ).scalar_one_or_none()
+
+
+def _refresh_counts(conn: Connection, job: _ActiveJob) -> tuple[int, int] | None:
+    # A stale-refresh job only fetches changed bills, so its own window is the target.
+    if not job.refresh_stale:
+        return None
+    row = conn.execute(
+        select(
+            _INGEST_WINDOWS_TABLE.c.hydrated_count,
+            _INGEST_WINDOWS_TABLE.c.target_count,
+        ).where(
+            (_INGEST_WINDOWS_TABLE.c.job_id == job.job_id)
+            & (_INGEST_WINDOWS_TABLE.c.resource == job.resource)
+        )
+    ).first()
+    if row is None or not row.target_count:
+        return None
+    return int(row.hydrated_count or 0), int(row.target_count)
 
 
 def _job_activity(status: str, last_progress_at: str | None) -> str:
@@ -321,6 +344,9 @@ class AdminService:
             progress_heartbeats = {
                 job.job_id: _latest_progress_at(conn, job) for job in active_jobs
             }
+            refresh_counts = {
+                job.job_id: _refresh_counts(conn, job) for job in active_jobs
+            }
 
         for job in active_jobs:
             job_progress_at = progress_heartbeats[job.job_id]
@@ -333,12 +359,15 @@ class AdminService:
                 _hydrated_count(job) if job.fetch_items else _cached_list_count(job)
             )
             discovered = _cached_list_count(job)
-            api_total = self._fetch_bill_total(job, api_total_cache)
-
-            if api_total and api_total > 0:
-                target = max(hydrated, discovered, api_total)
+            refresh = refresh_counts[job.job_id]
+            if refresh is not None:
+                hydrated, target = refresh
             else:
-                target = max(hydrated, discovered)
+                api_total = self._fetch_bill_total(job, api_total_cache)
+                if api_total and api_total > 0:
+                    target = max(hydrated, discovered, api_total)
+                else:
+                    target = max(hydrated, discovered)
 
             discovered = min(target, discovered)
             remaining = max(0, target - hydrated)

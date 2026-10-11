@@ -28,6 +28,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--index-batch-size", type=int, default=500)
     parser.add_argument("--no-index", action="store_true")
     parser.add_argument("--preserve-raw", action="store_true")
+    parser.add_argument(
+        "--refresh-stale",
+        action="store_true",
+        help="Fetch only bills that are new, newer upstream, or still skeletons",
+    )
+    parser.add_argument(
+        "--retain-records",
+        action="store_true",
+        help="Keep each fetched record in the durable record library",
+    )
     return parser.parse_args()
 
 
@@ -51,6 +61,8 @@ def main() -> None:
         "index": not args.no_index,
         "index_batch_size": args.index_batch_size,
         "preserve_raw": args.preserve_raw,
+        "refresh_stale": args.refresh_stale,
+        "retain_records": args.retain_records,
     }
     job = WorkerContainer(get_config()).job_submitter.submit(JobKind.INGEST.value, payload)
     print(f"{job['id']}\t{job['status']}")

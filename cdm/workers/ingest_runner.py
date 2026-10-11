@@ -8,10 +8,16 @@ from pathlib import Path
 from redis import Redis
 
 from cdm.config.app_config import CongressApiConfig, RedisConfig
-from cdm.ingest.archive import JsonlRecordArchive, SQLiteQuarantineArchive
+from cdm.ingest.archive import (
+    JsonlRecordArchive,
+    LatestRecordArchive,
+    SQLiteQuarantineArchive,
+)
 from cdm.ingest.pipeline import Pipeline, PipelineConfig, ResourceResult
+from cdm.ingest.record_library import RecordLibrary
 from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.ingest.runner import IngestCancelledError, Resource
+from cdm.ingest.stale_bills import IndexedBillStateReader, StaleBillFilter
 from cdm.jobs.payloads import IndexPayload, IngestPayload
 from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
 from cdm.utils.json_types import JsonObject
@@ -34,6 +40,7 @@ class IngestSession:
         redis_config: RedisConfig,
         archive: JsonlRecordArchive,
         quarantine: SQLiteQuarantineArchive,
+        library: LatestRecordArchive | None = None,
     ) -> None:
         self._job_id = job_id
         self._store = store
@@ -41,7 +48,13 @@ class IngestSession:
         self._redis_config = redis_config
         self.archive = archive
         self._quarantine = quarantine
+        self._library = library
         self._last_cancel_check = time.monotonic()
+
+    def archive_record(self, resource: str, record: JsonObject) -> None:
+        self.archive.write(resource, record)
+        if self._library is not None:
+            self._library.write(resource, record)
 
     def publish_record(self, resource: str, record: JsonObject) -> None:
         RedisRecordStream(
@@ -90,12 +103,16 @@ class IngestJobRunner:
         submitter: JobSubmitter,
         redis_config: RedisConfig,
         congress_api: CongressApiConfig,
+        bill_states: IndexedBillStateReader,
+        library: RecordLibrary,
     ) -> None:
         self._store = store
         self._redis = redis_client
         self._submitter = submitter
         self._redis_config = redis_config
         self._congress_api = congress_api
+        self._bill_states = bill_states
+        self._library = library
 
     @classmethod
     def should_queue_index_job(cls, resource: str) -> bool:
@@ -114,6 +131,7 @@ class IngestJobRunner:
             self._redis_config,
             JsonlRecordArchive(job_outdir, int(job["attempts"])),
             SQLiteQuarantineArchive(job_outdir),
+            self._library_archive(payload),
         )
         try:
             results = self._run_pipeline(payload, job_outdir, session)
@@ -123,6 +141,19 @@ class IngestJobRunner:
             return JobResult(job_id=job_id, cancelled=True)
         self._store.mark_succeeded(job_id)
         return JobResult(job_id=job_id, index_jobs=index_jobs)
+
+    def _library_archive(self, payload: IngestPayload) -> LatestRecordArchive | None:
+        if not payload.retain_records:
+            return None
+        label = (
+            f"congress-{payload.congress}" if payload.congress is not None else "all"
+        )
+        return self._library.archive(label)
+
+    def _item_filter(self, payload: IngestPayload) -> StaleBillFilter | None:
+        if not payload.refresh_stale or payload.congress is None:
+            return None
+        return StaleBillFilter(self._bill_states.read(payload.congress))
 
     def _run_pipeline(
         self, payload: IngestPayload, job_outdir: Path, session: IngestSession
@@ -146,9 +177,10 @@ class IngestJobRunner:
             api_key=payload.api_key,
             skip_errors=False,
             record_sink=session.publish_record,
-            record_archive_sink=session.archive.write,
+            record_archive_sink=session.archive_record,
             validation_failure_sink=session.quarantine_validation_failure,
             progress_sink=session.update_progress,
+            item_filter=self._item_filter(payload),
         )
         selected = [Resource(name) for name in payload.resources or ()]
         pipeline = Pipeline(config)
