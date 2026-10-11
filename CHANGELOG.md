@@ -4,6 +4,8 @@
 
 ### Removed
 
+- Admin ingest progress no longer calls Congress.gov on each page poll (it previously made uncached, unmetered requests that spent API budget); progress comes from the ledger only.
+- Dead code found by a vulture audit and verified by AST/reference checks: unused response/meta models (`meta_models`, `data_types`, `consumer_models`), unused helpers and enums, and unused `Pipeline.run_*` and index-manager methods.
 - Legacy local ingest CLIs `scripts/ingest.py`, `scripts/ingest_all.py` and `scripts/ingest_history.py` (they bypassed the job ledger and the shared rate budget), their tests, and the unused `cdm.services` package. Ingest unit tests import `cdm.ingest.runner` directly.
 
 ### Fixed
