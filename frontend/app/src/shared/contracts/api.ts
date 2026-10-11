@@ -1554,6 +1554,8 @@ export interface components {
             label: string;
             /** Weight */
             weight: number;
+            /** Topic Id */
+            topic_id?: number | null;
         };
         /** TopicSummary */
         TopicSummary: {

@@ -485,7 +485,11 @@ class TopicService:
         totals: Counter[int] = Counter(topic_id for _, topic_id in pairs)
         total_count = sum(totals.values())
         topics = [
-            TopicItem(label=label_of(topic_id), weight=round(count / total_count, 4))
+            TopicItem(
+                label=label_of(topic_id),
+                weight=round(count / total_count, 4),
+                topic_id=topic_id,
+            )
             for topic_id, count in totals.most_common()
         ]
 

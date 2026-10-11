@@ -55,7 +55,7 @@ export type MemberTopicTrendPoint = {
 
 export type MemberTopicsResponse = {
   bioguide_id: string;
-  topics: { label: string; weight: number }[];
+  topics: { label: string; weight: number; topic_id?: number | null }[];
   trend: MemberTopicTrendPoint[];
   model_version: string | null;
   subjects: { label: string; weight: number }[];

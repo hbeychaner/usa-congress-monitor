@@ -90,6 +90,7 @@ class ActivityItem(BaseModel):
 class TopicItem(BaseModel):
     label: str
     weight: float
+    topic_id: int | None = None
 
 
 class TopicSummary(BaseModel):

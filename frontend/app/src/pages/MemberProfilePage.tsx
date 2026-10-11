@@ -223,6 +223,10 @@ export function MemberProfilePage() {
               <HorizontalBarChart
                 data={shownTopics.map((topic) => ({ label: topic.label, value: topic.weight }))}
                 formatValue={formatShare}
+                onBarClick={(label) => {
+                  const topicId = shownTopics.find((topic) => topic.label === label)?.topic_id;
+                  if (topicId != null) navigate(`/topics/${topicId}`);
+                }}
               />
               <Flex justify="between" align="center">
                 <Text size="1" color="gray">
