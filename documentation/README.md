@@ -187,12 +187,9 @@ cdm/                    — Congress Data Model (core library)
   contracts/            — API request/response schemas used by cdm/backend
 
 scripts/
-  ingest_history.py     — Full-history bulk ingest CLI (year-by-year + congress-by-congress)
   submit_ingest.py      — Idempotent RabbitMQ/Celery job submission CLI
   queue_full_ingest.py  — Durable, batched full-historical-plan job submission
   create_indices.py     — OpenSearch index creation/update/status CLI
-  ingest.py             — Single-resource ingest CLI (legacy; prefer cdm.ingest.runner)
-  ingest_all.py         — Local (non-durable) multi-resource ingest CLI
   queue_govinfo_bulk.py     — Discover/queue GovInfo bulk package jobs
   reconcile_govinfo_bulk.py — Submit a reconciliation replay job
   report_govinfo_coverage.py — Coverage report for discovered vs archived GovInfo packages
@@ -231,21 +228,10 @@ records are compressed and deduplicated in per-resource SQLite databases.
 
 ### Full-history ingest
 
-```bash
-uv run python scripts/ingest_history.py \
-  --from-year 2020 --to-year 2026 \
-  --items \
-  --outdir data/full_history \
-  --resume \
-  --concurrency 20 \
-  --rate-limit 4800
-```
-
 For durable queue submission, use `scripts/queue_full_ingest.py`; it creates
 idempotent jobs for static resources, date windows, and Congress-scoped
-resources. `scripts/ingest_history.py` remains a local compatibility/backfill
-tool. Both use SQLite checkpoints and avoid large local JSON or JSONL staging
-files.
+resources. Jobs use SQLite checkpoints and avoid large local JSON or JSONL
+staging files.
 
 For a complete historical legislation corpus, discover and queue official
 GovInfo packages into a precreated versioned OpenSearch index:

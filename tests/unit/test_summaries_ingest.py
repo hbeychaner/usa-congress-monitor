@@ -63,7 +63,7 @@ def test_ingest_summaries(tmp_path, monkeypatch):
         "cdm.ingest.runner.get_client", lambda api_key=None, **k: client
     )
 
-    from scripts.ingest import IngestRunner, Resource
+    from cdm.ingest.runner import IngestRunner, Resource
 
     runner = IngestRunner(
         outdir=tmp_path,
@@ -133,7 +133,7 @@ def test_ingest_resumes_after_completed_list_page(tmp_path, monkeypatch):
         "cdm.ingest.runner.get_client", lambda api_key=None, **k: client
     )
 
-    from scripts.ingest import IngestRunner, Resource
+    from cdm.ingest.runner import IngestRunner, Resource
 
     runner = IngestRunner(
         outdir=tmp_path,
@@ -207,7 +207,7 @@ def test_ingest_reduces_list_page_size_after_server_error(tmp_path, monkeypatch)
         "cdm.ingest.runner.get_client", lambda api_key=None, **k: client
     )
 
-    from scripts.ingest import IngestRunner, Resource
+    from cdm.ingest.runner import IngestRunner, Resource
 
     result = IngestRunner(
         outdir=tmp_path,
@@ -265,7 +265,7 @@ def test_ingest_preserves_checkpoint_when_all_page_fallbacks_fail(
         "cdm.ingest.runner.get_client", lambda api_key=None, **k: client
     )
 
-    from scripts.ingest import IngestRunner, Resource
+    from cdm.ingest.runner import IngestRunner, Resource
 
     runner = IngestRunner(
         outdir=tmp_path,
@@ -322,7 +322,7 @@ def test_ingest_deduplicates_repeated_list_records(tmp_path, monkeypatch):
     )
     archived = []
 
-    from scripts.ingest import IngestRunner, Resource
+    from cdm.ingest.runner import IngestRunner, Resource
 
     result = IngestRunner(
         outdir=tmp_path,

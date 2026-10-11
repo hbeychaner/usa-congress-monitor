@@ -2,6 +2,10 @@
 
 ## 2026-10-11
 
+### Removed
+
+- Legacy local ingest CLIs `scripts/ingest.py`, `scripts/ingest_all.py` and `scripts/ingest_history.py` (they bypassed the job ledger and the shared rate budget), their tests, and the unused `cdm.services` package. Ingest unit tests import `cdm.ingest.runner` directly.
+
 ### Fixed
 
 - Ingest jobs now draw from one Redis-backed Congress.gov request budget (`SharedTokenBucket`, `INGEST_RATE_LIMIT_PER_HOUR` total) instead of one budget per job; concurrent jobs previously exceeded the API key's hourly limit and all stalled on 429 backoff.

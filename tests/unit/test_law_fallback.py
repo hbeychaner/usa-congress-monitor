@@ -1,4 +1,4 @@
-from scripts.ingest import _attempt_law_fallback
+from cdm.ingest.runner import _attempt_law_fallback
 
 
 class FakeModel:

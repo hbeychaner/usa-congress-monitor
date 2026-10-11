@@ -50,7 +50,7 @@ def test_ingest_committee(tmp_path, monkeypatch):
         "cdm.ingest.runner.get_client", lambda api_key=None, **k: client
     )
 
-    from scripts.ingest import IngestRunner, Resource
+    from cdm.ingest.runner import IngestRunner, Resource
 
     runner = IngestRunner(
         outdir=tmp_path,
