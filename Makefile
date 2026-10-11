@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # Makefile for local development tasks (start OpenSearch, manage deps)
 
-.PHONY: start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
+.PHONY: env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
 
 # Detect docker compose command at make-parse time (prefer `docker compose`)
 DOCKER_COMPOSE_CMD_DETECTED := $(if $(shell docker compose version >/dev/null 2>&1 && echo ok),docker compose,$(if $(shell command -v docker-compose >/dev/null 2>&1 && echo ok),docker-compose,))
@@ -9,7 +9,14 @@ DOCKER_COMPOSE_CMD_DETECTED := $(if $(shell docker compose version >/dev/null 2>
 # Start the local OpenSearch stack (uses elastic-start-local/docker-compose.yml)
 start: services
 
-local:
+env-init:
+	@uv run python scripts/bootstrap_env.py init
+
+# Run once after OpenSearch is up on a fresh checkout.
+es-api-key:
+	@uv run python scripts/bootstrap_env.py api-key
+
+local: env-init
 	@echo "Starting local OpenSearch stack..."
 	@$(MAKE) ensure-docker
 	@cd elastic-start-local && . ../.make_docker_env && eval "$$DOCKER_COMPOSE_CMD up -d --remove-orphans"

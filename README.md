@@ -19,10 +19,14 @@ Requirements: Python 3.13+, `uv`, Docker Desktop, and a Congress.gov API key.
 
 ```bash
 uv sync --all-extras
-# Create .env with CONGRESS_API_KEY and local service settings
-make local
+make local          # creates .env from .env.example (generated local secrets), starts OpenSearch, Redis, RabbitMQ
+# Set CONGRESS_API_KEY in .env
+make es-api-key     # one time, once OpenSearch is up: writes ES_LOCAL_API_KEY / ELASTIC_API_KEY to .env
 make ingest-service-install
 ```
+
+Indices are created on demand by the indexing worker; the job ledger, archives
+and record library are created under `data/` on first use.
 
 For unattended macOS operation, use `make services`. It starts OpenSearch,
 Redis, and RabbitMQ, then installs launchd-supervised ingest, indexing, and Beat
