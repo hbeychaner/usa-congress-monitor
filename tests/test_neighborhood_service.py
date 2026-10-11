@@ -2,7 +2,7 @@ from typing import cast
 
 import pytest
 
-from cdm.backend.services.graph_service import GraphService
+from cdm.backend.services.graph_service import MAX_EDGE_RESULTS, GraphService
 from cdm.backend.services.member_service import MemberService
 from cdm.backend.services.neighborhood_service import (
     NeighborhoodQuery,
@@ -103,3 +103,17 @@ def test_shared_topics_are_carried_to_links(service: NeighborhoodService):
     query = NeighborhoodQuery(seeds=["A"], weights={Signal.TOPIC: 1.0})
     link = service.neighborhood(query).links[0]
     assert link.shared_topics == ["health care"]
+
+
+def test_edge_query_size_is_capped_to_result_window() -> None:
+    class RecordingClient:
+        size = 0
+
+        def search(self, **kwargs):  # type: ignore[no-untyped-def]
+            self.size = kwargs["size"]
+            return {"hits": {"hits": []}}
+
+    client = RecordingClient()
+    graph = GraphService(client, None)  # type: ignore[arg-type]
+    graph.edges("v1", Signal.TOPIC, ["A"], None, 50_000, neighbors=["B"])
+    assert client.size == MAX_EDGE_RESULTS

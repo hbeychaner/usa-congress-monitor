@@ -17,6 +17,8 @@ from cdm.graph.models import (
 )
 from cdm.graph.store import GraphStore
 
+MAX_EDGE_RESULTS = 10_000  # Elasticsearch default index.max_result_window
+
 
 class GraphService:
     """Answers edge queries against the live graph version of each signal."""
@@ -68,7 +70,7 @@ class GraphService:
             }
         response = self.client.search(
             index=self.store.index,
-            size=size,
+            size=min(size, MAX_EDGE_RESULTS),
             query={"bool": {"filter": filters}},
             sort=[sort],
         )
