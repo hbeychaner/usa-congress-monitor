@@ -281,7 +281,7 @@ export function MemberGraphPage() {
 
       <Flex gap="4" wrap="wrap" align="start">
         <Card size="2" style={{ flex: '1 1 600px', minWidth: 0 }}>
-          {topicMode ? !centerKey : !seeds.length ? (
+          {(topicMode ? !centerKey : !seeds.length) ? (
             <Text color="gray">{topicMode ? 'Pick a metasubject, topic or subject to see who works on it.' : 'Search for a member to start exploring their network.'}</Text>
           ) : data && data.nodes?.length ? (
             <MemberGraphView data={data} selectedId={selectedId} colorMode={colorMode} onSelect={setSelectedId} />
