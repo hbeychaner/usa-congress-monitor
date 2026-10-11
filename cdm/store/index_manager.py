@@ -308,31 +308,8 @@ class IndexManager:
         )
         return result
 
-    def ensure_write_alias(self, name: str) -> None:
-        """Ensure the bulk-write alias points at the logical index."""
-        self._ensure_alias(name, write_alias(name))
 
-    def ensure_read_alias(self, name: str) -> None:
-        """Ensure the read alias points at the logical index."""
-        self._ensure_alias(name, read_alias(name))
 
-    def _ensure_alias(self, name: str, alias: str) -> None:
-        idx = _prefixed(name)
-        if self.dry_run:
-            print(f"[dry-run] would point {alias!r} to {idx!r}")
-            return
-        try:
-            current = self.client.indices.get_alias(name=alias)
-        except NotFoundError:
-            current = {}
-        # Never move an existing alias: routine index-creation paths must not
-        # steal aliases from a versioned index promoted by a deliberate
-        # migration (switch_aliases_to_versioned owns alias moves).
-        if current:
-            return
-        self.client.indices.update_aliases(
-            body={"actions": [{"add": {"index": idx, "alias": alias}}]}
-        )
 
     def ensure_aliases(self, name: str) -> None:
         """Create missing read/write aliases; existing aliases are never moved."""

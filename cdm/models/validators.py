@@ -43,26 +43,3 @@ def normalize_chamber(v):
     return None
 
 
-def parse_iso_datetime(value: str):
-    """Parse a variety of ISO-like datetime strings into a datetime.
-
-    Returns a datetime on success or raises ValueError on failure. This
-    helper keeps parsing logic centralized for model validators.
-    """
-    if value is None:
-        raise ValueError("None is not a valid datetime")
-    if isinstance(value, datetime):
-        return value
-    s = str(value).strip()
-    # try fromisoformat first (Python 3.7+)
-    try:
-        return datetime.fromisoformat(s)
-    except ValueError:
-        pass
-    # common fallback formats
-    for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
-        try:
-            return datetime.strptime(s, fmt).replace(tzinfo=UTC)
-        except ValueError:
-            continue
-    raise ValueError(f"Unrecognized datetime format: {value}")

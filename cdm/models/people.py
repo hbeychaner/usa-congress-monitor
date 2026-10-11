@@ -143,22 +143,6 @@ class MemberAddress(BaseModel):
     model_config = {"populate_by_name": True}
 
 
-class Term(BaseModel):
-    """Service term for a member, including chamber and year range."""
-
-    chamber: Annotated[
-        Chamber, Field(description="Which chamber the term was served in.")
-    ]
-    end_year: Annotated[
-        int,
-        Field(alias="endYear", default=None, description="What year the term ended."),
-    ]
-    start_year: Annotated[
-        int,
-        Field(
-            alias="startYear", default=None, description="What year the term started."
-        ),
-    ]
 
 
 class Member(EntityBase):

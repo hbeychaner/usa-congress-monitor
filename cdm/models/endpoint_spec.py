@@ -204,21 +204,3 @@ class EndpointSpec(BaseModel):
                     raise ValueError(f"Param {name} expected number, got {type(val)}")
 
 
-class MetadataRecord(BaseModel):
-    """Container describing a specific endpoint invocation and its state.
-
-    Attributes:
-        endpoint: The ``EndpointSpec`` describing the endpoint to call.
-        runtime_params: Ordered runtime parameters resolved for the call.
-        offset: Optional pagination offset for list-style endpoints.
-        limit: Optional page size for list-style endpoints.
-        page: Optional page number when using page-based pagination.
-    """
-
-    endpoint: EndpointSpec
-    runtime_params: _OrderedDict = Field(default_factory=_OrderedDict)
-    offset: int | None = None
-    limit: int | None = None
-    page: int | None = None
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)

@@ -35,10 +35,6 @@ class MetasubjectRepository:
         self.client = client
         self.index = index
 
-    def ensure_mappings(self) -> None:
-        self.client.indices.put_mapping(
-            index=self.index, properties=METASUBJECT_MAPPINGS["properties"]
-        )
 
     def latest(self) -> list[Metasubject]:
         """Metasubjects of the newest model version, or [] when none exist."""

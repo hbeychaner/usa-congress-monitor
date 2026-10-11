@@ -252,17 +252,6 @@ class BehalfType(StrEnum):
         return self.value.split()[0]
 
 
-class AmendmentType(StrEnum):
-    """Enumeration of amendment types by chamber and numbering scheme."""
-
-    SAMDT = "SAMDT"  # Senate Amendment
-    HAMDT = "HAMDT"  # House Amendment
-    SUAMDT = "SUAMDT"  # Senate Unnumbered Amendment
-
-    def __init__(self, value: str):
-        """Initialize the enum and cache the URL-friendly slug."""
-        self._value_ = value
-        self.type_url = value.lower()
 
 
 class TextVersion(BaseModel):
@@ -361,13 +350,6 @@ class Summary(BaseModel):
     ]
 
 
-class ActionSourceSystem(StrEnum):
-    """Enumeration of source system codes for actions."""
-
-    SENATE = "0"
-    LIBRARY_OF_CONGRESS = "9"
-    HOUSE1 = "1"
-    HOUSE2 = "2"
 
 
 class IdentifyingEntity(StrEnum):
@@ -1015,48 +997,6 @@ class Amendment(BaseModel):
                     return full_text
         return ""
 
-    def get_amendment_details(self, client: CDGClient):
-        """Populate the amendment with related actions, cosponsors, and text versions."""
-        """
-        Retrieve additional data for an amendment.
-
-        Args:
-            client (CDGClient): The client object.
-            amendment_metadata (AmendmentMetadata): The amendment metadata.
-
-        Returns:
-            Amendment: The amendment object.
-        """
-        amendment_data = {}
-        congress = self.congress
-        amendment_type = self.type
-        amendment_number = self.number
-        additional_amendment_data = {
-            "actions": "actions",
-            "cosponsors": "cosponsors",
-            "textVersions": "text",
-            "amendments": "amendments",
-        }
-
-        for key, endpoint in additional_amendment_data.items():
-            data = client.get_json(
-                f"amendment/{congress}/{amendment_type.lower()}/{amendment_number}/{endpoint}",
-                params={"format": None},
-            )
-            amendment_data[key] = data[key]
-
-        self.actions = [
-            Action(**x) for x in amendment_data["actions"] if isinstance(x, dict)
-        ]
-        self.cosponsors = [
-            Member(**x) for x in amendment_data["cosponsors"] if isinstance(x, dict)
-        ]
-        self.text_versions = [
-            TextVersion(**x)
-            for x in amendment_data["textVersions"]
-            if isinstance(x, dict)
-        ]
-        self.full_text = self.add_full_text(client)
 
     def build_id(self) -> str:
         """Return a canonical id for this amendment instance."""

@@ -31,9 +31,6 @@ from pathlib import Path
 from cdm.ingest.resource_config import (
     RESOURCE_CONFIGS,
     ResourceConfig,
-    congress_scoped,
-    date_windowed,
-    static_resources,
 )
 from cdm.ingest.runner import FatalIngestError, IngestRunner, Resource
 from cdm.ingest.stale_bills import ItemFilter
@@ -109,17 +106,8 @@ class Pipeline:
         resources = list(Resource)
         return self.run(resources)
 
-    def run_date_windowed(self) -> list[ResourceResult]:
-        """Run only date-windowed resources (require --from-date / --to-date)."""
-        return self.run([c.resource for c in date_windowed()])
 
-    def run_congress_scoped(self) -> list[ResourceResult]:
-        """Run only congress-scoped resources (require --congress)."""
-        return self.run([c.resource for c in congress_scoped()])
 
-    def run_static(self) -> list[ResourceResult]:
-        """Run only static resources (no date or congress filter)."""
-        return self.run([c.resource for c in static_resources()])
 
     def run(self, resources: Sequence[Resource]) -> list[ResourceResult]:
         """Run IngestRunner for each resource in *resources*."""

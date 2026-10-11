@@ -143,7 +143,3 @@ class EntityBase(BaseModel):
         )
 
 
-class ListMetadataBase(BaseModel):
-    """Base class for list response wrappers that include pagination metadata."""
-
-    pagination: dict | None = Field(default=None, description="Pagination info")

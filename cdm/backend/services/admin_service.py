@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-import requests
 from elastic_transport import TransportError
 from elasticsearch import Elasticsearch
 from sqlalchemy import (
@@ -327,8 +326,6 @@ class AdminService:
         self._engine = engine
 
     def get_ingest_progress(self) -> IngestProgressResponse:
-        api_total_cache: dict[tuple[str | None, str | None], int | None] = {}
-
         with self._engine.connect() as conn:
             active_jobs = _load_active_ingest_jobs(conn)
             backfill = _backfill_progress(conn)
@@ -363,11 +360,7 @@ class AdminService:
             if refresh is not None:
                 hydrated, target = refresh
             else:
-                api_total = self._fetch_bill_total(job, api_total_cache)
-                if api_total and api_total > 0:
-                    target = max(hydrated, discovered, api_total)
-                else:
-                    target = max(hydrated, discovered)
+                target = max(hydrated, discovered)
 
             discovered = min(target, discovered)
             remaining = max(0, target - hydrated)
@@ -417,45 +410,6 @@ class AdminService:
             jobs=jobs,
             backfill=backfill,
         )
-
-    def _fetch_bill_total(
-        self,
-        job: _ActiveJob,
-        cache: dict[tuple[str | None, str | None], int | None],
-    ) -> int | None:
-        if job.resource != "bill" or not job.from_date or not job.to_date:
-            return None
-
-        key = (job.from_date, job.to_date)
-        if key in cache:
-            return cache[key]
-
-        if not self._config.congress_api.congress_api_key or not self._config.congress_api.congress_api_url:
-            cache[key] = None
-            return None
-
-        try:
-            response = requests.get(
-                f"{self._config.congress_api.congress_api_url.rstrip('/')}/bill",
-                params={
-                    "format": "json",
-                    "offset": 0,
-                    "limit": 1,
-                    "fromDateTime": job.from_date,
-                    "toDateTime": job.to_date,
-                },
-                headers={"x-api-key": self._config.congress_api.congress_api_key},
-                timeout=20,
-            )
-            response.raise_for_status()
-            payload = response.json()
-            pagination = payload.get("pagination", {})
-            total = int(pagination.get("count") or pagination.get("total") or 0)
-            cache[key] = total
-            return total
-        except (KeyError, TypeError, ValueError, requests.RequestException):
-            cache[key] = None
-            return None
 
     def _staging_status(self) -> StagingStatus:
         status = StagingStatus(index=self._config.elastic.staging_index)

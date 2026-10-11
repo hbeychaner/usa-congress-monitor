@@ -54,22 +54,6 @@ def _is_json_response(response: requests.Response) -> bool:
     return ct.lower().startswith("application/json")
 
 
-def _to_int(value: object, default: int) -> int:
-    """Convert a value to int with a safe default.
-
-    Args:
-        value: value to coerce to int (may be None or non-int).
-        default: fallback integer if conversion fails or value is None.
-
-    Returns:
-        int: converted integer or the provided default.
-    """
-    try:
-        if value is None:
-            return default
-        return int(str(value))
-    except (TypeError, ValueError):
-        return default
 
 
 # Explicit JSON helper method is implemented on the client class below.

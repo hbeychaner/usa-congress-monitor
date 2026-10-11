@@ -58,3 +58,4 @@ planning/
 # Trained topic-model artifacts (regenerate with scripts/train_topic_model.py)
 models/
 
+scripts/preview_topic_labels.py
