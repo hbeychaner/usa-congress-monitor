@@ -117,6 +117,8 @@ field with lifecycle version ranking (`ih` → `enr`; later stages win, and
 API-hydrated text is never overwritten). The Congress.gov API remains the
 source for daily incremental updates and resources GovInfo does not publish
 (amendments, members, nominations, treaties, hearings, votes).
+Per-job archive directories are the replay source and are deleted by the daily
+retention task 30 days after a job finishes.
 
 Each job writes fetched list pages to a compressed SQLite cache and item records
 to `data/full_history/<job-id>/<resource>/records.sqlite3`. Checkpoints advance
@@ -279,6 +281,27 @@ in [documentation/diagrams/data-model.mmd](documentation/diagrams/data-model.mmd
 id), `member` joins via flattened bioguide-id arrays, and nearly everything
 anchors to `congress_ref`. Bill full text lives inline on the legislation
 document -- there is no separate bill-text index.
+
+## Topic Model And Metasubjects
+
+`scripts/train_topic_model.py` (or the Retrain button on the Admin page) embeds
+every bill from `--min-congress` onward, clusters the embeddings with BERTopic,
+labels topics with Ollama, then groups topic centroids into about 30
+metasubjects. Embeddings live in the `congress-embeddings` index (one vector per
+bill, cached by content hash, also used by `GET /bills/{id}/similar`); topics,
+metasubjects, assignments and quarterly trends live in
+`congress-analysis-topics`, and each retrain prunes superseded versions.
+
+- Outlier bills are reassigned to the nearest metasubject and flagged
+  `low_confidence` below `metasubject_low_confidence_similarity` (0.5).
+- Group ids are stable across retrains (centroid matching). Names carry over
+  unless a group's size changes by more than 3x; duplicate names are resolved by
+  a second Ollama pass.
+- Rename a group by hand with
+  `uv run python scripts/set_metasubject_override.py <id> "Name"` (`--clear`,
+  `--history`); overrides apply on the next retrain.
+- `GET /topics/metasubjects/{id}` returns the group's topics, trend and related
+  groups by centroid similarity.
 
 ## Planning & Notes
 

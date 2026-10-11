@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-11
+
+### Changed
+
+- Recounted missing legislative subjects per Congress (all of the 91st-107th, 117th-119th largely upstream gaps).
+- Deleted archive directories of succeeded GovInfo jobs for the 118th and earlier (19 GB to 2.4 GB); ledger rows kept.
+- README documents the topic model, metasubjects and archive retention.
+
 ## 2026-09-16
 
 ### Added
