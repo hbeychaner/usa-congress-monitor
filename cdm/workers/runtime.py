@@ -13,7 +13,7 @@ from cdm.ingest.record_library import RecordLibrary
 from cdm.ingest.stale_bills import IndexedBillStateReader
 from cdm.jobs.store import JobStore
 from cdm.store.opensearch import read_alias
-from cdm.utils.rate_limiter import TokenBucket
+from cdm.utils.rate_limiter import SharedTokenBucket, TokenBucket
 from cdm.workers.celery_app import celery_app
 from cdm.workers.dispatch import JobDispatcher, JobSubmitter
 from cdm.workers.failures import FailureClassifier
@@ -80,6 +80,14 @@ class WorkerContainer(Container):
         )
 
     @cached_property
+    def congress_rate_limiter(self) -> TokenBucket:
+        return SharedTokenBucket(
+            self.redis_client,
+            self.config.congress_api.ingest_rate_limit_key,
+            rate_per_hour=self.config.congress_api.ingest_rate_limit_per_hour,
+        )
+
+    @cached_property
     def bill_state_reader(self) -> IndexedBillStateReader:
         return IndexedBillStateReader(self.elastic_client, read_alias("bill"))
 
@@ -97,6 +105,7 @@ class WorkerContainer(Container):
             self.config.congress_api,
             self.bill_state_reader,
             self.record_library,
+            self.congress_rate_limiter,
         )
 
     @cached_property

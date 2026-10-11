@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 
-from cdm.config import get_config
+RUN_INTEGRATION_ENV = "RUN_INTEGRATION_TESTS"
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
-    if get_config().congress_api.congress_api_key:
+    if os.environ.get(RUN_INTEGRATION_ENV):
         return
-    skip = pytest.mark.skip(reason="CONGRESS_API_KEY is not configured")
+    skip = pytest.mark.skip(
+        reason=f"integration tests spend API budget; set {RUN_INTEGRATION_ENV}=1"
+    )
     for item in items:
         if "integration" in item.path.parts:
             item.add_marker(skip)

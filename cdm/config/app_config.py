@@ -39,6 +39,8 @@ class CongressApiConfig(_Section):
     timeout_secs: int = 30
     # Shared per-ingest-job request budget.
     ingest_rate_limit_per_hour: int = 4800
+    # Redis key holding the budget shared by every worker process.
+    ingest_rate_limit_key: str = "congress:api:rate"
 
 
 class OpenAIConfig(_Section):

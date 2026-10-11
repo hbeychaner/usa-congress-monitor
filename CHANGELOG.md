@@ -2,9 +2,14 @@
 
 ## 2026-10-11
 
+### Fixed
+
+- Ingest jobs now draw from one Redis-backed Congress.gov request budget (`SharedTokenBucket`, `INGEST_RATE_LIMIT_PER_HOUR` total) instead of one budget per job; concurrent jobs previously exceeded the API key's hourly limit and all stalled on 429 backoff.
+- Integration tests are opt-in (`RUN_INTEGRATION_TESTS=1`) so a test run no longer spends API budget.
+
 ### Added
 
-- Fresh-clone bootstrap: `.env.example`, `make env-init` (also run by `make local`) generates local secrets and links the compose env file, `make es-api-key` mints the OpenSearch API key; integration tests skip without `CONGRESS_API_KEY`.
+- Fresh-clone bootstrap: `.env.example`, `make env-init` (also run by `make local`) generates local secrets and links the compose env file, `make es-api-key` mints the OpenSearch API key; integration tests are skipped by default.
 - Stale-bill refresh: `submit_ingest.py --refresh-stale` lists a Congress, compares each bill's list `updateDate` with the indexed `update_date`, and hydrates only changed bills or never-hydrated skeletons; admin progress targets just those bills.
 - Record library: `--retain-records` upserts every fetched record into `data/record_library/congress-N/records.sqlite3` (latest write wins, outside job retention) for future reindexing.
 - Admin ingest job table shows per-job speed (items/hour since start) and ETA, and a single `completed / total` progress indicator instead of the Observed/Target/Remaining columns.

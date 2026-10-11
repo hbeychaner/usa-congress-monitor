@@ -105,6 +105,7 @@ class IngestJobRunner:
         congress_api: CongressApiConfig,
         bill_states: IndexedBillStateReader,
         library: RecordLibrary,
+        rate_limiter: TokenBucket,
     ) -> None:
         self._store = store
         self._redis = redis_client
@@ -113,6 +114,7 @@ class IngestJobRunner:
         self._congress_api = congress_api
         self._bill_states = bill_states
         self._library = library
+        self._rate_limiter = rate_limiter
 
     @classmethod
     def should_queue_index_job(cls, resource: str) -> bool:
@@ -171,9 +173,7 @@ class IngestJobRunner:
             list_page_size=payload.list_page_size,
             max_skipped_list_pages=payload.max_skipped_list_pages,
             concurrency=payload.concurrency,
-            rate_limiter=TokenBucket(
-                rate_per_hour=self._congress_api.ingest_rate_limit_per_hour
-            ),
+            rate_limiter=self._rate_limiter,
             api_key=payload.api_key,
             skip_errors=False,
             record_sink=session.publish_record,
