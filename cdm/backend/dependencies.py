@@ -17,6 +17,7 @@ from cdm.backend.services.search_service import SearchService
 from cdm.backend.services.similar_bill_service import SimilarBillService
 from cdm.backend.services.state_service import StateService
 from cdm.backend.services.subject_service import SubjectService
+from cdm.backend.services.topic_neighborhood_service import TopicNeighborhoodService
 from cdm.backend.services.topic_service import TopicService
 from cdm.backend.services.vote_service import VoteService
 from cdm.config import get_config
@@ -79,6 +80,10 @@ def get_neighborhood_service(container: ContainerDep) -> NeighborhoodService:
     return container.neighborhood_service
 
 
+def get_topic_neighborhood_service(container: ContainerDep) -> TopicNeighborhoodService:
+    return container.topic_neighborhood_service
+
+
 AdminServiceDep = Annotated[AdminService, Depends(get_admin_service)]
 SimilarBillServiceDep = Annotated[SimilarBillService, Depends(get_similar_bill_service)]
 CommitteeServiceDep = Annotated[CommitteeService, Depends(get_committee_service)]
@@ -91,3 +96,6 @@ TopicServiceDep = Annotated[TopicService, Depends(get_topic_service)]
 MemberServiceDep = Annotated[MemberService, Depends(get_member_service)]
 GraphServiceDep = Annotated[GraphService, Depends(get_graph_service)]
 NeighborhoodServiceDep = Annotated[NeighborhoodService, Depends(get_neighborhood_service)]
+TopicNeighborhoodServiceDep = Annotated[
+    TopicNeighborhoodService, Depends(get_topic_neighborhood_service)
+]

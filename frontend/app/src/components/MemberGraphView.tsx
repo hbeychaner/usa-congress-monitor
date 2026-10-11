@@ -40,6 +40,8 @@ type Props = {
 function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
   const graph = new Graph({ type: 'undirected' });
   const nodes = data.nodes ?? [];
+  // A topic-centered graph has no seeds, so its center node is drawn larger.
+  const centered = (data.seeds ?? []).length === 0;
   nodes.forEach((node, index) => {
     const angle = (2 * Math.PI * index) / Math.max(nodes.length, 1);
     graph.addNode(node.member.bioguide_id, {
@@ -63,7 +65,7 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
   (data.topic_nodes ?? []).forEach((topic) => {
     graph.addNode(`${TOPIC_PREFIX}${topic.topic_id}`, {
       label: topic.label,
-      size: nodeSize(nodes.length, false) * 0.8,
+      size: nodeSize(nodes.length, false) * (centered ? 2.2 : 0.8),
       color: TOPIC_COLOR,
       x: Math.random() * 10 - 5,
       y: Math.random() * 10 - 5,
@@ -83,7 +85,7 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
   (data.subject_nodes ?? []).forEach((subject) => {
     graph.addNode(`${SUBJECT_PREFIX}${subject.name}`, {
       label: subject.name,
-      size: nodeSize(nodes.length, false) * 0.8,
+      size: nodeSize(nodes.length, false) * (centered ? 2.2 : 0.8),
       color: SUBJECT_COLOR,
       x: Math.random() * 10 - 5,
       y: Math.random() * 10 - 5,
@@ -103,7 +105,7 @@ function buildGraph(data: Neighborhood, colorMode: ColorMode): Graph {
   (data.metasubject_nodes ?? []).forEach((group) => {
     graph.addNode(`${METASUBJECT_PREFIX}${group.metasubject_id}`, {
       label: group.name,
-      size: nodeSize(nodes.length, false) * 0.9,
+      size: nodeSize(nodes.length, false) * (centered ? 2.2 : 0.9),
       color: METASUBJECT_COLOR,
       x: Math.random() * 10 - 5,
       y: Math.random() * 10 - 5,

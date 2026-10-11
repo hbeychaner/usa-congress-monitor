@@ -2,6 +2,10 @@
 
 ## 2026-10-11
 
+### Added
+
+- Topic-centered member graph: `GET /api/v1/graph/topic-neighborhood` centers on a metasubject, topic or CRS subject and shows its top sponsors with their collaboration/voting/topic links. The graph page has a "Centered on topics" mode with a picker.
+
 ### Changed
 
 - Recounted missing legislative subjects per Congress (all of the 91st-107th, 117th-119th largely upstream gaps).

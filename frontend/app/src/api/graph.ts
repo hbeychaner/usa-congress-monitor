@@ -36,3 +36,25 @@ export function fetchNeighborhood(params: NeighborhoodParams): Promise<Neighborh
     if (params.chamber) query.set('chamber', params.chamber);
     return apiGet<Neighborhood>(`/api/v1/graph/neighborhood?${query.toString()}`);
 }
+
+export type CenterKind = components['schemas']['CenterKind'];
+
+export type TopicNeighborhoodParams = Omit<
+    NeighborhoodParams,
+    'members' | 'includeTopics' | 'includeSubjects' | 'includeMetasubjects'
+> & { kind: CenterKind; key: string };
+
+export function fetchTopicNeighborhood(params: TopicNeighborhoodParams): Promise<Neighborhood> {
+    const query = new URLSearchParams({
+        kind: params.kind,
+        key: params.key,
+        collaboration_weight: String(params.collaborationWeight),
+        voting_weight: String(params.votingWeight),
+        topic_weight: String(params.topicWeight),
+        limit: String(params.limit),
+    });
+    params.parties.forEach((party) => query.append('party', party));
+    if (params.congress) query.set('congress', String(params.congress));
+    if (params.chamber) query.set('chamber', params.chamber);
+    return apiGet<Neighborhood>(`/api/v1/graph/topic-neighborhood?${query.toString()}`);
+}

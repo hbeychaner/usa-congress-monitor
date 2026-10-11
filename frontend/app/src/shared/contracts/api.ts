@@ -499,6 +499,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/graph/topic-neighborhood": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Topic Neighborhood */
+        get: operations["topic_neighborhood_api_v1_graph_topic_neighborhood_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -717,6 +734,11 @@ export interface components {
          * @enum {string}
          */
         BuildState: "idle" | "running" | "succeeded" | "failed";
+        /**
+         * CenterKind
+         * @enum {string}
+         */
+        CenterKind: "topic" | "metasubject" | "subject";
         /**
          * Chamber
          * @enum {string}
@@ -2546,6 +2568,45 @@ export interface operations {
                 subjects_per_member?: number;
                 include_metasubjects?: boolean;
                 metasubjects_per_member?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NeighborhoodResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    topic_neighborhood_api_v1_graph_topic_neighborhood_get: {
+        parameters: {
+            query: {
+                kind: components["schemas"]["CenterKind"];
+                key: string;
+                collaboration_weight?: number;
+                voting_weight?: number;
+                topic_weight?: number;
+                congress?: number | null;
+                limit?: number;
+                party?: components["schemas"]["PartyGroup"][] | null;
+                chamber?: components["schemas"]["Chamber"] | null;
             };
             header?: never;
             path?: never;

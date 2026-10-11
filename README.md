@@ -302,6 +302,9 @@ metasubjects, assignments and quarterly trends live in
   `--history`); overrides apply on the next retrain.
 - `GET /topics/metasubjects/{id}` returns the group's topics, trend and related
   groups by centroid similarity.
+- `GET /graph/topic-neighborhood?kind=metasubject|topic|subject&key=...` returns
+  the top sponsors of a metasubject, topic or CRS subject (same node/link shape as
+  the member neighborhood). The graph page's "Centered on topics" mode uses it.
 
 ## Planning & Notes
 

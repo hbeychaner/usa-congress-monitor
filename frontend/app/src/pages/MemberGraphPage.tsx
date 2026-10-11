@@ -2,8 +2,9 @@ import { Badge, Button, Callout, Card, Checkbox, Flex, Heading, SegmentedControl
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { fetchNeighborhood, type Neighborhood, type PartyGroup } from '../api/graph';
+import { fetchNeighborhood, fetchTopicNeighborhood, type CenterKind, type Neighborhood, type PartyGroup } from '../api/graph';
 import { fetchMembers, type MemberSummary } from '../api/members';
+import { TopicCenterPicker } from '../components/TopicCenterPicker';
 import { MemberGraphView, METASUBJECT_PREFIX, PARTY_COLORS, SUBJECT_PREFIX, TOPIC_PREFIX, type ColorMode } from '../components/MemberGraphView';
 
 const MAX_SEEDS = 5;
@@ -30,6 +31,9 @@ function WeightSlider({ label, value, onCommit }: WeightSliderProps) {
 export function MemberGraphPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const seeds = searchParams.getAll('member');
+  const topicMode = searchParams.get('view') === 'topics';
+  const centerKind = (searchParams.get('kind') ?? 'metasubject') as CenterKind;
+  const centerKey = searchParams.get('key');
   const [collaborationWeight, setCollaborationWeight] = useState(1);
   const [votingWeight, setVotingWeight] = useState(0.6);
   const [topicWeight, setTopicWeight] = useState(0.3);
@@ -50,13 +54,16 @@ export function MemberGraphPage() {
 
   const seedKey = seeds.join(',');
   useEffect(() => {
-    if (!seeds.length) {
+    if (topicMode ? !centerKey : !seeds.length) {
       setData(null);
       return;
     }
     let cancelled = false;
     setLoading(true);
-    fetchNeighborhood({ members: seeds, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, includeTopics: showTopics, includeSubjects: showSubjects, includeMetasubjects: showMetasubjects })
+    const request = topicMode && centerKey
+      ? fetchTopicNeighborhood({ kind: centerKind, key: centerKey, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit })
+      : fetchNeighborhood({ members: seeds, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, includeTopics: showTopics, includeSubjects: showSubjects, includeMetasubjects: showMetasubjects });
+    request
       .then((response) => {
         if (cancelled) return;
         setData(response);
@@ -67,7 +74,7 @@ export function MemberGraphPage() {
       .finally(() => !cancelled && setLoading(false));
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedKey, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, showTopics, showSubjects, showMetasubjects]);
+  }, [seedKey, topicMode, centerKind, centerKey, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, showTopics, showSubjects, showMetasubjects]);
 
   const names = useMemo(
     () => new Map((data?.nodes ?? []).map((node) => [node.member.bioguide_id, node.member.display_name])),
@@ -126,6 +133,14 @@ export function MemberGraphPage() {
     setSearchParams(next.length ? { member: next } : {});
   }
 
+  function setCenter(kind: CenterKind, key: string | null) {
+    setSearchParams(key ? { view: 'topics', kind, key } : { view: 'topics', kind });
+  }
+
+  function setMode(topics: boolean) {
+    setSearchParams(topics ? { view: 'topics' } : {});
+  }
+
   async function search(event: FormEvent) {
     event.preventDefault();
     if (!query.trim()) return;
@@ -145,6 +160,10 @@ export function MemberGraphPage() {
           <Text color="gray">Who works with, and votes like, a member. Edges blend cosponsorship, roll-call agreement and shared legislative topics.</Text>
         </Flex>
         <Flex gap="3" align="center">
+          <SegmentedControl.Root size="1" value={topicMode ? 'topics' : 'members'} onValueChange={(value) => setMode(value === 'topics')}>
+            <SegmentedControl.Item value="members">Centered on members</SegmentedControl.Item>
+            <SegmentedControl.Item value="topics">Centered on topics</SegmentedControl.Item>
+          </SegmentedControl.Root>
           <SegmentedControl.Root size="1" value={colorMode} onValueChange={(value) => setColorMode(value as ColorMode)}>
             <SegmentedControl.Item value="party">Party</SegmentedControl.Item>
             <SegmentedControl.Item value="community">Communities</SegmentedControl.Item>
@@ -160,7 +179,10 @@ export function MemberGraphPage() {
 
       <Card size="3">
         <Flex direction="column" gap="4">
-          <Flex gap="3" wrap="wrap" align="end">
+          {topicMode ? (
+            <TopicCenterPicker kind={centerKind} selectedKey={centerKey} onChange={setCenter} />
+          ) : null}
+          <Flex gap="3" wrap="wrap" align="end" style={topicMode ? { display: 'none' } : undefined}>
             <form onSubmit={search}>
               <Flex gap="2" align="end">
                 <label>
@@ -197,7 +219,7 @@ export function MemberGraphPage() {
             <WeightSlider label="Voting" value={votingWeight} onCommit={setVotingWeight} />
             <WeightSlider label="Topics" value={topicWeight} onCommit={setTopicWeight} />
             <Flex direction="column" gap="1" style={{ minWidth: 160 }}>
-              <Text size="2" weight="medium">Neighbors per member: {limit}</Text>
+              <Text size="2" weight="medium">{topicMode ? 'Members shown' : 'Neighbors per member'}: {limit}</Text>
               <Slider min={5} max={40} step={1} defaultValue={[limit]} onValueCommit={([next]) => setLimit(next)} />
             </Flex>
             <Flex direction="column" gap="1">
@@ -222,6 +244,7 @@ export function MemberGraphPage() {
               </Select.Root>
             </Flex>
             <Flex gap="3" align="center">
+              {topicMode ? null : (<>
               <Text as="label" size="2">
                 <Flex gap="1" align="center">
                   <Checkbox checked={showTopics} onCheckedChange={(checked) => setShowTopics(checked === true)} />
@@ -240,6 +263,7 @@ export function MemberGraphPage() {
                   Show metasubjects
                 </Flex>
               </Text>
+              </>)}
               {PARTIES.map((party) => (
                 <Text key={party.value} as="label" size="2">
                   <Flex gap="1" align="center">
@@ -257,8 +281,8 @@ export function MemberGraphPage() {
 
       <Flex gap="4" wrap="wrap" align="start">
         <Card size="2" style={{ flex: '1 1 600px', minWidth: 0 }}>
-          {!seeds.length ? (
-            <Text color="gray">Search for a member to start exploring their network.</Text>
+          {topicMode ? !centerKey : !seeds.length ? (
+            <Text color="gray">{topicMode ? 'Pick a metasubject, topic or subject to see who works on it.' : 'Search for a member to start exploring their network.'}</Text>
           ) : data && data.nodes?.length ? (
             <MemberGraphView data={data} selectedId={selectedId} colorMode={colorMode} onSelect={setSelectedId} />
           ) : (

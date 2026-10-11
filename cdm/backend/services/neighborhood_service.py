@@ -127,6 +127,55 @@ class NeighborhoodService:
             for signal in query.signals
         ) / total
 
+    def allowed_members(
+        self, member_ids: list[str], query: NeighborhoodQuery
+    ) -> dict[str, MemberSummary]:
+        """Summaries of the members that pass the party and chamber filters."""
+        summaries = self.members.get_summaries(member_ids)
+        return {
+            member_id: summary
+            for member_id, summary in summaries.items()
+            if self._allowed(summary, query)
+        }
+
+    def links_among(
+        self, member_ids: list[str], query: NeighborhoodQuery
+    ) -> tuple[dict[Signal, str], list[GraphLink]]:
+        """Blended links between the given members, with the signal versions used."""
+        versions = {
+            signal: version
+            for signal in query.signals
+            if (version := self.graph.active_version(signal)) is not None
+        }
+        if not versions or len(member_ids) < 2:
+            return versions, []
+        scaler = SignalScaler()
+        pairs: dict[PairKey, dict[Signal, float]] = defaultdict(dict)
+        topics: dict[PairKey, list[str]] = {}
+        size = max(1, len(member_ids) * len(member_ids))
+        for signal, version in versions.items():
+            edges = self.graph.edges(
+                version, signal, member_ids, query.congress, size, neighbors=member_ids
+            )
+            scaler.fit(signal, [self.graph.score(edge, query.congress) for edge in edges])
+            self._collect(pairs, edges, signal, scaler, query.congress, topics)
+        members = set(member_ids)
+        links = [
+            GraphLink(
+                source=first,
+                target=second,
+                score=blended,
+                signal_scores=signal_scores,
+                shared_topics=topics.get((first, second), []),
+            )
+            for (first, second), signal_scores in pairs.items()
+            if first in members
+            and second in members
+            and (blended := self._blend(signal_scores, query)) > 0
+        ]
+        links.sort(key=lambda link: link.score, reverse=True)
+        return versions, links
+
     def neighborhood(self, query: NeighborhoodQuery) -> NeighborhoodResponse:
         versions = {
             signal: version

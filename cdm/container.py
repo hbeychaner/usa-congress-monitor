@@ -24,7 +24,9 @@ from cdm.backend.services.similar_bill_service import SimilarBillService
 from cdm.backend.services.sponsored_bills import SponsoredBillReader
 from cdm.backend.services.state_service import StateService
 from cdm.backend.services.subject_service import SubjectService
+from cdm.backend.services.topic_neighborhood_service import TopicNeighborhoodService
 from cdm.backend.services.topic_service import TopicService
+from cdm.backend.services.topic_sponsors import AssignedBillReader, TopicSponsorReader
 from cdm.backend.services.vote_service import VoteService
 from cdm.config import AppConfig
 from cdm.store.client import ElasticClientFactory
@@ -183,4 +185,13 @@ class Container:
             MemberTopicOverlayBuilder(self.sponsored_bills, self.topic_service),
             MemberSubjectOverlayBuilder(self.elastic_client),
             MemberMetasubjectOverlayBuilder(self.sponsored_bills, self.topic_service),
+        )
+
+    @cached_property
+    def topic_neighborhood_service(self) -> TopicNeighborhoodService:
+        return TopicNeighborhoodService(
+            self.neighborhood_service,
+            self.topic_service,
+            AssignedBillReader(self.elastic_client, self.config.elastic.analysis_index),
+            TopicSponsorReader(self.elastic_client),
         )
