@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- `scripts/submit_ingest.py` accepts `--item-resources` so bills can be hydrated (bill detail fetches were silently skipped).
+
 - Member graph no longer returns a 500 (shown as "Failed to fetch") when several seeds and a large limit push an edge query past the 10,000-result window.
 
 ### Changed

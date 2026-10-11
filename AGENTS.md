@@ -13,6 +13,7 @@
 - Prefer dependency injection anywhere possible instead of procedural code that passes parameters through multiple levels of functional depth.
 - Never commit work that still has pydantic warnings or issues. Always scan for pydantic and ruff issues, and fix before committing. 
 - Update the CHANGELOG, README, and other documentation if that documentation is committed to the repository before every commit. 
+- Push to the remote after every commit, once the CHANGELOG and README are updated.
 
 ## Configuration and dependency injection
 
@@ -33,4 +34,4 @@ These rules apply to new and modified code as well as legacy modules. Rewrite le
 
 - Tests: `uv run pytest -q`.
 - Do not commit `planning/`, `models/`, `data/`, `logs/`, or one-off local scripts.
-- Ask before pushing.
+- Never force-push; ask before any other push that is not a plain push of committed work.

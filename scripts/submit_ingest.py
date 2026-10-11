@@ -21,6 +21,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--to-date")
     parser.add_argument("--congress", type=int)
     parser.add_argument("--fetch-items", action="store_true")
+    parser.add_argument("--item-resources", help="Comma-separated resources to hydrate (bills need this)")
     parser.add_argument("--max-pages", type=int)
     parser.add_argument("--max-items", type=int)
     parser.add_argument("--concurrency", type=int, default=4)
@@ -41,6 +42,9 @@ def main() -> None:
         "to_date": args.to_date,
         "congress": args.congress,
         "fetch_items": args.fetch_items,
+        "item_resources": [name.strip() for name in args.item_resources.split(",") if name.strip()]
+        if args.item_resources
+        else None,
         "max_pages": args.max_pages,
         "max_items": args.max_items,
         "concurrency": args.concurrency,
