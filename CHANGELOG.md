@@ -10,6 +10,7 @@
 
 ### Fixed
 
+- `CDGClient` takes an injectable `sleeper`, so rate-limit backoff is tested with a recording fake instead of real waits.
 - Ingest jobs now draw from one Redis-backed Congress.gov request budget (`SharedTokenBucket`, `INGEST_RATE_LIMIT_PER_HOUR` total) instead of one budget per job; concurrent jobs previously exceeded the API key's hourly limit and all stalled on 429 backoff.
 - Integration tests are opt-in (`RUN_INTEGRATION_TESTS=1`) so a test run no longer spends API budget.
 

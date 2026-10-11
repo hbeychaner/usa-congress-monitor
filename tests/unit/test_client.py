@@ -93,33 +93,58 @@ def test_coerce_records_reports_raw_validation_payload():
     assert "validation error" in failures[0][1]
 
 
+class _StubResponse:
+    def __init__(self, status_code, headers):
+        self.status_code = status_code
+        self.headers = headers
+
+    def raise_for_status(self):
+        return None
+
+
 def test_request_retries_rate_limit_response(monkeypatch):
-    client = CDGClient(api_key="")
-
-    class Response:
-        def __init__(self, status_code, headers):
-            self.status_code = status_code
-            self.headers = headers
-
-        def raise_for_status(self):
-            return None
-
-    responses = iter(
-        [
-            Response(429, {"Retry-After": "0"}),
-            Response(200, {}),
-        ]
-    )
+    sleeps: list[float] = []
+    client = CDGClient(api_key="", sleeper=sleeps.append)
+    responses = iter([_StubResponse(429, {"Retry-After": "7"}), _StubResponse(200, {})])
     monkeypatch.setattr(
         client._session, "get", lambda *args, **kwargs: next(responses)
     )
-    sleeps = []
-    monkeypatch.setattr("cdm.data_collection.client.time.sleep", sleeps.append)
 
     response = client._request_with_backoff("https://api.congress.gov/v3/test")
 
     assert response.status_code == 200
-    assert sleeps == [0.0]
+    assert sleeps == [7.0]
+
+
+def test_rate_limit_without_retry_after_backs_off_exponentially(monkeypatch):
+    sleeps: list[float] = []
+    client = CDGClient(api_key="", sleeper=sleeps.append)
+    responses = iter(
+        [_StubResponse(429, {}), _StubResponse(429, {}), _StubResponse(200, {})]
+    )
+    monkeypatch.setattr(
+        client._session, "get", lambda *args, **kwargs: next(responses)
+    )
+
+    client._request_with_backoff("https://api.congress.gov/v3/test")
+
+    assert sleeps == [60.0, 120.0]
+
+
+def test_rate_limit_gives_up_after_max_attempts(monkeypatch):
+    sleeps: list[float] = []
+    client = CDGClient(api_key="", sleeper=sleeps.append)
+    monkeypatch.setattr(
+        client._session, "get", lambda *args, **kwargs: _StubResponse(429, {})
+    )
+
+    with pytest.raises(RuntimeError):
+        client._request_with_backoff(
+            "https://api.congress.gov/v3/test", max_rate_limit_attempts=2
+        )
+
+    # Two rate-limit waits, then the generic retry loop's short backoffs.
+    assert sleeps[:2] == [60.0, 120.0]
 
 
 def test_iterate_pages_single_shot(monkeypatch):

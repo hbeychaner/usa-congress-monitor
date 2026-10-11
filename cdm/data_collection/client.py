@@ -75,6 +75,7 @@ class CDGClient:
         added_headers: dict[str, str] | None = None,
         rate_limiter: TokenBucket | None = None,
         id_strategy: IdStrategyApplier | None = None,
+        sleeper: Callable[[float], None] = time.sleep,
     ) -> None:
         """Initialize the CDGClient.
 
@@ -93,6 +94,7 @@ class CDGClient:
         """
         self.base_url = urljoin(ROOT_URL, api_version) + "/"
         self._id_strategy = id_strategy or IdStrategyApplier()
+        self._sleep = sleeper
         self._session = requests.Session()
         self._session.headers.update({"User-Agent": "congress-tracker/1.0"})
         self._session.params = {"format": response_format}
@@ -209,7 +211,7 @@ class CDGClient:
                         delay,
                         rate_limit_attempts,
                     )
-                    time.sleep(delay)
+                    self._sleep(delay)
                     continue
                 # Treat 5xx as retryable when a real status_code is present.
                 if hasattr(resp, "status_code") and resp.status_code >= 500:
@@ -231,7 +233,7 @@ class CDGClient:
                         f"Exceeded total retry wait of {self._max_total_retry_wait}s"
                     ) from exc
                 sleep_for = min(delay, remaining)
-                time.sleep(sleep_for)
+                self._sleep(sleep_for)
                 cumulative_sleep += sleep_for
                 continue
 
