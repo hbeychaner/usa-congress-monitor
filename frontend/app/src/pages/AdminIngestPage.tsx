@@ -233,11 +233,9 @@ export function AdminIngestPage() {
                                         <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Resource</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Scope</Table.ColumnHeaderCell>
-                                        <Table.ColumnHeaderCell>Completed</Table.ColumnHeaderCell>
-                                        <Table.ColumnHeaderCell>Observed</Table.ColumnHeaderCell>
-                                        <Table.ColumnHeaderCell>Target</Table.ColumnHeaderCell>
-                                        <Table.ColumnHeaderCell>Remaining</Table.ColumnHeaderCell>
                                         <Table.ColumnHeaderCell>Progress</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>Speed</Table.ColumnHeaderCell>
+                                        <Table.ColumnHeaderCell>ETA</Table.ColumnHeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
@@ -247,16 +245,14 @@ export function AdminIngestPage() {
                                             <Table.Cell><Badge variant="soft">{job.status}</Badge></Table.Cell>
                                             <Table.Cell>{job.resource}</Table.Cell>
                                             <Table.Cell>{job.from_date || job.to_date ? `${formatDate(job.from_date)} to ${formatDate(job.to_date)}` : job.congress ? `Congress ${job.congress}` : 'All'}</Table.Cell>
-                                            <Table.Cell>{job.hydrated.toLocaleString()}</Table.Cell>
-                                            <Table.Cell>{job.discovered.toLocaleString()}</Table.Cell>
-                                            <Table.Cell>{job.target.toLocaleString()}</Table.Cell>
-                                            <Table.Cell>{job.remaining.toLocaleString()}</Table.Cell>
                                             <Table.Cell style={{ minWidth: 120 }}>
                                                 <Flex direction="column" gap="1">
                                                     <Progress value={job.target > 0 ? Math.min(100, (job.hydrated / job.target) * 100) : 0} size="2" />
-                                                    <Text size="1" color="gray">{job.target > 0 ? `${((job.hydrated / job.target) * 100).toFixed(0)}%` : 'n/a'}</Text>
+                                                    <Text size="1" color="gray">{job.hydrated.toLocaleString()} / {job.target.toLocaleString()}</Text>
                                                 </Flex>
                                             </Table.Cell>
+                                            <Table.Cell>{job.rate_per_hour > 0 ? `${job.rate_per_hour.toLocaleString()}/h` : 'n/a'}</Table.Cell>
+                                            <Table.Cell>{job.eta ? formatEta(job.eta) : 'n/a'}</Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>

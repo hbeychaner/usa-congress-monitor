@@ -422,6 +422,8 @@ class IngestProgressJob(BaseModel):
     discovered: int
     target: int
     remaining: int
+    rate_per_hour: int = Field(default=0, description="Average items hydrated per hour since start.")
+    eta: str | None = None
 
 
 class BackfillProgress(BaseModel):

@@ -982,6 +982,14 @@ export interface components {
             target: number;
             /** Remaining */
             remaining: number;
+            /**
+             * Rate Per Hour
+             * @description Average items hydrated per hour since start.
+             * @default 0
+             */
+            rate_per_hour: number;
+            /** Eta */
+            eta?: string | null;
         };
         /** IngestProgressResponse */
         IngestProgressResponse: {

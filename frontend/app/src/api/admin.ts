@@ -49,6 +49,8 @@ export type IngestProgressJob = {
     discovered: number;
     target: number;
     remaining: number;
+    rate_per_hour: number;
+    eta: string | null;
 };
 
 export type BackfillProgress = {

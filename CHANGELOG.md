@@ -4,6 +4,8 @@
 
 ### Added
 
+- Admin ingest job table shows per-job speed (items/hour since start) and ETA, and a single `completed / total` progress indicator instead of the Observed/Target/Remaining columns.
+
 - Topic page "Related Topics" chart: nearest topics by embedding-centroid similarity. Training now stores each topic's `centroid`; the current model was backfilled from its saved embeddings.
 - Member profile "Legislative Topics" bars link to the topic page (`topic_id` added to member topic items).
 - Topic-centered member graph: `GET /api/v1/graph/topic-neighborhood` centers on a metasubject, topic or CRS subject and shows its top sponsors with their collaboration/voting/topic links. The graph page has a "Centered on topics" mode with a picker.

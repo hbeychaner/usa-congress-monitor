@@ -41,6 +41,7 @@ _JOBS_TABLE = Table(
     Column("payload", String),
     Column("created_at", String),
     Column("updated_at", String),
+    Column("started_at", String),
 )
 _RECORDS_TABLE = Table(
     "records",
@@ -70,6 +71,32 @@ class _ActiveJob:
     from_date: str | None
     to_date: str | None
     fetch_items: bool
+    started_at: datetime | None
+
+
+def _parse_timestamp(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+
+
+def _rate_and_eta(
+    job: _ActiveJob, hydrated: int, remaining: int
+) -> tuple[int, str | None]:
+    # Average speed since the job started; unknown until something is hydrated.
+    if job.status != "running" or job.started_at is None or hydrated <= 0:
+        return 0, None
+    now = datetime.now(UTC)
+    elapsed_hours = (now - job.started_at).total_seconds() / 3600
+    if elapsed_hours <= 0:
+        return 0, None
+    rate = hydrated / elapsed_hours
+    eta = (now + timedelta(hours=remaining / rate)).isoformat() if remaining else None
+    return round(rate), eta
 
 
 def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
@@ -81,6 +108,7 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
                 _JOBS_TABLE.c.kind,
                 _JOBS_TABLE.c.status,
                 _JOBS_TABLE.c.payload,
+                _JOBS_TABLE.c.started_at,
             )
             # GovInfo bulk packages/batches are aggregated separately; listing
             # each of the ~211k queued packages here made this endpoint unusable.
@@ -114,6 +142,7 @@ def _load_active_ingest_jobs(conn: Connection) -> list[_ActiveJob]:
                 from_date=payload.get("from_date"),
                 to_date=payload.get("to_date"),
                 fetch_items=bool(payload.get("fetch_items", False)),
+                started_at=_parse_timestamp(row["started_at"]),
             )
         )
     return jobs
@@ -314,6 +343,8 @@ class AdminService:
             discovered = min(target, discovered)
             remaining = max(0, target - hydrated)
 
+            rate_per_hour, eta = _rate_and_eta(job, hydrated, remaining)
+
             total_hydrated += hydrated
             total_discovered += discovered
             total_target += target
@@ -331,6 +362,8 @@ class AdminService:
                     discovered=discovered,
                     target=target,
                     remaining=remaining,
+                    rate_per_hour=rate_per_hour,
+                    eta=eta,
                 )
             )
 
