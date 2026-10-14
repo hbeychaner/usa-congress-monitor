@@ -22,6 +22,7 @@ from cdm.workers.govinfo_runner import (
     GovInfoPackageRunner,
     ReconciliationRunner,
 )
+from cdm.workers.heartbeat import JobHeartbeat
 from cdm.workers.index_runner import IndexJobRunner
 from cdm.workers.ingest_runner import IngestJobRunner
 from cdm.workers.maintenance import (
@@ -58,6 +59,10 @@ class WorkerContainer(Container):
     @cached_property
     def job_submitter(self) -> JobSubmitter:
         return JobSubmitter(self.job_store, self.job_dispatcher)
+
+    @cached_property
+    def job_heartbeat(self) -> JobHeartbeat:
+        return JobHeartbeat(self.job_store, self.config.queue.job_heartbeat_seconds)
 
     @cached_property
     def failure_classifier(self) -> FailureClassifier:

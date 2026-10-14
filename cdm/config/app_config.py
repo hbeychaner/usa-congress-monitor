@@ -72,6 +72,8 @@ class QueueConfig(_Section):
     celery_retry_max: int = 8
     celery_retry_max_transient: int = 24
     celery_retry_backoff_max: int = 3600
+    # Running jobs touch their ledger row this often; recovery treats silence as a crash.
+    job_heartbeat_seconds: float = 60.0
     celery_task_soft_time_limit: int = 3600
     celery_task_time_limit: int = 3900
 

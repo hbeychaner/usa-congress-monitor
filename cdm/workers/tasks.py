@@ -40,7 +40,8 @@ def warm_store(**_: object) -> None:
 def _execute(task: object, job_id: str, run: Callable[[str], JobResult]) -> JsonObject:
     """Run a job and hand failures to the retry policy."""
     try:
-        return run(job_id).model_dump(mode="json", exclude_none=True)
+        with _container().job_heartbeat.watch(job_id):
+            return run(job_id).model_dump(mode="json", exclude_none=True)
     except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
         _retry(task, job_id, exc)
 

@@ -5,7 +5,7 @@
 ### Fixed
 
 - Sparse historical API records no longer fail ingest: sponsors with blank `sponsorshipDate`/withdrawn dates or a null/missing `state`, recorded votes without a `url`, actions without `text`, and bill relationships identified by the Government Publishing Office now validate (about 2,900 items were being skipped).
-- Crash recovery no longer requeues ingest jobs that are still running within the 6-hour task limit (their ledger rows are not heartbeated), which had marked live jobs queued and risked duplicate concurrent runs.
+- Crash recovery no longer requeues live long-running jobs: every running job now heartbeats its ledger row (`job_heartbeat_seconds`, 60s), so all kinds use the 15-minute stale cutoff and jobs stranded by a worker restart or kill are requeued within about 20 minutes.
 - Coverage-gap planning treats queued, running and retrying windows as covered and no longer re-dispatches existing jobs, so waiting jobs are not duplicated against the API budget.
 - Failed ingest jobs are requeued only when no ingest job is queued, running or retrying, so retries use idle API budget instead of competing with live jobs.
 - Failure recovery and log trimming run on a dedicated `congress-maintenance` queue and worker, so saturated ingest workers can no longer starve the 5-minute recovery sweep.

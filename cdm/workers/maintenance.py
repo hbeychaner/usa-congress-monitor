@@ -62,8 +62,6 @@ class JobRecoveryService:
     # Redispatching an already-QUEUED job is a rare safety net for messages
     # lost to broker hiccups, not a routine driver of work.
     CRASH_CUTOFF = timedelta(minutes=15)
-    # Ingest rows are not heartbeated; live jobs run past the 6h hard limit never.
-    INGEST_CRASH_CUTOFF = timedelta(hours=7)
     ORPHAN_CUTOFF = timedelta(minutes=60)
     INGEST_ORPHAN_CUTOFF = timedelta(days=1)
     ORPHAN_BATCH_LIMIT = 25
@@ -117,7 +115,7 @@ class JobRecoveryService:
         store = self._store
         candidates = [
             *self._failed_candidates(),
-            *self._stale_active(now),
+            *store.stale_active((now - self.CRASH_CUTOFF).isoformat()),
             *store.stale_queued(
                 self.ORPHAN_KINDS,
                 (now - self.ORPHAN_CUTOFF).isoformat(),
@@ -139,14 +137,6 @@ class JobRecoveryService:
                 )
             )
         return candidates
-
-    def _stale_active(self, now: datetime) -> list[JobRow]:
-        ingest_cutoff = (now - self.INGEST_CRASH_CUTOFF).isoformat()
-        return [
-            job
-            for job in self._store.stale_active((now - self.CRASH_CUTOFF).isoformat())
-            if job["kind"] != JobKind.INGEST or job["updated_at"] < ingest_cutoff
-        ]
 
     def _failed_candidates(self) -> list[JobRow]:
         """Failed ingest jobs wait until no ingest job is active, to spare the API budget."""

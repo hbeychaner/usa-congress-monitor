@@ -254,7 +254,6 @@ def test_recovery_requeues_stale_active_job(monkeypatch):
         "id": "ingest:stale-running",
         "kind": JobKind.INGEST.value,
         "status": JobStatus.RUNNING.value,
-        "updated_at": (datetime.now(UTC) - timedelta(hours=8)).isoformat(),
         "payload": {},
     }
     store = FakeStore(active=[job])
@@ -520,18 +519,3 @@ def test_recovery_runs_on_its_own_queue():
     assert routes["cdm.workers.tasks.recover_failed_ingest_jobs"]["queue"] == queue.celery_maintenance_queue
     assert queue.celery_maintenance_queue not in {queue.celery_ingest_queue, queue.celery_bulk_queue}
 
-
-def test_recovery_leaves_long_running_ingest_jobs_alone(monkeypatch):
-    job = {
-        "id": "ingest:live",
-        "kind": JobKind.INGEST.value,
-        "status": JobStatus.RUNNING.value,
-        "updated_at": (datetime.now(UTC) - timedelta(hours=3)).isoformat(),
-        "payload": {},
-    }
-    store = FakeStore(active=[job])
-    _install(monkeypatch, job_store=store, redis_client=FakeRedis(FakeLock(True)))
-
-    result = cast(Any, tasks.recover_failed_ingest_jobs).run()
-
-    assert result == {"recovered": []}

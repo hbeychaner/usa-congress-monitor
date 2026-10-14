@@ -664,6 +664,17 @@ class JobStore:
         statement = statement.order_by(_JOBS.c.updated_at)
         return self._fetch(statement)
 
+    def touch(self, job_id: str) -> None:
+        """Refresh ``updated_at`` of a RUNNING job so recovery sees it is alive."""
+        with self._transaction_lock(), self.engine.begin() as connection:
+            connection.execute(
+                update(_JOBS)
+                .where(
+                    (_JOBS.c.id == job_id) & (_JOBS.c.status == JobStatus.RUNNING.value)
+                )
+                .values(updated_at=_now())
+            )
+
     def has_active(self, kind: str) -> bool:
         """Return whether any job of ``kind`` is queued, running or retrying."""
         statement = (
