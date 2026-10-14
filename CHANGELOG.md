@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Crash recovery no longer requeues ingest jobs that are still running within the 6-hour task limit (their ledger rows are not heartbeated), which had marked live jobs queued and risked duplicate concurrent runs.
 - Coverage-gap planning treats queued, running and retrying windows as covered and no longer re-dispatches existing jobs, so waiting jobs are not duplicated against the API budget.
 - Failed ingest jobs are requeued only when no ingest job is queued, running or retrying, so retries use idle API budget instead of competing with live jobs.
 - Failure recovery and log trimming run on a dedicated `congress-maintenance` queue and worker, so saturated ingest workers can no longer starve the 5-minute recovery sweep.
