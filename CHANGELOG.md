@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Sparse historical API records no longer fail ingest: sponsors with blank `sponsorshipDate`/withdrawn dates or a null/missing `state`, recorded votes without a `url`, actions without `text`, and bill relationships identified by the Government Publishing Office now validate (about 2,900 items were being skipped).
 - Crash recovery no longer requeues ingest jobs that are still running within the 6-hour task limit (their ledger rows are not heartbeated), which had marked live jobs queued and risked duplicate concurrent runs.
 - Coverage-gap planning treats queued, running and retrying windows as covered and no longer re-dispatches existing jobs, so waiting jobs are not duplicated against the API budget.
 - Failed ingest jobs are requeued only when no ingest job is queued, running or retrying, so retries use idle API budget instead of competing with live jobs.

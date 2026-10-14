@@ -359,6 +359,7 @@ class IdentifyingEntity(StrEnum):
     SENATE = "Senate"
     CRS = "CRS"  # Congressional Research Service
     LIBRARY_OF_CONGRESS = "Library of Congress"
+    GOVERNMENT_PUBLISHING_OFFICE = "U.S. Government Publishing Office"
 
 
 class RelationshipDetail(BaseModel):
@@ -643,7 +644,9 @@ class RecordedVote(BaseModel):
     roll_number: Annotated[
         int, Field(alias="rollNumber", description="What the roll call number is.")
     ]
-    url: Annotated[HttpUrl, Field(description="Where to retrieve the vote in the API.")]
+    url: Annotated[
+        HttpUrl | None, Field(description="Where to retrieve the vote in the API.")
+    ] = None
     chamber: Annotated[
         Chamber, Field(alias="chamber", description="Which chamber held the vote.")
     ]
@@ -669,7 +672,7 @@ class Action(BaseModel):
         SourceSystem | None,
         Field(alias="sourceSystem", description="Which system provided the action."),
     ] = None
-    text: Annotated[str, Field(description="What the action text says.")]
+    text: Annotated[str, Field(description="What the action text says.")] = ""
     type: Annotated[str | None, Field(description="What type of action this is.")] = ""
     committees: Annotated[
         list[CommitteeMetadata] | None,

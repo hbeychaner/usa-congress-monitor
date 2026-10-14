@@ -463,6 +463,20 @@ class Member(EntityBase):
 class Sponsor(Member):
     """A member acting as sponsor, with sponsorship timing metadata."""
 
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate_sparse_sponsor(cls, values: object) -> object:
+        # Historical sponsors arrive with blank dates and a null or missing state.
+        if not isinstance(values, dict):
+            return values
+        cleaned = dict(values)
+        for key in ("sponsorshipDate", "sponsorshipWithdrawnDate"):
+            if cleaned.get(key) == "":
+                cleaned[key] = None
+        if cleaned.get("state") is None:
+            cleaned["state"] = ""
+        return cleaned
+
     sponsorship_date: Annotated[
         datetime | None,
         Field(
