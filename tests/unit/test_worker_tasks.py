@@ -79,14 +79,19 @@ class FakeRedis:
 
 
 class FakeStore:
-    def __init__(self, jobs=None, queued=None, active=None):
+    def __init__(self, jobs=None, queued=None, active=None, failed=None, ingest_active=False):
         self.requeued = []
+        self._failed = failed or []
+        self._ingest_active = ingest_active
         self._jobs = jobs or []
         self._queued = queued or []
         self._active = active or []
 
     def failed(self):
-        return []
+        return self._failed
+
+    def has_active(self, kind):
+        return self._ingest_active
 
     def stale_active(self, cutoff):
         return self._active
@@ -476,3 +481,40 @@ def test_index_job_archive_fallback_skips_when_archive_missing(tmp_path):
     missing = IndexPayload(stream="s", resource="bill", archive_root=payload["archive_root"])
     assert replayer.replay(missing) == 0
     assert replayer.replay(IndexPayload(stream="s", resource="bill")) == 0
+
+
+def _failed_job(job_id, kind):
+    return {
+        "id": job_id,
+        "kind": kind.value,
+        "status": JobStatus.FAILED.value,
+        "last_error": "SoftTimeLimitExceeded()",
+        "payload": {},
+    }
+
+
+def test_recovery_holds_failed_ingest_jobs_while_ingest_is_active(monkeypatch):
+    failed = [_failed_job("ingest:a", JobKind.INGEST), _failed_job("index:a", JobKind.INDEX)]
+    store = FakeStore(jobs=failed, failed=failed, ingest_active=True)
+    _install(monkeypatch, job_store=store, redis_client=FakeRedis(FakeLock(True)))
+
+    result = cast(Any, tasks.recover_failed_ingest_jobs).run()
+
+    assert result == {"recovered": ["index:a"]}
+
+
+def test_recovery_requeues_failed_ingest_jobs_once_ingest_is_idle(monkeypatch):
+    failed = [_failed_job("ingest:a", JobKind.INGEST)]
+    store = FakeStore(jobs=failed, failed=failed, ingest_active=False)
+    _install(monkeypatch, job_store=store, redis_client=FakeRedis(FakeLock(True)))
+
+    result = cast(Any, tasks.recover_failed_ingest_jobs).run()
+
+    assert result == {"recovered": ["ingest:a"]}
+
+
+def test_recovery_runs_on_its_own_queue():
+    queue = get_config().queue
+    routes = tasks.celery_app.conf.task_routes
+    assert routes["cdm.workers.tasks.recover_failed_ingest_jobs"]["queue"] == queue.celery_maintenance_queue
+    assert queue.celery_maintenance_queue not in {queue.celery_ingest_queue, queue.celery_bulk_queue}

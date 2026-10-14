@@ -49,8 +49,9 @@ reliable time cursor; they remain covered by the historical/static ingest
 plan.
 
 On macOS, use `make ingest-service-install` for unattended operation and
-`make ingest-service-status` to inspect all three agents. Use `make worker`,
-`make worker-index`, and `make beat` only for foreground development or
+`make ingest-service-status` to inspect all four agents (ingest, index,
+maintenance, beat). Use `make worker`,
+`make worker-index`, `make worker-maintenance`, and `make beat` only for foreground development or
 diagnostics. Linux deployments can use the foreground commands or a process
 manager with the default prefork pool.
 

@@ -114,7 +114,7 @@ class JobRecoveryService:
         now = datetime.now(UTC)
         store = self._store
         candidates = [
-            *store.failed(),
+            *self._failed_candidates(),
             *store.stale_active((now - self.CRASH_CUTOFF).isoformat()),
             *store.stale_queued(
                 self.ORPHAN_KINDS,
@@ -137,6 +137,13 @@ class JobRecoveryService:
                 )
             )
         return candidates
+
+    def _failed_candidates(self) -> list[JobRow]:
+        """Failed ingest jobs wait until no ingest job is active, to spare the API budget."""
+        failed = self._store.failed()
+        if not self._store.has_active(JobKind.INGEST.value):
+            return failed
+        return [job for job in failed if job["kind"] != JobKind.INGEST]
 
     def _batched_package_ids(self) -> set[str]:
         ids: set[str] = set()

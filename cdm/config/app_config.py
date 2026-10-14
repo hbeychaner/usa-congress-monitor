@@ -67,6 +67,8 @@ class QueueConfig(_Section):
     # Bulk fan-out gets its own queue so it cannot starve operational traffic.
     celery_bulk_queue: str = "congress-bulk"
     celery_index_queue: str = "congress-index"
+    # Light periodic upkeep gets its own queue so busy ingest workers cannot starve it.
+    celery_maintenance_queue: str = "congress-maintenance"
     celery_retry_max: int = 8
     celery_retry_max_transient: int = 24
     celery_retry_backoff_max: int = 3600

@@ -96,13 +96,16 @@ case "${1:-}" in
         install_agent com.congress-tracker.index \
             '-A cdm.workers.celery_app:celery_app worker --hostname=index-launchd@%h --pool=prefork --concurrency=4 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index' \
             worker-index-launchd.log
+        install_agent com.congress-tracker.maintenance \
+            '-A cdm.workers.celery_app:celery_app worker --hostname=maintenance-launchd@%h --pool=prefork --concurrency=1 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-maintenance' \
+            worker-maintenance-launchd.log
         install_agent com.congress-tracker.beat \
             '-A cdm.workers.celery_app:celery_app beat --loglevel=INFO' \
             beat-launchd.log
-        printf 'Installed and started supervised ingest, index, and beat agents.\n'
+        printf 'Installed and started supervised ingest, index, maintenance, and beat agents.\n'
         ;;
     uninstall)
-        for label in com.congress-tracker.ingest-recovery com.congress-tracker.index com.congress-tracker.beat; do
+        for label in com.congress-tracker.ingest-recovery com.congress-tracker.index com.congress-tracker.maintenance com.congress-tracker.beat; do
             launchctl bootout "gui/$UID/$label" 2>/dev/null || true
             rm -f "$agent_dir/$label.plist"
         done

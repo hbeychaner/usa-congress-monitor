@@ -664,6 +664,23 @@ class JobStore:
         statement = statement.order_by(_JOBS.c.updated_at)
         return self._fetch(statement)
 
+    def has_active(self, kind: str) -> bool:
+        """Return whether any job of ``kind`` is queued, running or retrying."""
+        statement = (
+            select(_JOBS.c.id)
+            .where(_JOBS.c.kind == kind)
+            .where(
+                _JOBS.c.status.in_([
+                    JobStatus.QUEUED.value,
+                    JobStatus.RUNNING.value,
+                    JobStatus.RETRYING.value,
+                ])
+            )
+            .limit(1)
+        )
+        with self.engine.connect() as connection:
+            return connection.execute(statement).first() is not None
+
     def unfinished(self, kind: str | None = None) -> list[JobRow]:
         """Return jobs that are not in a successful/cancelled terminal state."""
         statement = select(_JOBS).where(

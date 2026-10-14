@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # Makefile for local development tasks (start OpenSearch, manage deps)
 
-.PHONY: env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
+.PHONY: env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-maintenance worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
 
 # Detect docker compose command at make-parse time (prefer `docker compose`)
 DOCKER_COMPOSE_CMD_DETECTED := $(if $(shell docker compose version >/dev/null 2>&1 && echo ok),docker compose,$(if $(shell command -v docker-compose >/dev/null 2>&1 && echo ok),docker-compose,))
@@ -29,6 +29,7 @@ services: local
 	else \
 		mkdir -p logs; nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=ingest@%h --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest >> logs/worker-ingest.log 2>&1 & \
 		nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=index@%h --pool=prefork --concurrency=4 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index >> logs/worker-index.log 2>&1 & \
+		nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=maintenance@%h --pool=prefork --concurrency=1 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-maintenance >> logs/worker-maintenance.log 2>&1 & \
 		nohup uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO >> logs/beat.log 2>&1 & \
 		echo "Worker and beat started; logs are in logs/worker-ingest.log, logs/worker-index.log, and logs/beat.log."; \
 	fi
@@ -127,6 +128,9 @@ worker:
 
 worker-index:
 	uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=index@%h --pool=prefork --concurrency=4 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index
+
+worker-maintenance:
+	uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=maintenance@%h --pool=prefork --concurrency=1 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-maintenance
 
 worker-monitor:
 	uv run python scripts/monitor_ingest_progress.py

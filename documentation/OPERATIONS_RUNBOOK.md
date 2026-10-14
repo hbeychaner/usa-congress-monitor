@@ -35,9 +35,9 @@ make health-check
 ```
 
 `make services` starts the local containers and installs the launchd-supervised
-ingest, index, and Beat agents. The agents restart after process failure and
+ingest, index, maintenance, and Beat agents. The agents restart after process failure and
 resume after login or wake. Do not also run `make worker`, `make worker-index`,
-or `make beat` for the same queues. On Linux, use the corresponding foreground
+`make worker-maintenance`, or `make beat` for the same queues. On Linux, use the corresponding foreground
 commands under a process manager.
 
 For the full container stack:

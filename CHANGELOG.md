@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-14
+
+### Fixed
+
+- Coverage-gap planning treats queued, running and retrying windows as covered and no longer re-dispatches existing jobs, so waiting jobs are not duplicated against the API budget.
+- Failed ingest jobs are requeued only when no ingest job is queued, running or retrying, so retries use idle API budget instead of competing with live jobs.
+- Failure recovery and log trimming run on a dedicated `congress-maintenance` queue and worker, so saturated ingest workers can no longer starve the 5-minute recovery sweep.
+
 ## 2026-10-11
 
 ### Removed
