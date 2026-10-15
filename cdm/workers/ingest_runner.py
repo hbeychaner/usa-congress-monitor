@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from collections import Counter
 from pathlib import Path
 
 from redis import Redis
@@ -50,6 +51,7 @@ class IngestSession:
         self._quarantine = quarantine
         self._library = library
         self._last_cancel_check = time.monotonic()
+        self.published_counts: Counter[str] = Counter()
 
     def archive_record(self, resource: str, record: JsonObject) -> None:
         self.archive.write(resource, record)
@@ -57,6 +59,7 @@ class IngestSession:
             self._library.write(resource, record)
 
     def publish_record(self, resource: str, record: JsonObject) -> None:
+        self.published_counts[resource] += 1
         RedisRecordStream(
             self._redis,
             RedisRecordStream.stream_name(self._job_id, resource),
@@ -141,6 +144,12 @@ class IngestJobRunner:
         except IngestCancelledError:
             # Ledger already reflects the cancel; stop work without retrying.
             return JobResult(job_id=job_id, cancelled=True)
+        except Exception:
+            # Index what this attempt fetched so a retry skips it instead of redoing it.
+            self._queue_partial_index_jobs(
+                job_id, payload, job_outdir, session, int(job["attempts"])
+            )
+            raise
         self._store.mark_succeeded(job_id)
         return JobResult(job_id=job_id, index_jobs=index_jobs)
 
@@ -207,15 +216,48 @@ class IngestJobRunner:
             resource = result.resource.value
             if not result.published_count or not self.should_queue_index_job(resource):
                 continue
-            index_payload = IndexPayload(
-                stream=RedisRecordStream.stream_name(job_id, resource),
-                resource=resource,
-                batch_size=payload.index_batch_size,
-                preserve_raw=payload.preserve_raw,
-                consumer_group=self._redis_config.redis_consumer_group,
-                expected_count=result.published_count,
-                archive_root=str(job_outdir),
+            index_jobs.append(
+                self._submit_index(
+                    job_id, payload, job_outdir, resource, result.published_count
+                )
             )
-            job = self._submitter.submit(JobKind.INDEX, index_payload.to_json())
-            index_jobs.append(job["id"])
         return index_jobs
+
+    def _queue_partial_index_jobs(
+        self,
+        job_id: str,
+        payload: IngestPayload,
+        job_outdir: Path,
+        session: IngestSession,
+        attempt: int,
+    ) -> None:
+        if not payload.index:
+            return
+        for resource, count in session.published_counts.items():
+            if count and self.should_queue_index_job(resource):
+                self._submit_index(
+                    job_id, payload, job_outdir, resource, None, source_attempt=attempt
+                )
+
+    def _submit_index(
+        self,
+        job_id: str,
+        payload: IngestPayload,
+        job_outdir: Path,
+        resource: str,
+        expected_count: int | None,
+        *,
+        source_attempt: int | None = None,
+    ) -> str:
+        index_payload = IndexPayload(
+            stream=RedisRecordStream.stream_name(job_id, resource),
+            resource=resource,
+            batch_size=payload.index_batch_size,
+            preserve_raw=payload.preserve_raw,
+            consumer_group=self._redis_config.redis_consumer_group,
+            expected_count=expected_count,
+            archive_root=str(job_outdir),
+        )
+        if source_attempt is not None:
+            index_payload.source_attempt = source_attempt
+        return self._submitter.submit(JobKind.INDEX, index_payload.to_json())["id"]

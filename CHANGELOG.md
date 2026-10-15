@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-15
+
+### Fixed
+
+- Ingest attempts that fail or hit the time limit now queue index jobs for the records they already fetched, so retries skip them instead of refetching the same bills every attempt (long-running congress jobs were looping without ever indexing anything).
+
 ## 2026-10-14
 
 ### Fixed
