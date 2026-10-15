@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- The admin ingest page's active-jobs table is now titled "Per Ingest Job" and notes that index jobs appear only in the Job Ledger, which counts every job kind.
 - Ingest attempts that fail or hit the time limit now queue index jobs for the records they already fetched, so retries skip them instead of refetching the same bills every attempt (long-running congress jobs were looping without ever indexing anything).
 
 ## 2026-10-14

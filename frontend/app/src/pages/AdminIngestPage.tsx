@@ -206,7 +206,7 @@ export function AdminIngestPage() {
 
                     <Card size="3">
                         <Flex justify="between" align="center" wrap="wrap" gap="3" mb="2">
-                            <Heading size="4">Per Job</Heading>
+                            <Heading size="4">Per Ingest Job</Heading>
                             <label>
                                 <Text as="div" size="2" mb="1" weight="medium">Status</Text>
                                 <Select.Root value={statusFilter || 'all'} onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value)}>
@@ -222,7 +222,7 @@ export function AdminIngestPage() {
                         </Flex>
                         {data.jobs.length > 0 ? <Text as="p" size="2" color="gray" mb="2">Showing {filteredJobs.length.toLocaleString()} of {data.jobs.length.toLocaleString()} active jobs</Text> : null}
                         {data.jobs.length === 0 ? (
-                            <Text as="p">No active ingest jobs.</Text>
+                            <Text as="p">No active ingest jobs. Index jobs appear only in the Job Ledger.</Text>
                         ) : filteredJobs.length === 0 ? (
                             <Text as="p">No active jobs match this status.</Text>
                         ) : (
