@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-16
+
+### Changed
+
+- Ingest jobs are no longer failed after 6 hours: ingest tasks have a 5-day time limit (`celery_ingest_soft_time_limit`), and a task that does hit its soft limit retries in place instead of being marked failed and waiting behind other jobs.
+- Running ingest jobs queue an index job every 100 new records (`ingest_partial_index_every`) instead of only when the attempt ends, so long jobs bank progress continuously and a retry or restart skips what is already indexed.
+
 ## 2026-10-15
 
 ### Fixed

@@ -111,6 +111,7 @@ class WorkerContainer(Container):
             self.bill_state_reader,
             self.record_library,
             self.congress_rate_limiter,
+            self.config.indexing.ingest_partial_index_every,
         )
 
     @cached_property

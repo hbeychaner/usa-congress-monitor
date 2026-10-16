@@ -63,6 +63,7 @@ class IndexPayload(JobPayload):
     target_index: str | None = None
     replace: bool = False
     source_attempt: int | None = None
+    part: int | None = None
 
     def shares_batch_with(self, other: IndexPayload) -> bool:
         return (

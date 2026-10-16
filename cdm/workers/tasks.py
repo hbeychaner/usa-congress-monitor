@@ -50,7 +50,12 @@ def _retry(task: object, job_id: str, exc: Exception) -> NoReturn:
     _container().task_retrier.handle(task, job_id, exc)  # type: ignore[arg-type]
 
 
-@celery_app.task(bind=True, name=TaskName.RUN_INGEST.value)
+@celery_app.task(
+    bind=True,
+    name=TaskName.RUN_INGEST.value,
+    soft_time_limit=get_config().queue.celery_ingest_soft_time_limit,
+    time_limit=get_config().queue.celery_ingest_time_limit,
+)
 def run_ingest_job(self: object, job_id: str) -> JsonObject:
     return _execute(self, job_id, _container().ingest_runner.run)
 

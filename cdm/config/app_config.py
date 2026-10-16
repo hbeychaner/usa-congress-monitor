@@ -76,6 +76,9 @@ class QueueConfig(_Section):
     job_heartbeat_seconds: float = 60.0
     celery_task_soft_time_limit: int = 3600
     celery_task_time_limit: int = 3900
+    # Ingest jobs may run for days; they are bounded by stalls, not elapsed time.
+    celery_ingest_soft_time_limit: int = 5 * 24 * 3600
+    celery_ingest_time_limit: int = 5 * 24 * 3600 + 3600
 
 
 class RedisConfig(_Section):
@@ -107,6 +110,8 @@ class GovInfoConfig(_Section):
 class IndexingConfig(_Section):
     index_batch_jobs: int = 25
     index_batch_docs: int = 1000
+    # Running ingest jobs queue an index job after this many new records.
+    ingest_partial_index_every: int = 100
 
 
 class EmbeddingConfig(_Section):

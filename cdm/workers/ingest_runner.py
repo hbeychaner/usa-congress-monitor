@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from collections import Counter
+from collections.abc import Callable
 from pathlib import Path
 
 from redis import Redis
@@ -42,6 +43,8 @@ class IngestSession:
         archive: JsonlRecordArchive,
         quarantine: SQLiteQuarantineArchive,
         library: LatestRecordArchive | None = None,
+        flush_every: int = 100,
+        on_flush: Callable[[str, int], str | None] | None = None,
     ) -> None:
         self._job_id = job_id
         self._store = store
@@ -51,7 +54,11 @@ class IngestSession:
         self._quarantine = quarantine
         self._library = library
         self._last_cancel_check = time.monotonic()
-        self.published_counts: Counter[str] = Counter()
+        self._flush_every = flush_every
+        self._on_flush = on_flush
+        self._unflushed: Counter[str] = Counter()
+        self.parts: Counter[str] = Counter()
+        self.index_job_ids: list[str] = []
 
     def archive_record(self, resource: str, record: JsonObject) -> None:
         self.archive.write(resource, record)
@@ -59,12 +66,28 @@ class IngestSession:
             self._library.write(resource, record)
 
     def publish_record(self, resource: str, record: JsonObject) -> None:
-        self.published_counts[resource] += 1
         RedisRecordStream(
             self._redis,
             RedisRecordStream.stream_name(self._job_id, resource),
             maxlen=self._redis_config.redis_stream_maxlen,
         ).publish(resource, record)
+        self._unflushed[resource] += 1
+        if self._unflushed[resource] >= self._flush_every:
+            self.flush_resource(resource)
+
+    def flush_resource(self, resource: str) -> None:
+        """Queue an index job for records published since the last flush."""
+        if self._on_flush is None or not self._unflushed[resource]:
+            return
+        self._unflushed[resource] = 0
+        self.parts[resource] += 1
+        job = self._on_flush(resource, self.parts[resource])
+        if job is not None:
+            self.index_job_ids.append(job)
+
+    def flush_all(self) -> None:
+        for resource in list(self._unflushed):
+            self.flush_resource(resource)
 
     def update_progress(
         self, resource: str, stage: CoverageStage, values: dict[str, int | str | None]
@@ -109,7 +132,9 @@ class IngestJobRunner:
         bill_states: IndexedBillStateReader,
         library: RecordLibrary,
         rate_limiter: TokenBucket,
+        partial_index_every: int,
     ) -> None:
+        self._partial_index_every = partial_index_every
         self._store = store
         self._redis = redis_client
         self._submitter = submitter
@@ -129,26 +154,31 @@ class IngestJobRunner:
             return SkippedClaim(self._store).result(job_id)
         payload = IngestPayload.model_validate(job["payload"])
         job_outdir = Path(payload.outdir) / job_id
+        attempt = int(job["attempts"])
         session = IngestSession(
             job_id,
             self._store,
             self._redis,
             self._redis_config,
-            JsonlRecordArchive(job_outdir, int(job["attempts"])),
+            JsonlRecordArchive(job_outdir, attempt),
             SQLiteQuarantineArchive(job_outdir),
             self._library_archive(payload),
+            self._partial_index_every,
+            lambda resource, part: self._flush_index(
+                job_id, payload, job_outdir, resource, attempt, part
+            ),
         )
         try:
             results = self._run_pipeline(payload, job_outdir, session)
-            index_jobs = self._queue_index_jobs(job_id, payload, job_outdir, results)
+            index_jobs = self._queue_index_jobs(
+                job_id, payload, job_outdir, results, session
+            )
         except IngestCancelledError:
             # Ledger already reflects the cancel; stop work without retrying.
             return JobResult(job_id=job_id, cancelled=True)
         except Exception:
             # Index what this attempt fetched so a retry skips it instead of redoing it.
-            self._queue_partial_index_jobs(
-                job_id, payload, job_outdir, session, int(job["attempts"])
-            )
+            session.flush_all()
             raise
         self._store.mark_succeeded(job_id)
         return JobResult(job_id=job_id, index_jobs=index_jobs)
@@ -208,36 +238,38 @@ class IngestJobRunner:
         payload: IngestPayload,
         job_outdir: Path,
         results: list[ResourceResult],
+        session: IngestSession,
     ) -> list[str]:
         if not payload.index:
             return []
-        index_jobs: list[str] = []
         for result in results:
             resource = result.resource.value
             if not result.published_count or not self.should_queue_index_job(resource):
                 continue
-            index_jobs.append(
-                self._submit_index(
-                    job_id, payload, job_outdir, resource, result.published_count
+            if session.parts[resource]:
+                session.flush_resource(resource)
+            else:
+                session.index_job_ids.append(
+                    self._submit_index(
+                        job_id, payload, job_outdir, resource, result.published_count
+                    )
                 )
-            )
-        return index_jobs
+        return session.index_job_ids
 
-    def _queue_partial_index_jobs(
+    def _flush_index(
         self,
         job_id: str,
         payload: IngestPayload,
         job_outdir: Path,
-        session: IngestSession,
+        resource: str,
         attempt: int,
-    ) -> None:
-        if not payload.index:
-            return
-        for resource, count in session.published_counts.items():
-            if count and self.should_queue_index_job(resource):
-                self._submit_index(
-                    job_id, payload, job_outdir, resource, None, source_attempt=attempt
-                )
+        part: int,
+    ) -> str | None:
+        if not payload.index or not self.should_queue_index_job(resource):
+            return None
+        return self._submit_index(
+            job_id, payload, job_outdir, resource, None, attempt=attempt, part=part
+        )
 
     def _submit_index(
         self,
@@ -247,7 +279,8 @@ class IngestJobRunner:
         resource: str,
         expected_count: int | None,
         *,
-        source_attempt: int | None = None,
+        attempt: int | None = None,
+        part: int | None = None,
     ) -> str:
         index_payload = IndexPayload(
             stream=RedisRecordStream.stream_name(job_id, resource),
@@ -258,6 +291,8 @@ class IngestJobRunner:
             expected_count=expected_count,
             archive_root=str(job_outdir),
         )
-        if source_attempt is not None:
-            index_payload.source_attempt = source_attempt
+        if attempt is not None:
+            index_payload.source_attempt = attempt
+        if part is not None:
+            index_payload.part = part
         return self._submitter.submit(JobKind.INDEX, index_payload.to_json())["id"]

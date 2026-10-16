@@ -31,6 +31,8 @@ class FailureClassifier:
         "still has",
         "transporterror(5",
         "transporterror(429",
+        # Banked progress means a timed-out attempt resumes rather than fails.
+        "softtimelimitexceeded",
     )
     _RETRYABLE_PREFIXES = (
         "server error: 5",
