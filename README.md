@@ -191,6 +191,18 @@ Local defaults (from `.env` via `cdm/config`): RabbitMQ at
 OpenSearch/Elastic at `http://localhost:9200` (Kibana at `:5601`), backend API
 at `http://localhost:8000`, frontend dev server at `http://localhost:5173`.
 
+### One command (native processes, macOS)
+
+```bash
+make down          # stop frontend, API, Celery agents, then containers (volumes kept)
+make up            # start Docker if needed, containers, Celery agents, API, frontend
+make restart       # down, then up
+make stack-status  # what is running
+```
+
+Interrupted ingest jobs resume automatically after `make up`: the maintenance
+worker requeues jobs whose heartbeat went silent within about 20 minutes.
+
 ### Start everything (native processes, macOS)
 
 ```bash

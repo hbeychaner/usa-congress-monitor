@@ -2,6 +2,10 @@
 
 ## 2026-10-17
 
+### Added
+
+- `make up`, `make down`, `make restart` and `make stack-status` (`scripts/stack.sh`) start or stop containers, Celery agents, the API and the frontend in one command; `ingest_launch_agent.sh stop` unloads the agents without removing their plists.
+
 ### Changed
 
 - At most `ingest_max_concurrent_jobs` (2) ingest jobs run at once; further jobs are deferred and rechecked every `ingest_defer_seconds` (300s), so a few congresses finish instead of all crawling together on the shared API budget.

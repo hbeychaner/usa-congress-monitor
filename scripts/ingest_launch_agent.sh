@@ -74,7 +74,7 @@ EOF
 }
 
 usage() {
-    printf 'Usage: %s {install|uninstall|status}\n' "$0"
+    printf 'Usage: %s {install|stop|uninstall|status}\n' "$0"
 }
 
 case "${1:-}" in
@@ -103,6 +103,12 @@ case "${1:-}" in
             '-A cdm.workers.celery_app:celery_app beat --loglevel=INFO' \
             beat-launchd.log
         printf 'Installed and started supervised ingest, index, maintenance, and beat agents.\n'
+        ;;
+    stop)
+        for label in com.congress-tracker.ingest-recovery com.congress-tracker.index com.congress-tracker.maintenance com.congress-tracker.beat; do
+            launchctl bootout "gui/$UID/$label" 2>/dev/null || true
+        done
+        printf 'Stopped supervised Celery agents (plists kept).\n'
         ;;
     uninstall)
         for label in com.congress-tracker.ingest-recovery com.congress-tracker.index com.congress-tracker.maintenance com.congress-tracker.beat; do

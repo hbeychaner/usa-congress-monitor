@@ -1,10 +1,23 @@
 #!/usr/bin/make -f
 # Makefile for local development tasks (start OpenSearch, manage deps)
 
-.PHONY: env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-maintenance worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
+.PHONY: up down restart stack-status env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-maintenance worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
 
 # Detect docker compose command at make-parse time (prefer `docker compose`)
 DOCKER_COMPOSE_CMD_DETECTED := $(if $(shell docker compose version >/dev/null 2>&1 && echo ok),docker compose,$(if $(shell command -v docker-compose >/dev/null 2>&1 && echo ok),docker-compose,))
+
+# Everything: containers, Celery agents, API, frontend (see scripts/stack.sh).
+up:
+	@sh scripts/stack.sh up
+
+down:
+	@sh scripts/stack.sh down
+
+restart:
+	@sh scripts/stack.sh restart
+
+stack-status:
+	@sh scripts/stack.sh status
 
 # Start the local OpenSearch stack (uses elastic-start-local/docker-compose.yml)
 start: services
