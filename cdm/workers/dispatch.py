@@ -43,14 +43,19 @@ class JobDispatcher:
             ),
         }
 
-    def dispatch(self, kind: str, job_id: str) -> None:
+    def dispatch(self, kind: str, job_id: str, *, countdown: int | None = None) -> None:
         try:
             route = self._routes.get(JobKind(kind))
         except ValueError:
             return
         if route is not None:
             name, queue = route
-            self._app.send_task(name.value, args=[job_id], queue=queue)
+            if countdown is None:
+                self._app.send_task(name.value, args=[job_id], queue=queue)
+            else:
+                self._app.send_task(
+                    name.value, args=[job_id], queue=queue, countdown=countdown
+                )
 
 
 class JobSubmitter:

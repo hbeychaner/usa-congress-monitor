@@ -1,7 +1,9 @@
 import threading
 from pathlib import Path
 
-from cdm.jobs.store import JobKind, JobStatus, JobStore
+import pytest
+
+from cdm.jobs.store import JobKind, JobSlotsBusy, JobStatus, JobStore
 from cdm.workers.heartbeat import JobHeartbeat
 
 
@@ -54,3 +56,17 @@ def test_heartbeat_stops_after_watch_exits(tmp_path: Path) -> None:
     threading.Event().wait(0.05)
 
     assert len(calls) == settled
+
+
+def test_claim_is_refused_beyond_the_concurrency_cap(tmp_path: Path) -> None:
+    store = JobStore(tmp_path / "jobs.sqlite3", repair=False)
+    jobs = [store.create(JobKind.INGEST.value, f"k{i}", {})["id"] for i in range(3)]
+
+    assert store.mark_running(jobs[0], max_active=2) is not None
+    assert store.mark_running(jobs[1], max_active=2) is not None
+    with pytest.raises(JobSlotsBusy):
+        store.mark_running(jobs[2], max_active=2)
+
+    assert store.get(jobs[2])["status"] == JobStatus.QUEUED.value
+    store.mark_succeeded(jobs[0])
+    assert store.mark_running(jobs[2], max_active=2) is not None

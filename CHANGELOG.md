@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-17
+
+### Changed
+
+- At most `ingest_max_concurrent_jobs` (2) ingest jobs run at once; further jobs are deferred and rechecked every `ingest_defer_seconds` (300s), so a few congresses finish instead of all crawling together on the shared API budget.
+
+### Fixed
+
+- Crash recovery asks the workers which jobs they are actually running before requeueing silent ones, so a laptop sleep no longer turns live ingest jobs into queued rows with duplicate messages; live jobs get their heartbeat refreshed instead.
+
 ## 2026-10-16
 
 ### Changed

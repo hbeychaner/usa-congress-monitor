@@ -21,6 +21,7 @@ class JobResult(BaseModel):
     skipped: bool | None = None
     status: str | None = None
     cancelled: bool | None = None
+    deferred: bool | None = None
     index_jobs: list[str] | None = None
     resource: str | None = None
     packages_dispatched: list[str] | None = None

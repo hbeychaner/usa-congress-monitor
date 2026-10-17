@@ -20,6 +20,7 @@ from sqlalchemy import (
     Table,
     Text,
     create_engine,
+    func,
     select,
     update,
 )
@@ -30,6 +31,10 @@ from sqlalchemy.sql import Select
 
 from cdm.ingest.govinfo import GovInfoPackage
 from cdm.utils.json_types import JsonObject
+
+
+class JobSlotsBusy(Exception):
+    """Raised when claiming a job would exceed its kind's concurrency cap."""
 
 
 class JobKind(StrEnum):
@@ -330,7 +335,13 @@ class JobStore:
             raise KeyError(f"Unknown job {job_id}")
         return _decode_job(row)
 
-    def mark_running(self, job_id: str, *, update_windows: bool = True) -> JobRow | None:
+    def mark_running(
+        self,
+        job_id: str,
+        *,
+        update_windows: bool = True,
+        max_active: int | None = None,
+    ) -> JobRow | None:
         """Atomically claim a job for execution, returning ``None`` if already claimed.
 
         RUNNING is intentionally excluded from the claimable source statuses so
@@ -362,6 +373,8 @@ class JobStore:
             )
             if result.rowcount != 1:
                 return None
+            if max_active is not None and self._running_count(connection, job_id) > max_active:
+                raise JobSlotsBusy(job_id)
             if update_windows:
                 connection.execute(
                     update(_INGEST_WINDOWS)
@@ -373,6 +386,19 @@ class JobStore:
                     )
                 )
         return self.get(job_id)
+
+    @staticmethod
+    def _running_count(connection: Connection, job_id: str) -> int:
+        """RUNNING jobs of the same kind as ``job_id``, including itself."""
+        kind = select(_JOBS.c.kind).where(_JOBS.c.id == job_id).scalar_subquery()
+        return int(
+            connection.execute(
+                select(func.count())
+                .select_from(_JOBS)
+                .where(_JOBS.c.kind == kind)
+                .where(_JOBS.c.status == JobStatus.RUNNING.value)
+            ).scalar_one()
+        )
 
     def claim_queued(
         self,

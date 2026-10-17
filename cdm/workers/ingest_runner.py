@@ -9,7 +9,7 @@ from pathlib import Path
 
 from redis import Redis
 
-from cdm.config.app_config import CongressApiConfig, RedisConfig
+from cdm.config.app_config import CongressApiConfig, QueueConfig, RedisConfig
 from cdm.ingest.archive import (
     JsonlRecordArchive,
     LatestRecordArchive,
@@ -21,10 +21,10 @@ from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.ingest.runner import IngestCancelledError, Resource
 from cdm.ingest.stale_bills import IndexedBillStateReader, StaleBillFilter
 from cdm.jobs.payloads import IndexPayload, IngestPayload
-from cdm.jobs.store import CoverageStage, JobKind, JobStatus, JobStore
+from cdm.jobs.store import CoverageStage, JobKind, JobSlotsBusy, JobStatus, JobStore
 from cdm.utils.json_types import JsonObject
 from cdm.utils.rate_limiter import TokenBucket
-from cdm.workers.dispatch import JobSubmitter
+from cdm.workers.dispatch import JobDispatcher, JobSubmitter
 from cdm.workers.results import JobResult, SkippedClaim
 
 
@@ -133,8 +133,12 @@ class IngestJobRunner:
         library: RecordLibrary,
         rate_limiter: TokenBucket,
         partial_index_every: int,
+        dispatcher: JobDispatcher,
+        queues: QueueConfig,
     ) -> None:
         self._partial_index_every = partial_index_every
+        self._dispatcher = dispatcher
+        self._queues = queues
         self._store = store
         self._redis = redis_client
         self._submitter = submitter
@@ -149,7 +153,16 @@ class IngestJobRunner:
         return resource not in cls.NON_INDEXED_RESOURCES
 
     def run(self, job_id: str) -> JobResult:
-        job = self._store.mark_running(job_id)
+        try:
+            job = self._store.mark_running(
+                job_id, max_active=self._queues.ingest_max_concurrent_jobs
+            )
+        except JobSlotsBusy:
+            # Wait for a running job to finish rather than splitting the API budget.
+            self._dispatcher.dispatch(
+                JobKind.INGEST, job_id, countdown=self._queues.ingest_defer_seconds
+            )
+            return JobResult(job_id=job_id, deferred=True)
         if job is None:
             return SkippedClaim(self._store).result(job_id)
         payload = IngestPayload.model_validate(job["payload"])

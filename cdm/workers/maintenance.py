@@ -42,6 +42,28 @@ class QueueDepthProbe:
             return None
 
 
+class ActiveJobProbe:
+    """Asks the workers which jobs they are executing right now."""
+
+    def __init__(self, app: Celery, timeout_seconds: float = 5.0) -> None:
+        self._app = app
+        self._timeout = timeout_seconds
+
+    def job_ids(self) -> set[str]:
+        """Job ids running on any worker; empty if no worker answers."""
+        try:
+            replies = self._app.control.inspect(timeout=self._timeout).active() or {}
+        except Exception:
+            logger.warning("Could not inspect active tasks", exc_info=True)
+            return set()
+        return {
+            str(task["args"][0])
+            for tasks in replies.values()
+            for task in tasks
+            if task.get("args")
+        }
+
+
 class RecoveryResult(BaseModel):
     recovered: list[str]
     skipped: str | None = None
@@ -85,7 +107,9 @@ class JobRecoveryService:
         probe: QueueDepthProbe,
         classifier: FailureClassifier,
         queues: QueueConfig,
+        active_jobs: ActiveJobProbe,
     ) -> None:
+        self._active_jobs = active_jobs
         self._store = store
         self._redis = redis_client
         self._dispatcher = dispatcher
@@ -115,7 +139,7 @@ class JobRecoveryService:
         store = self._store
         candidates = [
             *self._failed_candidates(),
-            *store.stale_active((now - self.CRASH_CUTOFF).isoformat()),
+            *self._stale_active(now),
             *store.stale_queued(
                 self.ORPHAN_KINDS,
                 (now - self.ORPHAN_CUTOFF).isoformat(),
@@ -137,6 +161,17 @@ class JobRecoveryService:
                 )
             )
         return candidates
+
+    def _stale_active(self, now: datetime) -> list[JobRow]:
+        """Silent jobs that no worker is actually running (e.g. after a laptop sleep)."""
+        stale = self._store.stale_active((now - self.CRASH_CUTOFF).isoformat())
+        if not stale:
+            return []
+        live = self._active_jobs.job_ids()
+        for job in stale:
+            if job["id"] in live:
+                self._store.touch(job["id"])
+        return [job for job in stale if job["id"] not in live]
 
     def _failed_candidates(self) -> list[JobRow]:
         """Failed ingest jobs wait until no ingest job is active, to spare the API budget."""

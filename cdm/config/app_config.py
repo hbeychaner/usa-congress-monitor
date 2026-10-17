@@ -70,6 +70,9 @@ class QueueConfig(_Section):
     # Light periodic upkeep gets its own queue so busy ingest workers cannot starve it.
     celery_maintenance_queue: str = "congress-maintenance"
     celery_retry_max: int = 8
+    # Few ingest jobs at a time so each finishes instead of all crawling together.
+    ingest_max_concurrent_jobs: int = 2
+    ingest_defer_seconds: int = 300
     celery_retry_max_transient: int = 24
     celery_retry_backoff_max: int = 3600
     # Running jobs touch their ledger row this often; recovery treats silence as a crash.

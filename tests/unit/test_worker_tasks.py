@@ -19,7 +19,7 @@ class FakeCeleryApp:
     def __init__(self, dispatched):
         self.dispatched = dispatched
 
-    def send_task(self, name, *, args, queue):
+    def send_task(self, name, *, args, queue, countdown=None):
         self.dispatched.append((name, args, queue))
 
 
@@ -31,6 +31,14 @@ class FakeProbe:
         return self.value
 
 
+class FakeActiveJobs:
+    def __init__(self, live=()):
+        self.live = set(live)
+
+    def job_ids(self):
+        return self.live
+
+
 def _install(monkeypatch, dispatched=None, probe_depth=None, **overrides):
     """Make tasks use a WorkerContainer whose providers are replaced by fakes."""
     config = get_config()
@@ -40,6 +48,7 @@ def _install(monkeypatch, dispatched=None, probe_depth=None, **overrides):
         config.queue,
     )
     container.__dict__["queue_depth_probe"] = FakeProbe(probe_depth)
+    container.__dict__["active_job_probe"] = FakeActiveJobs()
     container.__dict__.update(overrides)
     monkeypatch.setattr(tasks, "_container", lambda: container)
     return container
@@ -519,3 +528,26 @@ def test_recovery_runs_on_its_own_queue():
     assert routes["cdm.workers.tasks.recover_failed_ingest_jobs"]["queue"] == queue.celery_maintenance_queue
     assert queue.celery_maintenance_queue not in {queue.celery_ingest_queue, queue.celery_bulk_queue}
 
+
+
+def test_recovery_leaves_stale_jobs_that_a_worker_is_still_running(monkeypatch):
+    job = {
+        "id": "ingest:slept",
+        "kind": JobKind.INGEST.value,
+        "status": JobStatus.RUNNING.value,
+        "payload": {},
+    }
+    store = FakeStore(active=[job])
+    store.touch = lambda job_id: store.touched.append(job_id)
+    store.touched = []
+    _install(
+        monkeypatch,
+        job_store=store,
+        redis_client=FakeRedis(FakeLock(True)),
+        active_job_probe=FakeActiveJobs({"ingest:slept"}),
+    )
+
+    result = cast(Any, tasks.recover_failed_ingest_jobs).run()
+
+    assert result == {"recovered": []}
+    assert store.touched == ["ingest:slept"]

@@ -26,6 +26,7 @@ from cdm.workers.heartbeat import JobHeartbeat
 from cdm.workers.index_runner import IndexJobRunner
 from cdm.workers.ingest_runner import IngestJobRunner
 from cdm.workers.maintenance import (
+    ActiveJobProbe,
     GovInfoRefreshScheduler,
     JobRecoveryService,
     QueueDepthProbe,
@@ -112,6 +113,8 @@ class WorkerContainer(Container):
             self.record_library,
             self.congress_rate_limiter,
             self.config.indexing.ingest_partial_index_every,
+            self.job_dispatcher,
+            self.config.queue,
         )
 
     @cached_property
@@ -161,6 +164,10 @@ class WorkerContainer(Container):
         return QueueDepthProbe(celery_app)
 
     @cached_property
+    def active_job_probe(self) -> ActiveJobProbe:
+        return ActiveJobProbe(celery_app)
+
+    @cached_property
     def recovery_service(self) -> JobRecoveryService:
         return JobRecoveryService(
             self.job_store,
@@ -169,6 +176,7 @@ class WorkerContainer(Container):
             self.queue_depth_probe,
             self.failure_classifier,
             self.config.queue,
+            self.active_job_probe,
         )
 
     @cached_property

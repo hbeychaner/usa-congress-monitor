@@ -4,7 +4,7 @@ from typing import Any, cast
 import pytest
 from celery.exceptions import SoftTimeLimitExceeded
 
-from cdm.config.app_config import CongressApiConfig, RedisConfig
+from cdm.config.app_config import CongressApiConfig, QueueConfig, RedisConfig
 from cdm.ingest.redis_stream import RedisRecordStream
 from cdm.jobs.payloads import IndexPayload, IngestPayload
 from cdm.workers.failures import FailureClassifier
@@ -32,6 +32,8 @@ def _runner(submitter: RecordingSubmitter) -> IngestJobRunner:
         unused,
         unused,
         100,
+        unused,
+        QueueConfig(),
     )
 
 
