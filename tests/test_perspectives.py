@@ -103,3 +103,15 @@ def test_subject_contrast_ranks_each_groups_own_subjects() -> None:
     names = [use.name for use in contrast.top(left, right)]
 
     assert names == ["Native Americans"]
+
+
+def test_subject_contrast_merges_near_duplicate_subjects() -> None:
+    contrast = SubjectContrast(PerspectiveConfig())
+    names = [
+        "Housing and Community Development",
+        "Housing and community development funding",
+    ]
+    left = [_bill(f"l{i}", f"s{i}", "", names) for i in range(6)]
+    right = [_bill(f"r{i}", f"t{i}", "", ["Public Lands"]) for i in range(6)]
+
+    assert len(contrast.top(left, right)) == 1

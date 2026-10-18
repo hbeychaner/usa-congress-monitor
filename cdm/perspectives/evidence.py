@@ -12,6 +12,7 @@ from cdm.perspectives.models import BillRef, PerspectiveBill, SubjectUse, TermUs
 from cdm.perspectives.terms import Tokenizer
 
 SMOOTHING = 1.0
+MIN_SHARED_WORDS = 3
 
 
 class TermEvidence:
@@ -87,4 +88,21 @@ class SubjectContrast:
                     )
                 )
         scored.sort(key=lambda pair: pair[0], reverse=True)
-        return [use for _, use in scored[: self.config.perspective_subjects_top]]
+        kept: list[SubjectUse] = []
+        for _, use in scored:
+            if len(kept) == self.config.perspective_subjects_top:
+                break
+            if not any(self._same_idea(use.name, other.name) for other in kept):
+                kept.append(use)
+        return kept
+
+    @staticmethod
+    def _same_idea(first: str, second: str) -> bool:
+        """True when one subject is the other plus trailing words, as in 'Housing ... funding'."""
+        left, right = first.lower().split(), second.lower().split()
+        shorter, longer = sorted((left, right), key=len)
+        return (
+            len(shorter) >= MIN_SHARED_WORDS
+            and longer[: len(shorter)] == shorter
+            or left == right
+        )

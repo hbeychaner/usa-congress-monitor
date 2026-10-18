@@ -5,6 +5,7 @@
 ### Changed
 
 - Parties page language is now evidence-backed: each party shows the CRS subjects its bills carry more often than the other party's, plus phrases that must appear in at least 5 bills from 3 sponsors; clicking a phrase lists example bills. Plural and word-order variants are merged, rare member names are dropped from phrases, and a party or bipartisan group with fewer than 5 supported phrases shows no cloud instead of noise.
+- Near-duplicate subjects (one is the other plus trailing words, e.g. "Housing and Community Development" and "... funding") are shown once.
 - Approach summaries are written from subjects and sample bill titles rather than raw phrases, and avoid generic wording. Rebuild with `scripts/build_perspectives.py` to refresh stored results.
 
 ### Added
