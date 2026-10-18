@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Flex, Heading, Select, Table, Text, TextField } from '@radix-ui/themes';
+import { Badge, Button, Card, Checkbox, Flex, Heading, Select, Table, Text, TextField } from '@radix-ui/themes';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -116,6 +116,15 @@ export function BillsPage() {
                 placeholder="e.g. Health"
               />
             </label>
+            <label>
+              <Flex align="center" gap="2" style={{ height: 'var(--space-6)' }}>
+                <Checkbox
+                  checked={draft.hasVotes ?? false}
+                  onCheckedChange={(checked) => setDraft({ ...draft, hasVotes: checked === true })}
+                />
+                <Text size="2" weight="medium">Has votes</Text>
+              </Flex>
+            </label>
             <Button type="submit">Apply filters</Button>
           </Flex>
         </form>
@@ -132,6 +141,7 @@ export function BillsPage() {
               <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Congress</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Chamber</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Votes</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Updated</Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
@@ -144,6 +154,7 @@ export function BillsPage() {
                 <Table.Cell>{bill.title}</Table.Cell>
                 <Table.Cell>{bill.congress ?? '—'}</Table.Cell>
                 <Table.Cell>{bill.chamber ?? '—'}</Table.Cell>
+                <Table.Cell>{bill.vote_count ? <Badge color="blue">{bill.vote_count}</Badge> : '—'}</Table.Cell>
                 <Table.Cell>{bill.updated_at ? new Date(bill.updated_at).toLocaleDateString() : '—'}</Table.Cell>
               </Table.Row>
             ))}

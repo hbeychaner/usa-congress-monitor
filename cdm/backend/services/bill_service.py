@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from cdm.backend.services.bill_vote_index import BillVoteIndex
 from cdm.contracts.api import BillDetail, BillDetailResponse, BillsResponse, BillSummary
 from cdm.store.opensearch import read_alias
 from cdm.utils.lemmatize import try_lemmatize_query
@@ -22,8 +23,9 @@ _RELATIONSHIP_FIELDS = (
 class BillService:
     """Bill listing and detail lookups."""
 
-    def __init__(self, client: Any) -> None:
+    def __init__(self, client: Any, vote_index: BillVoteIndex) -> None:
         self._client = client
+        self._vote_index = vote_index
 
     def list_recent(
         self,
@@ -34,6 +36,7 @@ class BillService:
         bill_type: str | None = None,
         chamber: str | None = None,
         subject: str | None = None,
+        has_votes: bool = False,
     ) -> BillsResponse:
         """Return the most recently updated bills from the legislation read alias."""
         filters: list[dict[str, Any]] = [{"term": {"source_type": "bill"}}]
@@ -45,6 +48,8 @@ class BillService:
             filters.append({"term": {"origin_chamber": chamber}})
         if subject:
             filters.append(self._subject_filter(subject))
+        if has_votes:
+            filters.append({"terms": {"id": self._vote_index.bill_ids(congress)}})
         search_query: dict[str, Any] = {"bool": {"filter": filters}}
         if query and query.strip():
             search_query["bool"]["must"] = [self._text_query(query.strip())]
@@ -67,6 +72,9 @@ class BillService:
             for hit in hits.get("hits", [])
             if (summary := self._summary(hit)) is not None
         ]
+        vote_counts = self._vote_index.counts([bill.bill_id for bill in bills])
+        for bill in bills:
+            bill.vote_count = vote_counts.get(bill.bill_id, 0)
         return BillsResponse(bills=bills, total=int(total), page=page, limit=limit)
 
     def get(self, bill_id: str) -> BillDetailResponse:

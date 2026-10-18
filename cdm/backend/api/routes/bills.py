@@ -27,9 +27,10 @@ def recent_bills(
     bill_type: str | None = Query(default=None, max_length=20),
     chamber: str | None = Query(default=None, pattern="^(House|Senate)$"),
     subject: str | None = Query(default=None, max_length=200),
+    has_votes: bool = Query(default=False),
 ) -> BillsResponse:
     return service.list_recent(
-        limit, page, query, congress, bill_type, chamber, subject
+        limit, page, query, congress, bill_type, chamber, subject, has_votes
     )
 
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-19
+
+### Changed
+
+- A bill's Votes tab now merges Voteview roll calls (House and Senate, 113th Congress onward) with Congress.gov House votes, de-duplicated by chamber, session and Clerk roll number; Senate votes are now shown and each vote is labelled with its chamber.
+
+### Added
+
+- Bills page: a "Has votes" filter (`has_votes` on `GET /api/v1/bills/recent`) and a Votes column showing each bill's recorded vote count.
+
 ## 2026-10-18
 
 ### Changed

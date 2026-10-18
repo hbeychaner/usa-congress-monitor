@@ -10,6 +10,7 @@ from sqlalchemy.engine import Engine
 
 from cdm.backend.services.admin_service import AdminService
 from cdm.backend.services.bill_service import BillService
+from cdm.backend.services.bill_vote_index import BillVoteIndex
 from cdm.backend.services.committee_service import CommitteeService
 from cdm.backend.services.graph_service import GraphService
 from cdm.backend.services.member_metasubject_overlay import (
@@ -201,7 +202,7 @@ class Container:
 
     @cached_property
     def bill_service(self) -> BillService:
-        return BillService(self.elastic_client)
+        return BillService(self.elastic_client, BillVoteIndex(self.elastic_client))
 
     @cached_property
     def vote_service(self) -> VoteService:

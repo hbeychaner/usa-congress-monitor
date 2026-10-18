@@ -9,6 +9,7 @@ export type BillSummary = {
   number: number | null;
   chamber: string | null;
   updated_at?: string | null;
+  vote_count?: number;
 };
 
 export type BillsResponse = {
@@ -37,6 +38,7 @@ export type BillFilters = {
   chamber?: string;
   billType?: string;
   subject?: string;
+  hasVotes?: boolean;
 };
 
 export function fetchRecentBills(limit = 50, page = 1, filters: BillFilters = {}): Promise<BillsResponse> {
@@ -46,6 +48,7 @@ export function fetchRecentBills(limit = 50, page = 1, filters: BillFilters = {}
     if (filters.chamber) params.set('chamber', filters.chamber);
     if (filters.billType) params.set('bill_type', filters.billType);
     if (filters.subject) params.set('subject', filters.subject);
+    if (filters.hasVotes) params.set('has_votes', 'true');
     return apiGet<BillsResponse>(`/api/v1/bills/recent?${params.toString()}`);
 }
 

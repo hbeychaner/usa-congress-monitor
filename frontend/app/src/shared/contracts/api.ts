@@ -693,6 +693,11 @@ export interface components {
             chamber?: string | null;
             /** Updated At */
             updated_at?: string | null;
+            /**
+             * Vote Count
+             * @default 0
+             */
+            vote_count: number;
         };
         /** BillTopicsResponse */
         BillTopicsResponse: {

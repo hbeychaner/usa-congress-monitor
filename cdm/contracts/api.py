@@ -305,6 +305,7 @@ class BillSummary(BaseModel):
     number: str | None = None
     chamber: str | None = None
     updated_at: str | None = None
+    vote_count: int = 0
 
 
 class BillsResponse(BaseModel):
