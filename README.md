@@ -345,6 +345,11 @@ clusters that are surfaced only when stable. Use `--dry-run` to print instead
 of write and `--no-llm-labels` to skip Ollama. The frontend `/parties` page
 reads `GET /api/v1/parties?congress=` and `GET /api/v1/parties/topics/{id}`.
 
+The current Congress is rebuilt automatically every Monday at 07:00 (after the
+Sunday topic retrain) and on demand from the Admin page's "Party perspectives"
+card (`GET`/`POST /api/v1/admin/perspectives`). Status is kept in
+`data/perspective_build_status.json` and output in `logs/perspectives.log`.
+
 ## Planning & Notes
 
 In-progress design docs, operational runbooks, and architecture review notes

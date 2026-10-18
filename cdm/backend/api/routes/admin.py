@@ -8,10 +8,12 @@ from cdm.contracts.api import (
     TopicTrainingStatus,
 )
 from cdm.graph.runner import GraphBuildRunner, GraphBuildStatus
+from cdm.perspectives.launcher import PerspectiveBuildLauncher
 from cdm.utils.topic_training import read_status, start_training
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 graph_runner = GraphBuildRunner()
+perspective_launcher = PerspectiveBuildLauncher()
 
 
 @router.get("/topic-training", response_model=TopicTrainingStatus)
@@ -32,6 +34,16 @@ def member_graph_status() -> GraphBuildStatus:
 @router.post("/member-graph", response_model=GraphBuildStatus)
 def member_graph_build() -> GraphBuildStatus:
     return graph_runner.start()
+
+
+@router.get("/perspectives", response_model=GraphBuildStatus)
+def perspectives_status() -> GraphBuildStatus:
+    return perspective_launcher.read()
+
+
+@router.post("/perspectives", response_model=GraphBuildStatus)
+def perspectives_build() -> GraphBuildStatus:
+    return perspective_launcher.start()
 
 
 @router.get("/ingest-progress", response_model=IngestProgressResponse)

@@ -1,7 +1,7 @@
 import { Badge, Button, Callout, Card, Flex, Heading, Text } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 
-import { fetchMemberGraph, startMemberGraph, type MemberGraphStatus } from '../api/admin';
+import type { MemberGraphStatus } from '../api/admin';
 
 const STATE_COLORS: Record<string, 'gray' | 'blue' | 'green' | 'red'> = {
   idle: 'gray',
@@ -14,7 +14,14 @@ function formatTime(value: string | null | undefined): string {
   return value ? new Date(value).toLocaleString() : 'n/a';
 }
 
-export function MemberGraphCard() {
+type Props = {
+  title: string;
+  description: string;
+  fetchStatus: () => Promise<MemberGraphStatus>;
+  startBuild: () => Promise<MemberGraphStatus>;
+};
+
+export function BuildStatusCard({ title, description, fetchStatus, startBuild }: Props) {
   const [status, setStatus] = useState<MemberGraphStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -23,7 +30,7 @@ export function MemberGraphCard() {
     let cancelled = false;
     async function load() {
       try {
-        const next = await fetchMemberGraph();
+        const next = await fetchStatus();
         if (!cancelled) setStatus(next);
       } catch (err) {
         if (!cancelled) setError((err as Error).message);
@@ -35,13 +42,13 @@ export function MemberGraphCard() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, []);
+  }, [fetchStatus]);
 
   async function start() {
     setStarting(true);
     setError(null);
     try {
-      setStatus(await startMemberGraph());
+      setStatus(await startBuild());
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -56,16 +63,14 @@ export function MemberGraphCard() {
       <Flex direction="column" gap="3">
         <Flex justify="between" align="center" wrap="wrap" gap="3">
           <Flex align="center" gap="3">
-            <Heading size="4">Member graph</Heading>
+            <Heading size="4">{title}</Heading>
             <Badge color={STATE_COLORS[status?.state ?? 'idle'] ?? 'gray'}>{status?.state ?? 'unknown'}</Badge>
           </Flex>
           <Button onClick={start} disabled={running || starting}>
             {running ? 'Build in progress' : 'Rebuild now'}
           </Button>
         </Flex>
-        <Text size="2" color="gray">
-          Rebuilds collaboration and voting edges between members. Runs automatically every Monday at 05:00.
-        </Text>
+        <Text size="2" color="gray">{description}</Text>
         {status ? (
           <Flex gap="5" wrap="wrap">
             {status.stage ? <Text size="2"><Text weight="bold">Stage:</Text> {status.stage}</Text> : null}

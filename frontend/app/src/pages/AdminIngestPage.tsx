@@ -1,8 +1,8 @@
 import { Badge, Callout, Card, Flex, Grid, Heading, Progress, Select, Table, Text } from '@radix-ui/themes';
 import { useEffect, useMemo, useState } from 'react';
 
-import { fetchIngestProgress, fetchSystemStatus, type IngestProgressResponse, type SystemStatusResponse } from '../api/admin';
-import { MemberGraphCard } from '../components/MemberGraphCard';
+import { fetchIngestProgress, fetchMemberGraph, fetchPerspectives, startMemberGraph, startPerspectives, fetchSystemStatus, type IngestProgressResponse, type SystemStatusResponse } from '../api/admin';
+import { BuildStatusCard } from '../components/BuildStatusCard';
 import { TopicTrainingCard } from '../components/TopicTrainingCard';
 
 function formatDate(date: string | null): string {
@@ -119,7 +119,18 @@ export function AdminIngestPage() {
             </Card>
 
             <TopicTrainingCard />
-            <MemberGraphCard />
+            <BuildStatusCard
+                title="Member graph"
+                description="Rebuilds collaboration and voting edges between members. Runs automatically every Monday at 05:00."
+                fetchStatus={fetchMemberGraph}
+                startBuild={startMemberGraph}
+            />
+            <BuildStatusCard
+                title="Party perspectives"
+                description="Rebuilds each topic's party phrases, summaries and bilateral support for the current Congress from the latest topic model. Runs automatically every Monday at 07:00."
+                fetchStatus={fetchPerspectives}
+                startBuild={startPerspectives}
+            />
 
             {error ? (
                 <Callout.Root color="red">

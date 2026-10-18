@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cdm.config import get_config
 from cdm.container import Container
+from cdm.graph.runner import BuildState, GraphBuildRunner
 from cdm.perspectives.models import TopicPerspectives
 from cdm.perspectives.runner import NoTopicModelError
 
@@ -42,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--dry-run", action="store_true", help="Print results, write nothing"
     )
+    parser.add_argument("--status-file", type=Path, help="Report progress here")
     return parser.parse_args()
 
 
@@ -93,10 +95,34 @@ def print_topic(result: TopicPerspectives) -> None:
 
 def main() -> None:
     args = parse_args()
+    status = GraphBuildRunner(args.status_file) if args.status_file else None
+    try:
+        message = build(args, status)
+    except (Exception, SystemExit) as exc:
+        if status:
+            status.update(
+                state=BuildState.FAILED,
+                finished_at=datetime.now(UTC),
+                message=str(exc) or type(exc).__name__,
+            )
+        raise
+    if status:
+        status.update(
+            state=BuildState.SUCCEEDED,
+            finished_at=datetime.now(UTC),
+            stage=None,
+            message=message,
+        )
+
+
+def build(args: argparse.Namespace, status: GraphBuildRunner | None) -> str:
     container = Container(get_config())
     runner = container.perspective_runner(use_llm=not args.no_llm_labels)
     top = None if args.all_topics else args.top_topics
+    written_total = 0
     for congress in args.congress or [DEFAULT_CONGRESS]:
+        if status:
+            status.update(stage=f"Congress {congress}")
         try:
             run = runner.run(
                 congress, topic_ids=args.topic_id, top_topics=top, on_topic=print_topic
@@ -115,7 +141,9 @@ def main() -> None:
             datetime.now(UTC).isoformat(),
             run.results,
         )
+        written_total += written
         print(f"wrote {written} topic documents for Congress {congress}")
+    return f"wrote {written_total} topic documents"
 
 
 if __name__ == "__main__":

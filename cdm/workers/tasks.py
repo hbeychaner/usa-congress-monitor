@@ -14,6 +14,7 @@ from cdm.config import get_config
 from cdm.graph.runner import GraphBuildRunner
 from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
 from cdm.jobs.store import JobKind
+from cdm.perspectives.launcher import PerspectiveBuildLauncher
 from cdm.utils.json_types import JsonObject
 from cdm.utils.log_trimmer import LogTrimmer
 from cdm.utils.topic_training import start_training
@@ -127,6 +128,13 @@ def schedule_topic_training() -> JsonObject:
 def schedule_member_graph_build() -> JsonObject:
     """Start a member graph rebuild unless one is already running."""
     status = GraphBuildRunner().start()
+    return {"started": status.started, "state": status.state.value}
+
+
+@celery_app.task(name="cdm.workers.tasks.schedule_perspective_build")
+def schedule_perspective_build() -> JsonObject:
+    """Rebuild the current Congress's party perspectives unless a build is running."""
+    status = PerspectiveBuildLauncher().start()
     return {"started": status.started, "state": status.state.value}
 
 

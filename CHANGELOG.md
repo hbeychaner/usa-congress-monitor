@@ -9,6 +9,7 @@
 
 ### Added
 
+- Party perspectives rebuild automatically every Monday at 07:00 for the current Congress, and from a new "Party perspectives" card on the Admin page (`/api/v1/admin/perspectives`). The Admin build cards share one `BuildStatusCard` component.
 - Each vote on a bill's Votes tab shows a chart of the yea, nay, present and not-voting share per party (`GET /api/v1/votes/{rollcall_id}/breakdown`); selecting a segment lists those members with links to their profiles.
 - Bills page: a "Has votes" filter (`has_votes` on `GET /api/v1/bills/recent`) and a Votes column showing each bill's recorded vote count.
 

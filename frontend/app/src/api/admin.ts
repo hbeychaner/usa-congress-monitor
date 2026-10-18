@@ -37,6 +37,14 @@ export function startMemberGraph(): Promise<MemberGraphStatus> {
     return apiPost<MemberGraphStatus>('/api/v1/admin/member-graph');
 }
 
+export function fetchPerspectives(): Promise<MemberGraphStatus> {
+    return apiGet<MemberGraphStatus>('/api/v1/admin/perspectives');
+}
+
+export function startPerspectives(): Promise<MemberGraphStatus> {
+    return apiPost<MemberGraphStatus>('/api/v1/admin/perspectives');
+}
+
 export type IngestProgressJob = {
     job_id: string;
     status: string;

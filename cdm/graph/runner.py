@@ -42,9 +42,15 @@ class GraphBuildStatus(BaseModel):
 class GraphBuildRunner:
     """Persists build status in a file so the API, workers and script share it."""
 
-    def __init__(self, status_path: Path = STATUS_PATH, log_path: Path = LOG_PATH) -> None:
+    def __init__(
+        self,
+        status_path: Path = STATUS_PATH,
+        log_path: Path = LOG_PATH,
+        script_path: Path = SCRIPT_PATH,
+    ) -> None:
         self.status_path = status_path
         self.log_path = log_path
+        self.script_path = script_path
 
     @staticmethod
     def _pid_alive(pid: int | None) -> bool:
@@ -80,17 +86,17 @@ class GraphBuildRunner:
         tmp.replace(self.status_path)
         return status
 
-    def start(self, signals: Sequence[Signal] = ()) -> GraphBuildStatus:
+    def start(self, args: Sequence[str] = ()) -> GraphBuildStatus:
         """Start a detached build unless one is already running."""
         current = self.read()
         if current.state is BuildState.RUNNING:
             return current.model_copy(update={"started": False})
         command = [
             sys.executable,
-            str(SCRIPT_PATH),
+            str(self.script_path),
             "--status-file",
             str(self.status_path),
-            *signals,
+            *args,
         ]
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
         with self.log_path.open("ab") as log:
