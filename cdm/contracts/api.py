@@ -3,6 +3,7 @@ from enum import StrEnum
 from pydantic import BaseModel, Field
 
 from cdm.graph.models import PartyGroup, Signal
+from cdm.perspectives.models import TopicPerspectives
 
 
 class StateSummary(BaseModel):
@@ -422,7 +423,9 @@ class IngestProgressJob(BaseModel):
     discovered: int
     target: int
     remaining: int
-    rate_per_hour: int = Field(default=0, description="Average items hydrated per hour since start.")
+    rate_per_hour: int = Field(
+        default=0, description="Average items hydrated per hour since start."
+    )
     eta: str | None = None
 
 
@@ -586,3 +589,43 @@ class NeighborhoodResponse(BaseModel):
     subject_links: list[GraphSubjectLink] = Field(default_factory=list)
     metasubject_nodes: list[GraphMetasubjectNode] = Field(default_factory=list)
     metasubject_links: list[GraphMetasubjectLink] = Field(default_factory=list)
+
+
+class PartyTopicEntry(BaseModel):
+    topic_id: int
+    label: str
+    bills: int
+    topic_bills: int
+    share_of_party: float
+    share_of_topic: float
+    summary: str = ""
+
+
+class PartyRanking(BaseModel):
+    party: PartyGroup
+    total_bills: int
+    topics: list[PartyTopicEntry]
+
+
+class BilateralTopicEntry(BaseModel):
+    topic_id: int
+    label: str
+    bills: int
+    bipartisan_bills: int
+    share: float
+    terms: list[str]
+    summary: str = ""
+
+
+class PartiesResponse(BaseModel):
+    congress: int | None
+    congresses: list[int]
+    model_version: str | None
+    parties: list[PartyRanking]
+    bilateral: list[BilateralTopicEntry]
+
+
+class PartyTopicResponse(BaseModel):
+    """One topic's party contrast; clusters appear only when they pass the stability gate."""
+
+    topic: TopicPerspectives

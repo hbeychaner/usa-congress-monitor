@@ -8,6 +8,7 @@ import { HomePage } from '../pages/HomePage';
 import { MemberGraphPage } from '../pages/MemberGraphPage';
 import { MemberProfilePage } from '../pages/MemberProfilePage';
 import { MemberSearchPage } from '../pages/MemberSearchPage';
+import { PartiesPage } from '../pages/PartiesPage';
 import { SearchPage } from '../pages/SearchPage';
 import { StateDetailPage } from '../pages/StateDetailPage';
 import { StatesPage } from '../pages/StatesPage';
@@ -29,6 +30,7 @@ export function AppRoutes() {
       <Route path="/committees/:systemCode" element={<CommitteeDetailPage />} />
       <Route path="/topics" element={<TopicsPage />} />
       <Route path="/topics/:topicId" element={<TopicDetailPage />} />
+      <Route path="/parties" element={<PartiesPage />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

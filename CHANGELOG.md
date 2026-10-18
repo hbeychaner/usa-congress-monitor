@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-18
+
+### Added
+
+- Parties page (`/parties`, `GET /api/v1/parties`, `GET /api/v1/parties/topics/{id}`): the topics each party sponsors most per Congress, a per-party phrase cloud (bigrams and trigrams) with a one-sentence Ollama summary of each party's approach, and a "Bilateral Support" section for topics where at least a quarter of bills draw cosponsors from the other party. Procedural measures and ceremonial bills are excluded.
+- `scripts/build_perspectives.py` builds and stores the analysis (`--congress` repeatable, `--all-topics`, `--dry-run`); learned cross-topic boilerplate, sponsor names and states are filtered from the phrases. Topic clusters ("Perspectives") are shown only when they pass the stability gate.
+
 ## 2026-10-17
 
 ### Added

@@ -333,6 +333,18 @@ metasubjects, assignments and quarterly trends live in
   the top sponsors of a metasubject, topic or CRS subject (same node/link shape as
   the member neighborhood). The graph page's "Centered on topics" mode uses it.
 
+## Parties And Perspectives
+
+`scripts/build_perspectives.py --congress 119 --all-topics` reads one Congress's
+policy bills (resolutions and ceremonial measures excluded), assigns them to
+the latest topic model, and stores per-topic party contrast documents
+(`kind=party_topic`) in the analysis index. Each topic gets the phrases each
+party uses more than the other, a one-sentence Ollama summary per party, a
+bipartisan-cosponsor share ("Bilateral Support" at 25% or more), and optional
+clusters that are surfaced only when stable. Use `--dry-run` to print instead
+of write and `--no-llm-labels` to skip Ollama. The frontend `/parties` page
+reads `GET /api/v1/parties?congress=` and `GET /api/v1/parties/topics/{id}`.
+
 ## Planning & Notes
 
 In-progress design docs, operational runbooks, and architecture review notes

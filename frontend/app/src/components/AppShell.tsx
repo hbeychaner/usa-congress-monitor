@@ -12,6 +12,7 @@ const navItems = [
   { href: '/states', label: 'States' },
   { href: '/bills', label: 'Bills' },
   { href: '/topics', label: 'Topics' },
+  { href: '/parties', label: 'Parties' },
   { href: '/search', label: 'Search' },
   { href: '/members', label: 'Members' },
   { href: '/graph', label: 'Graph' },

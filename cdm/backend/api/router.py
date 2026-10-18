@@ -5,6 +5,7 @@ from cdm.backend.api.routes.admin import router as admin_router
 from cdm.backend.api.routes.committees import router as committees_router
 from cdm.backend.api.routes.graph import router as graph_router
 from cdm.backend.api.routes.members import router as members_router
+from cdm.backend.api.routes.parties import router as parties_router
 from cdm.backend.api.routes.search import router as search_router
 from cdm.backend.api.routes.states import router as states_router
 from cdm.backend.api.routes.subjects import router as subjects_router
@@ -20,3 +21,4 @@ api_router.include_router(committees_router)
 api_router.include_router(topics_router)
 api_router.include_router(subjects_router)
 api_router.include_router(graph_router)
+api_router.include_router(parties_router)

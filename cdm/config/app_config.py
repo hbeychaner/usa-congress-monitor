@@ -133,6 +133,54 @@ class MetasubjectConfig(_Section):
     metasubject_name_carry_max_size_ratio: float = 3.0
 
 
+class PerspectiveConfig(_Section):
+    # Each (Congress, topic) is clustered separately; smaller topics are left whole.
+    perspective_min_bills: int = 40
+    # Topics below this size are not analysed for the parties page.
+    perspective_min_topic_bills: int = 20
+    # Topics listed per party on the parties page.
+    perspective_ranking_size: int = 25
+    perspective_min_cluster_bills: int = 8
+    perspective_max_clusters: int = 6
+    # A split passes only if its silhouette and its stability across seeds reach these values.
+    perspective_min_silhouette: float = 0.05
+    perspective_min_stability: float = 0.6
+    perspective_stability_runs: int = 5
+    perspective_svd_dims: int = 20
+    # Only the start of each bill's text is used, which carries its purpose and operative terms.
+    perspective_text_chars: int = 30000
+    perspective_random_seed: int = 7
+    perspective_top_terms: int = 20
+    # Longest phrase length in words; 2 is bigrams only.
+    perspective_max_ngram: int = 3
+    perspective_term_min_docs: int = 3
+    perspective_sample_bills: int = 6
+    # Each party needs this many bills in a topic before their terms are contrasted.
+    perspective_party_min_bills: int = 10
+    # A bill is bipartisan with this many cosponsors from the party opposite its sponsor's.
+    perspective_bipartisan_min_cosponsors: int = 2
+    # A topic shows Bilateral Support when this share of its bills are bipartisan.
+    perspective_bilateral_min_share: float = 0.25
+    # A term prominent in this share of a topic's bills counts as present in that topic.
+    perspective_boilerplate_topic_share: float = 0.15
+    # A term present in this share of topics is boilerplate, not subject matter.
+    perspective_boilerplate_topic_spread: float = 0.2
+    # A term used in at least min_docs bills of this share of topics is boilerplate too.
+    perspective_boilerplate_presence_spread: float = 0.4
+    # A word in this share of all policy bills is boilerplate whatever its topics.
+    perspective_boilerplate_corpus_share: float = 0.12
+    perspective_boilerplate_min_docs: int = 5
+    perspective_boilerplate_min_topic_bills: int = 20
+    # Simple and concurrent resolutions and ceremonial measures carry no policy approach.
+    perspective_excluded_types: list[str] = ["hres", "sres", "hconres", "sconres"]
+    perspective_excluded_title_pattern: str = (
+        r"post office|postal service|designate the (facility|building)|"
+        r"(rename|redesignate|name) the|for the relief of|gold medal|"
+        r"commemorat|congressional recognition|"
+        r"^providing for (the )?(consideration|expeditious)|^waiving (all )?points"
+    )
+
+
 class ApiConfig(_Section):
     cors_origins_csv: str = Field(
         default="http://localhost:5183,http://localhost:5173",
@@ -160,6 +208,7 @@ class AppConfig(BaseModel):
     indexing: IndexingConfig = Field(default_factory=IndexingConfig)
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
     metasubject: MetasubjectConfig = Field(default_factory=MetasubjectConfig)
+    perspective: PerspectiveConfig = Field(default_factory=PerspectiveConfig)
     api: ApiConfig = Field(default_factory=ApiConfig)
 
 

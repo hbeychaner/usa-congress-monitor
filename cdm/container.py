@@ -19,6 +19,7 @@ from cdm.backend.services.member_service import MemberService
 from cdm.backend.services.member_subject_overlay import MemberSubjectOverlayBuilder
 from cdm.backend.services.member_topic_overlay import MemberTopicOverlayBuilder
 from cdm.backend.services.neighborhood_service import NeighborhoodService
+from cdm.backend.services.party_service import PartyService
 from cdm.backend.services.search_service import SearchService
 from cdm.backend.services.similar_bill_service import SimilarBillService
 from cdm.backend.services.sponsored_bills import SponsoredBillReader
@@ -29,10 +30,26 @@ from cdm.backend.services.topic_service import TopicService
 from cdm.backend.services.topic_sponsors import AssignedBillReader, TopicSponsorReader
 from cdm.backend.services.vote_service import VoteService
 from cdm.config import AppConfig
+from cdm.graph.topics import TopicModelReader
+from cdm.perspectives.boilerplate import BoilerplateLearner
+from cdm.perspectives.builder import PerspectiveBuilder
+from cdm.perspectives.clustering import PerspectiveClusterer
+from cdm.perspectives.corpus import (
+    CongressCorpusReader,
+    MeasureFilter,
+    MemberNameReader,
+    MemberPartyReader,
+)
+from cdm.perspectives.labeler import PerspectiveLabeler
+from cdm.perspectives.lexicon import BoilerplateLexicon
+from cdm.perspectives.runner import PerspectiveRunner
+from cdm.perspectives.summarizer import ApproachSummarizer
+from cdm.perspectives.terms import DistinctiveTerms, Tokenizer
 from cdm.store.client import ElasticClientFactory
 from cdm.store.embedding_store import EmbeddingStore
 from cdm.store.metasubject_override_store import MetasubjectOverrideStore
 from cdm.store.metasubject_repository import MetasubjectRepository
+from cdm.store.perspective_repository import PerspectiveRepository
 from cdm.utils.metasubject_namer import OllamaMetasubjectNamer, OllamaNameDisambiguator
 from cdm.utils.metasubjects import (
     LargestTopicNamer,
@@ -122,6 +139,56 @@ class Container:
         )
 
     @cached_property
+    def congress_corpus_reader(self) -> CongressCorpusReader:
+        parties = MemberPartyReader(self.elastic_client).read()
+        return CongressCorpusReader(
+            self.elastic_client,
+            parties,
+            self.config.perspective,
+            MeasureFilter(self.config.perspective),
+        )
+
+    @cached_property
+    def boilerplate_learner(self) -> BoilerplateLearner:
+        base = Tokenizer(
+            MemberNameReader(self.elastic_client).read(),
+            self.config.perspective.perspective_max_ngram,
+        )
+        return BoilerplateLearner(self.config.perspective, base)
+
+    def perspective_builder(
+        self, *, use_llm: bool, lexicon: BoilerplateLexicon
+    ) -> PerspectiveBuilder:
+        config = self.config.perspective
+        tokenizer = Tokenizer(lexicon, config.perspective_max_ngram)
+        return PerspectiveBuilder(
+            config,
+            PerspectiveClusterer(config, tokenizer),
+            DistinctiveTerms(config, tokenizer),
+            PerspectiveLabeler(self.ollama_client, enabled=use_llm),
+            ApproachSummarizer(self.ollama_client, enabled=use_llm),
+        )
+
+    @cached_property
+    def perspective_repository(self) -> PerspectiveRepository:
+        return PerspectiveRepository(
+            self.elastic_client, self.config.elastic.analysis_index
+        )
+
+    def perspective_runner(self, *, use_llm: bool) -> PerspectiveRunner:
+        return PerspectiveRunner(
+            self.config.perspective,
+            TopicModelReader(self.elastic_client, self.config.elastic.analysis_index),
+            self.congress_corpus_reader,
+            self.boilerplate_learner,
+            lambda lexicon: self.perspective_builder(use_llm=use_llm, lexicon=lexicon),
+        )
+
+    @cached_property
+    def party_service(self) -> PartyService:
+        return PartyService(self.perspective_repository, self.config.perspective)
+
+    @cached_property
     def similar_bill_service(self) -> SimilarBillService:
         return SimilarBillService(self.elastic_client, self.embedding_store())
 
@@ -152,7 +219,9 @@ class Container:
     @cached_property
     def topic_service(self) -> TopicService:
         return TopicService(
-            self.elastic_client, self.config.elastic.analysis_index, self.subject_service
+            self.elastic_client,
+            self.config.elastic.analysis_index,
+            self.subject_service,
         )
 
     @cached_property
