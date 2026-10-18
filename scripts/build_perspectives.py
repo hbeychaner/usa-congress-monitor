@@ -55,14 +55,18 @@ def print_topic(result: TopicPerspectives) -> None:
         print(
             f"  {tag}: {bilateral.bipartisan_bills}/{bilateral.bills} bipartisan "
             f"({bilateral.share:.0%}); bipartisan bills lean on: "
-            f"{', '.join(bilateral.terms[:8])}"
+            f"{', '.join(use.term for use in bilateral.terms[:8])}"
         )
         if bilateral.summary:
             print(f"    summary: {bilateral.summary}")
     for contrast in result.party_terms:
         print(
             f"  {contrast.party.value} ({contrast.bills} bills) leans on: "
-            f"{', '.join(contrast.terms)}"
+            f"{', '.join(use.term + f' [{use.bills}b/{use.sponsors}s]' for use in contrast.terms)}"
+        )
+        print(
+            "    subjects: "
+            + ", ".join(f"{use.name} ({use.bills})" for use in contrast.subjects)
         )
         if contrast.summary:
             print(f"    summary: {contrast.summary}")

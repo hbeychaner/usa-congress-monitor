@@ -24,7 +24,8 @@ export type BilateralTopicEntry = {
   bills: number;
   bipartisan_bills: number;
   share: number;
-  terms: string[];
+  terms: TermUse[];
+  subjects: SubjectUse[];
   summary: string;
 };
 
@@ -36,10 +37,29 @@ export type PartiesResponse = {
   bilateral: BilateralTopicEntry[];
 };
 
+export type BillRef = {
+  doc_id: string;
+  title: string;
+};
+
+export type TermUse = {
+  term: string;
+  bills: number;
+  sponsors: number;
+  examples: BillRef[];
+};
+
+export type SubjectUse = {
+  name: string;
+  bills: number;
+  share: number;
+};
+
 export type PartyTerms = {
   party: PartyGroup;
   bills: number;
-  terms: string[];
+  terms: TermUse[];
+  subjects: SubjectUse[];
   sample_titles: string[];
   summary: string;
 };
@@ -49,7 +69,8 @@ export type BilateralSupport = {
   bipartisan_bills: number;
   share: number;
   bilateral: boolean;
-  terms: string[];
+  terms: TermUse[];
+  subjects: SubjectUse[];
   sample_titles: string[];
   summary: string;
 };

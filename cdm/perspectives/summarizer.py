@@ -6,12 +6,15 @@ from cdm.utils.ollama_client import OllamaClient
 
 SYSTEM_PROMPT = (
     "You summarize the legislative approach of a group of US Congressional bills "
-    "that all belong to one topic. Given the topic, the group, its distinctive "
-    "phrases and sample bill titles, reply with ONE plain-English sentence of at "
-    "most 30 words saying what these bills emphasize, propose or prioritize. Base "
-    "it mainly on the distinctive phrases, since titles are often vague acronyms. "
-    "Use neutral wording that does not praise or criticize, never mention a party "
-    "or person by name, and do not restate the topic name. Reply with the sentence only."
+    "that all belong to one topic. You get the topic, the group, the official "
+    "subject areas its bills carry more often than the other group, a few "
+    "distinctive phrases, and sample bill titles. Reply with ONE plain-English "
+    "sentence of at most 30 words naming the specific policies, programs or "
+    "problems these bills address. Ground every claim in the titles and subjects; "
+    "phrases are only hints and may be noisy. Do not open with 'These bills', do "
+    "not use vague words such as 'measures', 'prioritize' or 'enhance', stay "
+    "neutral, never name a party or person, and do not restate the topic name. "
+    "Reply with the sentence only."
 )
 MAX_WORDS = 45
 TITLE_CHARS = 160
@@ -25,14 +28,20 @@ class ApproachSummarizer:
         self.enabled = enabled and ollama.is_available()
 
     def summarize(
-        self, topic: str, group: str, terms: list[str], titles: list[str]
+        self,
+        topic: str,
+        group: str,
+        terms: list[str],
+        subjects: list[str],
+        titles: list[str],
     ) -> str:
-        if not self.enabled or not terms:
+        if not self.enabled or not (terms or subjects):
             return ""
         samples = "\n".join(f"- {title[:TITLE_CHARS]}" for title in titles)
         reply = self.ollama.chat(
             SYSTEM_PROMPT,
-            f"Topic: {topic}\nGroup: {group}\nDistinctive phrases: {', '.join(terms)}\n"
+            f"Topic: {topic}\nGroup: {group}\nSubject areas: {', '.join(subjects)}\n"
+            f"Distinctive phrases: {', '.join(terms)}\n"
             f"Sample bills:\n{samples}\n\nSummary sentence:",
         )
         sentence = " ".join(reply.strip().strip("\"'").split())

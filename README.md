@@ -338,8 +338,8 @@ metasubjects, assignments and quarterly trends live in
 `scripts/build_perspectives.py --congress 119 --all-topics` reads one Congress's
 policy bills (resolutions and ceremonial measures excluded), assigns them to
 the latest topic model, and stores per-topic party contrast documents
-(`kind=party_topic`) in the analysis index. Each topic gets the phrases each
-party uses more than the other, a one-sentence Ollama summary per party, a
+(`kind=party_topic`) in the analysis index. Each topic gets the CRS subjects and
+phrases (backed by bill and sponsor counts) each party uses more than the other, a one-sentence Ollama summary per party, a
 bipartisan-cosponsor share ("Bilateral Support" at 25% or more), and optional
 clusters that are surfaced only when stable. Use `--dry-run` to print instead
 of write and `--no-llm-labels` to skip Ollama. The frontend `/parties` page

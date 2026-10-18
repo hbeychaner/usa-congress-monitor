@@ -16,6 +16,9 @@ class PerspectiveBill(BaseModel):
     title: str
     text: str
     sponsor_party: PartyGroup | None = None
+    sponsor_id: str = ""
+    # Policy area plus legislative subjects assigned by the Congressional Research Service.
+    subjects: list[str] = Field(default_factory=list)
     # True when cosponsors include enough members of the party opposite the sponsor's.
     bipartisan: bool = False
 
@@ -45,12 +48,35 @@ class Perspective(BaseModel):
     parties: list[PartyShare] = Field(default_factory=list)
 
 
+class BillRef(BaseModel):
+    doc_id: str
+    title: str
+
+
+class TermUse(BaseModel):
+    """A phrase with the evidence behind it: how many bills and sponsors use it."""
+
+    term: str
+    bills: int
+    sponsors: int
+    examples: list[BillRef] = Field(default_factory=list)
+
+
+class SubjectUse(BaseModel):
+    """A CRS subject a group's bills carry more often than the other group's."""
+
+    name: str
+    bills: int
+    share: float
+
+
 class PartyTerms(BaseModel):
     """Bigrams one party's bills in a topic use more than the other party's."""
 
     party: PartyGroup
     bills: int
-    terms: list[str] = Field(default_factory=list)
+    terms: list[TermUse] = Field(default_factory=list)
+    subjects: list[SubjectUse] = Field(default_factory=list)
     sample_titles: list[str] = Field(default_factory=list)
     summary: str = ""
 
@@ -62,8 +88,9 @@ class BilateralSupport(BaseModel):
     bipartisan_bills: int
     share: float
     bilateral: bool
-    # Bigrams bipartisan bills use more than the topic's party-line bills.
-    terms: list[str] = Field(default_factory=list)
+    # Phrases bipartisan bills use more than the topic's party-line bills.
+    terms: list[TermUse] = Field(default_factory=list)
+    subjects: list[SubjectUse] = Field(default_factory=list)
     sample_titles: list[str] = Field(default_factory=list)
     # One-sentence summary of the approach; empty when no language model was available.
     summary: str = ""

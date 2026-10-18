@@ -30,7 +30,24 @@ class BoilerplateLearner:
         ]
         words = self._spread(self.base.words, topics, corpus_cap=True)
         phrases = self._spread(self.base.ngrams, topics, corpus_cap=False)
-        return self.base.lexicon.with_terms(words, phrases)
+        learned = self.base.lexicon.with_terms(words, phrases)
+        return learned.with_names(self._rare_names(topics))
+
+    def _rare_names(self, topics: list[Sequence[str]]) -> frozenset[str]:
+        """Member names that are not also everyday words, so phrases holding them are credits."""
+        names = self.base.lexicon.person_names
+        texts = [text for group in topics for text in group]
+        if not names or not texts:
+            return names
+        vectorizer = CountVectorizer(
+            analyzer=self.base.content_words,  # pyright: ignore[reportArgumentType]
+            binary=True,
+            vocabulary=sorted(names),
+        )
+        counts = csr_matrix(vectorizer.fit_transform(texts))
+        share = np.asarray(counts.sum(axis=0)).ravel() / len(texts)
+        common = share >= self.config.perspective_name_common_share
+        return frozenset(name for name, flag in zip(sorted(names), common) if not flag)
 
     def _spread(
         self, analyzer: Analyzer, topics: list[Sequence[str]], *, corpus_cap: bool

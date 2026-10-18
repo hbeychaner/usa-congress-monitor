@@ -40,6 +40,7 @@ from cdm.perspectives.corpus import (
     MemberNameReader,
     MemberPartyReader,
 )
+from cdm.perspectives.evidence import SubjectContrast, TermEvidence
 from cdm.perspectives.labeler import PerspectiveLabeler
 from cdm.perspectives.lexicon import BoilerplateLexicon
 from cdm.perspectives.runner import PerspectiveRunner
@@ -165,6 +166,8 @@ class Container:
             config,
             PerspectiveClusterer(config, tokenizer),
             DistinctiveTerms(config, tokenizer),
+            TermEvidence(config, tokenizer),
+            SubjectContrast(config),
             PerspectiveLabeler(self.ollama_client, enabled=use_llm),
             ApproachSummarizer(self.ollama_client, enabled=use_llm),
         )

@@ -169,21 +169,36 @@ class Tokenizer:
                 for start in range(len(tokens) - size + 1):
                     run = tokens[start : start + size]
                     if self._keeps(run):
-                        phrases.append(" ".join(run))
+                        phrases.append(" ".join(self.stem(word) for word in run))
         return phrases
+
+    @staticmethod
+    def stem(word: str) -> str:
+        """Folds plurals together so 'tribe' and 'tribes' count as one phrase."""
+        if len(word) > 4 and word.endswith("ies"):
+            return word[:-3] + "y"
+        if len(word) > 4 and word.endswith(("ches", "shes", "sses", "xes")):
+            return word[:-2]
+        if (
+            len(word) > 3
+            and word.endswith("s")
+            and not word.endswith(("ss", "us", "is"))
+        ):
+            return word[:-1]
+        return word
 
     def _keeps(self, run: list[str]) -> bool:
         lexicon = self.lexicon
         for first, second in itertools.pairwise(run):
             if first == second:
                 return False
-            if first in lexicon.person_names and second in lexicon.person_names:
+            if self.stem(first) == self.stem(second):
                 return False
             if self._is_sponsor_line(first, second) or self._is_sponsor_line(
                 second, first
             ):
                 return False
-        if any(word in lexicon.words for word in run):
+        if any(word in lexicon.words or word in lexicon.person_names for word in run):
             return False
         return " ".join(run) not in lexicon.phrases
 
@@ -209,8 +224,13 @@ class DistinctiveTerms:
         return [position for position in ranked[:limit] if scores[position] > 0]
 
     def top(
-        self, texts: Sequence[str], groups: NDArray[np.intp]
+        self,
+        texts: Sequence[str],
+        groups: NDArray[np.intp],
+        limit: int | None = None,
     ) -> dict[int, list[str]]:
+        """Each group's most distinctive phrases, up to ``limit`` (default top_terms)."""
+        limit = limit or self.config.perspective_top_terms
         vectorizer = CountVectorizer(
             analyzer=self.tokenizer.ngrams,  # pyright: ignore[reportArgumentType]
             min_df=self.config.perspective_term_min_docs,
@@ -235,11 +255,9 @@ class DistinctiveTerms:
             delta = np.log(in_prior / in_rest) - np.log(out_prior / out_rest)
             score = delta / np.sqrt(1.0 / in_prior + 1.0 / out_prior)
             score[inside < self.config.perspective_term_min_docs] = -np.inf
-            pool = np.argsort(score)[::-1][: self.config.perspective_top_terms * POOL]
+            pool = np.argsort(score)[::-1][: limit * POOL]
             ranked = [str(vocabulary[p]) for p in pool if score[p] > 0]
-            result[int(group)] = self._longest(ranked)[
-                : self.config.perspective_top_terms
-            ]
+            result[int(group)] = self._longest(ranked)[:limit]
         return result
 
     @staticmethod

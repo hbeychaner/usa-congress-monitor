@@ -12,6 +12,11 @@ class BoilerplateLexicon:
     person_names: frozenset[str] = frozenset()
     place_names: frozenset[str] = frozenset()
 
+    def with_names(self, person_names: frozenset[str]) -> BoilerplateLexicon:
+        return BoilerplateLexicon(
+            self.words, self.phrases, person_names, self.place_names
+        )
+
     def with_terms(
         self, words: frozenset[str], phrases: frozenset[str]
     ) -> BoilerplateLexicon:

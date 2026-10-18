@@ -153,7 +153,16 @@ class PerspectiveConfig(_Section):
     perspective_top_terms: int = 20
     # Longest phrase length in words; 2 is bigrams only.
     perspective_max_ngram: int = 3
-    perspective_term_min_docs: int = 3
+    perspective_term_min_docs: int = 5
+    # A phrase must come from this many different sponsors to count as a party's language.
+    perspective_term_min_sponsors: int = 3
+    perspective_term_examples: int = 3
+    # Fewer surviving phrases than this and the party is shown without a phrase cloud.
+    perspective_min_display_terms: int = 5
+    perspective_subjects_top: int = 8
+    perspective_subject_min_bills: int = 3
+    # Member names used in this share of bills or more are ordinary words ("price", "grant").
+    perspective_name_common_share: float = 0.01
     perspective_sample_bills: int = 6
     # Each party needs this many bills in a topic before their terms are contrasted.
     perspective_party_min_bills: int = 10

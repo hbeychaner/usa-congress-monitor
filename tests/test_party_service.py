@@ -10,6 +10,7 @@ from cdm.perspectives.models import (
     PartyBillCount,
     PartyTerms,
     Perspective,
+    TermUse,
     TopicPerspectives,
 )
 from cdm.store.perspective_repository import PerspectiveRepository
@@ -46,7 +47,7 @@ def _topic(
             PartyTerms(
                 party=PartyGroup.DEMOCRATIC,
                 bills=dem,
-                terms=["a b"],
+                terms=[TermUse(term="a b", bills=6, sponsors=4)],
                 summary="dem view",
             )
         ],
@@ -55,7 +56,7 @@ def _topic(
             bipartisan_bills=5,
             share=0.3,
             bilateral=bilateral,
-            terms=["x y"],
+            terms=[TermUse(term="x y", bills=6, sponsors=4)],
         ),
         perspectives=[
             Perspective(

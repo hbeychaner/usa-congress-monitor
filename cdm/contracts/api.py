@@ -3,7 +3,7 @@ from enum import StrEnum
 from pydantic import BaseModel, Field
 
 from cdm.graph.models import PartyGroup, Signal
-from cdm.perspectives.models import TopicPerspectives
+from cdm.perspectives.models import SubjectUse, TermUse, TopicPerspectives
 
 
 class StateSummary(BaseModel):
@@ -613,7 +613,8 @@ class BilateralTopicEntry(BaseModel):
     bills: int
     bipartisan_bills: int
     share: float
-    terms: list[str]
+    terms: list[TermUse]
+    subjects: list[SubjectUse]
     summary: str = ""
 
 

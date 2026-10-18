@@ -2,6 +2,11 @@
 
 ## 2026-10-18
 
+### Changed
+
+- Parties page language is now evidence-backed: each party shows the CRS subjects its bills carry more often than the other party's, plus phrases that must appear in at least 5 bills from 3 sponsors; clicking a phrase lists example bills. Plural and word-order variants are merged, rare member names are dropped from phrases, and a party or bipartisan group with fewer than 5 supported phrases shows no cloud instead of noise.
+- Approach summaries are written from subjects and sample bill titles rather than raw phrases, and avoid generic wording. Rebuild with `scripts/build_perspectives.py` to refresh stored results.
+
 ### Added
 
 - Parties page (`/parties`, `GET /api/v1/parties`, `GET /api/v1/parties/topics/{id}`): the topics each party sponsors most per Congress, a per-party phrase cloud (bigrams and trigrams) with a one-sentence Ollama summary of each party's approach, and a "Bilateral Support" section for topics where at least a quarter of bills draw cosponsors from the other party. Procedural measures and ceremonial bills are excluded.

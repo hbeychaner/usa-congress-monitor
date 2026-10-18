@@ -163,6 +163,8 @@ class CongressCorpusReader:
                 title=title,
                 text=full_text[: self.config.perspective_text_chars] or document.text,
                 sponsor_party=sponsor_party,
+                sponsor_id=self._sponsor_id(source.get(SPONSOR_FIELD)),
+                subjects=self._subjects(source),
                 bipartisan=self._bipartisan(sponsor_party, source.get(COSPONSOR_FIELD)),
             )
         return CongressCorpus(congress=congress, bills=bills, documents=documents)
@@ -187,6 +189,18 @@ class CongressCorpusReader:
             for member in cosponsor_ids
         )
         return other >= self.config.perspective_bipartisan_min_cosponsors
+
+    @staticmethod
+    def _sponsor_id(sponsor_ids: list[str] | None) -> str:
+        return sponsor_ids[0] if sponsor_ids else ""
+
+    @staticmethod
+    def _subjects(source: dict[str, Any]) -> list[str]:
+        area = (source.get("policy_area") or {}).get("name")
+        listed = (source.get("subjects") or {}).get("legislative_subjects") or []
+        names = [str(area)] if area else []
+        names.extend(str(item["name"]) for item in listed if item.get("name"))
+        return list(dict.fromkeys(names))
 
     def _party(self, sponsor_ids: list[str] | None) -> PartyGroup | None:
         return self.parties.get(sponsor_ids[0]) if sponsor_ids else None

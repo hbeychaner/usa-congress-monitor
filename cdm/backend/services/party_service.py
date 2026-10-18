@@ -108,6 +108,7 @@ class PartyService:
                 bipartisan_bills=topic.bilateral.bipartisan_bills,
                 share=topic.bilateral.share,
                 terms=topic.bilateral.terms,
+                subjects=topic.bilateral.subjects,
                 summary=topic.bilateral.summary,
             )
             for topic in topics

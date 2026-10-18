@@ -10,6 +10,7 @@ import numpy as np
 from cdm.config import PerspectiveConfig
 from cdm.graph.models import PartyGroup
 from cdm.perspectives.clustering import ClusterResult, PerspectiveClusterer
+from cdm.perspectives.evidence import SubjectContrast, TermEvidence
 from cdm.perspectives.labeler import PerspectiveLabeler
 from cdm.perspectives.models import (
     MAJOR_PARTIES,
@@ -19,6 +20,8 @@ from cdm.perspectives.models import (
     PartyTerms,
     Perspective,
     PerspectiveBill,
+    SubjectUse,
+    TermUse,
     TopicPerspectives,
 )
 from cdm.perspectives.summarizer import ApproachSummarizer
@@ -46,12 +49,16 @@ class PerspectiveBuilder:
         config: PerspectiveConfig,
         clusterer: PerspectiveClusterer,
         terms: DistinctiveTerms,
+        evidence: TermEvidence,
+        subjects: SubjectContrast,
         labeler: PerspectiveLabeler,
         summarizer: ApproachSummarizer,
     ) -> None:
         self.config = config
         self.clusterer = clusterer
         self.terms = terms
+        self.evidence = evidence
+        self.subjects = subjects
         self.labeler = labeler
         self.summarizer = summarizer
 
@@ -117,73 +124,97 @@ class PerspectiveBuilder:
             return None
         flags = np.array([int(bill.bipartisan) for bill in majors], dtype=np.intp)
         share = float(flags.mean())
-        terms = (
-            self.terms.top([bill.text for bill in majors], flags).get(1, [])
-            if 0 < flags.sum() < len(flags)
+        backed = [bill for bill in majors if bill.bipartisan]
+        partisan = [bill for bill in majors if not bill.bipartisan]
+        contrasted = 0 < flags.sum() < len(flags)
+        candidates = (
+            self.terms.top([bill.text for bill in majors], flags, self._pool).get(1, [])
+            if contrasted
             else []
         )
-        summary = self._summary(
-            topic_label,
-            BIPARTISAN_GROUP,
-            terms,
-            [bill for bill in majors if bill.bipartisan],
-        )
+        terms = self._supported(candidates, backed)
+        subjects = self.subjects.top(backed, partisan) if contrasted else []
+        summary = self._summary(topic_label, BIPARTISAN_GROUP, terms, subjects, backed)
         return BilateralSupport(
             bills=len(majors),
             bipartisan_bills=int(flags.sum()),
             share=share,
             bilateral=share >= self.config.perspective_bilateral_min_share,
             terms=terms,
+            subjects=subjects,
             sample_titles=summary.sample_titles,
             summary=summary.summary,
         )
+
+    @property
+    def _pool(self) -> int:
+        return self.config.perspective_top_terms * 2
+
+    def _supported(
+        self, candidates: list[str], bills: list[PerspectiveBill]
+    ) -> list[TermUse]:
+        """Phrases with enough bills and sponsors behind them, or none if too few survive."""
+        described = self.evidence.describe(candidates, bills)
+        enough = len(described) >= self.config.perspective_min_display_terms
+        return described if enough else []
 
     def _summary(
         self,
         topic_label: str,
         group: str,
-        terms: list[str],
+        terms: list[TermUse],
+        subjects: list[SubjectUse],
         bills: list[PerspectiveBill],
     ) -> GroupSummary:
-        """Sample titles of the bills that best show the terms, and a model summary of them."""
+        """Sample titles of the bills that best show the evidence, and a model summary of them."""
+        if not terms and not subjects:
+            return GroupSummary([], "")
+        names = [use.term for use in terms]
         picks = self.terms.matching(
-            [bill.text for bill in bills], terms, self.config.perspective_sample_bills
-        )
+            [bill.text for bill in bills], names, self.config.perspective_sample_bills
+        ) or list(range(min(len(bills), self.config.perspective_sample_bills)))
         titles = [bills[position].title for position in picks]
         return GroupSummary(
-            titles, self.summarizer.summarize(topic_label, group, terms, titles)
+            titles,
+            self.summarizer.summarize(
+                topic_label, group, names, [use.name for use in subjects], titles
+            ),
         )
 
     def _party_terms(
         self, topic_label: str, bills: list[PerspectiveBill]
     ) -> list[PartyTerms]:
-        """Bigrams each major party uses more than the other; empty when a side is too small."""
+        """What each major party's bills emphasize; empty when a side is too small or too thin."""
         sides = list(MAJOR_PARTIES)
         known = [bill for bill in bills if bill.sponsor_party in sides]
-        counts = {
-            party: sum(bill.sponsor_party == party for bill in known) for party in sides
+        by_party = {
+            party: [bill for bill in known if bill.sponsor_party == party]
+            for party in sides
         }
-        if min(counts.values()) < self.config.perspective_party_min_bills:
+        if min(len(group) for group in by_party.values()) < (
+            self.config.perspective_party_min_bills
+        ):
             return []
         groups = np.array(
             [sides.index(bill.sponsor_party) for bill in known if bill.sponsor_party],
             dtype=np.intp,
         )
-        top = self.terms.top([bill.text for bill in known], groups)
+        top = self.terms.top([bill.text for bill in known], groups, self._pool)
         result: list[PartyTerms] = []
         for position, party in enumerate(sides):
-            terms = top.get(position, [])
-            summary = self._summary(
-                topic_label,
-                party.value,
-                terms,
-                [bill for bill in known if bill.sponsor_party == party],
-            )
+            members = by_party[party]
+            others = [
+                bill for other in sides if other != party for bill in by_party[other]
+            ]
+            terms = self._supported(top.get(position, []), members)
+            subjects = self.subjects.top(members, others)
+            summary = self._summary(topic_label, party.value, terms, subjects, members)
             result.append(
                 PartyTerms(
                     party=party,
-                    bills=counts[party],
+                    bills=len(members),
                     terms=terms,
+                    subjects=subjects,
                     sample_titles=summary.sample_titles,
                     summary=summary.summary,
                 )

@@ -6,7 +6,13 @@ import { fetchParties, fetchPartyTopic } from '../api/parties';
 import { PARTY_COLORS } from '../components/MemberGraphView';
 import { PhraseCloud } from '../components/PhraseCloud';
 
-import type { PartiesResponse, PartyRanking, PartyTopicDetail } from '../api/parties';
+import type {
+  PartiesResponse,
+  PartyRanking,
+  PartyTopicDetail,
+  SubjectUse,
+  TermUse,
+} from '../api/parties';
 import type { PartyGroup } from '../api/graph';
 
 const PARTY_LABELS: Record<PartyGroup, string> = {
@@ -82,6 +88,93 @@ function RankingCard({
   );
 }
 
+function SubjectBars({ subjects, color }: { subjects: SubjectUse[]; color: string }) {
+  const max = Math.max(...subjects.map((subject) => subject.bills), 1);
+  return (
+    <Flex direction="column" gap="1">
+      {subjects.map((subject) => (
+        <Flex key={subject.name} align="center" gap="2">
+          <Box style={{ width: 180, flexShrink: 0, overflow: 'hidden' }}>
+            <Text size="1" truncate title={subject.name}>
+              {subject.name}
+            </Text>
+          </Box>
+          <div
+            style={{
+              width: `${Math.max((subject.bills / max) * 100, 4)}%`,
+              maxWidth: '50%',
+              height: 10,
+              background: color,
+              borderRadius: 2,
+            }}
+          />
+          <Text size="1" color="gray">
+            {subject.bills} bills
+          </Text>
+        </Flex>
+      ))}
+    </Flex>
+  );
+}
+
+function Evidence({ use }: { use: TermUse | null }) {
+  if (!use) return null;
+  return (
+    <Box style={{ background: 'var(--gray-2)', borderRadius: 6, padding: 8 }}>
+      <Text size="1" color="gray">
+        &ldquo;{use.term}&rdquo; appears in {use.bills} bills from {use.sponsors} sponsors, e.g.
+      </Text>
+      <Flex direction="column">
+        {use.examples.map((bill) => (
+          <Text size="1" key={bill.doc_id}>
+            <Link to={`/bills/${encodeURIComponent(bill.doc_id)}`}>{bill.title}</Link>
+          </Text>
+        ))}
+      </Flex>
+    </Box>
+  );
+}
+
+function GroupLanguage({
+  heading,
+  color,
+  terms,
+  subjects,
+  summary,
+}: {
+  heading: string;
+  color: string;
+  terms: TermUse[];
+  subjects: SubjectUse[];
+  summary: string;
+}) {
+  const [picked, setPicked] = useState<TermUse | null>(null);
+  const thin = terms.length === 0 && subjects.length === 0;
+  return (
+    <Flex direction="column" gap="2">
+      <Text size="2" weight="bold" style={{ color }}>
+        {heading}
+      </Text>
+      {summary ? <Text size="2">{summary}</Text> : null}
+      {thin ? (
+        <Text size="2" color="gray">
+          Too little distinctive language to draw a conclusion.
+        </Text>
+      ) : null}
+      {subjects.length > 0 ? <SubjectBars subjects={subjects} color={color} /> : null}
+      {terms.length > 0 ? (
+        <PhraseCloud
+          terms={terms}
+          color={color}
+          selected={picked?.term ?? null}
+          onSelect={setPicked}
+        />
+      ) : null}
+      <Evidence use={picked} />
+    </Flex>
+  );
+}
+
 function TopicContrast({ detail }: { detail: PartyTopicDetail }) {
   return (
     <Card size="3">
@@ -101,13 +194,14 @@ function TopicContrast({ detail }: { detail: PartyTopicDetail }) {
         ) : (
           <Grid columns={{ initial: '1', md: '2' }} gap="4">
             {detail.party_terms.map((terms) => (
-              <Flex key={terms.party} direction="column" gap="2">
-                <Text size="2" weight="bold" style={{ color: PARTY_COLORS[terms.party] }}>
-                  {PARTY_LABELS[terms.party]} · {terms.bills} bills
-                </Text>
-                <PhraseCloud terms={terms.terms} color={PARTY_COLORS[terms.party]} />
-                {terms.summary ? <Text size="2">{terms.summary}</Text> : null}
-              </Flex>
+              <GroupLanguage
+                key={terms.party}
+                heading={`${PARTY_LABELS[terms.party]} · ${terms.bills} bills`}
+                color={PARTY_COLORS[terms.party]}
+                terms={terms.terms}
+                subjects={terms.subjects}
+                summary={terms.summary}
+              />
             ))}
           </Grid>
         )}
@@ -127,8 +221,13 @@ function TopicContrast({ detail }: { detail: PartyTopicDetail }) {
                 {percent(detail.bilateral.share)})
               </Text>
             </Flex>
-            <PhraseCloud terms={detail.bilateral.terms} color="var(--green-11)" />
-            {detail.bilateral.summary ? <Text size="2">{detail.bilateral.summary}</Text> : null}
+            <GroupLanguage
+              heading="What the bipartisan bills share"
+              color="var(--green-11)"
+              terms={detail.bilateral.terms}
+              subjects={detail.bilateral.subjects}
+              summary={detail.bilateral.summary}
+            />
           </Flex>
         ) : null}
         {detail.perspectives.length > 0 ? (
