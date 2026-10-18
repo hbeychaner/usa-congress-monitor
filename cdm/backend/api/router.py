@@ -10,6 +10,7 @@ from cdm.backend.api.routes.search import router as search_router
 from cdm.backend.api.routes.states import router as states_router
 from cdm.backend.api.routes.subjects import router as subjects_router
 from cdm.backend.api.routes.topics import router as topics_router
+from cdm.backend.api.routes.votes import router as votes_router
 
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(admin_router)
@@ -22,3 +23,4 @@ api_router.include_router(topics_router)
 api_router.include_router(subjects_router)
 api_router.include_router(graph_router)
 api_router.include_router(parties_router)
+api_router.include_router(votes_router)

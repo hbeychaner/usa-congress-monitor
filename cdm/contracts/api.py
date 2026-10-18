@@ -404,12 +404,41 @@ class VoteSummary(BaseModel):
     totals: VotePartyTotals
     amendment_number: int | None = None
     url: str | None = None
+    rollcall_id: str | None = None
 
 
 class BillVotesResponse(BaseModel):
     bill_id: str
     votes: list[VoteSummary]
     total: int
+
+
+class VotePosition(StrEnum):
+    YEA = "yea"
+    NAY = "nay"
+    PRESENT = "present"
+    NOT_VOTING = "not_voting"
+
+
+class VoteMember(BaseModel):
+    bioguide_id: str
+    name: str
+    state: str | None = None
+
+
+class PositionMembers(BaseModel):
+    position: VotePosition
+    members: list[VoteMember]
+
+
+class PartyVoteBreakdown(BaseModel):
+    party: PartyGroup
+    positions: list[PositionMembers]
+
+
+class VoteBreakdownResponse(BaseModel):
+    vote_id: str
+    parties: list[PartyVoteBreakdown]
 
 
 class IngestProgressJob(BaseModel):

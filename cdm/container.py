@@ -29,6 +29,7 @@ from cdm.backend.services.subject_service import SubjectService
 from cdm.backend.services.topic_neighborhood_service import TopicNeighborhoodService
 from cdm.backend.services.topic_service import TopicService
 from cdm.backend.services.topic_sponsors import AssignedBillReader, TopicSponsorReader
+from cdm.backend.services.vote_breakdown_service import VoteBreakdownService
 from cdm.backend.services.vote_service import VoteService
 from cdm.config import AppConfig
 from cdm.graph.topics import TopicModelReader
@@ -207,6 +208,10 @@ class Container:
     @cached_property
     def vote_service(self) -> VoteService:
         return VoteService(self.elastic_client)
+
+    @cached_property
+    def vote_breakdown_service(self) -> VoteBreakdownService:
+        return VoteBreakdownService(self.elastic_client)
 
     @cached_property
     def state_service(self) -> StateService:

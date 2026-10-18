@@ -60,6 +60,9 @@ class VoteService:
             merged[self._dedupe_key(vote)] = vote
         # Congress.gov House records carry URLs and vote types, so they win ties.
         for vote in self._house_votes(key, limit):
+            existing = merged.get(self._dedupe_key(vote))
+            if existing is not None:
+                vote.rollcall_id = existing.rollcall_id
             merged[self._dedupe_key(vote)] = vote
 
         votes = sorted(merged.values(), key=lambda vote: vote.date or "", reverse=True)
@@ -98,6 +101,7 @@ class VoteService:
         )
         return VoteSummary(
             vote_id=str(source.get("id") or hit.get("_id") or ""),
+            rollcall_id=str(source.get("id") or hit.get("_id") or ""),
             congress=source.get("congress"),
             session_number=source.get("session_number"),
             roll_call_number=roll_number,

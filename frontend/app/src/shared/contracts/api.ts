@@ -1722,6 +1722,8 @@ export interface components {
             amendment_number?: number | null;
             /** Url */
             url?: string | null;
+            /** Rollcall Id */
+            rollcall_id?: string | null;
         };
     };
     responses: never;

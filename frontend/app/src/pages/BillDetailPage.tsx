@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import { fetchBill, fetchBillVotes, type BillDetailResponse, type BillVotesResponse } from '../api/bills';
 import { fetchBillTopics, type BillTopicsResponse } from '../api/topics';
+import { VotePartyChart } from '../components/VotePartyChart';
 import { SimilarBillsCard } from '../components/SimilarBillsCard';
 import { ActionTimelineChart, type TimelineAction } from '../components/ActionTimelineChart';
 
@@ -255,6 +256,7 @@ export function BillDetailPage() {
                                                 <Text size="2">
                                                     Yea {vote.totals.yea} · Nay {vote.totals.nay} · Present {vote.totals.present} · Not Voting {vote.totals.not_voting}
                                                 </Text>
+                                                {vote.rollcall_id ? <VotePartyChart rollcallId={vote.rollcall_id} /> : null}
                                                 {vote.url ? (
                                                     <Text size="1"><a href={vote.url} target="_blank" rel="noreferrer">View vote details</a></Text>
                                                 ) : null}
