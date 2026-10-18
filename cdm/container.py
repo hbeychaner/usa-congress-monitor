@@ -37,6 +37,7 @@ from cdm.perspectives.boilerplate import BoilerplateLearner
 from cdm.perspectives.builder import PerspectiveBuilder
 from cdm.perspectives.clustering import PerspectiveClusterer
 from cdm.perspectives.corpus import (
+    BipartisanVoteReader,
     CongressCorpusReader,
     MeasureFilter,
     MemberNameReader,
@@ -149,6 +150,9 @@ class Container:
             parties,
             self.config.perspective,
             MeasureFilter(self.config.perspective),
+            BipartisanVoteReader(
+                self.elastic_client, parties, self.config.perspective
+            ),
         )
 
     @cached_property

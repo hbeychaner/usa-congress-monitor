@@ -99,6 +99,63 @@ class MemberNameReader:
         )
 
 
+class BipartisanVoteReader:
+    """Finds bills with a passage vote that most voting members of both major parties backed."""
+
+    def __init__(
+        self,
+        client: Elasticsearch,
+        parties: dict[str, PartyGroup],
+        config: PerspectiveConfig,
+    ) -> None:
+        self.client = client
+        self.parties = parties
+        self.min_share = config.perspective_vote_yea_min_share
+        self.passage = re.compile(
+            config.perspective_passage_question_pattern, re.IGNORECASE
+        )
+
+    def read(self, congress: int) -> set[str]:
+        hits = scan(
+            self.client,
+            index=read_alias("rollcall"),
+            query={
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"congress": congress}},
+                            {"exists": {"field": "legislation_id"}},
+                        ]
+                    }
+                },
+                "_source": ["legislation_id", "question", "yea_ids", "nay_ids"],
+            },
+        )
+        bills: set[str] = set()
+        for hit in hits:
+            source = hit["_source"]
+            if not self.passage.search(str(source.get("question") or "")):
+                continue
+            if self.backed_by_both(source.get("yea_ids"), source.get("nay_ids")):
+                bills.add(str(source["legislation_id"]))
+        return bills
+
+    def backed_by_both(
+        self, yea_ids: list[str] | None, nay_ids: list[str] | None
+    ) -> bool:
+        return all(
+            self._yea_share(party, yea_ids or [], nay_ids or []) > self.min_share
+            for party in MAJOR_PARTIES
+        )
+
+    def _yea_share(
+        self, party: PartyGroup, yea_ids: list[str], nay_ids: list[str]
+    ) -> float:
+        yea = sum(self.parties.get(member) == party for member in yea_ids)
+        nay = sum(self.parties.get(member) == party for member in nay_ids)
+        return yea / (yea + nay) if yea + nay else 0.0
+
+
 class MeasureFilter:
     """Drops resolutions and ceremonial measures, which carry no policy approach."""
 
@@ -121,11 +178,13 @@ class CongressCorpusReader:
         parties: dict[str, PartyGroup],
         config: PerspectiveConfig,
         measures: MeasureFilter,
+        votes: BipartisanVoteReader,
     ) -> None:
         self.client = client
         self.parties = parties
         self.config = config
         self.measures = measures
+        self.votes = votes
 
     def read(self, congress: int) -> CongressCorpus:
         hits = list(
@@ -146,6 +205,7 @@ class CongressCorpusReader:
             )
         )
         documents = {doc.doc_id: doc for doc in build_topic_documents(hits)}
+        voted_bipartisan = self.votes.read(congress)
         bills: dict[str, PerspectiveBill] = {}
         for hit in hits:
             doc_id = str(hit["_id"])
@@ -165,7 +225,8 @@ class CongressCorpusReader:
                 sponsor_party=sponsor_party,
                 sponsor_id=self._sponsor_id(source.get(SPONSOR_FIELD)),
                 subjects=self._subjects(source),
-                bipartisan=self._bipartisan(sponsor_party, source.get(COSPONSOR_FIELD)),
+                bipartisan=doc_id in voted_bipartisan
+                or self._bipartisan(sponsor_party, source.get(COSPONSOR_FIELD)),
             )
         return CongressCorpus(congress=congress, bills=bills, documents=documents)
 

@@ -168,6 +168,12 @@ class PerspectiveConfig(_Section):
     perspective_party_min_bills: int = 10
     # A bill is bipartisan with this many cosponsors from the party opposite its sponsor's.
     perspective_bipartisan_min_cosponsors: int = 2
+    # A bill with a passage vote on which more than this share of each major party's voting members said yea is bipartisan.
+    perspective_vote_yea_min_share: float = 0.5
+    perspective_passage_question_pattern: str = (
+        r"pass|suspend the rules and agree|agreeing to the (resolution|conference)"
+        r"|concur|conference report|on the joint resolution|overriding"
+    )
     # A topic shows Bilateral Support when this share of its bills are bipartisan.
     perspective_bilateral_min_share: float = 0.25
     # A term prominent in this share of a topic's bills counts as present in that topic.

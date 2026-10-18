@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Parties analysis: a bill is also bipartisan when a passage vote on it drew yea votes from more than half of the voting members of both the Democratic and Republican parties, in addition to the cosponsor rule. Rebuild with `scripts/build_perspectives.py` to apply it.
 - A bill's Votes tab now merges Voteview roll calls (House and Senate, 113th Congress onward) with Congress.gov House votes, de-duplicated by chamber, session and Clerk roll number; Senate votes are now shown and each vote is labelled with its chamber.
 
 ### Added

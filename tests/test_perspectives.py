@@ -1,7 +1,11 @@
+from unittest.mock import MagicMock
+
 import numpy as np
+from elasticsearch import Elasticsearch
 
 from cdm.config import PerspectiveConfig
-from cdm.perspectives.corpus import MeasureFilter
+from cdm.graph.models import PartyGroup
+from cdm.perspectives.corpus import BipartisanVoteReader, MeasureFilter
 from cdm.perspectives.evidence import SubjectContrast, TermEvidence
 from cdm.perspectives.lexicon import BoilerplateLexicon
 from cdm.perspectives.models import PerspectiveBill
@@ -115,3 +119,29 @@ def test_subject_contrast_merges_near_duplicate_subjects() -> None:
     right = [_bill(f"r{i}", f"t{i}", "", ["Public Lands"]) for i in range(6)]
 
     assert len(contrast.top(left, right)) == 1
+
+
+def _vote_reader() -> BipartisanVoteReader:
+    parties = {
+        "D1": PartyGroup.DEMOCRATIC,
+        "D2": PartyGroup.DEMOCRATIC,
+        "D3": PartyGroup.DEMOCRATIC,
+        "R1": PartyGroup.REPUBLICAN,
+        "R2": PartyGroup.REPUBLICAN,
+        "R3": PartyGroup.REPUBLICAN,
+    }
+    return BipartisanVoteReader(
+        MagicMock(spec=Elasticsearch), parties, PerspectiveConfig()
+    )
+
+
+def test_vote_is_bipartisan_when_most_of_both_parties_say_yea() -> None:
+    assert _vote_reader().backed_by_both(["D1", "D2", "R1", "R2"], ["D3", "R3"])
+
+
+def test_vote_is_partisan_when_one_party_mostly_opposes() -> None:
+    assert not _vote_reader().backed_by_both(["R1", "R2", "R3", "D1"], ["D2", "D3"])
+
+
+def test_vote_without_both_parties_is_not_bipartisan() -> None:
+    assert not _vote_reader().backed_by_both(["R1", "R2"], [])

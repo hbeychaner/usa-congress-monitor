@@ -19,7 +19,7 @@ class PerspectiveBill(BaseModel):
     sponsor_id: str = ""
     # Policy area plus legislative subjects assigned by the Congressional Research Service.
     subjects: list[str] = Field(default_factory=list)
-    # True when cosponsors include enough members of the party opposite the sponsor's.
+    # True when cosponsors include enough of the opposing party, or a passage vote drew a majority of both parties.
     bipartisan: bool = False
 
 
