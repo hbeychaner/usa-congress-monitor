@@ -1,0 +1,52 @@
+#!/bin/bash
+set -euo pipefail
+
+mkdir -p /mnt/data
+DISK=/dev/disk/by-id/google-data
+blkid "$DISK" >/dev/null 2>&1 || mkfs.ext4 -m 0 -F "$DISK"
+grep -q "/mnt/data" /etc/fstab || echo "$DISK /mnt/data ext4 discard,defaults,nofail 0 2" >> /etc/fstab
+mount -a
+
+# Docker's data root lives on the persistent disk so volumes survive VM rebuilds.
+mkdir -p /etc/docker /mnt/data/docker /mnt/data/data /mnt/data/logs /mnt/data/models
+echo '{"data-root": "/mnt/data/docker"}' > /etc/docker/daemon.json
+
+if ! command -v docker >/dev/null; then
+  apt-get update
+  apt-get install -y ca-certificates curl gnupg
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+  echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable" > /etc/apt/sources.list.d/docker.list
+  apt-get update
+  apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+fi
+systemctl restart docker
+
+gcloud auth configure-docker ${region}-docker.pkg.dev --quiet
+
+mkdir -p /opt/congress
+curl -sf -H "Metadata-Flavor: Google" \
+  "http://metadata.google.internal/computeMetadata/v1/instance/attributes/worker-compose" \
+  > /opt/congress/docker-compose.yml
+
+RABBITMQ_PASSWORD=$(gcloud secrets versions access latest --secret=${rabbitmq_password_secret})
+CONGRESS_API_KEY=$(gcloud secrets versions access latest --secret=${congress_api_key_secret})
+
+# The search VM publishes the API key after Elasticsearch first boots.
+until ES_KEY=$(gcloud secrets versions access latest --secret=${es_api_key_secret} 2>/dev/null); do sleep 15; done
+
+cat > /opt/congress/.env <<EOF
+BACKEND_IMAGE=${backend_image}
+RABBITMQ_USER=${rabbitmq_user}
+RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD
+RABBITMQ_URL=amqp://${rabbitmq_user}:$RABBITMQ_PASSWORD@rabbitmq:5672/
+REDIS_URL=redis://redis:6379/0
+ES_LOCAL_URL=${es_url}
+ES_LOCAL_API_KEY=$ES_KEY
+CONGRESS_API_KEY=$CONGRESS_API_KEY
+EOF
+chmod 600 /opt/congress/.env
+
+cd /opt/congress
+docker compose pull
+docker compose up -d

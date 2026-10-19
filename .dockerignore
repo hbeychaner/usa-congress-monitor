@@ -9,3 +9,10 @@ node_modules
 frontend/app/node_modules
 data
 tmp
+models
+logs
+planning
+frontend
+elastic-start-local
+infra
+deploy

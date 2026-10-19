@@ -1,0 +1,57 @@
+x-app: &app
+  image: ${BACKEND_IMAGE}
+  working_dir: /workspace
+  env_file: .env
+  restart: unless-stopped
+  volumes:
+    - /mnt/data/data:/workspace/data
+    - /mnt/data/logs:/workspace/logs
+    - /mnt/data/models:/workspace/models
+  depends_on:
+    - rabbitmq
+    - redis
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  worker:
+    <<: *app
+    command: >
+      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork
+      --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO
+      --queues=congress-ingest
+
+  worker-index:
+    <<: *app
+    command: >
+      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork
+      --concurrency=2 --max-tasks-per-child=200 --loglevel=INFO
+      --queues=congress-index
+
+  beat:
+    <<: *app
+    command: >
+      celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO
+      --schedule=/workspace/data/celerybeat-schedule
+
+volumes:
+  rabbitmq-data:
+  redis-data:

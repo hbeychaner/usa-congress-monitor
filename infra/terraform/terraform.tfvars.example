@@ -1,0 +1,11 @@
+project_id  = "your-gcp-project"
+region      = "us-central1"
+zone        = "us-central1-a"
+domain      = "congress.example.com"
+iap_members = ["user:you@gmail.com"]
+# iap_members = ["domain:yourcompany.com", "group:team@yourcompany.com"]
+
+# Phase 1 leaves this false; set true once images are pushed and the search VM has booted.
+deploy_apps = false
+
+# Pass the key with TF_VAR_congress_api_key rather than writing it here.

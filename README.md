@@ -350,6 +350,31 @@ Sunday topic retrain) and on demand from the Admin page's "Party perspectives"
 card (`GET`/`POST /api/v1/admin/perspectives`). Status is kept in
 `data/perspective_build_status.json` and output in `logs/perspectives.log`.
 
+## Deploying To Google Cloud
+
+Terraform in `infra/terraform` provisions a private deployment behind Google sign-in (Identity-Aware Proxy).
+
+```text
+Browser -> HTTPS load balancer + IAP (allowed Google accounts only)
+  /api/*, /health, /docs -> Cloud Run: API   (Direct VPC egress)
+  everything else        -> Cloud Run: frontend (nginx static build)
+Cloud Run API -> VPC -> worker VM (RabbitMQ, Redis) and search VM (Elasticsearch)
+Worker VM: Celery workers + beat, jobs ledger, status files, build logs on a snapshotted disk
+```
+
+- Search runs as self-managed Elasticsearch 9 on a Compute Engine VM. The code uses the `elasticsearch` client, so OpenSearch is not a drop-in replacement.
+- Worker VM state (`data/`, `logs/`, `models/`) lives on a persistent disk with daily snapshots. Admin status routes that read those local files only work where that disk is mounted, not on Cloud Run.
+- Vertex AI access (`roles/aiplatform.user`) is granted to the API and worker service accounts; the LLM client is still Ollama until a Vertex client is added.
+
+Steps:
+
+1. Create a state bucket, then `cd infra/terraform && terraform init -backend-config="bucket=<bucket>"`. Copy `terraform.tfvars.example` to `terraform.tfvars` and set `project_id` and `iap_members`; export `TF_VAR_congress_api_key`.
+2. Create the registry: `terraform apply -target=google_artifact_registry_repository.images -target=google_project_service.apis`.
+3. Push images: `deploy/gcp/build_push.sh <project_id> [region] [tag]`.
+4. `terraform apply` to create the network, secrets and VMs. The search VM publishes the app API key to Secret Manager on first boot; the worker VM waits for it.
+5. Configure the project OAuth consent screen once, set `deploy_apps = true`, and `terraform apply` for Cloud Run, the load balancer and IAP.
+6. Point a DNS A record for `domain` at the `dns_a_record` output; the managed certificate activates after DNS resolves.
+
 ## Planning & Notes
 
 In-progress design docs, operational runbooks, and architecture review notes

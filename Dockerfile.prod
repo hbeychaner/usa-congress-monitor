@@ -1,0 +1,19 @@
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm
+
+WORKDIR /workspace
+
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_LINK_MODE=copy \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:${PATH}"
+
+COPY pyproject.toml uv.lock requirements.txt ./
+COPY cdm ./cdm
+COPY scripts ./scripts
+
+# --no-sources skips local path overrides that do not exist in the image.
+RUN uv sync --no-sources --frozen --no-dev
+
+# Cloud Run supplies PORT; the worker VM overrides this command.
+CMD ["sh", "-c", "exec uvicorn cdm.backend.app:app --host 0.0.0.0 --port ${PORT:-8080}"]

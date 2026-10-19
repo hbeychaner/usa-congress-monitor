@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-20
+
+### Added
+
+- Google Cloud deployment: Terraform in `infra/terraform` (VPC, Artifact Registry, Secret Manager, Cloud Run API and frontend, worker and Elasticsearch VMs with snapshotted disks, HTTPS load balancer with Identity-Aware Proxy), production images `Dockerfile.prod` and `frontend/app/Dockerfile.prod`, and `deploy/gcp` (worker compose file, image build script). See the README deployment section.
+
 ## 2026-10-19
 
 ### Changed
