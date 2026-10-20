@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-20 (broker)
+
+### Fixed
+
+- RabbitMQ now has a fixed hostname, so queued messages survive container recreation. Previously every recreate got a random node name and started with an empty broker, leaving queued ingest jobs without messages. After the next `make up`, run `scripts/resume_queued_jobs.py --kinds ingest` once.
+
 ## 2026-10-20
 
 ### Added
