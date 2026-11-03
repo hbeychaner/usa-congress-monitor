@@ -1,13 +1,15 @@
 import { Avatar, Badge, Button, Card, DataList, Flex, Heading, SegmentedControl, Table, Text } from '@radix-ui/themes';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   fetchMemberActivity,
   fetchMemberProfile,
-  type MemberActivityResponse,
   type MemberProfileResponse,
 } from '../api/members';
-import { fetchMemberTopics, type MemberTopicsResponse } from '../api/topics';
+import { fetchMemberTopics } from '../api/topics';
+import { AnalysisNotice } from '../components/AnalysisNotice';
+import { PageControls } from '../components/PageControls';
+import { useRead } from '../hooks/useRead';
 import { HorizontalBarChart } from '../components/HorizontalBarChart';
 
 const PARTY_COLORS: Record<string, 'blue' | 'red' | 'gray'> = {
@@ -43,32 +45,21 @@ export function MemberProfilePage() {
   const [profile, setProfile] = useState<MemberProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activity, setActivity] = useState<MemberActivityResponse | null>(null);
-  const [activityLoading, setActivityLoading] = useState(true);
   const [activityType, setActivityType] = useState('all');
   const [activityPage, setActivityPage] = useState(1);
-  const [memberTopics, setMemberTopics] = useState<MemberTopicsResponse | null>(null);
+  const topicRequest = useCallback(() => fetchMemberTopics(bioguideId), [bioguideId]);
+  const { data: memberTopics, error: topicError, loading: topicsLoading } = useRead(topicRequest);
   const [showAllTopics, setShowAllTopics] = useState(false);
 
-  useEffect(() => {
-    setMemberTopics(null);
-    fetchMemberTopics(bioguideId)
-      .then(setMemberTopics)
-      .catch(() => setMemberTopics(null));
-  }, [bioguideId]);
-
-  useEffect(() => {
-    setActivityLoading(true);
-    fetchMemberActivity(
+  const activityRequest = useCallback(() => fetchMemberActivity(
       bioguideId,
       activityPage,
       ACTIVITY_PAGE_SIZE,
       activityType === 'all' ? undefined : activityType,
-    )
-      .then((data) => setActivity(data))
-      .catch(() => setActivity(null))
-      .finally(() => setActivityLoading(false));
-  }, [bioguideId, activityType, activityPage]);
+    ), [bioguideId, activityType, activityPage]);
+  const { data: activity, error: activityError, loading: activityLoading } = useRead(activityRequest);
+
+  useEffect(() => { setActivityPage(1); }, [bioguideId]);
 
   useEffect(() => {
     fetchMemberProfile(bioguideId)
@@ -88,7 +79,7 @@ export function MemberProfilePage() {
   const member = profile.member;
   const terms = [...(member.terms ?? [])].sort((a, b) => (b.congress ?? 0) - (a.congress ?? 0));
   const leadership = member.leadership ?? [];
-  const topics = memberTopics && memberTopics.topics.length > 0 ? memberTopics.topics : profile.topics;
+  const topics = memberTopics?.topics ?? [];
   const shownTopics = topics.slice(0, showAllTopics ? TOPICS_EXPANDED : TOPICS_COLLAPSED);
 
   const activityByType = profile.recent_activity.reduce<Record<string, number>>((acc, item) => {
@@ -217,6 +208,7 @@ export function MemberProfilePage() {
 
       <Card size="3">
         <Heading size="4" mb="2">Legislative Topics</Heading>
+        <AnalysisNotice analysis={memberTopics?.analysis} error={topicError} loading={topicsLoading} />
         <Flex direction="column" gap="3">
           {topics.length > 0 ? (
             <Flex direction="column" gap="2">
@@ -239,9 +231,7 @@ export function MemberProfilePage() {
                 ) : null}
               </Flex>
             </Flex>
-          ) : (
-            <Text as="p" color="gray">No modeled topic assignments yet — topics appear after the topic model is trained.</Text>
-          )}
+          ) : null}
           {memberTopics && memberTopics.subjects.length > 0 ? (
             <Flex direction="column" gap="1">
               <Heading size="3" mt="2">CRS Subjects</Heading>
@@ -318,6 +308,8 @@ export function MemberProfilePage() {
         ) : null}
         {activityLoading ? (
           <Text as="p" color="gray">Loading activity...</Text>
+        ) : activityError ? (
+          <Text as="p" color="red">Unable to load activity: {activityError.message}</Text>
         ) : activity && activity.items.length > 0 ? (
           <Flex direction="column" gap="2">
             {activity.items.map((item) => (
@@ -334,29 +326,11 @@ export function MemberProfilePage() {
                 )}
               </Flex>
             ))}
-            <Flex gap="2" align="center" mt="2">
-              <Button
-                variant="soft"
-                disabled={activityPage <= 1}
-                onClick={() => setActivityPage((page) => Math.max(1, page - 1))}
-              >
-                Previous
-              </Button>
-              <Text size="1" color="gray">
-                Page {activity.page} of {Math.max(1, Math.ceil(activity.total / ACTIVITY_PAGE_SIZE))}
-              </Text>
-              <Button
-                variant="soft"
-                disabled={activityPage * ACTIVITY_PAGE_SIZE >= activity.total}
-                onClick={() => setActivityPage((page) => page + 1)}
-              >
-                Next
-              </Button>
-            </Flex>
           </Flex>
         ) : (
           <Text as="p" color="gray">No indexed activity for this member.</Text>
         )}
+        <PageControls page={activityPage} bounds={activity} loading={activityLoading} onChange={setActivityPage} />
       </Card>
     </Flex>
   );

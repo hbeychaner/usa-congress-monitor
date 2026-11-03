@@ -1,6 +1,8 @@
 from collections import Counter
 from typing import cast
+from unittest.mock import Mock
 
+from cdm.backend.services.graph_service import GraphReadSnapshot, GraphService
 from cdm.backend.services.neighborhood_service import (
     NeighborhoodQuery,
     NeighborhoodService,
@@ -17,24 +19,49 @@ from cdm.backend.services.topic_sponsors import (
     TopicSponsorReader,
 )
 from cdm.contracts.api import GraphLink, MemberSummary
-from cdm.graph.models import Signal
+from cdm.graph.models import GraphVersionPointer, Signal
 
 
 def _summary(member_id: str, party: str) -> MemberSummary:
     return MemberSummary(
-        bioguide_id=member_id, display_name=member_id, party=party, state="X", chamber="Senate"
+        bioguide_id=member_id,
+        display_name=member_id,
+        party=party,
+        state="X",
+        chamber="Senate",
     )
 
 
 class FakeNeighborhoods(NeighborhoodService):
     def __init__(self) -> None:
-        self.table = {"A": _summary("A", "Democratic"), "B": _summary("B", "Republican")}
+        self.table = {
+            "A": _summary("A", "Democratic"),
+            "B": _summary("B", "Republican"),
+        }
+        self.graph = Mock(spec=GraphService)
+        self.graph.snapshot.return_value = GraphReadSnapshot(
+            pointers={
+                Signal.COLLABORATION: GraphVersionPointer(
+                    signal=Signal.COLLABORATION, graph_version="v1"
+                )
+            },
+            topic_model_version="v1",
+        )
 
-    def allowed_members(self, member_ids: list[str], query: NeighborhoodQuery) -> dict[str, MemberSummary]:
+    def allowed_members(
+        self, member_ids: list[str], query: NeighborhoodQuery
+    ) -> dict[str, MemberSummary]:
         return {key: self.table[key] for key in member_ids if key in self.table}
 
-    def links_among(self, member_ids, query):  # type: ignore[no-untyped-def]
-        return {Signal.COLLABORATION: "v1"}, [GraphLink(source="A", target="B", score=0.5)]
+    def links_among(self, member_ids, query, snapshot):  # type: ignore[no-untyped-def]
+        return [
+            GraphLink(
+                source="A",
+                target="B",
+                score=0.5,
+                signal_scores={Signal.COLLABORATION: 0.5},
+            )
+        ]
 
 
 class FakeTopics:
@@ -82,7 +109,10 @@ def test_topic_center_ranks_sponsors_and_drops_unknown_members() -> None:
     response = _service().neighborhood(_query(CenterKind.TOPIC, "7"))
     assert [node.member.bioguide_id for node in response.nodes] == ["A", "B"]
     assert response.topic_nodes[0].topic_id == 7
-    assert {link.member: link.bills for link in response.topic_links} == {"A": 5, "B": 2}
+    assert {link.member: link.bills for link in response.topic_links} == {
+        "A": 5,
+        "B": 2,
+    }
     assert len(response.links) == 1
 
 

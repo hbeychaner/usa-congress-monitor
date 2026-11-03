@@ -1,10 +1,10 @@
 import { apiGet } from './client';
-import type { components } from '../shared/contracts/api';
+import type * as Contracts from '../shared/contracts/api';
 
-export type Neighborhood = components['schemas']['NeighborhoodResponse'];
-export type GraphNode = components['schemas']['GraphNode'];
-export type GraphLink = components['schemas']['GraphLink'];
-export type PartyGroup = components['schemas']['PartyGroup'];
+export type Neighborhood = Contracts.NeighborhoodResponse;
+export type GraphNode = Contracts.GraphNode;
+export type GraphLink = Contracts.GraphLink;
+export type PartyGroup = Contracts.PartyGroup;
 
 export type NeighborhoodParams = {
     members: string[];
@@ -12,7 +12,7 @@ export type NeighborhoodParams = {
     votingWeight: number;
     topicWeight: number;
     congress: number | null;
-    chamber: 'house' | 'senate' | null;
+    chamber: Contracts.Chamber | null;
     parties: PartyGroup[];
     limit: number;
     includeTopics: boolean;
@@ -37,7 +37,7 @@ export function fetchNeighborhood(params: NeighborhoodParams): Promise<Neighborh
     return apiGet<Neighborhood>(`/api/v1/graph/neighborhood?${query.toString()}`);
 }
 
-export type CenterKind = components['schemas']['CenterKind'];
+export type CenterKind = Contracts.CenterKind;
 
 export type TopicNeighborhoodParams = Omit<
     NeighborhoodParams,

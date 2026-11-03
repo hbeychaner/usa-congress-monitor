@@ -1,13 +1,15 @@
-import { Badge, Box, Callout, Card, Flex, Grid, Heading, Select, Text } from '@radix-ui/themes';
-import { useEffect, useState } from 'react';
+import { Badge, Box, Card, Flex, Grid, Heading, Select, Text } from '@radix-ui/themes';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { fetchParties, fetchPartyTopic } from '../api/parties';
 import { PARTY_COLORS } from '../components/MemberGraphView';
 import { PhraseCloud } from '../components/PhraseCloud';
+import { AnalysisNotice } from '../components/AnalysisNotice';
+import { LabelOrigin } from '../components/LabelOrigin';
+import { useRead } from '../hooks/useRead';
 
 import type {
-  PartiesResponse,
   PartyRanking,
   PartyTopicDetail,
   SubjectUse,
@@ -242,6 +244,7 @@ function TopicContrast({ detail }: { detail: PartyTopicDetail }) {
                     <Text size="2" weight="bold">
                       {perspective.label} · {perspective.size} bills
                     </Text>
+                    <LabelOrigin origin={perspective} />
                     <Text size="1" color="gray">
                       {perspective.parties
                         .map((party) => `${PARTY_LABELS[party.party]} ${percent(party.share)}`)
@@ -260,51 +263,27 @@ function TopicContrast({ detail }: { detail: PartyTopicDetail }) {
 }
 
 export function PartiesPage() {
-  const [data, setData] = useState<PartiesResponse | null>(null);
   const [congress, setCongress] = useState<number | undefined>(undefined);
+  const request = useCallback(() => fetchParties(congress), [congress]);
+  const { data, error, loading } = useRead(request);
   const [selected, setSelected] = useState<number | null>(null);
-  const [detail, setDetail] = useState<PartyTopicDetail | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const detailRequest = useCallback(async () =>
+    !data?.congress || selected === null ? null : fetchPartyTopic(data.congress, selected),
+  [data, selected]);
+  const { data: topicResponse, error: detailError, loading: detailLoading } = useRead(detailRequest);
+  const detail = topicResponse?.topic;
 
   useEffect(() => {
-    setData(null);
-    setSelected(null);
-    fetchParties(congress)
-      .then((response) => {
-        setData(response);
-        setSelected(response.parties[0]?.topics[0]?.topic_id ?? null);
-      })
-      .catch((err) => setError((err as Error).message));
-  }, [congress]);
+    setSelected(data?.parties[0]?.topics[0]?.topic_id ?? null);
+  }, [data]);
 
-  useEffect(() => {
-    if (!data?.congress || selected === null) {
-      setDetail(null);
-      return;
-    }
-    fetchPartyTopic(data.congress, selected)
-      .then((response) => setDetail(response.topic))
-      .catch(() => setDetail(null));
-  }, [data?.congress, selected]);
-
-  if (error) {
-    return (
-      <Callout.Root color="red">
-        <Callout.Text>{error}</Callout.Text>
-      </Callout.Root>
-    );
-  }
-  if (!data) return <Text>Loading…</Text>;
-  if (data.congress === null) {
-    return (
-      <Callout.Root>
-        <Callout.Text>No party analysis has been built yet.</Callout.Text>
-      </Callout.Root>
-    );
+  if (!data || data.analysis.state === 'not_built') {
+    return <AnalysisNotice label="Party analysis" analysis={data?.analysis} error={error} loading={loading} />;
   }
 
   return (
     <Flex direction="column" gap="5">
+      <AnalysisNotice label="Party analysis" analysis={data.analysis} />
       <Flex justify="between" align="center" wrap="wrap" gap="3">
         <Heading size="7">Parties</Heading>
         <Select.Root
@@ -335,6 +314,7 @@ export function PartiesPage() {
           />
         ))}
       </Grid>
+      {selected !== null && <AnalysisNotice label="Party contrast" analysis={topicResponse?.analysis} error={detailError} loading={detailLoading} />}
       {detail ? <TopicContrast detail={detail} /> : null}
       <Card size="3">
         <Flex direction="column" gap="3">

@@ -72,7 +72,7 @@ def test_to_document_normalizes_reference_id_and_preserves_raw_when_requested():
     assert "referenceId" in record
 
 
-def test_to_document_copies_ingest_metadata_without_mutating_record():
+def test_to_document_retains_source_markers_without_trusting_unproven_labels():
     record = {"id": "bill:118:hr:1", "title": "Example"}
     ingest_metadata = {
         "hydration_status": "complete",
@@ -81,7 +81,7 @@ def test_to_document_copies_ingest_metadata_without_mutating_record():
 
     document = to_document(record, "bill", ingest_metadata=ingest_metadata)
 
-    assert document["hydration_status"] == "complete"
+    assert document["hydration_status"] == "unknown"
     assert document["hydrated_sources"] == ["govinfo:billstatus", "govinfo:bills"]
     assert "hydration_status" not in record
     assert "hydrated_sources" not in record

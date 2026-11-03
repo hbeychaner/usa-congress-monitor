@@ -79,14 +79,17 @@ def _archive_engine(path: Path) -> Engine:
 class SQLiteRecordArchive:
     """Store one compressed, deduplicated record per resource in SQLite."""
 
-    def __init__(self, root: Path, attempt: int) -> None:
+    def __init__(self, root: Path, attempt: int, *, read_only: bool = False) -> None:
         del attempt
         self.root = root
         self.path = root / "records.sqlite3"
-        self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
-        self.engine = _archive_engine(self.path)
-        _ARCHIVE_METADATA.create_all(self.engine)
+        if read_only:
+            self.engine = create_engine(f"sqlite:///file:{self.path}?mode=ro&uri=true")
+        else:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self.engine = _archive_engine(self.path)
+            _ARCHIVE_METADATA.create_all(self.engine)
 
     @staticmethod
     def _record_id(record: JsonObject) -> str:
@@ -162,13 +165,14 @@ class SQLiteRecordArchive:
                 ).scalars()
             )
 
-    def records(self, resource: str) -> list[JsonObject]:
+    def records(self, resource: str, *, limit: int | None = None) -> list[JsonObject]:
         """Return archived records for *resource* for deterministic replay."""
         with self.engine.connect() as connection:
             payloads = connection.execute(
                 select(_ARCHIVED_RECORDS.c.payload)
                 .where(_ARCHIVED_RECORDS.c.resource == resource)
                 .order_by(_ARCHIVED_RECORDS.c.record_id)
+                .limit(limit)
             ).scalars()
         return [json.loads(zlib.decompress(payload)) for payload in payloads]
 

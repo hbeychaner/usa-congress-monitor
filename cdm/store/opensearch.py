@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import cast
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
@@ -140,10 +139,14 @@ def bulk_upsert(
     *,
     target_index: str | None = None,
     replace: bool = False,
-) -> dict:
-    """Upsert records, or replace complete documents when ``replace`` is true."""
+) -> dict[str, int | bool]:
+    """Write canonical projections or raise with failed item identities/details."""
+    if target_index is not None and (
+        not target_index.strip() or not client.indices.exists(index=target_index)
+    ):
+        raise ValueError(f"Explicit index target does not exist: {target_index!r}")
     documents = list(docs)
-    index = target_index or write_alias(resource)
+    index = write_alias(resource) if target_index is None else target_index
     merge_script = (
         "for (entry in params.doc.entrySet()) {"
         " def key = entry.getKey();"
@@ -171,40 +174,46 @@ def bulk_upsert(
     for doc in documents:
         if not doc.get("id"):
             continue
-        if replace:
-            actions.append({
-                "_op_type": "index",
-                "_index": index,
-                "_id": doc["id"],
-                "_source": doc,
-            })
-        elif resource == "bill":
-            actions.append({
-                "_op_type": "update",
-                "_index": index,
-                "_id": doc["id"],
-                "script": {
-                    "lang": "painless",
-                    "source": merge_script,
-                    "params": {"doc": doc},
-                },
-                "upsert": doc,
-                "scripted_upsert": True,
-                "retry_on_conflict": UPDATE_RETRY_ON_CONFLICT,
-            })
-        elif resource == "bill_text":
+        if resource == "bill_text":
             action = bill_text_parent_action(doc, index)
             if action is not None:
                 actions.append(action)
+        elif replace:
+            actions.append(
+                {
+                    "_op_type": "index",
+                    "_index": index,
+                    "_id": doc["id"],
+                    "_source": doc,
+                }
+            )
+        elif resource == "bill":
+            actions.append(
+                {
+                    "_op_type": "update",
+                    "_index": index,
+                    "_id": doc["id"],
+                    "script": {
+                        "lang": "painless",
+                        "source": merge_script,
+                        "params": {"doc": doc},
+                    },
+                    "upsert": doc,
+                    "scripted_upsert": True,
+                    "retry_on_conflict": UPDATE_RETRY_ON_CONFLICT,
+                }
+            )
         else:
-            actions.append({
-                "_op_type": "update",
-                "_index": index,
-                "_id": doc["id"],
-                "doc": doc,
-                "doc_as_upsert": True,
-                "retry_on_conflict": UPDATE_RETRY_ON_CONFLICT,
-            })
+            actions.append(
+                {
+                    "_op_type": "update",
+                    "_index": index,
+                    "_id": doc["id"],
+                    "doc": doc,
+                    "doc_as_upsert": True,
+                    "retry_on_conflict": UPDATE_RETRY_ON_CONFLICT,
+                }
+            )
     if not actions:
         return {
             "updated": 0,
@@ -213,12 +222,10 @@ def bulk_upsert(
         }
 
     success, errors = bulk(client, actions, raise_on_error=False)
-    errors = cast(list[JsonObject], errors)
-    result = {
+    if errors:
+        raise RuntimeError(f"Bulk indexing failed: {errors}")
+    return {
         "updated": success,
         "errors": bool(errors),
         "skipped_missing_ids": sum(1 for doc in documents if not doc.get("id")),
     }
-    if errors:
-        result["error_details"] = errors[:3]
-    return result

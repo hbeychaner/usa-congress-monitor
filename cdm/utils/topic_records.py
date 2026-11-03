@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from cdm.contracts.labels import LabelProvenance
 
-class TopicSummaryRow(BaseModel):
+
+class TopicSummaryRow(LabelProvenance):
     topic_id: int
     name: str
     size: int

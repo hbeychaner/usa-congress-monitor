@@ -20,6 +20,9 @@ from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine, 
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.exc import DatabaseError
 
+from cdm.config.source_policy import SourcePolicy
+from cdm.ingest.source_contract import BillStatusEvidence
+
 
 class GovInfoHttpSession(Protocol):
     """Minimal HTTP session contract used by discovery and download code."""
@@ -316,6 +319,15 @@ class GovInfoBillStatusParser:
         latest_action = self._latest_action(bill)
         if latest_action:
             record["latest_action"] = latest_action
+        evidence = BillStatusEvidence.from_element(bill, SourcePolicy())
+        if evidence.snapshot is not None:
+            if "latest_action" in evidence.snapshot.complete_fields:
+                record["latest_action"] = latest_action
+            if "policy_area" in evidence.snapshot.complete_fields:
+                record["policy_area"] = policy_area or None
+            record["source_snapshot"] = evidence.snapshot.model_dump(mode="json")
+        else:
+            record["source_snapshot_unavailable_reason"] = evidence.reason
         return record
 
     @staticmethod
@@ -1150,6 +1162,7 @@ class GovInfoDownloader:
             and destination.exists()
             and self._sha256(destination) == previous["sha256"]
         ):
+            self._record_manifest(package, previous)
             return destination
 
         # Rate-limit only actual network fetches; cache hits above return

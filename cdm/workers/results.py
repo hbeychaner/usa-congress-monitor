@@ -8,7 +8,7 @@ from celery.exceptions import MaxRetriesExceededError
 from pydantic import BaseModel, ConfigDict
 
 from cdm.config.app_config import QueueConfig
-from cdm.jobs.store import JobStore
+from cdm.jobs.store import JobStatus, JobStore
 from cdm.workers.failures import FailureClassifier
 
 
@@ -62,7 +62,9 @@ class TaskRetrier:
         if not self._classifier.is_transient(exc):
             self._store.mark_failed(job_id, str(exc))
             raise exc
-        self._store.mark_retrying(job_id, str(exc))
+        retrying = self._store.mark_retrying(job_id, str(exc))
+        if retrying["status"] == JobStatus.CANCELLED:
+            raise exc
         try:
             raise task.retry(
                 exc=exc,

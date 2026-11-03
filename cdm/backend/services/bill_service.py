@@ -4,28 +4,30 @@ from __future__ import annotations
 
 from typing import Any
 
+from elasticsearch import Elasticsearch, NotFoundError
+
+from cdm.backend.errors import EntityNotFoundError
 from cdm.backend.services.bill_vote_index import BillVoteIndex
+from cdm.config.query_reads import QueryReadConfig
 from cdm.contracts.api import BillDetail, BillDetailResponse, BillsResponse, BillSummary
+from cdm.contracts.hydration import HydrationAssessment
+from cdm.store.client import SearchCompletion
 from cdm.store.opensearch import read_alias
 from cdm.utils.lemmatize import try_lemmatize_query
-
-_RELATIONSHIP_FIELDS = (
-    "actions",
-    "amendments",
-    "committees",
-    "cosponsors",
-    "summaries",
-    "titles",
-    "text_versions",
-)
 
 
 class BillService:
     """Bill listing and detail lookups."""
 
-    def __init__(self, client: Any, vote_index: BillVoteIndex) -> None:
+    def __init__(
+        self,
+        client: Elasticsearch,
+        vote_index: BillVoteIndex,
+        reads: QueryReadConfig | None = None,
+    ) -> None:
         self._client = client
         self._vote_index = vote_index
+        self._reads = reads or QueryReadConfig()
 
     def list_recent(
         self,
@@ -39,6 +41,9 @@ class BillService:
         has_votes: bool = False,
     ) -> BillsResponse:
         """Return the most recently updated bills from the legislation read alias."""
+        offset = self._reads.offset(page, limit)
+        if query:
+            self._reads.text(query, "query")
         filters: list[dict[str, Any]] = [{"term": {"source_type": "bill"}}]
         if congress is not None:
             filters.append({"term": {"congress": congress}})
@@ -55,14 +60,20 @@ class BillService:
             search_query["bool"]["must"] = [self._text_query(query.strip())]
         response = self._client.search(
             index=read_alias("bill"),
+            allow_partial_search_results=False,
             body={
-                "from": (page - 1) * limit,
+                "from": offset,
                 "size": limit,
+                "_source": list(self._reads.bill_fields),
                 "track_total_hits": True,
                 "query": search_query,
-                "sort": [{"update_date": {"order": "desc", "missing": "_last"}}],
+                "sort": [
+                    {"update_date": {"order": "desc", "missing": "_last"}},
+                    {"id": "asc"},
+                ],
             },
         )
+        SearchCompletion.model_validate(response.body).require_complete()
         hits = response.get("hits", {})
         total = hits.get("total", 0)
         if isinstance(total, dict):
@@ -75,15 +86,26 @@ class BillService:
         vote_counts = self._vote_index.counts([bill.bill_id for bill in bills])
         for bill in bills:
             bill.vote_count = vote_counts.get(bill.bill_id, 0)
-        return BillsResponse(bills=bills, total=int(total), page=page, limit=limit)
+        return BillsResponse(
+            bills=bills,
+            total=int(total),
+            page=page,
+            limit=limit,
+            max_result_window=self._reads.max_result_window,
+        )
 
     def get(self, bill_id: str) -> BillDetailResponse:
         """Return one bill document from the read alias."""
         normalized_id = bill_id.strip()
-        response = self._client.get(index=read_alias("bill"), id=normalized_id)
+        try:
+            response = self._client.get(index=read_alias("bill"), id=normalized_id)
+        except NotFoundError as exc:
+            if isinstance(exc.body, dict) and exc.body.get("found") is False:
+                raise EntityNotFoundError(f"Bill not found: {normalized_id}") from exc
+            raise
         source: dict[str, Any] = response.get("_source", {})
         if source.get("source_type") != "bill":
-            raise ValueError(f"Bill not found: {normalized_id}")
+            raise EntityNotFoundError(f"Bill not found: {normalized_id}")
 
         policy_area = source.get("policy_area")
         if isinstance(policy_area, dict):
@@ -125,6 +147,7 @@ class BillService:
                 full_text=source.get("full_text"),
                 full_text_version_code=source.get("full_text_version_code"),
                 relationship_counts=self._relationship_counts(source),
+                hydration=HydrationAssessment.from_record(source),
             )
         )
 
@@ -164,7 +187,9 @@ class BillService:
         ]
         lemma_query = try_lemmatize_query(text)
         if lemma_query:
-            should.append({"match": {"title_lemma": {"query": lemma_query, "boost": 2}}})
+            should.append(
+                {"match": {"title_lemma": {"query": lemma_query, "boost": 2}}}
+            )
         return {"bool": {"should": should, "minimum_should_match": 1}}
 
     @staticmethod
@@ -183,10 +208,9 @@ class BillService:
             updated_at=source.get("update_date"),
         )
 
-    @staticmethod
-    def _relationship_counts(source: dict[str, Any]) -> dict[str, int]:
+    def _relationship_counts(self, source: dict[str, Any]) -> dict[str, int]:
         counts: dict[str, int] = {}
-        for field in _RELATIONSHIP_FIELDS:
+        for field in self._reads.bill_relationship_fields:
             value = source.get(field)
             if isinstance(value, dict) and value.get("count") is not None:
                 counts[field] = int(value["count"])

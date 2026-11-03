@@ -1,13 +1,13 @@
-from typing import Any
-
 from cdm.backend.services.topic_service import TopicService
+from cdm.config.topic_analysis import TopicReadConfig
+from cdm.utils.json_types import JsonObject
 
 
 class CentroidTopics(TopicService):
     def __init__(self) -> None:
-        pass
+        self._settings = TopicReadConfig()
 
-    def _search(self, body: dict[str, Any]) -> dict[str, Any] | None:
+    def _search(self, body: JsonObject) -> JsonObject | None:
         topics = [
             (-1, [1.0, 0.0]),
             (1, [1.0, 0.0]),

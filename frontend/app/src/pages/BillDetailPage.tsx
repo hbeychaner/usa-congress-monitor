@@ -1,9 +1,11 @@
-import { Badge, Button, Card, DataList, Flex, Grid, Heading, ScrollArea, Tabs, Text } from '@radix-ui/themes';
-import { useEffect, useState } from 'react';
+import { Badge, Button, Callout, Card, DataList, Flex, Grid, Heading, ScrollArea, Tabs, Text } from '@radix-ui/themes';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { fetchBill, fetchBillVotes, type BillDetailResponse, type BillVotesResponse } from '../api/bills';
-import { fetchBillTopics, type BillTopicsResponse } from '../api/topics';
+import { fetchBillTopics } from '../api/topics';
+import { AnalysisNotice } from '../components/AnalysisNotice';
+import { useRead } from '../hooks/useRead';
 import { VotePartyChart } from '../components/VotePartyChart';
 import { SimilarBillsCard } from '../components/SimilarBillsCard';
 import { ActionTimelineChart, type TimelineAction } from '../components/ActionTimelineChart';
@@ -88,7 +90,8 @@ export function BillDetailPage() {
     const [response, setResponse] = useState<BillDetailResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [votesResponse, setVotesResponse] = useState<BillVotesResponse | null>(null);
-    const [topicsResponse, setTopicsResponse] = useState<BillTopicsResponse | null>(null);
+    const topicRequest = useCallback(() => fetchBillTopics(billId), [billId]);
+    const { data: topicsResponse, error: topicError, loading: topicsLoading } = useRead(topicRequest);
     const [showAllActions, setShowAllActions] = useState(false);
 
     useEffect(() => {
@@ -101,11 +104,6 @@ export function BillDetailPage() {
     useEffect(() => {
         setVotesResponse(null);
         fetchBillVotes(billId).then(setVotesResponse).catch(() => setVotesResponse(null));
-    }, [billId]);
-
-    useEffect(() => {
-        setTopicsResponse(null);
-        fetchBillTopics(billId).then(setTopicsResponse).catch(() => setTopicsResponse(null));
     }, [billId]);
 
     if (error) {
@@ -142,10 +140,19 @@ export function BillDetailPage() {
     return (
         <Flex direction="column" gap="4">
             <Link to="/bills">Back to bills</Link>
+            {bill.hydration?.status !== 'complete' && (
+                <Callout.Root color="amber" role="status" aria-label="Bill hydration">
+                    <Callout.Text>
+                        <strong>{bill.hydration?.status === 'partial' ? 'Partial bill details' : 'Bill detail completeness unknown'}.</strong>{' '}
+                        {bill.hydration?.reason ?? 'The server supplied no hydration assessment.'} Empty sections are not proof that no records exist.
+                    </Callout.Text>
+                </Callout.Root>
+            )}
             <Flex justify="between" align="start" wrap="wrap" gap="3">
                 <Flex direction="column" gap="1" style={{ flex: '1 1 480px' }}>
                     <Text size="1" color="gray">{bill.bill_type ?? 'Bill'} {bill.number ?? ''} · Congress {bill.congress ?? 'Unknown'}</Text>
                     <Heading size="7">{bill.title}</Heading>
+                    <AnalysisNotice label="Bill topics" analysis={topicsResponse?.analysis} error={topicError} loading={topicsLoading} />
                     <Text color="gray">
                         {[
                             bill.origin_chamber ?? 'Chamber not recorded',

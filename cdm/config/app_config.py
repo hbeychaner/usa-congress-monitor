@@ -8,6 +8,9 @@ from pathlib import Path
 from pydantic import BaseModel, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from cdm.config.query_reads import QueryReadConfig
+from cdm.config.topic_analysis import GraphRepairConfig
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_FILES = (REPO_ROOT / ".env", REPO_ROOT / "elastic-start-local" / ".env")
 
@@ -69,6 +72,9 @@ class QueueConfig(_Section):
     celery_index_queue: str = "congress-index"
     # Light periodic upkeep gets its own queue so busy ingest workers cannot starve it.
     celery_maintenance_queue: str = "congress-maintenance"
+    celery_analytics_queue: str = "congress-analytics"
+    celery_analytics_soft_time_limit: int = Field(default=5 * 24 * 3600, gt=0)
+    celery_analytics_time_limit: int = Field(default=5 * 24 * 3600 + 3600, gt=0)
     celery_retry_max: int = 8
     # Few ingest jobs at a time so each finishes instead of all crawling together.
     ingest_max_concurrent_jobs: int = 2
@@ -197,6 +203,7 @@ class PerspectiveConfig(_Section):
 
 
 class ApiConfig(_Section):
+    readiness_timeout_secs: float = Field(default=2.0, gt=0, le=10)
     cors_origins_csv: str = Field(
         default="http://localhost:5183,http://localhost:5173",
         validation_alias="CORS_ORIGINS",
@@ -225,6 +232,8 @@ class AppConfig(BaseModel):
     metasubject: MetasubjectConfig = Field(default_factory=MetasubjectConfig)
     perspective: PerspectiveConfig = Field(default_factory=PerspectiveConfig)
     api: ApiConfig = Field(default_factory=ApiConfig)
+    query_reads: QueryReadConfig = Field(default_factory=QueryReadConfig)
+    graph_repair: GraphRepairConfig = Field(default_factory=GraphRepairConfig)
 
 
 @lru_cache

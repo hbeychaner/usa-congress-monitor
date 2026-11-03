@@ -1,41 +1,27 @@
 import { Badge, Button, Card, Flex, Heading, Select, Table, Text, TextField } from '@radix-ui/themes';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
-import { fetchMembers, type MemberFilters, type MemberSummary } from '../api/members';
+import { fetchMembers } from '../api/members';
+import { PageControls } from '../components/PageControls';
+import { useRead } from '../hooks/useRead';
+import { useQueryForm } from '../hooks/useQueryForm';
+import { memberQuery } from '../shared/queryState';
 
 const PAGE_SIZE = 50;
 
 export function MemberSearchPage() {
-  const [members, setMembers] = useState<MemberSummary[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<MemberFilters>({});
-  const [draft, setDraft] = useState<MemberFilters>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { applied, draft, setDraft, apply, error: urlError, requestKey } = useQueryForm(memberQuery);
+  const request = useCallback(() => fetchMembers(applied.page, PAGE_SIZE, applied), [applied, requestKey]);
+  const { data, error: readError, loading } = useRead(urlError ? null : request);
+  const error = urlError ?? readError;
+  const page = applied.page;
+  const members = data?.members ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    fetchMembers(page, PAGE_SIZE, filters).then((response) => {
-      if (cancelled) return;
-      setMembers(response.members);
-      setTotal(response.total);
-      setError(null);
-    }).catch((err: Error) => {
-      if (!cancelled) setError(err.message);
-    }).finally(() => {
-      if (!cancelled) setLoading(false);
-    });
-    return () => { cancelled = true; };
-  }, [page, filters]);
-
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   function onSubmit(event: FormEvent) {
     event.preventDefault();
-    setPage(1);
-    setFilters({ ...draft });
+    apply({ ...draft, page: 1 });
   }
 
   return (
@@ -46,7 +32,7 @@ export function MemberSearchPage() {
           <Heading size="7">Members</Heading>
           <Text color="gray">Find current and historical members by identity, state, chamber, or party.</Text>
         </Flex>
-        <Badge size="2" variant="soft">{loading ? 'Loading' : `${total.toLocaleString()} records`}</Badge>
+        <Badge size="2" variant="soft">{loading ? 'Loading' : data ? `${total.toLocaleString()} records` : 'Unavailable'}</Badge>
       </Flex>
 
       <Card size="3" asChild>
@@ -82,12 +68,12 @@ export function MemberSearchPage() {
             <label>
               <Text as="div" size="2" mb="1" weight="medium">Party</Text>
               <Select.Root value={draft.party ?? 'all'} onValueChange={(value) => setDraft({ ...draft, party: value === 'all' ? undefined : value })}>
-                <Select.Trigger placeholder="All parties" />
+                <Select.Trigger>{draft.party ?? 'All parties'}</Select.Trigger>
                 <Select.Content>
                   <Select.Item value="all">All parties</Select.Item>
-                  <Select.Item value="Democratic">Democratic</Select.Item>
-                  <Select.Item value="Republican">Republican</Select.Item>
-                  <Select.Item value="Independent">Independent</Select.Item>
+                  {[...new Set(['Democratic', 'Republican', 'Independent', ...(applied.party ? [applied.party] : [])])].map(party => (
+                    <Select.Item key={party} value={party}>{party}</Select.Item>
+                  ))}
                 </Select.Content>
               </Select.Root>
             </label>
@@ -96,7 +82,7 @@ export function MemberSearchPage() {
         </form>
       </Card>
 
-      {error ? <Card size="3"><Text as="p">Unable to load members: {error}</Text></Card> : null}
+      {error ? <Card size="3" role="alert"><Text as="p">Unable to load members: {error.message}</Text></Card> : null}
       {!loading && !error && members.length === 0 ? <Card size="3"><Text as="p">No members match these filters.</Text></Card> : null}
 
       {members.length > 0 ? (
@@ -129,11 +115,7 @@ export function MemberSearchPage() {
         </Table.Root>
       ) : null}
 
-      <Flex justify="center" align="center" gap="3" aria-label="Member pages">
-        <Button variant="soft" disabled={page <= 1 || loading} onClick={() => setPage(page - 1)}>Previous</Button>
-        <Text>Page {page} of {pageCount}</Text>
-        <Button disabled={page >= pageCount || loading} onClick={() => setPage(page + 1)}>Next</Button>
-      </Flex>
+      {!urlError ? <PageControls page={page} bounds={data} loading={loading} onChange={page => apply({ ...applied, page })} /> : null}
     </Flex>
   );
 }

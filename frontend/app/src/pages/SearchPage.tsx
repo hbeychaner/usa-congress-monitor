@@ -1,10 +1,11 @@
 import { Button, Card, Flex, Heading, Select, Text, TextField } from '@radix-ui/themes';
-import { FormEvent, useState } from 'react';
+import { useCallback, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { fetchSearch, type SearchResponse } from '../api/search';
-
-const SEARCH_TYPES = ['member', 'state', 'bill'] as const;
+import { useRead } from '../hooks/useRead';
+import { useQueryForm } from '../hooks/useQueryForm';
+import { searchQuery, SEARCH_TYPES, type SearchKind } from '../shared/queryState';
 
 function resultHref(resultType: string, id: string): string | null {
     if (resultType === 'member') {
@@ -20,12 +21,11 @@ function resultHref(resultType: string, id: string): string | null {
 }
 
 export function SearchPage() {
-    const [query, setQuery] = useState('');
-    const [selectedTypes, setSelectedTypes] = useState<string[]>([...SEARCH_TYPES]);
-    const [limit, setLimit] = useState(20);
-    const [result, setResult] = useState<SearchResponse | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const { applied, draft, setDraft, apply, error: urlError, requestKey } = useQueryForm(searchQuery);
+    const { query, types: selectedTypes, limit } = draft;
+    const request = useCallback(() => fetchSearch(applied), [applied, requestKey]);
+    const { data: result, error: readError, loading } = useRead(!urlError && applied.query ? request : null);
+    const error = urlError ?? readError;
 
     const groupedResults = (result?.results ?? []).reduce<Record<string, SearchResponse['results']>>(
         (acc, item) => {
@@ -36,31 +36,14 @@ export function SearchPage() {
         {}
     );
 
-    function toggleType(type: string) {
-        setSelectedTypes((previous) => {
-            if (previous.includes(type)) {
-                return previous.filter((item) => item !== type);
-            }
-            return [...previous, type];
-        });
+    function toggleType(type: SearchKind) {
+        setDraft(previous => ({ ...previous, types: previous.types.includes(type)
+            ? previous.types.filter(item => item !== type) : [...previous.types, type] }));
     }
 
-    async function onSubmit(event: FormEvent) {
+    function onSubmit(event: FormEvent) {
         event.preventDefault();
-        setLoading(true);
-        setError(null);
-        try {
-            const data = await fetchSearch({
-                query,
-                types: selectedTypes.length > 0 ? selectedTypes : [...SEARCH_TYPES],
-                limit,
-            });
-            setResult(data);
-        } catch (err) {
-            setError((err as Error).message);
-        } finally {
-            setLoading(false);
-        }
+        apply(draft);
     }
 
     return (
@@ -71,9 +54,10 @@ export function SearchPage() {
                 <form onSubmit={onSubmit}>
                     <Flex gap="3" wrap="wrap">
                         <TextField.Root
-                            style={{ flex: 1, minWidth: '240px' }}
+                            style={{ flex: '1 1 15rem', minWidth: 0 }}
                             value={query}
-                            onChange={(event) => setQuery(event.target.value)}
+                            onChange={(event) => setDraft({ ...draft, query: event.target.value })}
+                            aria-label="Search query"
                             placeholder="Search members, states, bills"
                         />
                         <Button type="submit" disabled={!query || loading}>
@@ -91,6 +75,7 @@ export function SearchPage() {
                             key={type}
                             type="button"
                             variant={selectedTypes.includes(type) ? 'solid' : 'soft'}
+                            aria-pressed={selectedTypes.includes(type)}
                             onClick={() => toggleType(type)}
                         >
                             {type}
@@ -98,11 +83,11 @@ export function SearchPage() {
                     ))}
                 </Flex>
                 <label>
-                    <Text as="div" size="2" mb="1" weight="medium">Result limit</Text>
-                    <Select.Root value={String(limit)} onValueChange={(value) => setLimit(Number(value))}>
+                    <Text as="div" size="2" mb="1" weight="medium">Results per type</Text>
+                    <Select.Root value={String(limit)} onValueChange={(value) => setDraft({ ...draft, limit: Number(value) })}>
                         <Select.Trigger />
                         <Select.Content>
-                            {[10, 20, 50].map((option) => (
+                            {[...new Set([10, 20, 50, 100, limit])].sort((a, b) => a - b).map((option) => (
                                 <Select.Item key={option} value={String(option)}>{option}</Select.Item>
                             ))}
                         </Select.Content>
@@ -110,13 +95,13 @@ export function SearchPage() {
                 </label>
             </Card>
 
-            {error ? <Card size="3"><Text as="p">Search failed: {error}</Text></Card> : null}
+            {error ? <Card size="3" role="alert"><Text as="p">Search failed: {error.message}</Text></Card> : null}
             {result ? (
                 <>
                     <Card size="3">
                         <Heading size="4" mb="1">Search Summary</Heading>
                         <Text as="p">
-                            Query: <Text weight="bold">{result.query}</Text> · Types: {result.types.join(', ')} · Limit: {result.limit}
+                            Query: <Text weight="bold">{result.query}</Text> · Types: {result.types.join(', ')} · Results per type: {result.limit}. Groups are not globally ranked.
                         </Text>
                     </Card>
 

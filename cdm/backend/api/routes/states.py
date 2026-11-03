@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Query
 
 from cdm.backend.dependencies import StateServiceDep
-from cdm.contracts.api import StateSummary, StateTimelineResponse
+from cdm.contracts.api import (
+    DistrictFeatureCollection,
+    StateSummary,
+    StateTimelineResponse,
+)
 
 router = APIRouter(prefix="/states", tags=["states"])
 
@@ -21,6 +25,8 @@ def get_timeline(
     return service.get_timeline(state_code, from_congress, to_congress)
 
 
-@router.get("/{state_code}/districts")
-def get_districts(state_code: str, service: StateServiceDep) -> dict:
-    return service.get_districts(state_code)
+@router.get("/{state_code}/districts", response_model=DistrictFeatureCollection)
+def get_districts(
+    state_code: str, service: StateServiceDep
+) -> DistrictFeatureCollection:
+    return DistrictFeatureCollection.model_validate(service.get_districts(state_code))

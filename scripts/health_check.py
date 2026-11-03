@@ -18,7 +18,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from cdm.config import get_config
 from cdm.container import Container
 from cdm.graph.health import GraphHealthChecker, HealthState
-from cdm.jobs.store import JobStore
+from cdm.graph.models import GraphBuildStatus
+from cdm.graph.store import GraphStore
+from cdm.jobs.store import JobKind, JobStore
 from cdm.workers.celery_app import celery_app
 
 
@@ -125,8 +127,11 @@ def _check_celery() -> dict[str, Any]:
 
 
 def _check_member_graph() -> dict[str, Any]:
+    container = Container(get_config())
     report = GraphHealthChecker(
-        Container(get_config()).elastic_client, get_config().elastic.analysis_index
+        GraphStore(container.elastic_client),
+        container.topic_publications,
+        lambda: container.analytics_jobs.status(JobKind.MEMBER_GRAPH, GraphBuildStatus),
     ).check()
     return {**report.model_dump(mode="json"), "status": report.state.value}
 
@@ -141,11 +146,15 @@ def collect_health(window_minutes: int = 15) -> dict[str, Any]:
     }
 
     try:
-        with JobStore(get_config().ledger.job_db_path, repair=False).engine.connect() as connection:
+        with JobStore(
+            get_config().ledger.job_db_path, repair=False
+        ).engine.connect() as connection:
             integrity = connection.execute(text("PRAGMA integrity_check")).scalar_one()
         if integrity != "ok":
             raise RuntimeError(f"SQLite integrity check failed: {integrity}")
-        report["checks"]["jobs"] = _job_snapshot(JobStore(get_config().ledger.job_db_path, repair=False), window_minutes)
+        report["checks"]["jobs"] = _job_snapshot(
+            JobStore(get_config().ledger.job_db_path, repair=False), window_minutes
+        )
     except Exception as exc:  # noqa: BLE001 - report dependency failures without aborting the check.
         report["status"] = "failed"
         report["checks"]["jobs"] = {"status": "failed", "error": str(exc)}

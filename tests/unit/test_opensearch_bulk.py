@@ -1,3 +1,8 @@
+from unittest.mock import Mock
+
+import pytest
+from elasticsearch import Elasticsearch
+
 from cdm.store.opensearch import bulk_upsert
 
 
@@ -11,7 +16,7 @@ def test_bulk_upsert_uses_mapped_write_alias_and_idempotent_actions(monkeypatch)
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
     result = bulk_upsert(
-        object(),
+        Mock(spec=Elasticsearch),
         "bill",
         [{"id": "bill:118:hr:1", "title": "Example"}],
     )
@@ -40,7 +45,7 @@ def test_bulk_upsert_merges_bill_text_onto_parent_bill(monkeypatch):
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
     bulk_upsert(
-        object(),
+        Mock(spec=Elasticsearch),
         "bill_text",
         [
             {
@@ -52,7 +57,12 @@ def test_bulk_upsert_merges_bill_text_onto_parent_bill(monkeypatch):
                 "full_text": "Section 1.",
             },
             # No text: produces no action.
-            {"id": "bill-text:118:hr:2:ih", "congress": 118, "type": "hr", "number": "2"},
+            {
+                "id": "bill-text:118:hr:2:ih",
+                "congress": 118,
+                "type": "hr",
+                "number": "2",
+            },
         ],
     )
 
@@ -76,7 +86,9 @@ def test_bulk_upsert_keeps_non_bill_actions_on_doc_upsert(monkeypatch):
         return 1, []
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
-    bulk_upsert(object(), "member", [{"id": "member:1", "name": "Example"}])
+    bulk_upsert(
+        Mock(spec=Elasticsearch), "member", [{"id": "member:1", "name": "Example"}]
+    )
 
     assert captured["actions"][0]["doc_as_upsert"] is True
     assert captured["actions"][0]["doc"] == {
@@ -94,7 +106,7 @@ def test_bulk_upsert_can_target_staging_index(monkeypatch):
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
     bulk_upsert(
-        object(),
+        Mock(spec=Elasticsearch, indices=Mock()),
         "bill",
         [{"id": "bill:118:hr:1"}],
         target_index="congress-legislation-v7",
@@ -112,7 +124,7 @@ def test_bulk_upsert_can_replace_complete_bill_document(monkeypatch):
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
     bulk_upsert(
-        object(),
+        Mock(spec=Elasticsearch, indices=Mock()),
         "bill",
         [{"id": "bill:118:hr:1", "title": "Complete"}],
         target_index="congress-legislation-v7",
@@ -134,7 +146,7 @@ def test_bulk_upsert_replacement_is_available_for_non_bill_resources(monkeypatch
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
     bulk_upsert(
-        object(),
+        Mock(spec=Elasticsearch),
         "member",
         [{"id": "member:1", "name": "Complete"}],
         replace=True,
@@ -156,7 +168,7 @@ def test_bulk_upsert_reports_missing_ids(monkeypatch):
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
     result = bulk_upsert(
-        object(),
+        Mock(spec=Elasticsearch),
         "amendment",
         [{"title": "missing"}, {"id": "amendment:118:samdt:1"}],
     )
@@ -172,11 +184,73 @@ def test_bulk_upsert_reports_partial_failures(monkeypatch):
 
     monkeypatch.setattr("cdm.store.opensearch.bulk", fake_bulk)
 
-    result = bulk_upsert(object(), "bill", [{"id": "bill:1"}, {"id": "bill:2"}])
+    with pytest.raises(RuntimeError, match="Bulk indexing failed.*400"):
+        bulk_upsert(
+            Mock(spec=Elasticsearch), "bill", [{"id": "bill:1"}, {"id": "bill:2"}]
+        )
 
-    assert result == {
-        "updated": 1,
-        "errors": True,
-        "skipped_missing_ids": 0,
-        "error_details": [{"index": {"status": 400}}],
-    }
+
+def test_bulk_failure_keeps_every_rejected_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    errors = [
+        {"update": {"_index": "staging", "_id": f"bill:{number}", "status": 400}}
+        for number in range(5)
+    ]
+    monkeypatch.setattr("cdm.store.opensearch.bulk", Mock(return_value=(0, errors)))
+    with pytest.raises(RuntimeError) as failure:
+        bulk_upsert(Mock(spec=Elasticsearch), "bill", [{"id": "bill:1"}])
+    assert str(failure.value) == f"Bulk indexing failed: {errors}"
+
+
+class TestCanonicalTextProjection:
+    @pytest.mark.parametrize("target", [None, "congress-legislation-staging"])
+    def test_replace_preserves_the_live_parent_projection(
+        self, monkeypatch: pytest.MonkeyPatch, target: str | None
+    ) -> None:
+        bulk = Mock(return_value=(1, []))
+        monkeypatch.setattr("cdm.store.opensearch.bulk", bulk)
+        client = Mock(spec=Elasticsearch, indices=Mock())
+        client.indices.exists.return_value = True
+        text = {
+            "id": "bill-text:118:hr:1:enr",
+            "congress": 118,
+            "type": "hr",
+            "number": "1",
+            "version_code": "enr",
+            "full_text": "Section 1.",
+            "full_text_lemma": "section 1",
+        }
+
+        bulk_upsert(client, "bill_text", [text], target_index=target)
+        live_actions = bulk.call_args.args[1]
+        bulk_upsert(client, "bill_text", [text], target_index=target, replace=True)
+        replay_actions = bulk.call_args.args[1]
+
+        assert replay_actions == live_actions
+        assert replay_actions[0]["_op_type"] == "update"
+        assert replay_actions[0]["_id"] == "bill:118:hr:1"
+        assert replay_actions[0]["script"]["params"]["full_text_lemma"] == "section 1"
+        assert replay_actions[0]["script"]["params"]["rank"] == 3
+
+    @pytest.mark.parametrize("target", ["congress-legislation-missing", "", "  "])
+    @pytest.mark.parametrize("replace", [False, True])
+    def test_explicit_missing_destination_never_reaches_bulk(
+        self, monkeypatch: pytest.MonkeyPatch, target: str, replace: bool
+    ) -> None:
+        bulk = Mock()
+        monkeypatch.setattr("cdm.store.opensearch.bulk", bulk)
+        client = Mock(spec=Elasticsearch, indices=Mock())
+        client.indices.exists.return_value = False
+
+        with pytest.raises(ValueError, match="Explicit index target"):
+            bulk_upsert(
+                client,
+                "bill",
+                [{"id": "bill:118:hr:1"}],
+                target_index=target,
+                replace=replace,
+            )
+
+        bulk.assert_not_called()
+        client.indices.create.assert_not_called()

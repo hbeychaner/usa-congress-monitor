@@ -1,0 +1,31 @@
+sequenceDiagram
+    title Opening a bill - request path and failure behavior
+    actor Reader
+    participant Page as BillDetailPage
+    participant Client as fetchBill / apiGet
+    participant Route as bills.bill_detail
+    participant DI as BillServiceDep / get_bill_service
+    participant Container as Container.bill_service
+    participant Service as BillService.get
+    participant ES as congress-legislation-read
+    Reader->>Page: Open bill detail route
+    Page->>Client: fetchBill(canonical ID)
+    Client->>Route: GET /api/v1/bills/{bill_id}
+    Route->>DI: Resolve service dependency
+    DI->>Container: Obtain cached service
+    Container-->>DI: Injected BillService
+    DI-->>Route: BillService
+    Route->>Service: get(trimmed ID)
+    Service->>ES: Get exact canonical document
+    alt Bill document found
+        ES-->>Service: Source document
+        Service-->>Route: Typed bill response
+        Route-->>Client: Serialized response
+        Client-->>Page: Bill data
+        Page-->>Reader: Render details and tabs
+    else Missing document or non-bill input
+        ES-->>Service: Missing result or mismatched document
+        Note over Service,Route: Missing-document / ValueError is not explicitly mapped to 404
+        Route-->>Client: Request fails
+        Client-->>Page: Shared HTTP error handling
+    end

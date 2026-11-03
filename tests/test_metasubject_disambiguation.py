@@ -4,6 +4,8 @@ from collections.abc import Sequence
 
 import numpy as np
 
+from cdm.config import OllamaConfig
+from cdm.contracts.labels import LabelResult, LabelSource
 from cdm.utils.metasubject_namer import OllamaNameDisambiguator
 from cdm.utils.metasubjects import (
     LargestTopicNamer,
@@ -13,11 +15,12 @@ from cdm.utils.metasubjects import (
     StableIdMatcher,
     TopicVector,
 )
+from cdm.utils.ollama_client import OllamaClient, OllamaReply
 
 
 class FixedNamer:
-    def name(self, members: Sequence[TopicVector]) -> str:
-        return "Transportation Policy"
+    def name(self, members: Sequence[TopicVector]) -> LabelResult:
+        return LabelResult(label="Transportation Policy", label_source=LabelSource.LLM)
 
 
 class SuffixDisambiguator:
@@ -26,9 +29,15 @@ class SuffixDisambiguator:
 
     def rename(
         self, colliding: Sequence[NamedGroup], taken: set[str]
-    ) -> dict[int, str]:
+    ) -> dict[int, LabelResult]:
         self.calls.append(([g.metasubject_id for g in colliding], taken))
-        return {g.metasubject_id: f"{g.name} {g.metasubject_id}" for g in colliding}
+        return {
+            g.metasubject_id: LabelResult(
+                label=f"{g.name} {g.metasubject_id}",
+                label_source=LabelSource.DETERMINISTIC,
+            )
+            for g in colliding
+        }
 
 
 def _topic(topic_id: int, size: int, vector: list[float]) -> TopicVector:
@@ -83,17 +92,18 @@ def test_without_disambiguator_duplicates_remain() -> None:
     groups = _builder(None).build(_topics())
 
     assert [g.name for g in groups] == ["Transportation Policy"] * 2
-    assert LargestTopicNamer().name(_topics()) == "t0"
+    assert LargestTopicNamer().name(_topics()).label == "t0"
 
 
-class ScriptedOllama:
+class ScriptedOllama(OllamaClient):
     def __init__(self, replies: list[str]) -> None:
+        super().__init__(OllamaConfig())
         self.replies = replies
         self.prompts: list[str] = []
 
-    def chat(self, system: str, user: str) -> str:
+    def chat(self, system: str, user: str) -> OllamaReply:
         self.prompts.append(user)
-        return self.replies.pop(0)
+        return OllamaReply(content=self.replies.pop(0))
 
 
 def _group(metasubject_id: int, labels: list[str]) -> NamedGroup:
@@ -108,23 +118,27 @@ def _group(metasubject_id: int, labels: list[str]) -> NamedGroup:
 
 
 def test_ollama_disambiguator_retries_taken_names_and_shows_other_group() -> None:
-    ollama = ScriptedOllama(["Foreign Policy", "Trade Agreements", "Diplomatic Affairs"])
-    resolver = OllamaNameDisambiguator(ollama)  # type: ignore[arg-type]
+    ollama = ScriptedOllama(
+        ["Foreign Policy", "Trade Agreements", "Diplomatic Affairs"]
+    )
+    resolver = OllamaNameDisambiguator(ollama)
 
     renamed = resolver.rename(
         [_group(1, ["tariffs", "trade deals"]), _group(2, ["embassies"])],
         {"foreign policy"},
     )
 
-    assert renamed[1] == "Trade Agreements"
+    assert renamed[1].label == "Trade Agreements"
+    assert renamed[1].label_source == LabelSource.LLM
     assert "embassies" in ollama.prompts[0] and "tariffs" in ollama.prompts[0]
 
 
 def test_ollama_disambiguator_falls_back_to_largest_topic() -> None:
-    resolver = OllamaNameDisambiguator(ScriptedOllama([""] * 4))  # type: ignore[arg-type]
+    resolver = OllamaNameDisambiguator(ScriptedOllama([""] * 4))
 
     renamed = resolver.rename(
         [_group(1, ["tariffs", "trade deals"]), _group(2, ["embassies"])], set()
     )
 
-    assert renamed[1] == "Foreign Policy: tariffs"
+    assert renamed[1].label == "Foreign Policy: tariffs"
+    assert renamed[1].label_source == LabelSource.DETERMINISTIC

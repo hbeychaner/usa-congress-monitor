@@ -27,7 +27,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.engine import Connection, Engine, RowMapping
 from sqlalchemy.pool import NullPool
-from sqlalchemy.sql import Select
+from sqlalchemy.sql import Select, Update
 
 from cdm.ingest.govinfo import GovInfoPackage
 from cdm.utils.json_types import JsonObject
@@ -43,6 +43,9 @@ class JobKind(StrEnum):
     GOVINFO_BULK = "govinfo_bulk"
     GOVINFO_BULK_BATCH = "govinfo_bulk_batch"
     RECONCILE = "reconcile"
+    TOPIC_TRAINING = "topic_training"
+    MEMBER_GRAPH = "member_graph"
+    PERSPECTIVES = "perspectives"
 
 
 class JobStatus(StrEnum):
@@ -93,6 +96,12 @@ _INGEST_WINDOWS = Table(
     Column("last_progress_at", String),
     Column("completed_at", String),
     Column("last_error", Text),
+)
+_JOB_PROGRESS = Table(
+    "job_progress",
+    _METADATA,
+    Column("job_id", String, primary_key=True),
+    Column("payload", Text, nullable=False),
 )
 
 _JOBS_STATUS_INDEX = "jobs_status_idx"
@@ -250,10 +259,38 @@ class JobStore:
             finally:
                 fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
-    def create(self, kind: str, idempotency_key: str, payload: JsonObject) -> JobRow:
+    def create(
+        self,
+        kind: str,
+        idempotency_key: str,
+        payload: JsonObject,
+        *,
+        reuse_active: bool = False,
+    ) -> JobRow:
         now = _now()
         job_id = idempotency_key
         with self._transaction_lock(), self.engine.begin() as connection:
+            if reuse_active:
+                active = (
+                    connection.execute(
+                        select(_JOBS)
+                        .where(_JOBS.c.kind == kind)
+                        .where(
+                            _JOBS.c.status.in_(
+                                [
+                                    JobStatus.QUEUED.value,
+                                    JobStatus.RUNNING.value,
+                                    JobStatus.RETRYING.value,
+                                ]
+                            )
+                        )
+                        .limit(1)
+                    )
+                    .mappings()
+                    .first()
+                )
+                if active is not None:
+                    return _decode_job(active)
             connection.execute(
                 sqlite_insert(_JOBS)
                 .prefix_with("OR IGNORE")
@@ -272,14 +309,43 @@ class JobStore:
                     connection, job_id, payload, now, JobStatus.QUEUED.value
                 )
             row = (
-                connection
-                .execute(select(_JOBS).where(_JOBS.c.id == job_id))
+                connection.execute(select(_JOBS).where(_JOBS.c.id == job_id))
                 .mappings()
                 .one()
             )
         return _decode_job(row)
 
-    def create_govinfo_bulk_job(self, package: GovInfoPackage, *, outdir: Path | str) -> JobRow:
+    def latest(self, kind: str) -> JobRow | None:
+        rows = self._fetch(
+            select(_JOBS)
+            .where(_JOBS.c.kind == kind)
+            .order_by(_JOBS.c.created_at.desc())
+            .limit(1)
+        )
+        return rows[0] if rows else None
+
+    def progress(self, job_id: str) -> JsonObject:
+        with self.engine.connect() as connection:
+            payload = connection.execute(
+                select(_JOB_PROGRESS.c.payload).where(_JOB_PROGRESS.c.job_id == job_id)
+            ).scalar_one_or_none()
+        return json.loads(payload) if payload is not None else {}
+
+    def report_progress(self, job_id: str, progress: JsonObject) -> None:
+        with self._transaction_lock(), self.engine.begin() as connection:
+            statement = sqlite_insert(_JOB_PROGRESS).values(
+                job_id=job_id, payload=json.dumps(progress)
+            )
+            connection.execute(
+                statement.on_conflict_do_update(
+                    index_elements=[_JOB_PROGRESS.c.job_id],
+                    set_={"payload": statement.excluded.payload},
+                )
+            )
+
+    def create_govinfo_bulk_job(
+        self, package: GovInfoPackage, *, outdir: Path | str
+    ) -> JobRow:
         """Create an idempotent durable job for one GovInfo package."""
         payload = {
             "collection": str(package.collection),
@@ -291,12 +357,14 @@ class JobStore:
             "version_code": package.version_code,
             "outdir": str(outdir),
         }
-        idempotency_key = "govinfo:" + ":".join((
-            payload["collection"],
-            str(payload["congress"]),
-            payload["measure_type"],
-            payload["package_id"],
-        ))
+        idempotency_key = "govinfo:" + ":".join(
+            (
+                payload["collection"],
+                str(payload["congress"]),
+                payload["measure_type"],
+                payload["package_id"],
+            )
+        )
         return self.create(JobKind.GOVINFO_BULK.value, idempotency_key, payload)
 
     @staticmethod
@@ -326,8 +394,7 @@ class JobStore:
     def get(self, job_id: str) -> JobRow:
         with self.engine.connect() as connection:
             row = (
-                connection
-                .execute(select(_JOBS).where(_JOBS.c.id == job_id))
+                connection.execute(select(_JOBS).where(_JOBS.c.id == job_id))
                 .mappings()
                 .first()
             )
@@ -357,11 +424,13 @@ class JobStore:
                 update(_JOBS)
                 .where(
                     (_JOBS.c.id == job_id)
-                    & _JOBS.c.status.in_([
-                        JobStatus.QUEUED.value,
-                        JobStatus.RETRYING.value,
-                        JobStatus.FAILED.value,
-                    ])
+                    & _JOBS.c.status.in_(
+                        [
+                            JobStatus.QUEUED.value,
+                            JobStatus.RETRYING.value,
+                            JobStatus.FAILED.value,
+                        ]
+                    )
                 )
                 .values(
                     status=JobStatus.RUNNING.value,
@@ -369,11 +438,15 @@ class JobStore:
                     started_at=now,
                     updated_at=now,
                     last_error=None,
+                    finished_at=None,
                 )
             )
             if result.rowcount != 1:
                 return None
-            if max_active is not None and self._running_count(connection, job_id) > max_active:
+            if (
+                max_active is not None
+                and self._running_count(connection, job_id) > max_active
+            ):
                 raise JobSlotsBusy(job_id)
             if update_windows:
                 connection.execute(
@@ -446,115 +519,82 @@ class JobStore:
                 )
         return claimed
 
+    def _transition(
+        self, job_id: str, job: Update, windows: Update | None = None
+    ) -> JobRow:
+        with self._transaction_lock(), self.engine.begin() as connection:
+            connection.execute(job.where(_JOBS.c.id == job_id))
+            if windows is not None:
+                connection.execute(windows.where(_INGEST_WINDOWS.c.job_id == job_id))
+        return self.get(job_id)
+
     def mark_succeeded(self, job_id: str) -> JobRow:
         now = _now()
-        with self._transaction_lock(), self.engine.begin() as connection:
-            connection.execute(
-                update(_JOBS)
-                .where(
-                    (_JOBS.c.id == job_id) & (_JOBS.c.status == JobStatus.RUNNING.value)
-                )
-                .values(
-                    status=JobStatus.SUCCEEDED.value,
-                    updated_at=now,
-                    finished_at=now,
-                )
-            )
-            connection.execute(
-                update(_INGEST_WINDOWS)
-                .where(_INGEST_WINDOWS.c.job_id == job_id)
-                # A cancelled window must stay cancelled even if an in-flight
-                # attempt finishes after the cancel was recorded.
-                .where(_INGEST_WINDOWS.c.status != JobStatus.CANCELLED.value)
-                .values(
-                    status=JobStatus.SUCCEEDED.value,
-                    completed_at=now,
-                    last_progress_at=now,
-                )
-            )
-        return self.get(job_id)
+        return self._transition(
+            job_id,
+            update(_JOBS)
+            .where(_JOBS.c.status == JobStatus.RUNNING)
+            .values(status=JobStatus.SUCCEEDED, updated_at=now, finished_at=now),
+            update(_INGEST_WINDOWS)
+            .where(_INGEST_WINDOWS.c.status != JobStatus.CANCELLED)
+            .values(status=JobStatus.SUCCEEDED, completed_at=now, last_progress_at=now),
+        )
 
     def mark_failed(self, job_id: str, error: str) -> JobRow:
         now = _now()
-        with self._transaction_lock(), self.engine.begin() as connection:
-            connection.execute(
-                update(_JOBS)
-                .where(
-                    (_JOBS.c.id == job_id) & (_JOBS.c.status == JobStatus.RUNNING.value)
-                )
-                .values(
-                    status=JobStatus.FAILED.value,
-                    last_error=error,
-                    updated_at=now,
-                )
-            )
-            connection.execute(
-                update(_INGEST_WINDOWS)
-                .where(_INGEST_WINDOWS.c.job_id == job_id)
-                .where(_INGEST_WINDOWS.c.status != JobStatus.CANCELLED.value)
-                .values(
-                    status=JobStatus.FAILED.value,
-                    last_error=error,
-                    last_progress_at=now,
-                )
-            )
-        return self.get(job_id)
+        return self._transition(
+            job_id,
+            update(_JOBS)
+            .where(_JOBS.c.status.in_([JobStatus.RUNNING, JobStatus.RETRYING]))
+            .values(
+                status=JobStatus.FAILED,
+                last_error=error,
+                updated_at=now,
+                finished_at=now,
+            ),
+            update(_INGEST_WINDOWS)
+            .where(_INGEST_WINDOWS.c.status != JobStatus.CANCELLED)
+            .values(status=JobStatus.FAILED, last_error=error, last_progress_at=now),
+        )
 
     def cancel(self, job_id: str, reason: str) -> JobRow:
         """Cancel a queued or running job while preserving an audit reason."""
         now = _now()
-        with self._transaction_lock(), self.engine.begin() as connection:
-            connection.execute(
-                update(_JOBS)
-                .where(_JOBS.c.id == job_id)
-                .where(
-                    _JOBS.c.status.in_([
-                        JobStatus.QUEUED.value,
-                        JobStatus.RUNNING.value,
-                        JobStatus.RETRYING.value,
-                        JobStatus.FAILED.value,
-                    ])
-                )
-                .values(
-                    status=JobStatus.CANCELLED.value,
-                    last_error=reason,
-                    updated_at=now,
-                    finished_at=now,
+        return self._transition(
+            job_id,
+            update(_JOBS)
+            .where(
+                _JOBS.c.status.in_(
+                    [
+                        JobStatus.QUEUED,
+                        JobStatus.RUNNING,
+                        JobStatus.RETRYING,
+                        JobStatus.FAILED,
+                    ]
                 )
             )
-            connection.execute(
-                update(_INGEST_WINDOWS)
-                .where(_INGEST_WINDOWS.c.job_id == job_id)
-                .values(
-                    status=JobStatus.CANCELLED.value,
-                    last_error=reason,
-                    last_progress_at=now,
-                )
-            )
-        return self.get(job_id)
+            .values(
+                status=JobStatus.CANCELLED,
+                last_error=reason,
+                updated_at=now,
+                finished_at=now,
+            ),
+            update(_INGEST_WINDOWS).values(
+                status=JobStatus.CANCELLED, last_error=reason, last_progress_at=now
+            ),
+        )
 
     def mark_retrying(self, job_id: str, error: str) -> JobRow:
         now = _now()
-        with self._transaction_lock(), self.engine.begin() as connection:
-            connection.execute(
-                update(_JOBS)
-                .where(_JOBS.c.id == job_id)
-                .values(
-                    status=JobStatus.RETRYING.value,
-                    last_error=error,
-                    updated_at=now,
-                )
-            )
-            connection.execute(
-                update(_INGEST_WINDOWS)
-                .where(_INGEST_WINDOWS.c.job_id == job_id)
-                .values(
-                    status=JobStatus.RETRYING.value,
-                    last_error=error,
-                    last_progress_at=now,
-                )
-            )
-        return self.get(job_id)
+        return self._transition(
+            job_id,
+            update(_JOBS)
+            .where(_JOBS.c.status != JobStatus.CANCELLED)
+            .values(status=JobStatus.RETRYING, last_error=error, updated_at=now),
+            update(_INGEST_WINDOWS)
+            .where(_INGEST_WINDOWS.c.status != JobStatus.CANCELLED)
+            .values(status=JobStatus.RETRYING, last_error=error, last_progress_at=now),
+        )
 
     def coverage(self, resource: str | None = None) -> list[CoverageRow]:
         statement = select(_INGEST_WINDOWS).order_by(
@@ -570,7 +610,9 @@ class JobStore:
                 for row in connection.execute(statement).mappings()
             ]
 
-    def update_coverage(self, job_id: str, resource: str, **fields: int | str | None) -> None:
+    def update_coverage(
+        self, job_id: str, resource: str, **fields: int | str | None
+    ) -> None:
         allowed = {
             "discovered_count": _INGEST_WINDOWS.c.discovered_count,
             "hydrated_count": _INGEST_WINDOWS.c.hydrated_count,
@@ -602,21 +644,21 @@ class JobStore:
         callers rate-limit redispatch of the same stale job via ``updated_at``.
         """
         now = _now()
-        with self._transaction_lock(), self.engine.begin() as connection:
-            connection.execute(
-                update(_JOBS)
-                .where(
-                    (_JOBS.c.id == job_id)
-                    & _JOBS.c.status.in_([
-                        JobStatus.QUEUED.value,
-                        JobStatus.FAILED.value,
-                        JobStatus.RUNNING.value,
-                        JobStatus.RETRYING.value,
-                    ])
+        return self._transition(
+            job_id,
+            update(_JOBS)
+            .where(
+                _JOBS.c.status.in_(
+                    [
+                        JobStatus.QUEUED,
+                        JobStatus.FAILED,
+                        JobStatus.RUNNING,
+                        JobStatus.RETRYING,
+                    ]
                 )
-                .values(status=JobStatus.QUEUED.value, updated_at=now)
             )
-        return self.get(job_id)
+            .values(status=JobStatus.QUEUED, updated_at=now),
+        )
 
     def prune_terminal_jobs(
         self,
@@ -636,10 +678,12 @@ class JobStore:
             rows = connection.execute(
                 select(_JOBS.c.id, _JOBS.c.kind, _JOBS.c.payload)
                 .where(
-                    _JOBS.c.status.in_([
-                        JobStatus.SUCCEEDED.value,
-                        JobStatus.CANCELLED.value,
-                    ])
+                    _JOBS.c.status.in_(
+                        [
+                            JobStatus.SUCCEEDED.value,
+                            JobStatus.CANCELLED.value,
+                        ]
+                    )
                 )
                 .where(_JOBS.c.updated_at < older_than)
             ).all()
@@ -653,6 +697,9 @@ class JobStore:
                 # SQLite caps bound parameters; delete in chunks.
                 for start in range(0, len(ids), 500):
                     chunk = ids[start : start + 500]
+                    connection.execute(
+                        _JOB_PROGRESS.delete().where(_JOB_PROGRESS.c.job_id.in_(chunk))
+                    )
                     connection.execute(_JOBS.delete().where(_JOBS.c.id.in_(chunk)))
         return pruned
 
@@ -707,11 +754,13 @@ class JobStore:
             select(_JOBS.c.id)
             .where(_JOBS.c.kind == kind)
             .where(
-                _JOBS.c.status.in_([
-                    JobStatus.QUEUED.value,
-                    JobStatus.RUNNING.value,
-                    JobStatus.RETRYING.value,
-                ])
+                _JOBS.c.status.in_(
+                    [
+                        JobStatus.QUEUED.value,
+                        JobStatus.RUNNING.value,
+                        JobStatus.RETRYING.value,
+                    ]
+                )
             )
             .limit(1)
         )
@@ -721,12 +770,14 @@ class JobStore:
     def unfinished(self, kind: str | None = None) -> list[JobRow]:
         """Return jobs that are not in a successful/cancelled terminal state."""
         statement = select(_JOBS).where(
-            _JOBS.c.status.in_([
-                JobStatus.QUEUED.value,
-                JobStatus.RUNNING.value,
-                JobStatus.RETRYING.value,
-                JobStatus.FAILED.value,
-            ])
+            _JOBS.c.status.in_(
+                [
+                    JobStatus.QUEUED.value,
+                    JobStatus.RUNNING.value,
+                    JobStatus.RETRYING.value,
+                    JobStatus.FAILED.value,
+                ]
+            )
         )
         if kind:
             statement = statement.where(_JOBS.c.kind == kind)

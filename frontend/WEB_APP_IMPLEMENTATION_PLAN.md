@@ -1,5 +1,15 @@
 # Congress Tracker Web App Implementation Plan
 
+> **Engineering review, 2026-11-02:** The canonical current roadmap is
+> [Engineering improvement plan](../documentation/IMPLEMENTATION_PLAN.md).
+> Its [crosswalk](../documentation/IMPLEMENTATION_PLAN.md#plan-crosswalk)
+> reconciles these stories/checklists with the actual implementation.
+> This file remains the historical product/scaffold specification, not a
+> completion report or the current task order. In particular, the app uses
+> Radix Themes rather than the original shadcn proposal; topic/discovery,
+> graph and perspective implementations now exist, but do not satisfy every
+> stable-taxonomy/evidence goal automatically.
+
 ## Objective
 Build a scaffolded web application where users can:
 - Browse US states.
@@ -225,8 +235,9 @@ Backend responsibilities:
 - Container stack provides OPENAPI_URL=http://backend:8000/openapi.json so generation works in Docker by default.
 
 ## Visual Guide
-Architecture diagram: [frontend/diagrams/system-architecture.mmd](frontend/diagrams/system-architecture.mmd)
-Navigation diagram: [frontend/diagrams/navigation-flow.mmd](frontend/diagrams/navigation-flow.mmd)
+Architecture diagram: [system-architecture.mmd](diagrams/system-architecture.mmd)
+Navigation diagram: [navigation-flow.mmd](diagrams/navigation-flow.mmd)
+Current routed views and data flow: [visual atlas](../documentation/reference/visuals.md).
 
 ## Proposed Repository Layout
 
@@ -577,6 +588,10 @@ Exit criteria:
   - Mitigation: deterministic baseline first, versioned topic pipeline.
 
 ## Immediate Next Implementation Task
+
+> Superseded for sequencing by the current
+> [delivery waves](../documentation/IMPLEMENTATION_PLAN.md#delivery-sequence-and-migration-safeguards).
+> The original task below is retained as historical context.
 Completed since the last revision (2026-09-15): bill detail now renders the
 full indexed record (action history, cosponsors, summaries, titles, text
 versions, committees, related bills, full text); member profiles show

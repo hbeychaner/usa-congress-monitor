@@ -42,6 +42,8 @@ frontend/app/dist/
 frontend/app/*.tsbuildinfo
 frontend/app/vite.config.d.ts
 frontend/app/vite.config.js
+frontend/app/playwright-report/
+frontend/app/test-results/
 
 # Celery Beat local schedule state
 celerybeat-schedule*
@@ -59,3 +61,6 @@ planning/
 models/
 
 scripts/preview_topic_labels.py
+
+# Generated publication copy; repository documentation remains canonical.
+/documentation/wiki/

@@ -7,31 +7,32 @@ from itertools import batched
 
 from elasticsearch import Elasticsearch, NotFoundError
 from elasticsearch.helpers import scan
+from pydantic import TypeAdapter
 
+from cdm.config.topic_analysis import GraphStoreConfig
 from cdm.graph.models import (
     BillSignature,
     DocumentKind,
     GraphField,
+    GraphIndexDefinition,
+    GraphMapping,
     GraphVersionPointer,
     MemberEdge,
     RollCallVotes,
     Signal,
 )
-from cdm.store.index_manager import IndexManager
+from cdm.store.index_manager import IndexManager, load_definitions
 from cdm.store.opensearch import bulk_upsert, index_name, read_alias
-
-GRAPH_INDEX = "analysis_graph"
-KEEP_VERSIONS = 3
-WRITE_BATCH = 5000
-FIRST_CONGRESS = 113
 
 
 class BillSignatureReader:
     """Streams sponsor/cosponsor ids for bills from the legislation index."""
 
-    def __init__(self, client: Elasticsearch, first_congress: int = FIRST_CONGRESS):
+    def __init__(
+        self, client: Elasticsearch, settings: GraphStoreConfig | None = None
+    ) -> None:
         self.client = client
-        self.first_congress = first_congress
+        self.first_congress = (settings or GraphStoreConfig()).first_congress
 
     def read(self) -> Iterator[BillSignature]:
         fields = [
@@ -40,6 +41,7 @@ class BillSignatureReader:
         hits = scan(
             self.client,
             index=read_alias("bill"),
+            allow_partial_search_results=False,
             query={
                 "query": {
                     "bool": {
@@ -59,49 +61,100 @@ class BillSignatureReader:
 class RollCallReader:
     """Streams yea/nay voter ids for roll calls from the roll call index."""
 
-    def __init__(self, client: Elasticsearch, first_congress: int = FIRST_CONGRESS):
+    def __init__(
+        self,
+        client: Elasticsearch,
+        settings: GraphStoreConfig | None = None,
+        *,
+        index: str | None = None,
+    ) -> None:
         self.client = client
-        self.first_congress = first_congress
+        self.first_congress = (settings or GraphStoreConfig()).first_congress
+        self.index = index or read_alias("rollcall")
 
     def read(self) -> Iterator[RollCallVotes]:
         hits = scan(
             self.client,
-            index=read_alias("rollcall"),
+            index=self.index,
+            allow_partial_search_results=False,
             query={
                 "query": {"range": {"congress": {"gte": self.first_congress}}},
                 "_source": list(RollCallVotes.model_fields),
             },
         )
         for hit in hits:
-            yield RollCallVotes.model_validate(hit["_source"])
+            roll = RollCallVotes.model_validate(hit["_source"])
+            if not any(
+                (roll.yea_ids, roll.nay_ids, roll.present_ids, roll.not_voting_ids)
+            ):
+                raise ValueError(
+                    f"Roll call {hit['_id']} has no linked member positions"
+                )
+            yield roll
 
 
 class GraphStore:
     """Writes edges under a version and flips the per-signal pointer when done."""
 
-    def __init__(self, client: Elasticsearch) -> None:
+    def __init__(
+        self, client: Elasticsearch, settings: GraphStoreConfig | None = None
+    ) -> None:
         self.client = client
-        self.index = index_name(GRAPH_INDEX)
+        self._settings = settings or GraphStoreConfig()
+        self.index = index_name(self._settings.index)
 
     def ensure_index(self) -> None:
-        IndexManager(self.client).create(GRAPH_INDEX)
+        if self.client.indices.exists(index=self.index):
+            self.require_schema()
+            return
+        IndexManager(self.client).create(self._settings.index)
+        self.require_schema()
+
+    def schema_errors(self) -> list[str]:
+        try:
+            response = self.client.indices.get_mapping(index=self.index)
+        except NotFoundError:
+            return [f"{self.index}: missing graph index"]
+        definitions = TypeAdapter(dict[str, GraphIndexDefinition]).validate_python(
+            response.body
+        )
+        if not definitions:
+            raise ValueError(f"No graph mapping returned for {self.index}")
+        expected = GraphMapping.model_validate(
+            load_definitions()["analysis_graph"]["mappings"]
+        )
+        return [
+            f"{index}: {problem}"
+            for index, definition in definitions.items()
+            for problem in expected.differences(definition.mappings)
+        ]
+
+    def require_schema(self) -> None:
+        problems = self.schema_errors()
+        if problems:
+            raise ValueError(
+                f"Incompatible graph index; approved schema migration required: {problems}"
+            )
 
     def write_edges(self, edges: Iterable[MemberEdge]) -> int:
+        self.require_schema()
         written = 0
-        for batch in batched(edges, WRITE_BATCH):
+        for batch in batched(edges, self._settings.write_batch):
             result = bulk_upsert(
                 self.client,
-                GRAPH_INDEX,
+                self._settings.index,
                 (edge.model_dump(mode="json") for edge in batch),
                 replace=True,
+                target_index=self.index,
             )
-            if result.get("errors"):
-                raise RuntimeError(f"graph bulk errors: {result.get('error_details')}")
             written += int(result["updated"])
         return written
 
-    def publish(self, signal: Signal, graph_version: str) -> None:
-        pointer = GraphVersionPointer(signal=signal, graph_version=graph_version)
+    def publish(self, pointer: GraphVersionPointer) -> None:
+        self.require_schema()
+        refreshed = self.client.indices.refresh(index=self.index)
+        if refreshed["_shards"]["failed"]:
+            raise RuntimeError(f"Graph refresh failed: {refreshed['_shards']}")
         self.client.index(
             index=self.index,
             id=pointer.id,
@@ -136,39 +189,3 @@ class GraphStore:
             },
         )
         return int(response["count"])
-
-    def prune(self, signal: Signal) -> list[str]:
-        """Delete edges of all but the newest versions for the signal."""
-        response = self.client.search(
-            index=self.index,
-            size=0,
-            query={
-                "bool": {
-                    "filter": [
-                        {"term": {GraphField.KIND: DocumentKind.EDGE}},
-                        {"term": {GraphField.SIGNAL: signal}},
-                    ]
-                }
-            },
-            aggs={"versions": {"terms": {"field": GraphField.GRAPH_VERSION, "size": 100}}},
-        )
-        versions = sorted(
-            (bucket["key"] for bucket in response["aggregations"]["versions"]["buckets"]),
-            reverse=True,
-        )
-        stale = versions[KEEP_VERSIONS:]
-        if stale:
-            self.client.delete_by_query(
-                index=self.index,
-                query={
-                    "bool": {
-                        "filter": [
-                            {"term": {GraphField.SIGNAL: signal}},
-                            {"terms": {GraphField.GRAPH_VERSION: stale}},
-                        ]
-                    }
-                },
-                conflicts="proceed",
-                wait_for_completion=False,
-            )
-        return stale

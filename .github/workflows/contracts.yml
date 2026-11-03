@@ -1,0 +1,246 @@
+name: API contracts
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:9.3.1
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+          xpack.ml.enabled: "false"
+          http.max_content_length: 8mb
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        ports:
+          - 9200:9200
+        options: >-
+          --cpus=1 --memory=1536m
+          --health-cmd="curl --fail --silent 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s'"
+          --health-interval=5s --health-timeout=10s --health-retries=30
+      repair_source:
+        image: docker.elastic.co/elasticsearch/elasticsearch:9.3.1
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+          xpack.ml.enabled: "false"
+          ES_JAVA_OPTS: -Xms256m -Xmx256m
+        ports:
+          - 9201:9200
+        options: >-
+          --cpus=1 --memory=1024m
+          --health-cmd="curl --fail --silent 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s'"
+          --health-interval=5s --health-timeout=10s --health-retries=30
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --cpus=0.5 --memory=192m
+          --health-cmd="redis-cli ping"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/app/package-lock.json
+      - run: uv sync --frozen
+      - run: npm ci
+        working-directory: frontend/app
+      - run: npm run audit
+        working-directory: frontend/app
+      - run: npm run contracts:check
+        working-directory: frontend/app
+      - name: Lint pipeline acceptance
+        run: >-
+          uvx ruff==0.17.3 check
+          tests/integration/test_pipeline_failures.py
+          tests/integration/test_release_images.py
+          tests/unit/test_deployment.py
+          tests/unit/test_job_lifecycle.py
+          tests/unit/test_read_boundary.py
+          tests/test_config_container.py
+          tests/unit/test_topic_training_job.py
+          tests/unit/test_analytics_jobs.py
+          cdm/container.py
+          cdm/workers/runtime.py
+          scripts/set_metasubject_override.py
+          cdm/jobs/store.py
+          cdm/store/opensearch.py
+          cdm/store/batch_indexing.py
+          cdm/workers/index_runner.py
+          cdm/graph/store.py
+          cdm/graph/repair.py
+          cdm/graph/live_repair.py
+          cdm/graph/promotion.py
+          cdm/graph/job.py
+          cdm/config/topic_analysis.py
+          cdm/config/app_config.py
+          scripts/stage_graph_repair.py
+          scripts/repair_graph_sources.py
+          scripts/promote_voting_graph.py
+          tools/build_documentation.py
+          tests/unit/test_documentation.py
+          tests/unit/test_graph_repair.py
+          tests/integration/test_graph_repair_integration.py
+          cdm/graph/models.py
+          cdm/graph/health.py
+          cdm/graph/topics.py
+          cdm/backend/services/graph_service.py
+          cdm/ingest/voteview.py
+          cdm/ingest/reconciliation.py
+          cdm/config/source_policy.py
+          cdm/contracts/hydration.py
+          cdm/models/bills.py
+          cdm/ingest/runner.py
+          cdm/backend/services/bill_service.py
+          cdm/contracts/api.py
+          cdm/ingest/source_contract.py
+          cdm/ingest/archive.py
+          cdm/ingest/govinfo.py
+          cdm/store/indexer.py
+          cdm/workers/govinfo_runner.py
+          scripts/reconcile_govinfo_bulk.py
+          tests/unit/test_source_contract.py
+          tests/unit/test_hydration_contract.py
+          tests/unit/test_graph_lineage.py
+          tests/test_voteview.py
+          tests/test_graph_health.py
+          tests/test_neighborhood_service.py
+          tests/integration/test_indexing_projection.py
+          tests/unit/test_index_runner.py
+          tests/unit/test_opensearch_bulk.py
+          tests/unit/test_reconciliation.py
+          tests/integration/test_graph_publication_integration.py
+          tools/release_smoke_probe.py
+      - name: Check contracts and durable recovery
+        run: >-
+          uv run pytest -q
+          tests/unit/test_api_contracts.py
+          tests/unit/test_http_errors.py
+          tests/unit/test_analytics_availability.py
+          tests/unit/test_label_provenance.py
+          tests/unit/test_query_reads.py
+          tests/unit/test_member_activity.py
+          tests/test_vote_service.py
+          tests/unit/test_analytics_jobs.py
+          tests/unit/test_index_runner.py
+          tests/unit/test_opensearch_bulk.py
+          tests/unit/test_archive.py
+          tests/unit/test_reconciliation.py
+          tests/unit/test_source_contract.py
+          tests/unit/test_hydration_contract.py
+          tests/unit/test_mapping_validation.py
+          tests/unit/test_graph_lineage.py
+          tests/unit/test_graph_repair.py
+          tests/test_voteview.py
+          tests/test_graph_health.py
+          tests/test_collaboration_graph.py
+          tests/test_voting_graph.py
+          tests/test_topic_graph.py
+          tests/test_neighborhood_service.py
+          tests/unit/test_bills_relatedbills.py
+          tests/unit/test_bill_ingest.py
+          tests/unit/test_bill_legacy_recovery.py
+          tests/unit/test_bill_response_models.py
+          tests/unit/test_indexer.py
+          tests/unit/test_govinfo.py
+          tests/unit/test_worker_retry.py
+          tests/unit/test_job_store_batching.py
+          tests/unit/test_job_store.py
+          tests/unit/test_job_lifecycle.py
+          tests/unit/test_job_heartbeat.py
+          tests/unit/test_worker_tasks.py
+          tests/unit/test_documentation.py
+          tests/unit/test_deployment.py
+          tests/unit/test_read_boundary.py
+          tests/test_config_container.py
+          tests/unit/test_topic_training_job.py
+          tests/test_related_topics.py
+          tests/test_related_metasubjects.py
+          tests/test_topic_terms.py
+          -W error::UserWarning
+      - name: Check isolated pipeline and publication failures
+        env:
+          RUN_INTEGRATION_TESTS: "1"
+          PIPELINE_TEST_SEARCH_URL: http://127.0.0.1:9200
+          PIPELINE_TEST_REDIS_URL: redis://127.0.0.1:6379/0
+          INDEXING_TEST_URL: http://127.0.0.1:9200
+          TOPIC_PUBLICATION_TEST_URL: http://127.0.0.1:9200
+          GRAPH_PUBLICATION_TEST_URL: http://127.0.0.1:9200
+          GRAPH_REPAIR_SOURCE_TEST_URL: http://127.0.0.1:9201
+          GRAPH_REPAIR_STAGING_TEST_URL: http://127.0.0.1:9200
+          PERSPECTIVE_PUBLICATION_TEST_URL: http://127.0.0.1:9200
+          PERSPECTIVE_PUBLICATION_TEST_MAX_BYTES: "8388608"
+          QUERY_READS_TEST_URL: http://127.0.0.1:9200
+        run: >-
+          uv run pytest -q
+          tests/integration/test_pipeline_failures.py
+          tests/integration/test_indexing_projection.py
+          tests/integration/test_topic_publication_integration.py
+          tests/integration/test_graph_publication_integration.py
+          tests/integration/test_graph_repair_integration.py
+          tests/integration/test_perspective_publication_integration.py
+          tests/integration/test_query_reads_integration.py
+          -W error::UserWarning
+      - run: npm test
+        working-directory: frontend/app
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend/app
+      - run: npm run test:browser
+        working-directory: frontend/app
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failures
+          path: |
+            frontend/app/playwright-report/
+            frontend/app/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  release-smoke:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - name: Install only the release test driver
+        run: uv sync --frozen --only-group release
+      - name: Build production images locally
+        run: |
+          docker build --target api -f Dockerfile.prod -t congress-release-backend:smoke .
+          docker build -f Dockerfile.prod -t congress-release-worker:smoke .
+          docker build -f frontend/app/Dockerfile.prod -t congress-release-frontend:smoke frontend/app
+          docker pull rabbitmq:3.13-alpine
+          docker image inspect congress-release-backend:smoke congress-release-worker:smoke congress-release-frontend:smoke --format '{{.RepoTags}} size={{.Size}} architecture={{.Architecture}}'
+      - name: Check isolated image startup and broker delivery
+        env:
+          RUN_INTEGRATION_TESTS: "1"
+          RELEASE_TEST_BACKEND_IMAGE: congress-release-backend:smoke
+          RELEASE_TEST_WORKER_IMAGE: congress-release-worker:smoke
+          RELEASE_TEST_FRONTEND_IMAGE: congress-release-frontend:smoke
+        run: >-
+          uv run --frozen --only-group release python -m pytest -q
+          tests/integration/test_release_images.py
+          -W error::UserWarning

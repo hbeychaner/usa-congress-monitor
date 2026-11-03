@@ -5,6 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { fetchNeighborhood, fetchTopicNeighborhood, type CenterKind, type Neighborhood, type PartyGroup } from '../api/graph';
 import { fetchMembers, type MemberSummary } from '../api/members';
 import { TopicCenterPicker } from '../components/TopicCenterPicker';
+import { AnalysisNotice } from '../components/AnalysisNotice';
 import { MemberGraphView, METASUBJECT_PREFIX, PARTY_COLORS, SUBJECT_PREFIX, TOPIC_PREFIX, type ColorMode } from '../components/MemberGraphView';
 
 const MAX_SEEDS = 5;
@@ -60,6 +61,9 @@ export function MemberGraphPage() {
     }
     let cancelled = false;
     setLoading(true);
+    setData(null);
+    setError(null);
+    setSelectedId(null);
     const request = topicMode && centerKey
       ? fetchTopicNeighborhood({ kind: centerKind, key: centerKey, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit })
       : fetchNeighborhood({ members: seeds, collaborationWeight, votingWeight, topicWeight, congress, chamber, parties, limit, includeTopics: showTopics, includeSubjects: showSubjects, includeMetasubjects: showMetasubjects });
@@ -281,12 +285,18 @@ export function MemberGraphPage() {
 
       <Flex gap="4" wrap="wrap" align="start">
         <Card size="2" style={{ flex: '1 1 600px', minWidth: 0 }}>
+          {data && Object.entries(data.analysis).map(([signal, analysis]) => (
+            <AnalysisNotice key={signal} label={`${signal} graph`} analysis={analysis} />
+          ))}
+          <AnalysisNotice label="Topic analysis" analysis={data?.topic_analysis} />
           {(topicMode ? !centerKey : !seeds.length) ? (
             <Text color="gray">{topicMode ? 'Pick a metasubject, topic or subject to see who works on it.' : 'Search for a member to start exploring their network.'}</Text>
           ) : data && data.nodes?.length ? (
             <MemberGraphView data={data} selectedId={selectedId} colorMode={colorMode} onSelect={setSelectedId} />
           ) : (
-            <Text color="gray">{loading ? 'Loading graph...' : 'No connections match these filters.'}</Text>
+            loading ? <Text color="gray">Loading graph...</Text>
+              : !error && data && !Object.keys(data.analysis).length && !data.topic_analysis
+                ? <Text color="gray">No connections match these filters.</Text> : null
           )}
         </Card>
         {selected ? (

@@ -1,63 +1,38 @@
-flowchart TB
-    %% Core indexed data models, join keys, and unique identifiers.
+---
+title: Logical record identities and query joins
+config:
+  flowchart:
+    curve: linear
+    nodeSpacing: 65
+    rankSpacing: 100
+---
+flowchart LR
+    bill["Legislation<br/>bill:congress:type:number<br/>Bill sources converge; parent holds full text"]
+    member["Member<br/>member:bioguide_id<br/>Relationships use bare Bioguide IDs"]
+    amendment["Amendment<br/>amendment:congress:type:number<br/>Bill components retained; flattened ID not guaranteed"]
+    house["Congress.gov House vote<br/>house-rollcall-vote:congress:session:roll<br/>Fallback identifier-based ID"]
+    rollcall["Voteview rollcall<br/>rollcall:congress:chamber:roll_number<br/>Position arrays contain bare Bioguide IDs"]
+    assignment["Bill assignment<br/>assignment:model_version:doc_id"]
+    topic["Topic<br/>topic:model_version:topic_id"]
+    meta["Metasubject<br/>metasubject:model_version:metasubject_id"]
+    perspective["Party-topic analysis<br/>party_topic:model_version:congress:topic_id"]
+    edge["Graph edge<br/>edge:graph_version:signal:member:neighbor<br/>Signal pointer chooses active graph version"]
+    committee["Committee<br/>system_code identity<br/>Bill documents contain nested committee references"]
 
-    subgraph ref["Reference Anchors"]
-        CR["**congress_ref**<br/>id: congress:{N}"]
-        MEM["**member**<br/>id: member:{bioguide_id}"]
-    end
+    amendment -->|"Amended bill congress / type / number"| bill
+    house -->|"Congress + upper-case legislation type + number"| bill
+    rollcall -->|"legislation_id when resolved"| bill
+    bill -->|"Sponsor / cosponsor Bioguide arrays"| member
+    rollcall -->|"Yea / nay / present / absent arrays"| member
+    assignment -->|"doc_id"| bill
+    assignment -->|"Model version + topic_id"| topic
+    assignment -->|"Model version + metasubject_id"| meta
+    meta -->|"topic_ids within the same model"| topic
+    perspective -->|"Model version + topic_id"| topic
+    edge -->|"Bare member and neighbor IDs"| member
+    bill -->|"Nested committees.system_code"| committee
 
-    subgraph leg["Legislative"]
-        LEG["**legislation**<br/>id: bill:{congress}:{type}:{number}<br/>carries full_text inline<br/>(version-ranked from GovInfo BILLS or API)"]
-        AMD["**amendment**<br/>id: amendment:{congress}:{type}:{number}"]
-        HV["**house_vote**<br/>id: house-rollcall-vote:{congress}:{session}:{roll}"]
-        CREC["**congressional_record**<br/>record_subtype: bound|daily"]
-    end
-
-    subgraph com["Committee"]
-        COM["**committee**<br/>id: committee:{chamber}:{system_code}"]
-        CMTG["**committee_meeting**"]
-        CPRT["**committee_print**"]
-        CRPT["**committee_report**"]
-        HRG["**hearing**"]
-    end
-
-    subgraph exec["Executive / Other"]
-        NOM["**nomination**"]
-        TRE["**treaty**"]
-        COMM["**communication**<br/>chamber: House|Senate"]
-        HREQ["**house_requirement**"]
-    end
-
-    %% ── congress → congress_ref (shared by almost everything) ──────────────
-    LEG  -->|"congress (int)"| CR
-    AMD  -->|"congress (int)"| CR
-    HV   -->|"congress (int)"| CR
-    CREC -->|"congress (int)"| CR
-    COM  -->|"congress (int)"| CR
-    CMTG -->|"congress (int)"| CR
-    CPRT -->|"congress (int)"| CR
-    CRPT -->|"congress (int)"| CR
-    HRG  -->|"congress (int)"| CR
-    NOM  -->|"congress (int)"| CR
-    TRE  -->|"congress_received (int)"| CR
-    COMM -->|"congress (int)"| CR
-
-    %% ── legislation is the hub ──────────────────────────────────────────────
-    AMD  -->|"amended_bill_id = legislation.id"| LEG
-    HV   -->|"legislation_id = legislation.id"| LEG
-    CRPT -.->|"bill ref (item-level only)"| LEG
-
-    %% ── member links ────────────────────────────────────────────────────────
-    AMD  -->|"sponsor_bioguide_id = member.bioguide_id"| MEM
-    LEG  -->|"sponsor/cosponsor_bioguide_ids"| MEM
-    NOM  -.->|"nominees (item-level only)"| MEM
-
-    %% ── committee is a second hub ───────────────────────────────────────────
-    COM  -->|"parent_system_code → system_code (self-join)"| COM
-    CMTG -.->|"system_code (item-level only)"| COM
-    CPRT -.->|"system_code (item-level only)"| COM
-    CRPT -.->|"system_code (item-level only)"| COM
-    HRG  -.->|"system_code (item-level only)"| COM
-
-    %% ── amendment voted on ──────────────────────────────────────────────────
-    HV   -->|"amendment_type + amendment_number"| AMD
+    classDef entity fill:#e4f0fb,stroke:#1168bd,color:#172b4d
+    classDef derived fill:#eef6e8,stroke:#548235,color:#203615
+    class bill,member,amendment,house,rollcall,committee entity
+    class assignment,topic,meta,perspective,edge derived

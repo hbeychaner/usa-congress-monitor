@@ -3,24 +3,22 @@
 
 .PHONY: up down restart stack-status env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-maintenance worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
 
-# Detect docker compose command at make-parse time (prefer `docker compose`)
-DOCKER_COMPOSE_CMD_DETECTED := $(if $(shell docker compose version >/dev/null 2>&1 && echo ok),docker compose,$(if $(shell command -v docker-compose >/dev/null 2>&1 && echo ok),docker-compose,))
+COMPOSE := docker compose
+STACK_PROFILES ?= operations
+export COMPOSE_PROFILES = $(STACK_PROFILES)
 
-# Everything: containers, Celery agents, API, frontend (see scripts/stack.sh).
-up:
-	@sh scripts/stack.sh up
+# Compose owns all managed application processes.
+up start services: stack-up
 
-down:
-	@sh scripts/stack.sh down
+down stop: stack-down
 
 restart:
-	@sh scripts/stack.sh restart
+	@$(MAKE) stack-down
+	@$(MAKE) stack-up
 
-stack-status:
-	@sh scripts/stack.sh status
-
-# Start the local OpenSearch stack (uses elastic-start-local/docker-compose.yml)
-start: services
+stack-status: require-docker
+	@cd elastic-start-local && $(COMPOSE) ps
+	@$(COMPOSE) -f docker-compose.fullstack.yml ps
 
 env-init:
 	@uv run python scripts/bootstrap_env.py init
@@ -32,20 +30,8 @@ es-api-key:
 local: env-init
 	@echo "Starting local OpenSearch stack..."
 	@$(MAKE) ensure-docker
-	@cd elastic-start-local && . ../.make_docker_env && eval "$$DOCKER_COMPOSE_CMD up -d --remove-orphans"
+	@cd elastic-start-local && $(COMPOSE) up -d --wait --wait-timeout 180 --remove-orphans
 	@echo "OpenSearch stack started."
-
-services: local
-	@echo "Starting Celery workers and 24-hour coverage scheduler..."
-	@if [ "$$(uname)" = "Darwin" ]; then \
-		$(MAKE) ingest-service-install; \
-	else \
-		mkdir -p logs; nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=ingest@%h --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest >> logs/worker-ingest.log 2>&1 & \
-		nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=index@%h --pool=prefork --concurrency=4 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index >> logs/worker-index.log 2>&1 & \
-		nohup uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=maintenance@%h --pool=prefork --concurrency=1 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-maintenance >> logs/worker-maintenance.log 2>&1 & \
-		nohup uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO >> logs/beat.log 2>&1 & \
-		echo "Worker and beat started; logs are in logs/worker-ingest.log, logs/worker-index.log, and logs/beat.log."; \
-	fi
 
 status:
 	@uv run python scripts/job_status.py
@@ -53,48 +39,44 @@ status:
 health-check:
 	@uv run python scripts/health_check.py
 
-local-down:
+local-down: require-docker
 	@echo "Stopping local OpenSearch stack..."
-	@cd elastic-start-local && . ../.make_docker_env && eval "$$DOCKER_COMPOSE_CMD down --volumes --remove-orphans"
+	@cd elastic-start-local && $(COMPOSE) down --volumes --remove-orphans
 	@echo "OpenSearch stack stopped."
 
-local-stop:
+local-stop: require-docker
 	@echo "Stopping local OpenSearch containers (volumes preserved)..."
-	@cd elastic-start-local && . ../.make_docker_env && eval "$$DOCKER_COMPOSE_CMD stop"
+	@cd elastic-start-local && $(COMPOSE) stop
 	@echo "OpenSearch containers stopped; volumes preserved."
 
-stop: local-stop
-
 stack-up:
-	@echo "Starting full container stack (infra + backend + worker + beat + frontend)..."
-	@$(MAKE) ensure-docker
+	@sh scripts/stack.sh check
+	@echo "Starting Compose stack with profiles: $(STACK_PROFILES)"
 	@$(MAKE) local
-	@. .make_docker_env && eval "$$DOCKER_COMPOSE_CMD -f docker-compose.fullstack.yml up -d --build --remove-orphans"
+	@$(COMPOSE) -f docker-compose.fullstack.yml up -d --build --wait --wait-timeout 180 --renew-anon-volumes --remove-orphans
 	@echo "Full stack started: frontend=http://localhost:5173 backend=http://localhost:8000"
 
-stack-down:
+stack-down: require-docker
 	@echo "Stopping full container stack..."
-	@$(MAKE) ensure-docker
-	@. .make_docker_env && eval "$$DOCKER_COMPOSE_CMD -f docker-compose.fullstack.yml down --remove-orphans"
+	@$(COMPOSE) -f docker-compose.fullstack.yml down --remove-orphans
 	@$(MAKE) local-stop
 	@echo "Full stack stopped."
 
-stack-logs:
-	@$(MAKE) ensure-docker
-	@. .make_docker_env && eval "$$DOCKER_COMPOSE_CMD -f docker-compose.fullstack.yml logs -f --tail=200"
+stack-logs: require-docker
+	@$(COMPOSE) -f docker-compose.fullstack.yml logs -f --tail=200
 
 contracts-sync:
-	@$(MAKE) ensure-docker
-	@. .make_docker_env && eval "$$DOCKER_COMPOSE_CMD -f docker-compose.fullstack.yml exec -T frontend sh -lc 'OPENAPI_URL=http://backend:8000/openapi.json npm run contracts:generate'"
+	npm --prefix frontend/app run contracts:generate
 
 
-.PHONY: ensure-docker
-ensure-docker:
-	# detect compose command at parse time and write to .make_docker_env
-	@if [ -z "$(DOCKER_COMPOSE_CMD_DETECTED)" ]; then \
-		echo "No docker compose command detected; please install Docker or docker-compose."; rm -f .make_docker_env; exit 1; \
-	fi; \
-	# Quick check if Docker daemon is responsive; try to start Docker on macOS
+.PHONY: ensure-docker check-compose require-docker
+check-compose:
+	@docker compose version >/dev/null 2>&1 || (echo "Docker Compose v2 is required."; exit 1)
+
+require-docker: check-compose
+	@docker info >/dev/null 2>&1 || (echo "Docker is not running."; exit 1)
+
+ensure-docker: check-compose
 	@if ! docker info >/dev/null 2>&1; then \
 		if [ "$$(uname)" = "Darwin" ]; then \
 			echo "Docker daemon not running. Attempting to start Docker Desktop..."; \
@@ -106,9 +88,7 @@ ensure-docker:
 		else \
 			echo "Docker daemon not running; please start Docker."; exit 1; \
 		fi; \
-	fi; \
-	echo "Using compose command: $(DOCKER_COMPOSE_CMD_DETECTED)"
-	echo "DOCKER_COMPOSE_CMD='$(DOCKER_COMPOSE_CMD_DETECTED)'" > .make_docker_env
+	fi
 
 
 # Install dependencies via pip as a fallback
@@ -151,14 +131,9 @@ worker-monitor:
 beat:
 	uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO
 
-ingest-service-install:
-	@sh scripts/ingest_launch_agent.sh install
-
-ingest-service-uninstall:
-	@sh scripts/ingest_launch_agent.sh uninstall
-
-ingest-service-status:
-	@sh scripts/ingest_launch_agent.sh status
+ingest-service-install ingest-service-uninstall ingest-service-status:
+	@printf 'Native agents are retired. See documentation/OPERATIONS_RUNBOOK.md for migration; use make up and make stack-status afterward.\n' >&2
+	@exit 1
 
 backend-api:
 	uv run uvicorn cdm.backend.app:app --host 0.0.0.0 --port 8000 --reload
@@ -168,9 +143,9 @@ frontend-dev:
 
 help:
 	@printf "Available targets:\n"
-	@printf "  start       - Start the local OpenSearch stack\n"
-	@printf "  stop        - Stop local containers and preserve Docker volumes\n"
-	@printf "  local       - Start local OpenSearch stack via docker-compose\n"
+	@printf "  up/start/services - Start the controlled Compose stack (STACK_PROFILES=operations)\n"
+	@printf "  down/stop   - Stop the Compose stack and preserve Docker volumes\n"
+	@printf "  local       - Start local infrastructure via Docker Compose v2\n"
 	@printf "  local-stop  - Stop containers while preserving Docker volumes\n"
 	@printf "  local-down  - Stop containers and remove Docker volumes\n"
 	@printf "  deps        - Install dependencies via pip (legacy)\n"
@@ -179,10 +154,6 @@ help:
 	@printf "  worker      - Start Celery worker and auto-open aggregate ingest monitor (MONITOR=0 disables)\n"
 	@printf "  worker-monitor - Run aggregate ingest progress monitor\n"
 	@printf "  beat        - Start the daily Celery scheduler\n"
-	@printf "  ingest-service-install - Install auto-restarting macOS ingest, index, and beat agents\n"
-	@printf "  ingest-service-uninstall - Remove the macOS Celery launch agents\n"
-	@printf "  ingest-service-status - Show macOS Celery launch agent status\n"
-	@printf "  services    - Start OpenSearch, Redis, RabbitMQ, worker, and beat\n"
 	@printf "  status      - Show durable job states and ingest coverage\n"
 	@printf "  health-check- Check SQLite, Celery, Redis, OpenSearch, backlog, and failures\n"
 	@printf "  backend-api - Start FastAPI backend (reload)\n"

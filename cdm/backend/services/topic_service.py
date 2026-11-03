@@ -1,8 +1,7 @@
 """Read topic-model output from the analysis index for API responses.
 
-All queries target the latest ``model_version`` in the analysis index (written by
-``scripts/train_topic_model.py``). Every method degrades to an empty response when
-the index or a trained model does not exist yet.
+Each response pins one published model. No publication is distinct from an empty
+result; failed reads of published analysis propagate to the HTTP error boundary.
 """
 
 from __future__ import annotations
@@ -11,9 +10,12 @@ from collections import Counter, defaultdict
 from typing import Any
 
 import numpy as np
-from elasticsearch import Elasticsearch, NotFoundError
+from elasticsearch import Elasticsearch
 
+from cdm.backend.errors import AnalysisNotBuiltError
 from cdm.backend.services.subject_service import SubjectService
+from cdm.config.topic_analysis import TopicId, TopicKind, TopicReadConfig
+from cdm.contracts.analysis import AnalysisState, AnalysisStatus
 from cdm.contracts.api import (
     BillTopicsResponse,
     MemberTopicsResponse,
@@ -35,30 +37,11 @@ from cdm.contracts.api import (
     TopicTrendSeries,
     TopicTrendsResponse,
 )
+from cdm.contracts.labels import LabelProvenance
+from cdm.store.client import IncompleteSearchError, SearchCompletion
 from cdm.store.opensearch import read_alias
-from cdm.utils.topic_terms import dedupe_terms, keyword_label
-
-_OUTLIER_TOPIC_ID = -1
-_TERMS_CHUNK = 1024
-_METASUBJECT_KIND = "metasubject"
-_METASUBJECT_TREND_KIND = "metasubject_over_time"
-_METASUBJECT_LIMIT = 100
-_METASUBJECT_TREND_LIMIT = 10000
-_RELATED_METASUBJECT_LIMIT = 5
-_RELATED_TOPIC_LIMIT = 10
-_TOPIC_LIMIT = 10000
-
-
-def topic_label(name: str | None, topic_id: int) -> str:
-    """Human-friendly label from a BERTopic name like ``5_health_care``."""
-    if topic_id == _OUTLIER_TOPIC_ID:
-        return "Uncategorized"
-    if name:
-        _, _, words = name.partition("_")
-        if words:
-            return words.replace("_", " ")
-        return name
-    return f"Topic {topic_id}"
+from cdm.store.topic_publication import TopicPublicationStore
+from cdm.utils.topic_terms import dedupe_terms, keyword_label, topic_label
 
 
 def _quarter(date: str) -> str:
@@ -69,26 +52,24 @@ def _quarter(date: str) -> str:
 
 class TopicService:
     def __init__(
-        self, client: Elasticsearch, analysis_index: str, subjects: SubjectService
+        self,
+        client: Elasticsearch,
+        analysis_index: str,
+        subjects: SubjectService,
+        publications: TopicPublicationStore | None = None,
+        read_config: TopicReadConfig | None = None,
     ) -> None:
         self._client = client
         self._index = analysis_index
         self._subjects = subjects
+        self._publications = publications or TopicPublicationStore(
+            client, analysis_index
+        )
+        self._settings = read_config or TopicReadConfig()
 
     def latest_model_version(self) -> tuple[str | None, str | None]:
-        response = self._search(
-            {
-                "size": 1,
-                "query": {"term": {"kind": "topic"}},
-                "sort": [{"trained_at": {"order": "desc"}}],
-                "_source": ["model_version", "trained_at"],
-            }
-        )
-        hits = self._hits(response)
-        if not hits:
-            return None, None
-        source = hits[0].get("_source", {})
-        return source.get("model_version"), source.get("trained_at")
+        run = self._publications.current()
+        return (run.model_version, run.trained_at.isoformat()) if run else (None, None)
 
     def topic_summaries(self, model_version: str) -> dict[int, TopicSummary]:
         response = self._search(
@@ -107,22 +88,27 @@ class TopicService:
         summaries: dict[int, TopicSummary] = {}
         for hit in self._hits(response):
             source = hit.get("_source", {})
-            topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
+            topic_id = int(source.get("topic_id", TopicId.OUTLIER))
             stored_label = str(source.get("label") or "").strip()
             top_words = dedupe_terms(
                 str(word) for word in source.get("top_words") or []
             )
             keywords = keyword_label(top_words)
+            provenance = LabelProvenance.model_validate(source)
             summaries[topic_id] = TopicSummary(
                 topic_id=topic_id,
                 name=str(source.get("name") or ""),
                 label=stored_label
-                or (keywords if topic_id != _OUTLIER_TOPIC_ID and keywords else None)
+                or (keywords if topic_id != TopicId.OUTLIER and keywords else None)
                 or topic_label(source.get("name"), topic_id),
                 size=int(source.get("size") or 0),
                 top_words=top_words,
                 metasubject_id=source.get("metasubject_id"),
+                label_source=provenance.label_source,
+                fallback_reason=provenance.fallback_reason,
             )
+        if not summaries:
+            raise IncompleteSearchError("Published topic summaries are missing")
         return summaries
 
     def member_assignments(
@@ -130,8 +116,8 @@ class TopicService:
     ) -> list[tuple[str, int]]:
         """(bill_id, topic_id) pairs for the member's bills under *model_version*."""
         pairs: list[tuple[str, int]] = []
-        for start in range(0, len(bill_ids), _TERMS_CHUNK):
-            chunk = bill_ids[start : start + _TERMS_CHUNK]
+        for start in range(0, len(bill_ids), self._settings.terms_chunk):
+            chunk = bill_ids[start : start + self._settings.terms_chunk]
             response = self._search(
                 {
                     "size": len(chunk),
@@ -149,8 +135,8 @@ class TopicService:
             )
             for hit in self._hits(response):
                 source = hit.get("_source", {})
-                topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
-                if topic_id != _OUTLIER_TOPIC_ID and source.get("doc_id"):
+                topic_id = int(source.get("topic_id", TopicId.OUTLIER))
+                if topic_id != TopicId.OUTLIER and source.get("doc_id"):
                     pairs.append((str(source["doc_id"]), topic_id))
         return pairs
 
@@ -159,8 +145,8 @@ class TopicService:
     ) -> list[tuple[str, int]]:
         """(bill_id, metasubject_id) pairs, including outlier bills, under *model_version*."""
         pairs: list[tuple[str, int]] = []
-        for start in range(0, len(bill_ids), _TERMS_CHUNK):
-            chunk = bill_ids[start : start + _TERMS_CHUNK]
+        for start in range(0, len(bill_ids), self._settings.terms_chunk):
+            chunk = bill_ids[start : start + self._settings.terms_chunk]
             response = self._search(
                 {
                     "size": len(chunk),
@@ -187,17 +173,25 @@ class TopicService:
         """Metasubjects of the latest trained model, largest first."""
         model_version, _ = self.latest_model_version()
         if not model_version:
-            return MetasubjectsResponse(metasubjects=[])
+            return MetasubjectsResponse(
+                metasubjects=[], analysis=AnalysisStatus(state=AnalysisState.NOT_BUILT)
+            )
+        groups = list(self.metasubject_summaries(model_version).values())
         return MetasubjectsResponse(
-            metasubjects=list(self.metasubject_summaries(model_version).values()),
+            metasubjects=groups,
             model_version=model_version,
+            analysis=AnalysisStatus.for_model(
+                model_version, model_version, bool(groups)
+            ),
         )
 
     def list_metasubject_trends(self) -> MetasubjectTrendsResponse:
         """Quarterly bill counts for every metasubject."""
         model_version, _ = self.latest_model_version()
         if not model_version:
-            return MetasubjectTrendsResponse(series=[])
+            return MetasubjectTrendsResponse(
+                series=[], analysis=AnalysisStatus(state=AnalysisState.NOT_BUILT)
+            )
         points = self._metasubject_points(model_version)
         series = [
             MetasubjectTrendSeries(
@@ -208,13 +202,19 @@ class TopicService:
             for group in self.metasubject_summaries(model_version).values()
             if points.get(group.metasubject_id)
         ]
-        return MetasubjectTrendsResponse(series=series, model_version=model_version)
+        return MetasubjectTrendsResponse(
+            series=series,
+            model_version=model_version,
+            analysis=AnalysisStatus.for_model(
+                model_version, model_version, bool(series)
+            ),
+        )
 
     def get_metasubject(self, metasubject_id: int) -> MetasubjectDetailResponse | None:
         """One metasubject with its member topics and quarterly trend."""
         model_version, _ = self.latest_model_version()
         if not model_version:
-            return None
+            raise AnalysisNotBuiltError("No topic analysis has been published yet.")
         group = self.metasubject_summaries(model_version).get(metasubject_id)
         if group is None:
             return None
@@ -233,6 +233,7 @@ class TopicService:
             topics=topics,
             trend=trend,
             model_version=model_version,
+            analysis=AnalysisStatus.for_model(model_version, model_version, True),
         )
 
     def related_metasubjects(
@@ -241,11 +242,11 @@ class TopicService:
         """Other metasubjects ranked by cosine similarity of their centroids."""
         response = self._search(
             {
-                "size": _METASUBJECT_LIMIT,
+                "size": self._settings.metasubject_limit,
                 "query": {
                     "bool": {
                         "filter": [
-                            {"term": {"kind": _METASUBJECT_KIND}},
+                            {"term": {"kind": TopicKind.METASUBJECT}},
                             {"term": {"model_version": model_version}},
                         ]
                     }
@@ -272,7 +273,7 @@ class TopicService:
                 metasubject_id=other_id, name=names[other_id], similarity=similarity
             )
             for other_id, similarity in self._nearest(
-                metasubject_id, centroids, _RELATED_METASUBJECT_LIMIT
+                metasubject_id, centroids, self._settings.related_metasubject_limit
             )
         ]
 
@@ -301,7 +302,7 @@ class TopicService:
         """Other topics ranked by cosine similarity of their centroids."""
         response = self._search(
             {
-                "size": _TOPIC_LIMIT,
+                "size": self._settings.topic_limit,
                 "query": {
                     "bool": {
                         "filter": [
@@ -316,18 +317,20 @@ class TopicService:
         centroids = {
             int(source["topic_id"]): np.asarray(source["centroid"], dtype=np.float64)
             for source in (hit.get("_source", {}) for hit in self._hits(response))
-            if source.get("centroid") and int(source["topic_id"]) != _OUTLIER_TOPIC_ID
+            if source.get("centroid") and int(source["topic_id"]) != TopicId.OUTLIER
         }
         if topic_id not in centroids:
             return []
         return [
             RelatedTopic(
                 topic_id=other_id,
-                label=summaries[other_id].label if other_id in summaries else f"Topic {other_id}",
+                label=summaries[other_id].label
+                if other_id in summaries
+                else f"Topic {other_id}",
                 similarity=similarity,
             )
             for other_id, similarity in self._nearest(
-                topic_id, centroids, _RELATED_TOPIC_LIMIT
+                topic_id, centroids, self._settings.related_topic_limit
             )
         ]
 
@@ -335,28 +338,37 @@ class TopicService:
         """All topics from the latest trained model, largest first."""
         model_version, trained_at = self.latest_model_version()
         if not model_version:
-            return TopicsResponse(topics=[])
+            return TopicsResponse(
+                topics=[], analysis=AnalysisStatus(state=AnalysisState.NOT_BUILT)
+            )
         topics = [
             topic
             for topic in self.topic_summaries(model_version).values()
-            if topic.topic_id != _OUTLIER_TOPIC_ID
+            if topic.topic_id != TopicId.OUTLIER
         ]
         topics.sort(key=lambda topic: topic.size, reverse=True)
         return TopicsResponse(
-            topics=topics, model_version=model_version, trained_at=trained_at
+            topics=topics,
+            model_version=model_version,
+            trained_at=trained_at,
+            analysis=AnalysisStatus.for_model(
+                model_version, model_version, bool(topics)
+            ),
         )
 
     def list_topic_trends(self, *, size: int = 8) -> TopicTrendsResponse:
         """Time series for the largest topics, EMM-dashboard style."""
         model_version, _ = self.latest_model_version()
         if not model_version:
-            return TopicTrendsResponse(series=[])
+            return TopicTrendsResponse(
+                series=[], analysis=AnalysisStatus(state=AnalysisState.NOT_BUILT)
+            )
         summaries = self.topic_summaries(model_version)
         top = sorted(
             (
                 topic
                 for topic in summaries.values()
-                if topic.topic_id != _OUTLIER_TOPIC_ID
+                if topic.topic_id != TopicId.OUTLIER
             ),
             key=lambda topic: topic.size,
             reverse=True,
@@ -380,7 +392,7 @@ class TopicService:
         points: dict[int, list[TopicTrendPoint]] = defaultdict(list)
         for hit in self._hits(response):
             source = hit.get("_source", {})
-            topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
+            topic_id = int(source.get("topic_id", TopicId.OUTLIER))
             points[topic_id].append(
                 TopicTrendPoint(
                     timestamp=str(source.get("timestamp") or ""),
@@ -397,7 +409,13 @@ class TopicService:
             for topic in top
             if points.get(topic.topic_id)
         ]
-        return TopicTrendsResponse(series=series, model_version=model_version)
+        return TopicTrendsResponse(
+            series=series,
+            model_version=model_version,
+            analysis=AnalysisStatus.for_model(
+                model_version, model_version, bool(series)
+            ),
+        )
 
     def get_topic(
         self, topic_id: int, *, top_bills: int = 20
@@ -405,7 +423,7 @@ class TopicService:
         """One topic with its time trend and highest-probability bills."""
         model_version, _ = self.latest_model_version()
         if not model_version:
-            return None
+            raise AnalysisNotBuiltError("No topic analysis has been published yet.")
         topic = self.topic_summaries(model_version).get(topic_id)
         if topic is None:
             return None
@@ -469,13 +487,16 @@ class TopicService:
             model_version=model_version,
             trend=trend,
             top_bills=bills,
+            analysis=AnalysisStatus.for_model(model_version, model_version, True),
         )
 
     def get_bill_topics(self, bill_id: str) -> BillTopicsResponse:
         """Topic assignments for one bill under the latest model."""
         model_version, _ = self.latest_model_version()
         if not model_version:
-            return BillTopicsResponse(bill_id=bill_id)
+            return BillTopicsResponse(
+                bill_id=bill_id, analysis=AnalysisStatus(state=AnalysisState.NOT_BUILT)
+            )
         response = self._search(
             {
                 "size": 10,
@@ -495,8 +516,8 @@ class TopicService:
         topics = []
         for hit in self._hits(response):
             source = hit.get("_source", {})
-            topic_id = int(source.get("topic_id", _OUTLIER_TOPIC_ID))
-            if topic_id == _OUTLIER_TOPIC_ID:
+            topic_id = int(source.get("topic_id", TopicId.OUTLIER))
+            if topic_id == TopicId.OUTLIER:
                 continue
             summary = summaries.get(topic_id)
             topics.append(
@@ -507,7 +528,12 @@ class TopicService:
                 )
             )
         return BillTopicsResponse(
-            bill_id=bill_id, topics=topics, model_version=model_version
+            bill_id=bill_id,
+            topics=topics,
+            model_version=model_version,
+            analysis=AnalysisStatus.for_model(
+                model_version, model_version, bool(topics)
+            ),
         )
 
     def get_member_topics(self, bioguide_id: str) -> MemberTopicsResponse:
@@ -516,7 +542,10 @@ class TopicService:
         model_version, _ = self.latest_model_version()
         if not model_version:
             return MemberTopicsResponse(
-                bioguide_id=bioguide_id, subjects=subjects, policy_areas=policy_areas
+                bioguide_id=bioguide_id,
+                subjects=subjects,
+                policy_areas=policy_areas,
+                analysis=AnalysisStatus(state=AnalysisState.NOT_BUILT),
             )
         bill_dates = self._member_bill_dates(bioguide_id)
         pairs = (
@@ -530,6 +559,7 @@ class TopicService:
                 model_version=model_version,
                 subjects=subjects,
                 policy_areas=policy_areas,
+                analysis=AnalysisStatus.for_model(model_version, model_version, False),
             )
         summaries = self.topic_summaries(model_version)
 
@@ -572,13 +602,17 @@ class TopicService:
             model_version=model_version,
             subjects=subjects,
             policy_areas=policy_areas,
+            analysis=AnalysisStatus.for_model(
+                model_version, model_version, bool(topics)
+            ),
         )
 
-    def _search(self, body: dict[str, Any]) -> dict[str, Any] | None:
-        try:
-            return self._client.search(index=self._index, body=body).body
-        except NotFoundError:
-            return None
+    def _search(self, body: dict[str, Any]) -> dict[str, Any]:
+        response = self._client.search(
+            index=self._index, body=body, allow_partial_search_results=False
+        )
+        SearchCompletion.model_validate(response.body).require_complete()
+        return response.body
 
     @staticmethod
     def _hits(response: dict[str, Any] | None) -> list[dict[str, Any]]:
@@ -591,16 +625,24 @@ class TopicService:
     ) -> dict[int, MetasubjectSummary]:
         response = self._search(
             {
-                "size": _METASUBJECT_LIMIT,
+                "size": self._settings.metasubject_limit,
                 "query": {
                     "bool": {
                         "filter": [
-                            {"term": {"kind": _METASUBJECT_KIND}},
+                            {"term": {"kind": TopicKind.METASUBJECT}},
                             {"term": {"model_version": model_version}},
                         ]
                     }
                 },
-                "_source": ["metasubject_id", "name", "size", "top_words", "topic_ids"],
+                "_source": [
+                    "metasubject_id",
+                    "name",
+                    "size",
+                    "top_words",
+                    "topic_ids",
+                    "label_source",
+                    "fallback_reason",
+                ],
             }
         )
         summaries = [
@@ -608,20 +650,22 @@ class TopicService:
             for hit in self._hits(response)
         ]
         summaries.sort(key=lambda group: group.size, reverse=True)
+        if not summaries:
+            raise IncompleteSearchError("Published metasubject summaries are missing")
         return {group.metasubject_id: group for group in summaries}
 
     def _metasubject_points(
         self, model_version: str, metasubject_ids: list[int] | None = None
     ) -> dict[int, list[TopicTrendPoint]]:
         filters: list[dict[str, Any]] = [
-            {"term": {"kind": _METASUBJECT_TREND_KIND}},
+            {"term": {"kind": TopicKind.METASUBJECT_OVER_TIME}},
             {"term": {"model_version": model_version}},
         ]
         if metasubject_ids is not None:
             filters.append({"terms": {"metasubject_id": metasubject_ids}})
         response = self._search(
             {
-                "size": _METASUBJECT_TREND_LIMIT,
+                "size": self._settings.metasubject_trend_limit,
                 "query": {"bool": {"filter": filters}},
                 "sort": [{"timestamp": {"order": "asc"}}],
             }
@@ -640,14 +684,13 @@ class TopicService:
     def _bill_titles(self, bill_ids: list[str]) -> dict[str, str]:
         if not bill_ids:
             return {}
-        try:
-            response = self._client.mget(
-                index=read_alias("bill"),
-                body={"ids": bill_ids},
-                source_includes=["title"],
-            )
-        except NotFoundError:
-            return {}
+        response = self._client.mget(
+            index=read_alias("bill"),
+            body={"ids": bill_ids},
+            source_includes=["title"],
+        )
+        if any("error" in doc for doc in response["docs"]):
+            raise IncompleteSearchError("Bill title lookup failed")
         return {
             doc["_id"]: str(doc["_source"].get("title") or "")
             for doc in response.get("docs", [])
@@ -656,40 +699,35 @@ class TopicService:
 
     def _member_bill_dates(self, bioguide_id: str) -> dict[str, str | None]:
         """Bill id → introduced date for bills the member sponsored/cosponsored."""
-        try:
-            response = self._client.search(
-                index=read_alias("bill"),
-                body={
-                    "size": 5000,
-                    "query": {
-                        "bool": {
-                            "filter": [
-                                {"term": {"source_type": "bill"}},
-                                {
-                                    "bool": {
-                                        "should": [
-                                            {
-                                                "term": {
-                                                    "sponsor_bioguide_ids": bioguide_id
-                                                }
-                                            },
-                                            {
-                                                "term": {
-                                                    "cosponsor_bioguide_ids": bioguide_id
-                                                }
-                                            },
-                                        ],
-                                        "minimum_should_match": 1,
-                                    }
-                                },
-                            ]
-                        }
-                    },
-                    "_source": ["introduced_date"],
+        response = self._client.search(
+            index=read_alias("bill"),
+            allow_partial_search_results=False,
+            body={
+                "size": 5000,
+                "query": {
+                    "bool": {
+                        "filter": [
+                            {"term": {"source_type": "bill"}},
+                            {
+                                "bool": {
+                                    "should": [
+                                        {"term": {"sponsor_bioguide_ids": bioguide_id}},
+                                        {
+                                            "term": {
+                                                "cosponsor_bioguide_ids": bioguide_id
+                                            }
+                                        },
+                                    ],
+                                    "minimum_should_match": 1,
+                                }
+                            },
+                        ]
+                    }
                 },
-            )
-        except NotFoundError:
-            return {}
+                "_source": ["introduced_date"],
+            },
+        )
+        SearchCompletion.model_validate(response.body).require_complete()
         return {
             hit["_id"]: (hit.get("_source") or {}).get("introduced_date")
             for hit in response.get("hits", {}).get("hits", [])

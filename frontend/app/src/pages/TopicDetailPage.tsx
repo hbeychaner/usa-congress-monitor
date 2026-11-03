@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { fetchTopic } from '../api/topics';
 import type { TopicDetailResponse } from '../api/topics';
 import { HorizontalBarChart } from '../components/HorizontalBarChart';
+import { LabelOrigin } from '../components/LabelOrigin';
 import { TrendLineChart } from '../components/TrendLineChart';
 import type { TrendSeries } from '../components/TrendLineChart';
 
@@ -72,6 +73,7 @@ export function TopicDetailPage() {
     <Flex direction="column" gap="5">
       <Flex direction="column" gap="2">
         <Heading size="8" style={{ textTransform: 'capitalize' }}>{topic.label}</Heading>
+        <LabelOrigin origin={topic} />
         <Text color="gray">{topic.size.toLocaleString()} bills assigned to this topic.</Text>
         <Flex gap="1" wrap="wrap">
           {topic.top_words.map((word) => (

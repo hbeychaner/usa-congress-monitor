@@ -24,6 +24,7 @@ from cdm.backend.services.vote_breakdown_service import VoteBreakdownService
 from cdm.backend.services.vote_service import VoteService
 from cdm.config import get_config
 from cdm.container import Container
+from cdm.jobs.analytics import AnalyticsJobs
 
 
 @lru_cache
@@ -32,6 +33,13 @@ def get_container() -> Container:
 
 
 ContainerDep = Annotated[Container, Depends(get_container)]
+
+
+def get_analytics_jobs(container: ContainerDep) -> AnalyticsJobs:
+    return container.analytics_jobs
+
+
+AnalyticsJobsDep = Annotated[AnalyticsJobs, Depends(get_analytics_jobs)]
 
 
 def get_similar_bill_service(container: ContainerDep) -> SimilarBillService:
@@ -108,7 +116,9 @@ SubjectServiceDep = Annotated[SubjectService, Depends(get_subject_service)]
 TopicServiceDep = Annotated[TopicService, Depends(get_topic_service)]
 MemberServiceDep = Annotated[MemberService, Depends(get_member_service)]
 GraphServiceDep = Annotated[GraphService, Depends(get_graph_service)]
-NeighborhoodServiceDep = Annotated[NeighborhoodService, Depends(get_neighborhood_service)]
+NeighborhoodServiceDep = Annotated[
+    NeighborhoodService, Depends(get_neighborhood_service)
+]
 TopicNeighborhoodServiceDep = Annotated[
     TopicNeighborhoodService, Depends(get_topic_neighborhood_service)
 ]

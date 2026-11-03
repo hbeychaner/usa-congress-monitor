@@ -1,11 +1,18 @@
 from typing import Any
 from unittest.mock import MagicMock
 
+from elastic_transport import (
+    ApiResponseMeta,
+    HttpHeaders,
+    NodeConfig,
+    ObjectApiResponse,
+)
 from elasticsearch import Elasticsearch
 
 from cdm.backend.services.bill_vote_index import BillKey, BillVoteIndex
 from cdm.backend.services.vote_service import VoteService
 from cdm.store.opensearch import read_alias
+from cdm.utils.json_types import JsonObject
 
 BILL_ID = "bill:119:hr:1"
 
@@ -88,12 +95,12 @@ def test_merges_both_chambers_and_prefers_house_vote_record() -> None:
 def test_has_votes_ids_union_both_sources() -> None:
     client = MagicMock(spec=Elasticsearch)
 
-    def search(index: str, **_: Any) -> dict[str, Any]:
+    def search(index: str, **_: Any) -> ObjectApiResponse[JsonObject]:
         if index == read_alias("rollcall"):
             buckets = [{"key": "bill:119:hr:1", "doc_count": 3}]
         else:
             buckets = [{"key": [118, "S", 7], "doc_count": 2}]
-        return {"aggregations": {"bills": {"buckets": buckets}}}
+        return aggregation_response(buckets)
 
     client.search.side_effect = search
     assert BillVoteIndex(client).bill_ids() == ["bill:118:s:7", "bill:119:hr:1"]
@@ -102,13 +109,28 @@ def test_has_votes_ids_union_both_sources() -> None:
 def test_counts_take_larger_source_and_skip_bills_without_votes() -> None:
     client = MagicMock(spec=Elasticsearch)
 
-    def search(index: str, **_: Any) -> dict[str, Any]:
+    def search(index: str, **_: Any) -> ObjectApiResponse[JsonObject]:
         if index == read_alias("rollcall"):
             buckets = [{"key": BILL_ID, "doc_count": 3}]
         else:
             buckets = [{"key": [119, "HR", 1], "doc_count": 5}]
-        return {"aggregations": {"bills": {"buckets": buckets}}}
+        return aggregation_response(buckets)
 
     client.search.side_effect = search
     counts = BillVoteIndex(client).counts([BILL_ID, "bill:119:s:9"])
     assert counts == {BILL_ID: 5}
+
+
+def aggregation_response(
+    buckets: list[dict[str, Any]],
+) -> ObjectApiResponse[JsonObject]:
+    return ObjectApiResponse(
+        {
+            "timed_out": False,
+            "_shards": {"failed": 0},
+            "aggregations": {"bills": {"buckets": buckets, "sum_other_doc_count": 0}},
+        },
+        ApiResponseMeta(
+            200, "1.1", HttpHeaders(), 0, NodeConfig("http", "localhost", 9200)
+        ),
+    )

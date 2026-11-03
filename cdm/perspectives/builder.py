@@ -236,11 +236,14 @@ class PerspectiveBuilder:
             bills[i].title
             for i in clusters.nearest(cluster, self.config.perspective_sample_bills)
         ]
+        label = self.labeler.label(topic_label, terms, samples)
         return Perspective(
             congress=congress,
             topic_id=topic_id,
             perspective_id=cluster,
-            label=self.labeler.label(topic_label, terms, samples),
+            label=label.label,
+            label_source=label.label_source,
+            fallback_reason=label.fallback_reason,
             size=len(members),
             terms=terms,
             sample_titles=samples,

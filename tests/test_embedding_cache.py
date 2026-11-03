@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+from unittest.mock import Mock
+
 import numpy as np
+import pytest
+from elasticsearch import Elasticsearch
 
 from cdm.store.embedding_store import EmbeddingRecord, EmbeddingStore
 from cdm.utils.cached_embedder import CachedEmbedder, EmbeddingJob
@@ -31,6 +35,9 @@ class InMemoryStore(EmbeddingStore):
 class CountingEmbedder:
     def __init__(self) -> None:
         self.encoded: list[str] = []
+
+    def get_sentence_embedding_dimension(self) -> int:
+        return DIMS
 
     def encode(self, texts: list[str], show_progress_bar: bool = False) -> np.ndarray:
         self.encoded.extend(texts)
@@ -73,3 +80,69 @@ def test_hash_depends_on_model() -> None:
     first = EmbeddingStore(None, "m1", index="i", batch_docs=1).content_hash("text")
     second = EmbeddingStore(None, "m2", index="i", batch_docs=1).content_hash("text")
     assert first != second
+
+
+def test_cache_batches_keep_only_fresh_vectors() -> None:
+    client = Mock(spec=Elasticsearch)
+    client.indices = Mock()
+    client.indices.exists.return_value = True
+    client.mget.side_effect = [
+        {
+            "docs": [
+                {
+                    "_id": "a",
+                    "found": True,
+                    "_source": {
+                        "model": "test-model",
+                        "content_hash": "fresh",
+                        "embedding": [1.0, 2.0, 3.0],
+                    },
+                },
+                {"_id": "b", "found": False},
+            ]
+        },
+        {
+            "docs": [
+                {
+                    "_id": "c",
+                    "found": True,
+                    "_source": {"content_hash": "stale", "embedding": [3.0, 2.0, 1.0]},
+                }
+            ]
+        },
+    ]
+    store = EmbeddingStore(client, "test-model", index="test", batch_docs=2)
+
+    fresh = store.fetch_fresh({"a": "fresh", "b": "missing", "c": "expected"})
+
+    assert list(fresh) == ["a"]
+    assert np.array_equal(fresh["a"], np.array([1.0, 2.0, 3.0], dtype=np.float32))
+    assert [call.kwargs["ids"] for call in client.mget.call_args_list] == [
+        ("a", "b"),
+        ("c",),
+    ]
+    assert [call[0] for call in client.method_calls] == [
+        "indices.exists",
+        "mget",
+        "mget",
+    ]
+
+
+@pytest.mark.parametrize(("model", "dims"), [("wrong-model", DIMS), ("test-model", 4)])
+def test_existing_incompatible_cache_is_rejected(model: str, dims: int) -> None:
+    client = Mock(spec=Elasticsearch, indices=Mock())
+    client.indices.exists.return_value = True
+    client.indices.get_mapping.return_value = {
+        "test": {
+            "mappings": {
+                "_meta": {"embedding_model": model},
+                "properties": {"embedding": {"type": "dense_vector", "dims": dims}},
+            }
+        }
+    }
+
+    with pytest.raises(ValueError, match="embedding cache"):
+        EmbeddingStore(client, "test-model", index="test", batch_docs=2).ensure_index(
+            DIMS
+        )
+    client.indices.create.assert_not_called()

@@ -1,55 +1,31 @@
 import { Badge, Button, Card, Checkbox, Flex, Heading, Select, Table, Text, TextField } from '@radix-ui/themes';
-import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useCallback, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 
-import { fetchRecentBills, type BillFilters, type BillSummary } from '../api/bills';
+import { fetchRecentBills, type BillSummary } from '../api/bills';
+import { PageControls } from '../components/PageControls';
+import { useRead } from '../hooks/useRead';
+import { useQueryForm } from '../hooks/useQueryForm';
+import { billQuery, BILL_TYPES } from '../shared/queryState';
 
 const PAGE_SIZE = 50;
-const BILL_TYPES = ['hr', 's', 'hres', 'sres', 'hjres', 'sjres', 'hconres', 'sconres'];
 
 function label(bill: BillSummary): string {
   return [bill.bill_type?.toUpperCase(), bill.number].filter(Boolean).join(' ');
 }
 
 export function BillsPage() {
-  const [searchParams] = useSearchParams();
-  const initialSubject = searchParams.get('subject') ?? undefined;
-  const [bills, setBills] = useState<BillSummary[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<BillFilters>({ subject: initialSubject });
-  const [draft, setDraft] = useState<BillFilters>({ subject: initialSubject });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { applied, draft, setDraft, apply, error: urlError, requestKey } = useQueryForm(billQuery);
+  const request = useCallback(() => fetchRecentBills(PAGE_SIZE, applied.page, applied), [applied, requestKey]);
+  const { data, error: readError, loading } = useRead(urlError ? null : request);
+  const error = urlError ?? readError;
+  const page = applied.page;
+  const bills = data?.bills ?? [];
+  const total = data?.total ?? 0;
 
-  useEffect(() => {
-    const subject = searchParams.get('subject') ?? undefined;
-    setPage(1);
-    setFilters((current) => ({ ...current, subject }));
-    setDraft((current) => ({ ...current, subject }));
-  }, [searchParams]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    fetchRecentBills(PAGE_SIZE, page, filters)
-      .then((response) => {
-        if (!cancelled) {
-          setBills(response.bills);
-          setTotal(response.total);
-          setError(null);
-        }
-      })
-      .catch((err: Error) => { if (!cancelled) setError(err.message); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [page, filters]);
-
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const applyFilters = (event: FormEvent) => {
     event.preventDefault();
-    setPage(1);
-    setFilters({ ...draft });
+    apply({ ...draft, page: 1 });
   };
 
   return (
@@ -58,10 +34,10 @@ export function BillsPage() {
         <Flex direction="column" gap="1">
           <Text size="1" color="gray">Legislation index</Text>
           <Heading size="7">Bills</Heading>
-          <Text color="gray">Browse {total.toLocaleString()} indexed bills with server-side search and filters.</Text>
+          <Text color="gray">Browse {data ? `${total.toLocaleString()} ` : ''}indexed bills with server-side search and filters.</Text>
         </Flex>
         <Badge size="2" variant="soft">
-          {loading ? 'Loading' : `${((page - 1) * PAGE_SIZE + (bills.length ? 1 : 0)).toLocaleString()}–${Math.min(page * PAGE_SIZE, total).toLocaleString()}`} of {total.toLocaleString()}
+          {loading ? 'Loading' : data ? `${((page - 1) * PAGE_SIZE + (bills.length ? 1 : 0)).toLocaleString()}–${Math.min(page * PAGE_SIZE, total).toLocaleString()} of ${total.toLocaleString()}` : 'Unavailable'}
         </Badge>
       </Flex>
 
@@ -102,7 +78,7 @@ export function BillsPage() {
                 <Select.Trigger placeholder="All types" />
                 <Select.Content>
                   <Select.Item value="all">All types</Select.Item>
-                  {BILL_TYPES.filter(Boolean).filter((type, index, list) => list.indexOf(type) === index).map((type) => (
+                  {BILL_TYPES.map((type) => (
                     <Select.Item key={type} value={type}>{type.toUpperCase()}</Select.Item>
                   ))}
                 </Select.Content>
@@ -130,7 +106,7 @@ export function BillsPage() {
         </form>
       </Card>
 
-      {error ? <Card size="3"><Text as="p">Unable to load bills: {error}</Text></Card> : null}
+      {error ? <Card size="3" role="alert"><Text as="p">Unable to load bills: {error.message}</Text></Card> : null}
       {!loading && !error && bills.length === 0 ? <Card size="3"><Text as="p">No bills match these filters.</Text></Card> : null}
 
       {bills.length > 0 ? (
@@ -162,11 +138,7 @@ export function BillsPage() {
         </Table.Root>
       ) : null}
 
-      <Flex justify="center" align="center" gap="3" aria-label="Bill pages">
-        <Button variant="soft" disabled={page <= 1 || loading} onClick={() => setPage(page - 1)}>Previous</Button>
-        <Text>Page {page} of {pageCount}</Text>
-        <Button disabled={page >= pageCount || loading} onClick={() => setPage(page + 1)}>Next</Button>
-      </Flex>
+      {!urlError ? <PageControls page={page} bounds={data} loading={loading} onChange={page => apply({ ...applied, page })} /> : null}
     </Flex>
   );
 }

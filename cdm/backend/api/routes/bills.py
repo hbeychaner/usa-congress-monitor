@@ -11,6 +11,7 @@ from cdm.contracts.api import (
     BillsResponse,
     BillTopicsResponse,
     BillVotesResponse,
+    ErrorResponse,
     SimilarBillsResponse,
 )
 
@@ -34,7 +35,11 @@ def recent_bills(
     )
 
 
-@router.get("/{bill_id}", response_model=BillDetailResponse)
+@router.get(
+    "/{bill_id}",
+    response_model=BillDetailResponse,
+    responses={404: {"model": ErrorResponse}},
+)
 def bill_detail(bill_id: str, service: BillServiceDep) -> BillDetailResponse:
     return service.get(bill_id)
 

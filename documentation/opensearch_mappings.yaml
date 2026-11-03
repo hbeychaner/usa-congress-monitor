@@ -70,6 +70,7 @@ legislation:
 
       # ── ingest provenance and completeness ──
       hydration_status: { type: keyword }
+      hydration_assessment: { type: object, enabled: false }
       hydrated_at:
         type: date
         format: "strict_date_optional_time||yyyy-MM-dd"
@@ -964,11 +965,14 @@ analysis_graph:
       signal:         { type: keyword }            # collaboration | voting | topic
       graph_version:  { type: keyword }
       built_at:       { type: date }
+      source_model_version: { type: keyword }
+      congresses:     { type: integer }
       member:         { type: keyword }            # bioguide id
       neighbor:       { type: keyword }
       score:          { type: float }
       shared_bills:   { type: integer }
       shared_votes:   { type: integer }
+      shared_topics:  { type: keyword }
       by_congress:
         type: nested
         properties:

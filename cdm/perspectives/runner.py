@@ -1,10 +1,9 @@
-"""Builds every topic's party perspectives for one Congress from the latest topic model."""
+"""Builds a Congress's party perspectives using an explicitly pinned topic model."""
 
 from __future__ import annotations
 
 from collections import Counter, defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass
 
 from cdm.config import PerspectiveConfig
 from cdm.graph.topics import TopicModelReader
@@ -16,16 +15,6 @@ from cdm.perspectives.models import TopicPerspectives
 
 BuilderFactory = Callable[[BoilerplateLexicon], PerspectiveBuilder]
 TopicCallback = Callable[[TopicPerspectives], None]
-
-
-@dataclass(frozen=True)
-class PerspectiveRun:
-    congress: int
-    model_version: str
-    lexicon: BoilerplateLexicon
-    bills: int
-    assigned: int
-    results: list[TopicPerspectives]
 
 
 class NoTopicModelError(RuntimeError):
@@ -49,19 +38,23 @@ class PerspectiveRunner:
         self.learner = learner
         self.builders = builders
 
+    def source_version(self) -> str:
+        version = self.topics.latest_version()
+        if version is None:
+            raise NoTopicModelError("no trained topic model")
+        return version
+
     def run(
         self,
         congress: int,
+        model_version: str,
         *,
         topic_ids: list[int] | None = None,
         top_topics: int | None = None,
         on_topic: TopicCallback | None = None,
-    ) -> PerspectiveRun:
-        version = self.topics.latest_version()
-        if version is None:
-            raise NoTopicModelError("no trained topic model")
-        assignments = self.topics.assignments(version)
-        labels = self.topics.labels(version)
+    ) -> list[TopicPerspectives]:
+        assignments = self.topics.assignments(model_version)
+        labels = self.topics.labels(model_version)
         corpus = self.corpus.read(congress)
         bills_by_topic: defaultdict[int, list[str]] = defaultdict(list)
         for doc_id, topic in sorted(assignments.items()):
@@ -85,14 +78,7 @@ class PerspectiveRunner:
             results.append(result)
             if on_topic:
                 on_topic(result)
-        return PerspectiveRun(
-            congress=congress,
-            model_version=version,
-            lexicon=lexicon,
-            bills=len(corpus.bills),
-            assigned=sum(len(ids) for ids in bills_by_topic.values()),
-            results=results,
-        )
+        return results
 
     def _selected(
         self,

@@ -1,18 +1,10 @@
 import { apiGet } from './client';
-import type { components } from '../shared/contracts/api';
+import type * as Contracts from '../shared/contracts/api';
 
-export type StateSummary = components['schemas']['StateSummary'];
-export type TimelineMember = components['schemas']['TimelineMember'];
-export type StateTimelineResponse = components['schemas']['StateTimelineResponse'];
-export type DistrictFeatureCollection = {
-    type: 'FeatureCollection';
-    features: Array<{
-        type: 'Feature';
-        id: string;
-        properties: { state: string; district: number };
-        geometry: Record<string, unknown>;
-    }>;
-};
+export type StateSummary = Contracts.StateSummary;
+export type TimelineMember = Contracts.TimelineMember;
+export type StateTimelineResponse = Contracts.StateTimelineResponse;
+export type DistrictFeatureCollection = Contracts.DistrictFeatureCollection;
 export type TimelineFilters = {
     fromCongress?: number;
     toCongress?: number;

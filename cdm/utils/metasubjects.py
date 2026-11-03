@@ -13,6 +13,12 @@ from pydantic import BaseModel, ConfigDict, Field
 from scipy.optimize import linear_sum_assignment
 from sklearn.cluster import AgglomerativeClustering
 
+from cdm.contracts.labels import (
+    LabelFallbackReason,
+    LabelProvenance,
+    LabelResult,
+    LabelSource,
+)
 from cdm.utils.topic_terms import dedupe_terms
 
 MAX_GROUP_WORDS = 10
@@ -31,7 +37,7 @@ class TopicVector(BaseModel):
     vector: np.ndarray
 
 
-class Metasubject(BaseModel):
+class Metasubject(LabelProvenance):
     metasubject_id: int
     name: str
     topic_ids: list[int]
@@ -47,7 +53,7 @@ class MetasubjectOverTimeRow(BaseModel):
 
 
 class MetasubjectNamer(Protocol):
-    def name(self, members: Sequence[TopicVector]) -> str: ...
+    def name(self, members: Sequence[TopicVector]) -> LabelResult: ...
 
 
 class NamedGroup(BaseModel):
@@ -63,7 +69,7 @@ class NamedGroup(BaseModel):
 class NameDisambiguator(Protocol):
     def rename(
         self, colliding: Sequence[NamedGroup], taken: set[str]
-    ) -> dict[int, str]:
+    ) -> dict[int, LabelResult]:
         """New names for *colliding* groups that share a name, avoiding *taken*."""
         ...
 
@@ -90,8 +96,12 @@ class MetasubjectAssignment(BaseModel):
 class LargestTopicNamer:
     """Fallback namer: the label of the group's largest topic."""
 
-    def name(self, members: Sequence[TopicVector]) -> str:
-        return max(members, key=lambda topic: topic.size).label
+    def name(self, members: Sequence[TopicVector]) -> LabelResult:
+        return LabelResult(
+            label=max(members, key=lambda topic: topic.size).label,
+            label_source=LabelSource.LARGEST_TOPIC,
+            fallback_reason=LabelFallbackReason.DISABLED,
+        )
 
 
 def _unit(vector: np.ndarray) -> np.ndarray:
@@ -181,23 +191,32 @@ class MetasubjectBuilder:
         for members, centroid, match in zip(groups, centroids, matches):
             size = sum(topic.size for topic in members)
             if match is None:
-                metasubject_id, name = next_id, self.namer.name(members)
+                metasubject_id = next_id
                 next_id += 1
             else:
                 metasubject_id = match.metasubject_id
-                name = (
-                    match.name
-                    if self._keeps_name(match, size)
-                    else self.namer.name(members)
-                )
             members_of[metasubject_id] = list(members)
             ranked = sorted(members, key=lambda topic: topic.size, reverse=True)
-            name = self.overrides.names.get(metasubject_id, name)
+            if metasubject_id in self.overrides.names:
+                label = LabelResult(
+                    label=self.overrides.names[metasubject_id],
+                    label_source=LabelSource.OVERRIDE,
+                )
+            elif match is not None and self._keeps_name(match, size):
+                label = LabelResult(
+                    label=match.name,
+                    label_source=match.label_source,
+                    fallback_reason=match.fallback_reason,
+                )
+            else:
+                label = self.namer.name(members)
             words = dedupe_terms(word for topic in ranked for word in topic.top_words)
             results.append(
                 Metasubject(
                     metasubject_id=metasubject_id,
-                    name=name,
+                    name=label.label,
+                    label_source=label.label_source,
+                    fallback_reason=label.fallback_reason,
                     topic_ids=sorted(topic.topic_id for topic in members),
                     size=size,
                     top_words=list(words)[:MAX_GROUP_WORDS],
@@ -236,7 +255,10 @@ class MetasubjectBuilder:
                 taken,
             )
             for group in movable:
-                group.name = renamed.get(group.metasubject_id, group.name)
+                if label := renamed.get(group.metasubject_id):
+                    group.name = label.label
+                    group.label_source = label.label_source
+                    group.fallback_reason = label.fallback_reason
 
 
 def topic_to_metasubject(metasubjects: Sequence[Metasubject]) -> dict[int, int]:

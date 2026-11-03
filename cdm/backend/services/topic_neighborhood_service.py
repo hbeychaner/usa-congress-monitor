@@ -17,6 +17,7 @@ from cdm.backend.services.topic_sponsors import (
     CenterKind,
     TopicSponsorReader,
 )
+from cdm.contracts.analysis import AnalysisStatus
 from cdm.contracts.api import (
     GraphMetasubjectLink,
     GraphMetasubjectNode,
@@ -52,13 +53,19 @@ class TopicNeighborhoodService:
         self.assigned = assigned
         self.sponsors = sponsors
 
-    def _counts(self, query: TopicNeighborhoodQuery, version: str | None) -> Counter[str]:
+    def _counts(
+        self, query: TopicNeighborhoodQuery, version: str | None
+    ) -> Counter[str]:
         congress = query.neighborhood.congress
         if query.kind is CenterKind.SUBJECT:
             return self.sponsors.by_subject(query.key, congress)
         if version is None or not query.key.lstrip("-").isdigit():
             return Counter()
-        field = AssignmentField.TOPIC if query.kind is CenterKind.TOPIC else AssignmentField.METASUBJECT
+        field = (
+            AssignmentField.TOPIC
+            if query.kind is CenterKind.TOPIC
+            else AssignmentField.METASUBJECT
+        )
         bills = self.assigned.read(field, int(query.key), version)
         return self.sponsors.by_bill_ids(bills, congress)
 
@@ -74,23 +81,55 @@ class TopicNeighborhoodService:
 
     def neighborhood(self, query: TopicNeighborhoodQuery) -> NeighborhoodResponse:
         inner = query.neighborhood
-        version, _ = self.topics.latest_model_version()
+        snapshot = self.neighborhoods.graph.snapshot(
+            inner.signals, include_topics=query.kind is not CenterKind.SUBJECT
+        )
+        version = snapshot.topic_model_version
         counts = self._counts(query, version)
-        ranked = [member for member, bills in counts.most_common() if bills >= MIN_BILLS]
+        ranked = [
+            member for member, bills in counts.most_common() if bills >= MIN_BILLS
+        ]
         allowed = self.neighborhoods.allowed_members(
             ranked[: inner.limit * CANDIDATE_FACTOR], inner
         )
         kept = [member for member in ranked if member in allowed][: inner.limit]
+        topic_analysis = (
+            AnalysisStatus.for_model(version, version, bool(kept))
+            if query.kind is not CenterKind.SUBJECT
+            else None
+        )
         if not kept:
-            return NeighborhoodResponse(seeds=[], congress=inner.congress)
-        versions, links = self.neighborhoods.links_among(kept, inner)
+            return NeighborhoodResponse(
+                seeds=[],
+                congress=inner.congress,
+                analysis=snapshot.analysis(set(), inner.congress),
+                versions=snapshot.versions,
+                topic_analysis=topic_analysis,
+            )
+        links = self.neighborhoods.links_among(kept, inner, snapshot)
         top = max(counts[member] for member in kept)
         nodes = [
-            GraphNode(member=allowed[member], party_group=PartyGroup.of(allowed[member].party))
+            GraphNode(
+                member=allowed[member], party_group=PartyGroup.of(allowed[member].party)
+            )
             for member in kept
         ]
         response = NeighborhoodResponse(
-            seeds=[], congress=inner.congress, versions=versions, nodes=nodes, links=links
+            seeds=[],
+            congress=inner.congress,
+            versions=snapshot.versions,
+            nodes=nodes,
+            links=links,
+            analysis=snapshot.analysis(
+                {
+                    signal
+                    for link in links
+                    for signal, score in link.signal_scores.items()
+                    if score > 0
+                },
+                inner.congress,
+            ),
+            topic_analysis=topic_analysis,
         )
         label = self._label(query, version)
         match query.kind:
@@ -98,14 +137,26 @@ class TopicNeighborhoodService:
                 topic_id = int(query.key)
                 response.topic_nodes = [GraphTopicNode(topic_id=topic_id, label=label)]
                 response.topic_links = [
-                    GraphTopicLink(member=member, topic_id=topic_id, share=counts[member] / top, bills=counts[member])
+                    GraphTopicLink(
+                        member=member,
+                        topic_id=topic_id,
+                        share=counts[member] / top,
+                        bills=counts[member],
+                    )
                     for member in kept
                 ]
             case CenterKind.METASUBJECT:
                 group_id = int(query.key)
-                response.metasubject_nodes = [GraphMetasubjectNode(metasubject_id=group_id, name=label)]
+                response.metasubject_nodes = [
+                    GraphMetasubjectNode(metasubject_id=group_id, name=label)
+                ]
                 response.metasubject_links = [
-                    GraphMetasubjectLink(member=member, metasubject_id=group_id, share=counts[member] / top, bills=counts[member])
+                    GraphMetasubjectLink(
+                        member=member,
+                        metasubject_id=group_id,
+                        share=counts[member] / top,
+                        bills=counts[member],
+                    )
                     for member in kept
                 ]
             case CenterKind.SUBJECT:

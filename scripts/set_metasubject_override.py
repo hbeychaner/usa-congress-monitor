@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cdm.config import get_config
-from cdm.container import Container
+from cdm.workers.runtime import WorkerContainer
 
 
 def main() -> None:
@@ -19,10 +19,12 @@ def main() -> None:
     parser.add_argument("--clear", action="store_true", help="Remove the override")
     parser.add_argument("--history", action="store_true", help="List stored edits")
     args = parser.parse_args()
-    store = Container(get_config()).metasubject_override_store
+    store = WorkerContainer(get_config()).metasubject_override_store
     if args.history or args.metasubject_id is None:
         for edit in store.history(args.metasubject_id):
-            print(f"{edit.metasubject_id} v{edit.version} {edit.created_at:%F} {edit.name}")
+            print(
+                f"{edit.metasubject_id} v{edit.version} {edit.created_at:%F} {edit.name}"
+            )
         return
     if args.clear:
         print(store.clear(args.metasubject_id))

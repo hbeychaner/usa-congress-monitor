@@ -1,5 +1,190 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- An explicit source-only legislation mapping for versioned bill hydration
+  assessments. Full-suite mapping validation exposed the missing declaration;
+  CI now includes those audits. Evidence stays in `_source`, while the existing
+  derived hydration-status keyword remains searchable. No live mapping/data
+  migration or acquisition is performed by this declaration.
+- Controlled managed Compose cutover with a slim API image, bounded one-slot
+  index/maintenance worker and explicit opt-in acquisition/analytics/scheduler/
+  observability profiles. Verified SQLite/volume backups and retirement of the
+  old native services precede startup; no retained state is pruned. Actual
+  production-image/broker, isolated real-store and managed desktop/narrow browser
+  acceptance pass. Full-load, automatic acquisition and cloud operation are not
+  certified by this scoped release gate.
+- Lightweight `--wiki-only --wiki <directory>` documentation preparation/checking
+  without source extraction, Node, scientific imports or a live API. Default
+  source/visual stale checks remain explicit and unchanged. Refreshed deployment/
+  C4 visuals, operations evidence, profile guidance and reproducible wiki
+  publication with source-revision links.
+- Sealed voting-only staging, measured API/browser acceptance and CAS
+  publication/rollback. Create-only edges, full history/source preservation,
+  exact candidate receipts and fail-closed concurrency/response handling prevent
+  partial stages or unknown writes from becoming successful publication.
+  Approved promotion serves 116,450 edges over Congresses 113-119, including
+  48,655 with Congress 114 evidence. Both real desktop/narrow browser views pass
+  before and after the switch; other pointers/aliases and the worker hold remained
+  unchanged at gate three. No pruning, live rollback or worker restart occurred
+  during that publication gate.
+- An explicit bounded live graph-schema/source-repair workflow: complete
+  historical graph before-images and isolated restore proof, eight additive-only
+  mapping paths, exact source version preconditions, fsynced per-write receipts,
+  resumable acknowledged rollback and fail-closed handling of indeterminate
+  responses. It never publishes pointers, changes aliases or resumes workers.
+  The approved retained deployment repair restored all 1,824 Congress 114
+  sources and installed those mappings after a full 1,148,223-document graph
+  backup/restore proof; graph documents and pointers were unchanged at gate two.
+- Sealed graph-repair capture/verification and different-cluster staging with
+  exact source/pointer rollback, concurrent-change rejection and owned-index
+  cleanup. `GraphBuildJob.stage()` writes a candidate without publication;
+  ordinary builds retain their publish behavior. A full retained-input rehearsal
+  produced 116,450 voting edges across Congresses 113-119, including 48,655 with
+  Congress 114 evidence. Gate one made no live record/mapping/pointer changes.
+  Two-cluster acceptance is wired into CI; the API import boundary is preserved.
+- Graph mapping preflight before edge writes/pointer publication, explicit
+  health failures for drift and warnings for unknown Congress scope, searchable
+  topic explanations, and rejection of partial topic scans/unlinked vote inputs.
+  Graph writes now target the same physical index as pointer writes and reads.
+- A verified Congress 114 voting-gap fix: integral ICPSR CSV identities are
+  normalized at the Pydantic boundary, instead of silently missing `"10713.0"`
+  to `"10713"` joins. Invalid identities, conflicting/missing member links and
+  mismatched roll-call sets fail before emitting replacement records. Retained
+  CSVs reconstruct all 1,824 roll calls offline; the later approved bounded
+  source repair and voting publication are recorded above.
+- Versioned, source-aware bill hydration evidence and explicit unknown/partial
+  states in the API and bill page, including compatibility with older servers.
+  Correct object-shaped subjects, bounded pagination, exact distinct counts,
+  unresolved envelopes and conflicting responses are covered by regressions.
+  Detail updates validate atomically; failed/empty text downloads are rejected.
+  Legacy completeness labels no longer establish proof. New GovInfo BILLSTATUS
+  v3/BILLSUM v2 normalized snapshots remain explicitly unassessed for API
+  hydration. No live relabel, reingestion or worker restart was performed.
+- A read-only live serving inventory: all 21 declared families and three
+  auxiliary indices, alias topology, searchable field capabilities, declared
+  schema differences, observed scope/hydration counts and bounded identity checks.
+  Application write counters stayed unchanged. Seven missing graph field paths,
+  empty bridge indices and unknown freshness/coverage remain explicit release
+  findings, not silent migration or completeness claims.
+- Operator-approved search-only startup with retained data and a recorded
+  temporary suspension of four legacy service trees; workers/Beat remain held
+  for review, without changing registrations or restart policies.
+- Typed source authority, completeness and independent source-check freshness
+  contracts, deterministic bill reconciliation, bounded read-only archive
+  inspection, target alias/mapping inventory and explicit all-resource/history
+  coverage gaps. These are shadow/staging evidence, not a live migration or
+  full-history completeness certificate.
+- An opt-in API-only production image target and isolated image checks proving
+  training packages are absent while real spaCy normalization/OpenAPI contracts
+  match the full image. The default image remains worker-capable.
+- Typed, fixture-backed Chromium acceptance tests in the existing contracts CI:
+  critical state/member/bill navigation, reproducible query URLs, keyboard and
+  narrow-screen behavior, unavailable states, and stale-response isolation.
+- Fail-closed browser network fixtures with self-tests, plus retained failure
+  traces/screenshots and CI artifact upload.
+- A full dependency-audit CI gate, generator type-guarantee regressions, and
+  map-rendering/color-interpolation acceptance checks.
+- Real Redis/Elasticsearch acceptance for mixed-success bulk writes, whole-batch
+  acknowledgement safety, abandoned-message reclaim, interrupted archive handoff,
+  trimmed/lost streams, duplicate terminal jobs, and incomplete-archive rejection.
+- Bounded disposable services in the existing CI workflow, reusing durable-job,
+  canonical-projection, analytics-publication/rollback, and measured-query tests;
+  scoped Ruff validation and a 30-minute job limit.
+- A user-selected manual pre-release image gate, real RabbitMQ envelope delivery
+  for every job kind, prefork worker/queue discovery, API health/readiness and
+  packaged-mapping checks, and production nginx SPA/asset checks.
+- Configurable immediate/delayed job-route regressions on every push/PR, and a
+  locked, training-free dependency group for the release test driver.
+- A killed-writer/WAL-backup restore case reusing the existing pipeline fixture:
+  retained pre-restore files, restored progress/terminal state, recovery dispatch,
+  archive replay, and duplicate-delivery safety.
+- Thirty lifecycle characterization cases plus transaction-rollback and
+  unrelated-row isolation checks.
+
+### Changed
+
+- GovInfo reconciliation CLI defaults to a 100-record preview. `--archives-only`
+  avoids search access; `--write-staging` explicitly submits durable replacement
+  work and rejects preview limits or aliased targets. Live bill merging remains
+  additive. Generated reference/wiki refresh follows release acceptance.
+  Verified with 447 selected regressions, 21 final real-store pipeline/projection
+  cases and clean scoped lint/type checks. Production Python grows by 932 lines
+  for the contracts and reporting; this increment is not a net code reduction.
+- Standardized managed local operation on Compose; retired the native launchd
+  installer and unmanaged background startup. Thin Make/shell aliases now share
+  one path, with read-only legacy-agent guards and an explicit preserved-plist
+  migration rather than automatically switching live services.
+- Consolidated Python Compose settings, installed dependencies at image build
+  time, added restart/readiness policies, and retained original absolute archive
+  paths plus shared ledger/Beat state during native-to-container migration.
+  Shell/Make management shrinks by 220 lines; 379 focused tests and four actual
+  development-image/broker/restart cases pass without switching live services.
+- Centralized bulk-write rejection handling for stream indexing, archive replay,
+  graph writes, Voteview ingestion and reconciliation. All rejected item
+  identities/details survive instead of only the first three; successful result
+  shapes remain compatible and whole-buffer late acknowledgement is unchanged.
+- Moved analysis construction into the existing worker composition root, removed
+  four single-use metasubject factory wrappers, and shared the topic-model reader.
+  Training dependencies now belong to the `analysis` group; normal development
+  installs still include it, with existing locked package versions retained.
+  Production Python shrank by another 23 lines. The opt-in API image measured
+  2.03 GB versus the prior 11.30 GB full image; the full image remains the default.
+- Replaced the Redocly-based contract generator with pinned Hey API type-only
+  generation, preserving offline exports and existing application response aliases.
+- Frontend tooling now requires Node 22.18+; CI and Docker builds use Node 22.
+- Production Python installs use `--no-cache`, excluding the duplicate uv
+  download cache from the runtime image without changing locked dependencies.
+- Consolidated five job-ledger transitions into one transactional write boundary,
+  preserving their existing guards/window semantics and removing 46 net
+  production Python lines.
+- Recovery instructions now use SQLite's backup API rather than copying a live
+  WAL database's main file; rollback preserves the old database and sidecars.
+
+### Fixed
+
+- GovInfo source checks retain actual HTTP fetch times through cached reparsing.
+  New normalized archives are immutable per artifact/parser/check snapshot, and
+  each index job pins its own archive rather than replaying unrelated versions.
+  BILLSTATUS completeness evidence cannot leak into live serving projections
+  as though authoritative removals had already been applied.
+- Archive fallback can no longer declare success by counting the same record
+  once from a stream and again from an incomplete archive. Failed reconciliation
+  writes no longer emit a new report claiming completion.
+- Restoring a historical party through browser history no longer clears the
+  member filter; restored options remain available while the draft changes,
+  and Independent is no longer duplicated in the selector.
+- All nine reported npm dependency-audit findings, through patched Vite/router/
+  source-map dependencies, removal of the old generator chain, and compatible
+  color/YAML overrides. Full audits now report zero vulnerabilities.
+- VS Code's missing `process` diagnostic in the Playwright configuration by
+  referencing the browser TypeScript project from the root solution.
+
+## 2026-11-02
+
+### Added
+
+- Canonical engineering improvement plan reconciling existing product and local
+  specialist plans with source-backed simplification/reliability findings,
+  decision gates, migration safeguards and testable delivery waves.
+- Source-backed documentation for architecture, data structures, indexing and
+  merge rules, ingestion/replay, API/frontend responsibilities, analytics,
+  configuration and deployment.
+- C4 context/container/component views and rendered Mermaid data-flow,
+  relationship, request-sequence and deployment visuals.
+- Reproducible Python and TypeScript declaration references, local-link checks,
+  and focused documentation-tooling tests.
+- A locally generated GitHub wiki with home, sidebar, footer and rewritten
+  cross-links; repository docs remain canonical and publication is manual.
+
+### Changed
+
+- Replaced the stale documentation landing page, removed obsolete collector and
+  Streamlit instructions there, and clarified Elasticsearch versus historical
+  OpenSearch naming and local/cloud deployment boundaries.
+
 ## 2026-10-20 (broker)
 
 ### Fixed

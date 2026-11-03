@@ -24,6 +24,7 @@ from sqlalchemy.exc import SQLAlchemyError
 # Ensure known specs are registered (importing the package imports submodules)
 import cdm.data_collection.specs  # noqa: F401
 from cdm.config import get_config
+from cdm.contracts.hydration import HydrationAssessment
 from cdm.data_collection.client import get_client
 from cdm.data_collection.endpoint_registry import get_spec
 from cdm.data_collection.id_utils import CanonicalIdBuilder, UrlIdParser
@@ -359,22 +360,18 @@ class IngestRunner:
                     runtime_params,
                     validation_failure_sink=quarantine,
                 )
-        hydration_sources: list[str] = []
         if self.resource is Resource.BILL:
             hydrate_details = getattr(item, "add_bill_details", None)
             if callable(hydrate_details):
                 hydrate_details(client)
-                hydration_sources.append("congress.gov_api")
         item_data = item.model_dump(mode="json", exclude_none=True)
-        if hydration_sources:
-            item_data.update({
-                "hydration_status": "complete",
-                "hydrated_at": datetime.now(UTC).isoformat(),
-                "hydrated_sources": hydration_sources,
-            })
-            detail_hydration = getattr(item, "detail_hydration", None)
-            if isinstance(detail_hydration, dict):
-                item_data["detail_hydration"] = detail_hydration
+        if self.resource is Resource.BILL:
+            assessment = HydrationAssessment.from_record(item_data)
+            item_data["hydration_assessment"] = assessment.model_dump(mode="json")
+            item_data["hydration_status"] = assessment.status.value
+            if assessment.assessed_at is not None:
+                item_data["hydrated_at"] = assessment.assessed_at.isoformat()
+                item_data["hydrated_sources"] = [assessment.source.value]
 
         if self.resource is Resource.BILL and meta_mapping.get("introduced_date"):
             base_id = meta_mapping.get("id") or item_data.get("id")
@@ -384,15 +381,15 @@ class IngestRunner:
         if not item_data.get("id"):
             try:
                 item_data["id"] = CanonicalIdBuilder().build(item)
-            except Exception:  # noqa: BLE001, S110 - ID enrichment is best effort.
-                pass
+            except (AttributeError, TypeError, ValueError) as exc:
+                logger.warning("Could not derive canonical identity for %s: %s", self.resource.value, exc)
 
         if not item_data.get("referenceId"):
             try:
                 if item_data.get("url"):
                     item_data["referenceId"] = UrlIdParser.parse(str(item_data["url"]))
-            except Exception:  # noqa: BLE001 - reference ID enrichment is best effort.
-                pass
+            except (AttributeError, TypeError, ValueError) as exc:
+                logger.warning("Could not derive reference identity for %s: %s", self.resource.value, exc)
 
         return item_data
 

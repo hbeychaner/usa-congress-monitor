@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
 from elasticsearch import Elasticsearch
@@ -18,8 +17,6 @@ from cdm.store.indexer import to_document
 from cdm.store.mapping_validation import validate_document
 from cdm.store.opensearch import bulk_upsert, resource_target
 from cdm.workers.results import JobResult, SkippedClaim
-
-logger = logging.getLogger(__name__)
 
 
 class ArchiveReplayer:
@@ -45,18 +42,13 @@ class ArchiveReplayer:
             ]
             for document in documents:
                 validate_document(document, payload.resource)
-            result = bulk_upsert(
+            bulk_upsert(
                 self._client,
                 payload.resource,
                 documents,
                 target_index=payload.target_index,
                 replace=payload.replace,
             )
-            if result.get("errors"):
-                raise RuntimeError(
-                    "OpenSearch bulk indexing failed during archive replay for "
-                    f"{payload.archive_root}: {result.get('error_details', [])}"
-                )
             replayed += len(documents)
         return replayed
 
@@ -117,14 +109,12 @@ class IndexJobRunner:
     ) -> dict[str, IndexOutcome | Exception]:
         target, _ = resource_target(payload.resource)
         target_index = payload.target_index
-        if target_index and not self._client.indices.exists(index=target_index):
-            logger.warning(
-                "Staging index %s is gone; indexing %s via its write alias",
-                target_index,
-                payload.resource,
-            )
-            target_index = None
-        if not target_index:
+        if target_index is not None and (
+            not target_index.strip()
+            or not self._client.indices.exists(index=target_index)
+        ):
+            raise ValueError(f"Explicit index target does not exist: {target_index!r}")
+        if target_index is None:
             IndexManager(self._client).create(target, exists_ok=True)
         return self._indexer.index(
             jobs,
@@ -172,7 +162,7 @@ class IndexJobRunner:
             # eviction); the durable per-job archive is the fallback source.
             replayed = self._replayer.replay(payload)
             outcome.replayed_from_archive = replayed
-            if outcome.indexed + replayed < expected:
+            if replayed < expected:
                 raise RuntimeError(
                     f"Indexed {outcome.indexed} records "
                     f"(+{replayed} archive replays), expected at least "

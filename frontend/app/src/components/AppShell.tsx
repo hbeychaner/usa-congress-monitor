@@ -2,7 +2,7 @@ import { Badge, Box, Flex, Heading, Link as RadixLink } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { fetchHealth } from '../api/system';
+import { fetchReadiness } from '../api/system';
 
 import type { PropsWithChildren } from 'react';
 
@@ -27,9 +27,9 @@ export function AppShell({ children }: PropsWithChildren) {
 
     async function checkHealth() {
       try {
-        const health = await fetchHealth();
+        const health = await fetchReadiness();
         if (!cancelled) {
-          setApiHealthy(health.status === 'ok');
+          setApiHealthy(health.status === 'ready');
         }
       } catch {
         if (!cancelled) {
@@ -47,12 +47,12 @@ export function AppShell({ children }: PropsWithChildren) {
     };
   }, []);
 
-  const healthLabel = apiHealthy === null ? 'Checking API...' : apiHealthy ? 'Ingest Online' : 'API Unreachable';
+  const healthLabel = apiHealthy === null ? 'Checking API...' : apiHealthy ? 'API Ready' : 'API Not Ready';
   const healthColor = apiHealthy === null ? 'gray' : apiHealthy ? 'green' : 'red';
 
   return (
     <Box className="app-shell">
-      <Flex asChild justify="between" align="center" gap="4" px="5" py="3" className="topbar">
+      <Flex asChild justify="between" align="center" wrap="wrap" gap="4" px="5" py="3" className="topbar">
         <header>
           <Heading as="h1" size="4" className="brand">
             Congress Tracker
@@ -60,7 +60,7 @@ export function AppShell({ children }: PropsWithChildren) {
           <Badge color={healthColor} variant="soft" radius="full" size="2">
             {healthLabel}
           </Badge>
-          <Flex asChild gap="4" align="center">
+          <Flex asChild gap="4" align="center" wrap="wrap">
             <nav aria-label="Primary">
               {navItems.map((item) => {
                 const active = location.pathname === item.href;

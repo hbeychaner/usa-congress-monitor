@@ -4,6 +4,20 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+from cdm.config.topic_analysis import TopicId
+
+
+def topic_label(name: str | None, topic_id: int) -> str:
+    """Human-friendly label from a BERTopic name like ``5_health_care``."""
+    if topic_id == TopicId.OUTLIER:
+        return "Uncategorized"
+    if name:
+        _, _, words = name.partition("_")
+        if words:
+            return words.replace("_", " ")
+        return name
+    return f"Topic {topic_id}"
+
 
 def dedupe_terms(terms: Iterable[str]) -> list[str]:
     """Drop repeats and terms whose words all appear in another, longer term."""
@@ -13,7 +27,8 @@ def dedupe_terms(terms: Iterable[str]) -> list[str]:
     for index, term in enumerate(unique):
         tokens = token_sets[index]
         covered = any(
-            other != index and tokens < token_sets[other] for other in range(len(unique))
+            other != index and tokens < token_sets[other]
+            for other in range(len(unique))
         )
         if not covered:
             kept.append(term)

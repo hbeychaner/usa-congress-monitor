@@ -130,18 +130,13 @@ class _IndexRun:
             return
         owners = {job_id for job_id, _, _ in self._buffer}
         try:
-            result = bulk_upsert(
+            bulk_upsert(
                 self._owner.client,
                 self._resource,
                 [document for _, _, document in self._buffer],
                 target_index=self._target_index,
                 replace=self._replace,
             )
-            if result.get("errors"):
-                raise RuntimeError(
-                    "OpenSearch bulk indexing failed: "
-                    f"{result.get('error_details', [])}"
-                )
         except Exception as exc:  # noqa: BLE001 - attributed to the owning jobs.
             for job_id in owners:
                 self._failed.setdefault(job_id, exc)

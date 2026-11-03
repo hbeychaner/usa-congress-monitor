@@ -23,8 +23,13 @@ class MemberMetasubjectOverlayBuilder:
         self.bills = bills
         self.topics = topics
 
-    def build(self, member_ids: list[str], congress: int | None, per_member: int) -> MetasubjectOverlay:
-        version, _ = self.topics.latest_model_version()
+    def build(
+        self,
+        member_ids: list[str],
+        congress: int | None,
+        per_member: int,
+        version: str | None,
+    ) -> MetasubjectOverlay:
         if not version or not member_ids:
             return MetasubjectOverlay([], [])
         bills = self.bills.by_member(member_ids, congress)
@@ -38,14 +43,19 @@ class MemberMetasubjectOverlayBuilder:
                 if count >= MIN_BILLS:
                     links.append(
                         GraphMetasubjectLink(
-                            member=member, metasubject_id=metasubject_id, share=count / total, bills=count
+                            member=member,
+                            metasubject_id=metasubject_id,
+                            share=count / total,
+                            bills=count,
                         )
                     )
         summaries = self.topics.metasubject_summaries(version)
         nodes = [
             GraphMetasubjectNode(
                 metasubject_id=metasubject_id,
-                name=summaries[metasubject_id].name if metasubject_id in summaries else f"Group {metasubject_id}",
+                name=summaries[metasubject_id].name
+                if metasubject_id in summaries
+                else f"Group {metasubject_id}",
             )
             for metasubject_id in sorted({link.metasubject_id for link in links})
         ]

@@ -1,4 +1,4 @@
-"""Composition root: the one place that wires configuration into collaborators."""
+"""Composition root for API reads and durable job submission."""
 
 from __future__ import annotations
 
@@ -32,41 +32,18 @@ from cdm.backend.services.topic_sponsors import AssignedBillReader, TopicSponsor
 from cdm.backend.services.vote_breakdown_service import VoteBreakdownService
 from cdm.backend.services.vote_service import VoteService
 from cdm.config import AppConfig
-from cdm.graph.topics import TopicModelReader
-from cdm.perspectives.boilerplate import BoilerplateLearner
-from cdm.perspectives.builder import PerspectiveBuilder
-from cdm.perspectives.clustering import PerspectiveClusterer
-from cdm.perspectives.corpus import (
-    BipartisanVoteReader,
-    CongressCorpusReader,
-    MeasureFilter,
-    MemberNameReader,
-    MemberPartyReader,
-)
-from cdm.perspectives.evidence import SubjectContrast, TermEvidence
-from cdm.perspectives.labeler import PerspectiveLabeler
-from cdm.perspectives.lexicon import BoilerplateLexicon
-from cdm.perspectives.runner import PerspectiveRunner
-from cdm.perspectives.summarizer import ApproachSummarizer
-from cdm.perspectives.terms import DistinctiveTerms, Tokenizer
+from cdm.graph.store import GraphStore
+from cdm.jobs.analytics import AnalyticsJobs
+from cdm.jobs.store import JobStore
 from cdm.store.client import ElasticClientFactory
 from cdm.store.embedding_store import EmbeddingStore
-from cdm.store.metasubject_override_store import MetasubjectOverrideStore
-from cdm.store.metasubject_repository import MetasubjectRepository
 from cdm.store.perspective_repository import PerspectiveRepository
-from cdm.utils.metasubject_namer import OllamaMetasubjectNamer, OllamaNameDisambiguator
-from cdm.utils.metasubjects import (
-    LargestTopicNamer,
-    Metasubject,
-    MetasubjectAssigner,
-    MetasubjectBuilder,
-    MetasubjectNamer,
-    MetasubjectOverrides,
-    NameDisambiguator,
-    StableIdMatcher,
-)
+from cdm.store.topic_publication import TopicPublicationStore
+from cdm.topics.retirement import RetirementReporter
 from cdm.utils.ollama_client import OllamaClient
 from cdm.utils.topic_labeler import TopicLabeler
+from cdm.workers.celery_app import celery_app
+from cdm.workers.dispatch import JobDispatcher, JobSubmitter
 
 
 class Container:
@@ -80,6 +57,22 @@ class Container:
         self.config = config
 
     @cached_property
+    def job_store(self) -> JobStore:
+        return JobStore(self.config.ledger.job_db_path, repair=False)
+
+    @cached_property
+    def job_dispatcher(self) -> JobDispatcher:
+        return JobDispatcher(celery_app, self.config.queue)
+
+    @cached_property
+    def job_submitter(self) -> JobSubmitter:
+        return JobSubmitter(self.job_store, self.job_dispatcher)
+
+    @cached_property
+    def analytics_jobs(self) -> AnalyticsJobs:
+        return AnalyticsJobs(self.job_store, self.job_dispatcher)
+
+    @cached_property
     def elastic_client(self) -> Elasticsearch:
         return ElasticClientFactory(self.config.elastic).create()
 
@@ -91,91 +84,34 @@ class Container:
     def topic_labeler(self) -> TopicLabeler:
         return TopicLabeler(self.ollama_client)
 
-    def embedding_store(self, model: str | None = None) -> EmbeddingStore:
+    def embedding_store(
+        self,
+        model: str | None = None,
+        *,
+        index: str | None = None,
+    ) -> EmbeddingStore:
+        model = model or self.config.embedding.embedding_model
         return EmbeddingStore(
             self.elastic_client,
-            model or self.config.embedding.embedding_model,
-            index=self.config.elastic.embeddings_index,
+            model,
+            index=index
+            if index is not None
+            else EmbeddingStore.namespace(self.config.elastic.embeddings_index, model),
             batch_docs=self.config.embedding.embedding_batch_docs,
         )
 
     @cached_property
-    def metasubject_override_store(self) -> MetasubjectOverrideStore:
-        return MetasubjectOverrideStore(
-            self.elastic_client, self.config.elastic.metasubject_overrides_index
-        )
-
-    @cached_property
-    def metasubject_repository(self) -> MetasubjectRepository:
-        return MetasubjectRepository(
+    def topic_publications(self) -> TopicPublicationStore:
+        return TopicPublicationStore(
             self.elastic_client, self.config.elastic.analysis_index
         )
 
-    def metasubject_namer(self, *, use_llm: bool) -> MetasubjectNamer:
-        if use_llm:
-            return OllamaMetasubjectNamer(self.ollama_client)
-        return LargestTopicNamer()
-
-    def metasubject_disambiguator(self, *, use_llm: bool) -> NameDisambiguator | None:
-        return OllamaNameDisambiguator(self.ollama_client) if use_llm else None
-
-    def metasubject_builder(
-        self,
-        namer: MetasubjectNamer,
-        overrides: MetasubjectOverrides | None = None,
-        disambiguator: NameDisambiguator | None = None,
-    ) -> MetasubjectBuilder:
-        settings = self.config.metasubject
-        return MetasubjectBuilder(
-            namer,
-            StableIdMatcher(settings.metasubject_match_min_similarity),
-            settings.metasubject_target_groups,
-            overrides,
-            disambiguator,
-            settings.metasubject_name_carry_max_size_ratio,
-        )
-
-    def metasubject_assigner(
-        self, metasubjects: list[Metasubject]
-    ) -> MetasubjectAssigner:
-        return MetasubjectAssigner(
-            metasubjects, self.config.metasubject.metasubject_low_confidence_similarity
-        )
-
     @cached_property
-    def congress_corpus_reader(self) -> CongressCorpusReader:
-        parties = MemberPartyReader(self.elastic_client).read()
-        return CongressCorpusReader(
-            self.elastic_client,
-            parties,
-            self.config.perspective,
-            MeasureFilter(self.config.perspective),
-            BipartisanVoteReader(
-                self.elastic_client, parties, self.config.perspective
-            ),
-        )
-
-    @cached_property
-    def boilerplate_learner(self) -> BoilerplateLearner:
-        base = Tokenizer(
-            MemberNameReader(self.elastic_client).read(),
-            self.config.perspective.perspective_max_ngram,
-        )
-        return BoilerplateLearner(self.config.perspective, base)
-
-    def perspective_builder(
-        self, *, use_llm: bool, lexicon: BoilerplateLexicon
-    ) -> PerspectiveBuilder:
-        config = self.config.perspective
-        tokenizer = Tokenizer(lexicon, config.perspective_max_ngram)
-        return PerspectiveBuilder(
-            config,
-            PerspectiveClusterer(config, tokenizer),
-            DistinctiveTerms(config, tokenizer),
-            TermEvidence(config, tokenizer),
-            SubjectContrast(config),
-            PerspectiveLabeler(self.ollama_client, enabled=use_llm),
-            ApproachSummarizer(self.ollama_client, enabled=use_llm),
+    def retirement_reporter(self) -> RetirementReporter:
+        return RetirementReporter(
+            self.topic_publications,
+            GraphStore(self.elastic_client),
+            self.config.elastic.embeddings_index,
         )
 
     @cached_property
@@ -184,22 +120,21 @@ class Container:
             self.elastic_client, self.config.elastic.analysis_index
         )
 
-    def perspective_runner(self, *, use_llm: bool) -> PerspectiveRunner:
-        return PerspectiveRunner(
+    @cached_property
+    def party_service(self) -> PartyService:
+        return PartyService(
+            self.perspective_repository,
             self.config.perspective,
-            TopicModelReader(self.elastic_client, self.config.elastic.analysis_index),
-            self.congress_corpus_reader,
-            self.boilerplate_learner,
-            lambda lexicon: self.perspective_builder(use_llm=use_llm, lexicon=lexicon),
+            self.topic_publications,
         )
 
     @cached_property
-    def party_service(self) -> PartyService:
-        return PartyService(self.perspective_repository, self.config.perspective)
-
-    @cached_property
     def similar_bill_service(self) -> SimilarBillService:
-        return SimilarBillService(self.elastic_client, self.embedding_store())
+        return SimilarBillService(
+            self.elastic_client,
+            self.embedding_store(index=self.config.elastic.embeddings_index),
+            self.topic_publications,
+        )
 
     @cached_property
     def committee_service(self) -> CommitteeService:
@@ -207,7 +142,11 @@ class Container:
 
     @cached_property
     def bill_service(self) -> BillService:
-        return BillService(self.elastic_client, BillVoteIndex(self.elastic_client))
+        return BillService(
+            self.elastic_client,
+            BillVoteIndex(self.elastic_client, self.config.query_reads),
+            self.config.query_reads,
+        )
 
     @cached_property
     def vote_service(self) -> VoteService:
@@ -223,7 +162,9 @@ class Container:
 
     @cached_property
     def search_service(self) -> SearchService:
-        return SearchService(self.elastic_client, self.state_service)
+        return SearchService(
+            self.elastic_client, self.state_service, self.config.query_reads
+        )
 
     @cached_property
     def subject_service(self) -> SubjectService:
@@ -235,12 +176,13 @@ class Container:
             self.elastic_client,
             self.config.elastic.analysis_index,
             self.subject_service,
+            self.topic_publications,
         )
 
     @cached_property
     def member_service(self) -> MemberService:
         return MemberService(
-            self.elastic_client, self.search_service, self.topic_service
+            self.elastic_client, self.search_service, self.config.query_reads
         )
 
     @cached_property
@@ -253,7 +195,12 @@ class Container:
 
     @cached_property
     def graph_service(self) -> GraphService:
-        return GraphService(self.elastic_client, self.member_service)
+        return GraphService(
+            GraphStore(self.elastic_client),
+            self.member_service,
+            self.topic_publications,
+            self.config.query_reads,
+        )
 
     @cached_property
     def sponsored_bills(self) -> SponsoredBillReader:

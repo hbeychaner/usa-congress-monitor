@@ -1,17 +1,56 @@
 from enum import StrEnum
+from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import Field, JsonValue
 
+from cdm.contracts.analysis import AnalysisResponse, AnalysisState, AnalysisStatus
+from cdm.contracts.base import ResponseModel
+from cdm.contracts.hydration import HydrationAssessment
+from cdm.contracts.labels import LabelProvenance
+from cdm.contracts.queries import WindowedResponse
 from cdm.graph.models import PartyGroup, Signal
 from cdm.perspectives.models import SubjectUse, TermUse, TopicPerspectives
 
 
-class StateSummary(BaseModel):
+class HealthResponse(ResponseModel):
+    status: str
+
+
+class ReadinessResponse(ResponseModel):
+    status: Literal["ready"]
+
+
+class ErrorResponse(ResponseModel):
+    detail: str
+
+
+class AnalysisErrorResponse(ErrorResponse):
+    analysis_state: Literal[AnalysisState.NOT_BUILT, AnalysisState.UNAVAILABLE]
+
+
+class DistrictProperties(ResponseModel):
+    state: str
+    district: int
+
+
+class DistrictFeature(ResponseModel):
+    type: Literal["Feature"]
+    id: str
+    properties: DistrictProperties
+    geometry: dict[str, JsonValue]
+
+
+class DistrictFeatureCollection(ResponseModel):
+    type: Literal["FeatureCollection"]
+    features: list[DistrictFeature]
+
+
+class StateSummary(ResponseModel):
     code: str = Field(description="Two-letter state code")
     name: str = Field(description="State display name")
 
 
-class TimelineMember(BaseModel):
+class TimelineMember(ResponseModel):
     bioguide_id: str
     name: str
     party: str
@@ -19,25 +58,25 @@ class TimelineMember(BaseModel):
     congress_end: int
 
 
-class CongressGroup(BaseModel):
+class CongressGroup(ResponseModel):
     congress: int
     members: list[TimelineMember]
 
 
-class ChamberTimeline(BaseModel):
+class ChamberTimeline(ResponseModel):
     chamber: str
     members: list[TimelineMember]
     groups: list[CongressGroup] = Field(default_factory=list)
 
 
-class StateTimelineResponse(BaseModel):
+class StateTimelineResponse(ResponseModel):
     state_code: str
     state_name: str
     house: ChamberTimeline
     senate: ChamberTimeline
 
 
-class MemberSummary(BaseModel):
+class MemberSummary(ResponseModel):
     bioguide_id: str
     display_name: str
     party: str
@@ -49,14 +88,11 @@ class MemberSummary(BaseModel):
     image_url: str | None = None
 
 
-class MembersResponse(BaseModel):
+class MembersResponse(WindowedResponse):
     members: list[MemberSummary]
-    total: int
-    page: int = 1
-    limit: int = 50
 
 
-class MemberTerm(BaseModel):
+class MemberTerm(ResponseModel):
     chamber: str | None = None
     congress: int | None = None
     start_year: int | None = None
@@ -81,20 +117,20 @@ class MemberDetail(MemberSummary):
     image_attribution: str | None = None
 
 
-class ActivityItem(BaseModel):
+class ActivityItem(ResponseModel):
     bill_id: str
     title: str
     activity_type: str
     congress: int
 
 
-class TopicItem(BaseModel):
+class TopicItem(ResponseModel):
     label: str
     weight: float
     topic_id: int | None = None
 
 
-class TopicSummary(BaseModel):
+class TopicSummary(LabelProvenance):
     topic_id: int
     name: str
     label: str
@@ -103,30 +139,30 @@ class TopicSummary(BaseModel):
     metasubject_id: int | None = None
 
 
-class TopicsResponse(BaseModel):
+class TopicsResponse(AnalysisResponse):
     topics: list[TopicSummary]
     model_version: str | None = None
     trained_at: str | None = None
 
 
-class TopicTrendPoint(BaseModel):
+class TopicTrendPoint(ResponseModel):
     timestamp: str
     frequency: int
     words: str | None = None
 
 
-class TopicTrendSeries(BaseModel):
+class TopicTrendSeries(ResponseModel):
     topic_id: int
     label: str
     points: list[TopicTrendPoint]
 
 
-class TopicTrendsResponse(BaseModel):
+class TopicTrendsResponse(AnalysisResponse):
     series: list[TopicTrendSeries]
     model_version: str | None = None
 
 
-class MetasubjectSummary(BaseModel):
+class MetasubjectSummary(LabelProvenance):
     metasubject_id: int
     name: str
     size: int
@@ -134,29 +170,29 @@ class MetasubjectSummary(BaseModel):
     topic_ids: list[int] = Field(default_factory=list)
 
 
-class RelatedMetasubject(BaseModel):
+class RelatedMetasubject(ResponseModel):
     metasubject_id: int
     name: str
     similarity: float
 
 
-class MetasubjectsResponse(BaseModel):
+class MetasubjectsResponse(AnalysisResponse):
     metasubjects: list[MetasubjectSummary]
     model_version: str | None = None
 
 
-class MetasubjectTrendSeries(BaseModel):
+class MetasubjectTrendSeries(ResponseModel):
     metasubject_id: int
     label: str
     points: list[TopicTrendPoint]
 
 
-class MetasubjectTrendsResponse(BaseModel):
+class MetasubjectTrendsResponse(AnalysisResponse):
     series: list[MetasubjectTrendSeries]
     model_version: str | None = None
 
 
-class MetasubjectDetailResponse(BaseModel):
+class MetasubjectDetailResponse(AnalysisResponse):
     metasubject: MetasubjectSummary
     related: list[RelatedMetasubject] = Field(default_factory=list)
     topics: list[TopicSummary] = Field(default_factory=list)
@@ -164,19 +200,19 @@ class MetasubjectDetailResponse(BaseModel):
     model_version: str | None = None
 
 
-class TopicBill(BaseModel):
+class TopicBill(ResponseModel):
     bill_id: str
     title: str | None = None
     probability: float
 
 
-class RelatedTopic(BaseModel):
+class RelatedTopic(ResponseModel):
     topic_id: int
     label: str
     similarity: float
 
 
-class TopicDetailResponse(BaseModel):
+class TopicDetailResponse(AnalysisResponse):
     topic: TopicSummary
     related: list[RelatedTopic] = Field(default_factory=list)
     model_version: str | None = None
@@ -184,26 +220,26 @@ class TopicDetailResponse(BaseModel):
     top_bills: list[TopicBill] = Field(default_factory=list)
 
 
-class TopicAssignmentItem(BaseModel):
+class TopicAssignmentItem(ResponseModel):
     topic_id: int
     label: str
     probability: float
 
 
-class BillTopicsResponse(BaseModel):
+class BillTopicsResponse(AnalysisResponse):
     bill_id: str
     topics: list[TopicAssignmentItem] = Field(default_factory=list)
     model_version: str | None = None
 
 
-class MemberTopicTrendPoint(BaseModel):
+class MemberTopicTrendPoint(ResponseModel):
     period: str
     topic_id: int
     label: str
     count: int
 
 
-class MemberTopicsResponse(BaseModel):
+class MemberTopicsResponse(AnalysisResponse):
     bioguide_id: str
     topics: list[TopicItem] = Field(default_factory=list)
     trend: list[MemberTopicTrendPoint] = Field(default_factory=list)
@@ -219,8 +255,9 @@ class TrainingState(StrEnum):
     FAILED = "failed"
 
 
-class TopicTrainingStatus(BaseModel):
+class TopicTrainingStatus(ResponseModel):
     state: TrainingState = TrainingState.IDLE
+    job_id: str | None = None
     started: bool | None = None
     pid: int | None = None
     stage: str | None = None
@@ -232,40 +269,39 @@ class TopicTrainingStatus(BaseModel):
     updated_at: str | None = None
 
 
-class SubjectCount(BaseModel):
+class SubjectCount(ResponseModel):
     name: str
     count: int
 
 
-class SubjectsResponse(BaseModel):
+class SubjectsResponse(ResponseModel):
     subjects: list[SubjectCount] = Field(default_factory=list)
     policy_areas: list[SubjectCount] = Field(default_factory=list)
     total_bills: int = 0
 
 
-class PolicyAreaTrendPoint(BaseModel):
+class PolicyAreaTrendPoint(ResponseModel):
     year: int
     count: int
 
 
-class PolicyAreaTrendSeries(BaseModel):
+class PolicyAreaTrendSeries(ResponseModel):
     name: str
     total: int
     points: list[PolicyAreaTrendPoint]
 
 
-class PolicyAreaTrendsResponse(BaseModel):
+class PolicyAreaTrendsResponse(ResponseModel):
     series: list[PolicyAreaTrendSeries] = Field(default_factory=list)
     total_bills: int = 0
 
 
-class MemberProfileResponse(BaseModel):
+class MemberProfileResponse(ResponseModel):
     member: MemberDetail
     recent_activity: list[ActivityItem]
-    topics: list[TopicItem]
 
 
-class MemberActivityItem(BaseModel):
+class MemberActivityItem(ResponseModel):
     id: str
     document_type: str  # "bill" | "amendment" (extensible: "vote", ...)
     activity_type: str  # "Sponsor" | "Cosponsor"
@@ -275,29 +311,28 @@ class MemberActivityItem(BaseModel):
     bill_id: str | None = None
 
 
-class MemberActivityResponse(BaseModel):
+class MemberActivityResponse(WindowedResponse):
     items: list[MemberActivityItem]
-    total: int
     counts: dict[str, int]
-    page: int = 1
     limit: int = 25
 
 
-class SearchResultItem(BaseModel):
+class SearchResultItem(ResponseModel):
     id: str
     result_type: str
     title: str
     subtitle: str | None = None
 
 
-class SearchResponse(BaseModel):
+class SearchResponse(ResponseModel):
     query: str
     types: list[str]
-    limit: int
+    limit: int = Field(description="Maximum results per selected entity type.")
+    ordering: Literal["grouped"] = "grouped"
     results: list[SearchResultItem]
 
 
-class BillSummary(BaseModel):
+class BillSummary(ResponseModel):
     bill_id: str
     title: str
     congress: int | None = None
@@ -308,26 +343,23 @@ class BillSummary(BaseModel):
     vote_count: int = 0
 
 
-class BillsResponse(BaseModel):
+class BillsResponse(WindowedResponse):
     bills: list[BillSummary]
-    total: int
-    page: int = 1
-    limit: int = 50
 
 
-class SimilarBill(BaseModel):
+class SimilarBill(ResponseModel):
     bill_id: str
     title: str
     congress: int | None = None
     score: float
 
 
-class CommitteeActivity(BaseModel):
+class CommitteeActivity(ResponseModel):
     name: str
     date: str | None = None
 
 
-class CommitteeBill(BaseModel):
+class CommitteeBill(ResponseModel):
     bill_id: str
     title: str
     congress: int | None = None
@@ -335,7 +367,7 @@ class CommitteeBill(BaseModel):
     activities: list[CommitteeActivity] = Field(default_factory=list)
 
 
-class CommitteeDetailResponse(BaseModel):
+class CommitteeDetailResponse(ResponseModel):
     system_code: str
     name: str
     chamber: str | None = None
@@ -346,12 +378,12 @@ class CommitteeDetailResponse(BaseModel):
     bills: list[CommitteeBill] = Field(default_factory=list)
 
 
-class SimilarBillsResponse(BaseModel):
+class SimilarBillsResponse(AnalysisResponse):
     bill_id: str
     similar: list[SimilarBill] = Field(default_factory=list)
 
 
-class BillDetail(BaseModel):
+class BillDetail(ResponseModel):
     bill_id: str
     title: str
     congress: int | None = None
@@ -378,20 +410,21 @@ class BillDetail(BaseModel):
     full_text: str | None = None
     full_text_version_code: str | None = None
     relationship_counts: dict[str, int] = Field(default_factory=dict)
+    hydration: HydrationAssessment = Field(default_factory=HydrationAssessment)
 
 
-class BillDetailResponse(BaseModel):
+class BillDetailResponse(ResponseModel):
     bill: BillDetail
 
 
-class VotePartyTotals(BaseModel):
+class VotePartyTotals(ResponseModel):
     yea: int = 0
     nay: int = 0
     present: int = 0
     not_voting: int = 0
 
 
-class VoteSummary(BaseModel):
+class VoteSummary(ResponseModel):
     vote_id: str
     congress: int | None = None
     session_number: int | None = None
@@ -407,7 +440,7 @@ class VoteSummary(BaseModel):
     rollcall_id: str | None = None
 
 
-class BillVotesResponse(BaseModel):
+class BillVotesResponse(ResponseModel):
     bill_id: str
     votes: list[VoteSummary]
     total: int
@@ -420,28 +453,28 @@ class VotePosition(StrEnum):
     NOT_VOTING = "not_voting"
 
 
-class VoteMember(BaseModel):
+class VoteMember(ResponseModel):
     bioguide_id: str
     name: str
     state: str | None = None
 
 
-class PositionMembers(BaseModel):
+class PositionMembers(ResponseModel):
     position: VotePosition
     members: list[VoteMember]
 
 
-class PartyVoteBreakdown(BaseModel):
+class PartyVoteBreakdown(ResponseModel):
     party: PartyGroup
     positions: list[PositionMembers]
 
 
-class VoteBreakdownResponse(BaseModel):
+class VoteBreakdownResponse(ResponseModel):
     vote_id: str
     parties: list[PartyVoteBreakdown]
 
 
-class IngestProgressJob(BaseModel):
+class IngestProgressJob(ResponseModel):
     job_id: str
     status: str
     resource: str
@@ -459,7 +492,7 @@ class IngestProgressJob(BaseModel):
     eta: str | None = None
 
 
-class BackfillProgress(BaseModel):
+class BackfillProgress(ResponseModel):
     total: int
     succeeded: int
     pending: int
@@ -473,7 +506,7 @@ class BackfillProgress(BaseModel):
     batches_pending: int = 0
 
 
-class IngestProgressResponse(BaseModel):
+class IngestProgressResponse(ResponseModel):
     hydrated: int
     discovered: int
     target: int
@@ -487,7 +520,7 @@ class IngestProgressResponse(BaseModel):
     backfill: BackfillProgress | None = None
 
 
-class JobStatusCounts(BaseModel):
+class JobStatusCounts(ResponseModel):
     queued: int = 0
     running: int = 0
     retrying: int = 0
@@ -495,7 +528,7 @@ class JobStatusCounts(BaseModel):
     failed: int = 0
 
 
-class GovInfoCoverage(BaseModel):
+class GovInfoCoverage(ResponseModel):
     congress: int
     expected: int = 0
     available: int = 0
@@ -506,7 +539,7 @@ class GovInfoCoverage(BaseModel):
     report_found: bool = False
 
 
-class StagingStatus(BaseModel):
+class StagingStatus(ResponseModel):
     index: str
     exists: bool = False
     documents: int = 0
@@ -514,7 +547,7 @@ class StagingStatus(BaseModel):
     connected: bool = False
 
 
-class AdminIngestSnapshot(BaseModel):
+class AdminIngestSnapshot(ResponseModel):
     congress: int
     govinfo: GovInfoCoverage
     govinfo_jobs: JobStatusCounts
@@ -526,19 +559,19 @@ class AdminIngestSnapshot(BaseModel):
     ready_for_cutover: bool
 
 
-class IndexStatus(BaseModel):
+class IndexStatus(ResponseModel):
     name: str
     documents: int = 0
 
 
-class SystemStatusResponse(BaseModel):
+class SystemStatusResponse(ResponseModel):
     search_connected: bool = False
     indices: list[IndexStatus] = Field(default_factory=list)
     jobs: dict[str, JobStatusCounts] = Field(default_factory=dict)
     generated_at: str | None = None
 
 
-class SimilarMember(BaseModel):
+class SimilarMember(ResponseModel):
     member: MemberSummary
     score: float
     member_sponsored: int = 0
@@ -551,7 +584,7 @@ class SimilarMember(BaseModel):
     shared_topics: list[str] = Field(default_factory=list)
 
 
-class SimilarMembersResponse(BaseModel):
+class SimilarMembersResponse(AnalysisResponse):
     member_id: str
     signal: Signal
     congress: int | None = None
@@ -559,13 +592,13 @@ class SimilarMembersResponse(BaseModel):
     similar: list[SimilarMember]
 
 
-class GraphNode(BaseModel):
+class GraphNode(ResponseModel):
     member: MemberSummary
     party_group: PartyGroup
     is_seed: bool = False
 
 
-class GraphLink(BaseModel):
+class GraphLink(ResponseModel):
     source: str
     target: str
     score: float
@@ -573,42 +606,44 @@ class GraphLink(BaseModel):
     shared_topics: list[str] = Field(default_factory=list)
 
 
-class GraphTopicNode(BaseModel):
+class GraphTopicNode(ResponseModel):
     topic_id: int
     label: str
 
 
-class GraphTopicLink(BaseModel):
+class GraphTopicLink(ResponseModel):
     member: str
     topic_id: int
     share: float
     bills: int
 
 
-class GraphSubjectNode(BaseModel):
+class GraphSubjectNode(ResponseModel):
     name: str
 
 
-class GraphSubjectLink(BaseModel):
+class GraphSubjectLink(ResponseModel):
     member: str
     subject: str
     bills: int
 
 
-class GraphMetasubjectNode(BaseModel):
+class GraphMetasubjectNode(ResponseModel):
     metasubject_id: int
     name: str
 
 
-class GraphMetasubjectLink(BaseModel):
+class GraphMetasubjectLink(ResponseModel):
     member: str
     metasubject_id: int
     share: float
     bills: int
 
 
-class NeighborhoodResponse(BaseModel):
+class NeighborhoodResponse(ResponseModel):
     seeds: list[str]
+    analysis: dict[Signal, AnalysisStatus]
+    topic_analysis: AnalysisStatus | None = None
     congress: int | None = None
     versions: dict[Signal, str] = Field(default_factory=dict)
     nodes: list[GraphNode] = Field(default_factory=list)
@@ -621,7 +656,7 @@ class NeighborhoodResponse(BaseModel):
     metasubject_links: list[GraphMetasubjectLink] = Field(default_factory=list)
 
 
-class PartyTopicEntry(BaseModel):
+class PartyTopicEntry(ResponseModel):
     topic_id: int
     label: str
     bills: int
@@ -631,13 +666,13 @@ class PartyTopicEntry(BaseModel):
     summary: str = ""
 
 
-class PartyRanking(BaseModel):
+class PartyRanking(ResponseModel):
     party: PartyGroup
     total_bills: int
     topics: list[PartyTopicEntry]
 
 
-class BilateralTopicEntry(BaseModel):
+class BilateralTopicEntry(ResponseModel):
     topic_id: int
     label: str
     bills: int
@@ -648,7 +683,7 @@ class BilateralTopicEntry(BaseModel):
     summary: str = ""
 
 
-class PartiesResponse(BaseModel):
+class PartiesResponse(AnalysisResponse):
     congress: int | None
     congresses: list[int]
     model_version: str | None
@@ -656,7 +691,7 @@ class PartiesResponse(BaseModel):
     bilateral: list[BilateralTopicEntry]
 
 
-class PartyTopicResponse(BaseModel):
+class PartyTopicResponse(AnalysisResponse):
     """One topic's party contrast; clusters appear only when they pass the stability gate."""
 
     topic: TopicPerspectives

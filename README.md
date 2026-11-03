@@ -1,12 +1,87 @@
 # Congress Tracker
 
-Congress Tracker collects typed Congress.gov records and unmetered GovInfo
+Congress Tracker collects typed Congress.gov records and public GovInfo
 bulk data, stores compressed, deduplicated SQLite archives, and indexes
-everything into a single canonical document per bill in OpenSearch. The system
+resource-specific projections in Elasticsearch, merging bill sources into a
+single canonical document per bill. The system
 supports one-off runs, scheduled daily collection, and resumable historical
 backfills without staging large JSON or JSONL files. A FastAPI backend and
 React web app serve search, bill detail (including inline full text), and
 member activity on top of the search store.
+
+Bulk writes share one fail-closed boundary: any rejected item fails its batch
+with all rejected document IDs/details retained, and Redis acknowledgements wait
+for success. Archive recovery requires a complete snapshot rather than adding
+possibly overlapping stream/replay counts. See the
+[recovery ownership table](documentation/OPERATIONS_RUNBOOK.md#recovery-ownership).
+
+GovInfo reconciliation now defaults to a bounded, read-only preview; offline
+inspection is explicit with `--archives-only`. Verified, field-complete snapshots
+can correct or remove fields only in an explicitly requested unaliased staging
+index. Sparse records preserve richer values, conflicts block writes, and
+coverage/freshness gaps remain explicit. Live additive merging is unchanged.
+See the [source contract](documentation/guides/ingestion.md#govinfo-replay-and-reconciliation)
+and [safe preview procedure](documentation/OPERATIONS_RUNBOOK.md#source-contract-preview-and-staging).
+The [dated live inventory](documentation/IMPLEMENTATION_PLAN.md#r03) records
+actual aliases, schema differences, observed coverage and remaining release
+gates; it does not certify complete upstream history.
+
+Versioned bill hydration evidence is explicitly source-only in the legislation
+mapping; its derived `hydration_status` remains searchable. Full-suite mapping
+audits guard against silently omitting newly emitted provenance fields.
+
+Graph repair now has a sealed, read-only capture and isolated staging/rollback
+workflow. It reconstructs the affected Congress 114 votes from retained CSVs,
+stages the full voting scope without publication, and rejects the serving
+cluster UUID as a rehearsal target. A separate bounded source-repair command
+requires a full historical graph backup/restore proof and conflict-checked,
+receipted writes. Voting publication uses a separate measured serving gate and
+compare-and-swap pointer switch. See the
+[graph rehearsal procedure](documentation/OPERATIONS_RUNBOOK.md#sealed-graph-repair-rehearsal).
+
+The approved retained-deployment repair has restored all 1,824 Congress 114
+roll-call source links and added the eight graph mapping paths. Approved voting
+promotion now serves 116,450 edges over Congresses 113-119, including 48,655 with
+Congress 114 evidence. Real API/desktop/narrow browser checks passed before and
+after publication. Other pointers, source versions and historical edges are
+preserved. The approved controlled Compose cutover now serves API/UI plus one
+index/maintenance worker; all old native agents/processes are retired. Acquisition,
+analytics publication, automatic retention scheduling and Beat remain disabled.
+Scoped release acceptance passed; this is not full-history, full-load or
+unattended-operation certification. See the [dated Gate 4 evidence and limits](documentation/OPERATIONS_RUNBOOK.md#controlled-cutover-acceptance).
+
+## Documentation
+
+Start with the [documentation home](documentation/README.md), organized by the
+questions you need answered:
+
+- [Current engineering/refactoring roadmap](documentation/IMPLEMENTATION_PLAN.md):
+  prioritized findings, existing-plan crosswalk, target state and acceptance gates.
+- [Architecture and C4 views](documentation/architecture.md) and the
+  [rendered visual atlas](documentation/reference/visuals.md).
+- [Data structures, identifiers, and relationships](documentation/reference/data-models.md).
+- [Index families, field mapping, merging, and acknowledgement rules](documentation/reference/indexing.md).
+- [Acquisition and replay data flows](documentation/guides/ingestion.md).
+- [API, frontend, and service responsibilities](documentation/reference/api-and-frontend.md).
+- [Topics, embeddings, party perspectives, and graph analysis](documentation/guides/analytics.md).
+- [Every declared source function/class and typed fields](documentation/reference/symbols/README.md).
+- [Configuration and deployment](documentation/guides/configuration-and-deployment.md)
+  and the [operations runbook](documentation/OPERATIONS_RUNBOOK.md).
+
+Repository documentation is canonical. The
+[GitHub wiki](https://github.com/hbeychaner/usa-congress-monitor/wiki) is its
+generated publication copy, not a separate editing location. Prepare pages
+locally without publishing:
+
+```bash
+uv run python tools/build_documentation.py --wiki documentation/wiki
+uv run python tools/build_documentation.py --check --wiki documentation/wiki
+```
+
+See [documentation maintenance and wiki publishing](documentation/CONTRIBUTING.md)
+for prerequisites, scope, and the later manual publication workflow.
+Historical `opensearch` module and mapping names remain in the code; the shipped
+runtime uses Elasticsearch and does not promise OpenSearch server compatibility.
 
 Endpoint configuration uses centralized string enums for HTTP methods, parameter
 locations, pagination modes, ingest resources, and identifier sources. Their
@@ -15,28 +90,44 @@ specifications.
 
 ## Quick Start
 
-Requirements: Python 3.13+, `uv`, Docker Desktop, and a Congress.gov API key.
+Requirements: Python 3.13+, `uv`, Docker with Compose v2 (Docker Desktop on macOS),
+and a Congress.gov API key.
 
 ```bash
 uv sync --all-extras
-make local          # creates .env from .env.example (generated local secrets), starts OpenSearch, Redis, RabbitMQ
+make local          # creates .env from .env.example (generated local secrets), starts Elasticsearch, Redis, RabbitMQ
 # Set CONGRESS_API_KEY in .env
-make es-api-key     # one time, once OpenSearch is up: writes ES_LOCAL_API_KEY / ELASTIC_API_KEY to .env
-make ingest-service-install
+make es-api-key     # one time, once Elasticsearch is up: writes ES_LOCAL_API_KEY / ELASTIC_API_KEY to .env
+make up             # API, frontend, one bounded index/maintenance worker; no acquisition or Beat
 ```
 
 Indices are created on demand by the indexing worker; the job ledger, archives
 and record library are created under `data/` on first use.
 
-For unattended macOS operation, use `make services`. It starts OpenSearch,
-Redis, and RabbitMQ, then installs launchd-supervised ingest, indexing, and Beat
-agents. The agents restart after process failure and resume after login or wake;
-they do not require an open Terminal window. Beat runs
+Normal `uv sync` includes the `dev` and `analysis` dependency groups, preserving
+the full development/worker environment. API-only installs use
+`--no-default-groups` in a separate environment. Production builds default to the
+full `analysis` target for worker/deployment compatibility; opt into the smaller
+API image with `docker build --target api -f Dockerfile.prod -t congress-api .`.
+Both retain the pinned spaCy model and existing query normalization; only the
+analysis target installs BERTopic, Sentence Transformers and their training
+dependencies. See [image acceptance](documentation/OPERATIONS_RUNBOOK.md#release-image-and-routing-acceptance)
+before using either image.
+
+Compose is the sole supported managed stack; `make up`, `make start`, and
+`make services` are aliases. Containers restart after process failure while
+Docker is running; on macOS, enable Docker Desktop startup at login. Native
+launchd management is retired. Existing agents must be explicitly migrated
+before Compose startup; the [runbook](documentation/OPERATIONS_RUNBOOK.md#retiring-native-agents)
+preserves their registrations and data. Nothing automatically stops old agents.
+Enable optional roles only after reviewing their queues and resource budget in
+the [profile guide](documentation/guides/configuration-and-deployment.md#managed-stack-compose).
+When explicitly enabled, Beat runs
 the normal daily overlap and, every 24 hours, checks durable coverage windows
 for date-capable endpoints. When a successful endpoint window is more than 24
 hours behind UTC, it queues an idempotent gap job with indexing enabled. The
 worker publishes hydrated records to Redis and automatically dispatches their
-OpenSearch indexing jobs; no separate indexing command is required.
+Elasticsearch indexing jobs; no separate indexing command is required.
 
 Inspect durable job states and coverage with:
 
@@ -48,12 +139,10 @@ Static endpoints are not gap-scheduled because their APIs do not expose a
 reliable time cursor; they remain covered by the historical/static ingest
 plan.
 
-On macOS, use `make ingest-service-install` for unattended operation and
-`make ingest-service-status` to inspect all four agents (ingest, index,
-maintenance, beat). Use `make worker`,
-`make worker-index`, `make worker-maintenance`, and `make beat` only for foreground development or
-diagnostics. Linux deployments can use the foreground commands or a process
-manager with the default prefork pool.
+Use `make stack-status` and `make stack-logs` to inspect managed processes.
+Foreground `make worker`, `make worker-index`, `make worker-maintenance`, and
+`make beat` remain debugging tools, not a second supervised stack. Do not run
+them against the same queues while Compose owns those roles.
 
 ## Run A Backfill
 
@@ -111,7 +200,8 @@ to disable pacing.
 ## GovInfo Bulk Backfills (bills)
 
 Historical bill work should use GovInfo bulk data instead of the rate-limited
-API: the bulk endpoints are public, unauthenticated, and unmetered. Three
+API: the bulk endpoints are public and unauthenticated; downloads still use
+the application's configured pacing. Three
 collections are supported — BILLSTATUS (full metadata: sponsors, cosponsors,
 actions, committees, subjects, summaries, text versions, laws), BILLS
 (published text), and BILLSUM (summaries). Parsed records use the same
@@ -147,7 +237,7 @@ Celery Beat / operator CLIs
     -> SQLite JobStore -> RabbitMQ -> Celery worker
          ├─ Congress.gov API pipeline (list + item hydration)
          └─ GovInfo bulk jobs (BILLSTATUS/BILLSUM/BILLS XML)
-    -> Redis Stream -> RedisIndexingRunner -> OpenSearch
+    -> Redis Stream -> RedisIndexingRunner -> Elasticsearch
     -> FastAPI backend -> React web app
 ```
 
@@ -158,7 +248,17 @@ Pending entries can be reclaimed after a worker failure. Bill documents merge
 null-safely — list-page skeletons, API hydration, and GovInfo bulk records all
 converge on one canonical document per bill, with full text stored inline.
 
-Visual documentation (Mermaid, C4-style):
+Bill detail pages distinguish **unknown**, **partial**, and versioned **complete**
+Congress API detail retrieval. Legacy labels and rich GovInfo records do not
+prove API hydration; complete retrieval does not certify full text or historical
+coverage. See [hydration evidence](documentation/guides/ingestion.md#bill-hydration-evidence).
+
+Graph publication rejects incompatible mappings and unlinked roll-call inputs.
+Graph coverage means observed inputs, not complete legislative history; see the
+[graph schema and coverage gates](documentation/guides/analytics.md#schema-and-source-coverage-gates).
+
+Visual documentation ([rendered atlas](documentation/reference/visuals.md);
+editable Mermaid sources):
 
 | Diagram | Shows |
 |---|---|
@@ -166,9 +266,13 @@ Visual documentation (Mermaid, C4-style):
 | [documentation/diagrams/ingest-dataflow.mmd](documentation/diagrams/ingest-dataflow.mmd) | Data flow: sources → jobs → ingest → indexing (merge semantics) → search → serving |
 | [documentation/diagrams/backend-components.mmd](documentation/diagrams/backend-components.mmd) | Application components on the serving path (pages, routes, services) |
 | [documentation/diagrams/data-model.mmd](documentation/diagrams/data-model.mmd) | Indexed data models, join keys, and unique identifiers |
-| [worker-architecture.mmd](worker-architecture.mmd) | Worker and indexing containers (C4 container view) |
+| [worker-architecture.mmd](worker-architecture.mmd) | Application processes and stores (C4 container view) |
+| [documentation/diagrams/bill-request-sequence.mmd](documentation/diagrams/bill-request-sequence.mmd) | Bill request, dependencies, query service, and typed response |
+| [documentation/diagrams/deployment.mmd](documentation/diagrams/deployment.mmd) | Local versus GCP runtime and filesystem boundaries |
 
-Operational details are in [documentation/README.md](documentation/README.md).
+Start with the [architecture](documentation/architecture.md) for boundaries and
+the [indexing reference](documentation/reference/indexing.md) for exact write
+semantics; use the [operations runbook](documentation/OPERATIONS_RUNBOOK.md) for recovery.
 
 ## Autonomous Operation
 
@@ -188,14 +292,14 @@ process failure.
 
 Local defaults (from `.env` via `cdm/config`): RabbitMQ at
 `amqp://guest:guest@localhost:5672/`, Redis at `redis://localhost:6379/0`,
-OpenSearch/Elastic at `http://localhost:9200` (Kibana at `:5601`), backend API
+Elasticsearch at `http://localhost:9200` (Kibana at `:5601`), backend API
 at `http://localhost:8000`, frontend dev server at `http://localhost:5173`.
 
-### One command (native processes, macOS)
+### One managed stack (Compose, Docker Desktop)
 
 ```bash
-make down          # stop frontend, API, Celery agents, then containers (volumes kept)
-make up            # start Docker if needed, containers, Celery agents, API, frontend
+make down          # stop application containers and infra (volumes kept)
+make up            # start Docker if needed, await infra/API readiness, start all roles
 make restart       # down, then up
 make stack-status  # what is running
 ```
@@ -203,80 +307,51 @@ make stack-status  # what is running
 Interrupted ingest jobs resume automatically after `make up`: the maintenance
 worker requeues jobs whose heartbeat went silent within about 20 minutes.
 
-### Start everything (native processes, macOS)
-
-```bash
-make services                 # containers plus launchd-supervised Celery agents
-make ingest-service-status    # verify ingest, index, and Beat agents
-make backend-api              # FastAPI backend (optional, only if using the web UI)
-make frontend-dev             # Vite dev server (optional, only if using the web UI)
-```
-
-`make services` uses launchd on macOS, so do not also run the foreground worker,
-index worker, or Beat commands for the same queues. On other platforms it
-starts those processes in the background with logs under `logs/`.
-
-### Start everything (containerized full stack)
-
-```bash
-make stack-up      # infra + backend + worker + worker-index + beat + frontend
-```
-
-This builds/starts `docker-compose.fullstack.yml` on top of the local infra
-stack. Frontend is served at `http://localhost:5173`, backend at
-`http://localhost:8000`.
+`make stack-up` is the same managed startup path. It builds frozen dependencies
+once per image, rather than syncing/installing packages in every process at
+startup. The stack includes API, frontend, ingest, bulk/default, indexing,
+maintenance, analytics and exactly one Beat service. Frontend is
+`http://localhost:5173`, backend `http://localhost:8000`.
 
 ### Check health
 
 ```bash
 make status         # durable job states and ingest coverage from SQLite
-make health-check    # SQLite, Celery, Redis, OpenSearch, backlog, failures
+make health-check    # SQLite, Celery, Redis, Elasticsearch, backlog, failures
 celery -A cdm.workers.celery_app:celery_app status   # confirm workers are online
 ```
 
 ### Restart
 
-On macOS, restart the supervised agents with `make ingest-service-install`.
-Containers only need a restart if their image or Compose file changed:
-
 ```bash
 make local-stop && make local     # restart infra containers, keep volumes
-make stack-down && make stack-up  # restart the full containerized stack
+make restart                      # rebuild/restart the managed stack, keep volumes
 ```
 
 The local RabbitMQ configuration allows long-running tasks to survive extended
 laptop sleep without expiring their delivery acknowledgements. If RabbitMQ is
-recreated after a Compose change, launchd reconnects the Celery agents; verify
-with `make ingest-service-status` and `make health-check`.
+recreated after a Compose change, Celery reconnects; verify with
+`make stack-status` and `make health-check`.
 
 ### Kill
 
 ```bash
-# Native Celery worker/beat processes (foreground development only)
-pkill -f "celery -A cdm.workers.celery_app:celery_app worker"
-pkill -f "celery -A cdm.workers.celery_app:celery_app beat"
-
-# macOS launchd-supervised agents
-make ingest-service-uninstall
-
-# Native backend/frontend dev servers
-pkill -f "uvicorn cdm.backend.app:app"
-pkill -f "vite"
+# Native foreground Celery/API/frontend processes:
+# Use Ctrl+C in each owning terminal, or kill only a verified PID you own.
 
 # Infra containers (preserves volumes/data)
 make local-stop
 
-# Infra containers + delete volumes (destructive, wipes local OpenSearch data)
+# Infra containers + delete volumes (destructive, wipes local Elasticsearch data)
 make local-down
 
 # Full containerized stack
 make stack-down
 ```
 
-Always stop old worker/beat processes before starting new ones after a code
-change to `cdm/workers/`. On macOS, use the launchd commands above rather than
-starting a second generation in a Terminal; duplicate Beat schedulers can
-enqueue duplicate scheduled/recovered jobs.
+Always stop old worker/Beat processes before switching managers; duplicate Beat
+schedulers can enqueue duplicate scheduled/recovered jobs. The retired native
+service targets now fail with migration guidance rather than installing agents.
 
 ## Tests
 
@@ -299,14 +374,55 @@ uv run pytest -q tests/unit
 uv run python -m compileall -q cdm scripts tools
 ```
 
+Frontend checks (Node 22.18+):
+
+```bash
+npm --prefix frontend/app ci
+npm --prefix frontend/app run audit
+npm --prefix frontend/app test
+npm --prefix frontend/app run contracts:check
+cd frontend/app
+npx playwright install chromium
+npm run test:browser
+```
+
+The [contracts workflow](.github/workflows/contracts.yml) also runs the browser
+gate. It builds and owns an isolated preview, uses typed API fixtures, and blocks
+unexpected network requests; no running backend or live API budget is needed.
+Audits include development dependencies and fail on low-or-higher advisories.
+Offline contract generation uses Hey API's type-only generator; it does not add
+a runtime client or require a running API.
+See [browser acceptance](documentation/reference/api-and-frontend.md#browser-acceptance-gate)
+for coverage, failure artifacts, and the remaining integration/release gates.
+
+The same workflow provisions bounded, disposable Elasticsearch and Redis services
+for real partial-bulk/reclaim/archive-recovery, publication/rollback, and measured
+query-budget tests. It also checks durable job recovery and lints the new pipeline
+acceptance module. These selected suites use synthetic records, not source APIs.
+See [controlled pipeline acceptance](documentation/OPERATIONS_RUNBOOK.md#controlled-pipeline-acceptance)
+for isolated-service requirements, the exact selectors, and limits of this gate.
+The recovery case also captures a live SQLite WAL through the backup API, kills
+the writer process, restores ledger/archive snapshots without deleting the
+pre-restore files, and verifies recovery dispatch plus archive replay.
+
+Production-image checks are a separate **manual pre-release** job in that workflow
+(Actions -> API contracts -> Run workflow). They build locally, never push images,
+and verify bounded API/frontend startup plus real RabbitMQ delivery and prefork
+worker discovery. See [release image acceptance](documentation/OPERATIONS_RUNBOOK.md#release-image-and-routing-acceptance).
+
 ## Data Model
 
 The core indexed models, their join keys, and unique identifiers are diagrammed
 in [documentation/diagrams/data-model.mmd](documentation/diagrams/data-model.mmd).
-`legislation` is the hub (amendments, votes, and reports join on its canonical
-id), `member` joins via flattened bioguide-id arrays, and nearly everything
-anchors to `congress_ref`. Bill full text lives inline on the legislation
-document -- there is no separate bill-text index.
+Bills use canonical `bill:{congress}:{type}:{number}` IDs. Member relationships
+use bare Bioguide IDs; House votes join bills by Congress/type/number components,
+while resolved Voteview roll calls carry `legislation_id`. Mapped relationship
+fields are not always synthesized by the normal indexer, and declared bridge
+indices are not automatically populated. These are logical query joins, not
+database-enforced foreign keys. Bill full text lives inline on the legislation
+document -- there is no separate bill-text index. See the
+[data structures](documentation/reference/data-models.md) and
+[indexing rules](documentation/reference/indexing.md) for precise behavior.
 
 ## Topic Model And Metasubjects
 
@@ -340,7 +456,8 @@ policy bills (resolutions and ceremonial measures excluded), assigns them to
 the latest topic model, and stores per-topic party contrast documents
 (`kind=party_topic`) in the analysis index. Each topic gets the CRS subjects and
 phrases (backed by bill and sponsor counts) each party uses more than the other, a one-sentence Ollama summary per party, a
-bipartisan-cosponsor share ("Bilateral Support" at 25% or more), and optional
+bipartisan-support share (cross-party cosponsors or a qualifying passage vote;
+"Bilateral Support" at 25% or more), and optional
 clusters that are surfaced only when stable. Use `--dry-run` to print instead
 of write and `--no-llm-labels` to skip Ollama. The frontend `/parties` page
 reads `GET /api/v1/parties?congress=` and `GET /api/v1/parties/topics/{id}`.

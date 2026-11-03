@@ -1,8 +1,12 @@
 from datetime import UTC, datetime
 from typing import Any
 
+from elasticsearch import Elasticsearch
+from pydantic import AliasPath, BaseModel, Field
+
+from cdm.backend.errors import EntityNotFoundError
 from cdm.backend.services.search_service import SearchService
-from cdm.backend.services.topic_service import TopicService
+from cdm.config.query_reads import ActivityKind, QueryReadConfig
 from cdm.contracts.api import (
     ActivityItem,
     MemberActivityItem,
@@ -13,6 +17,7 @@ from cdm.contracts.api import (
     MemberSummary,
     MemberTerm,
 )
+from cdm.store.client import IncompleteSearchError, SearchCompletion
 from cdm.store.opensearch import read_alias
 
 
@@ -46,7 +51,10 @@ def _expand_terms(source: dict[str, Any]) -> list[MemberTerm]:
         if term.get("congress") or not start:
             rows.append(
                 MemberTerm(
-                    **base, congress=term.get("congress"), start_year=start, end_year=end
+                    **base,
+                    congress=term.get("congress"),
+                    start_year=start,
+                    end_year=end,
                 )
             )
             continue
@@ -125,7 +133,9 @@ def _member_detail(source: dict[str, Any], fallback_id: str = "") -> MemberDetai
     )
 
 
-def _member_link_query(bioguide_id: str, extra_filters: list[dict[str, Any]]) -> dict[str, Any]:
+def _member_link_query(
+    bioguide_id: str, extra_filters: list[dict[str, Any]]
+) -> dict[str, Any]:
     return {
         "bool": {
             "filter": [
@@ -145,7 +155,11 @@ def _member_link_query(bioguide_id: str, extra_filters: list[dict[str, Any]]) ->
 
 
 def _activity_type(source: dict[str, Any], bioguide_id: str) -> str:
-    return "Sponsor" if bioguide_id in (source.get("sponsor_bioguide_ids") or []) else "Cosponsor"
+    return (
+        "Sponsor"
+        if bioguide_id in (source.get("sponsor_bioguide_ids") or [])
+        else "Cosponsor"
+    )
 
 
 def _bill_activity_item(source: dict[str, Any], bioguide_id: str) -> MemberActivityItem:
@@ -161,7 +175,9 @@ def _bill_activity_item(source: dict[str, Any], bioguide_id: str) -> MemberActiv
     )
 
 
-def _amendment_activity_item(source: dict[str, Any], bioguide_id: str) -> MemberActivityItem:
+def _amendment_activity_item(
+    source: dict[str, Any], bioguide_id: str
+) -> MemberActivityItem:
     amended_bill = source.get("amended_bill") or {}
     label = f"{source.get('type') or 'Amendment'} {source.get('number') or ''}".strip()
     detail = (
@@ -180,39 +196,26 @@ def _amendment_activity_item(source: dict[str, Any], bioguide_id: str) -> Member
     )
 
 
-# One entry per activity source: (resource alias, extra filters, sort field, parser).
-_ACTIVITY_SOURCES: dict[str, dict[str, Any]] = {
-    "bill": {
-        "resource": "bill",
-        "filters": [{"term": {"source_type": "bill"}}],
-        "sort": "update_date",
-        "fields": [
-            "id", "title", "congress", "update_date", "latest_action_date",
-            "sponsor_bioguide_ids",
-        ],
-        "parse": _bill_activity_item,
-    },
-    "amendment": {
-        "resource": "amendment",
-        "filters": [],
-        "sort": "submitted_date",
-        "fields": [
-            "id", "type", "number", "congress", "purpose", "description",
-            "submitted_date", "update_date", "amended_bill", "amended_bill_id",
-            "sponsor_bioguide_ids",
-        ],
-        "parse": _amendment_activity_item,
-    },
-}
+class ActivityCount(BaseModel):
+    doc_count: int
+
+
+class ActivityTotals(BaseModel):
+    counts: dict[ActivityKind, ActivityCount] = Field(
+        validation_alias=AliasPath("aggregations", "counts", "buckets")
+    )
 
 
 class MemberService:
     def __init__(
-        self, client: Any, search: SearchService, topics: TopicService
+        self,
+        client: Elasticsearch,
+        search: SearchService,
+        reads: QueryReadConfig | None = None,
     ) -> None:
         self._client = client
         self._search = search
-        self._topics = topics
+        self._reads = reads or QueryReadConfig()
 
     def list_members(
         self,
@@ -223,6 +226,15 @@ class MemberService:
         page: int,
         limit: int,
     ) -> MembersResponse:
+        offset = self._reads.offset(page, limit)
+        for parameter, value in (
+            ("query", query),
+            ("state", state),
+            ("chamber", chamber),
+            ("party", party),
+        ):
+            if value:
+                self._reads.text(value, parameter)
         filters: list[dict[str, Any]] = []
         if state:
             filters.append({"match": {"state": state.strip()}})
@@ -251,14 +263,22 @@ class MemberService:
             ]
         response = self._client.search(
             index=read_alias("member"),
+            allow_partial_search_results=False,
             body={
-                "from": (page - 1) * limit,
+                "from": offset,
                 "size": limit,
                 "track_total_hits": True,
+                "_source": list(self._reads.member_fields),
                 "query": query_body,
-                "sort": [{"_score": "desc"}, {"update_date": "desc"}, {"bioguide_id": "asc"}],
+                "sort": [
+                    {"_score": "desc"},
+                    {"update_date": "desc"},
+                    {"bioguide_id": "asc"},
+                    {"id": "asc"},
+                ],
             },
         )
+        SearchCompletion.model_validate(response.body).require_complete()
         total = response.get("hits", {}).get("total", 0)
         if isinstance(total, dict):
             total = total.get("value", 0)
@@ -266,12 +286,19 @@ class MemberService:
             _member_summary(hit.get("_source", {}), str(hit.get("_id", "")))
             for hit in response.get("hits", {}).get("hits", [])
         ]
-        return MembersResponse(members=members, total=int(total), page=page, limit=limit)
+        return MembersResponse(
+            members=members,
+            total=int(total),
+            page=page,
+            limit=limit,
+            max_result_window=self._reads.max_result_window,
+        )
 
     def get_profile(self, bioguide_id: str) -> MemberProfileResponse:
         normalized_id = bioguide_id.strip().upper()
         response = self._client.search(
             index=read_alias("member"),
+            allow_partial_search_results=False,
             body={
                 "size": 25,
                 "query": {
@@ -285,9 +312,10 @@ class MemberService:
                 },
             },
         )
+        SearchCompletion.model_validate(response.body).require_complete()
         hits = response.get("hits", {}).get("hits", [])
         if not hits:
-            raise ValueError(f"Member not found: {normalized_id}")
+            raise EntityNotFoundError(f"Member not found: {normalized_id}")
 
         source = max((hit.get("_source", {}) for hit in hits), key=self._richness)
         display_name = (
@@ -302,7 +330,6 @@ class MemberService:
         return MemberProfileResponse(
             member=_member_detail({**source, "name": display_name}, normalized_id),
             recent_activity=self._recent_activity(normalized_id),
-            topics=self._topics.get_member_topics(normalized_id).topics[:10],
         )
 
     def list_activity(
@@ -312,42 +339,83 @@ class MemberService:
         page: int = 1,
         limit: int = 25,
     ) -> MemberActivityResponse:
-        """Merged, date-sorted member activity across all linked document types."""
+        """One bounded page, sorted by the displayed date then canonical id."""
+        offset = self._reads.offset(page, limit)
         normalized_id = bioguide_id.strip().upper()
-        selected = [t.strip().lower() for t in (types or "").split(",") if t.strip()]
-        selected = [t for t in selected if t in _ACTIVITY_SOURCES] or list(_ACTIVITY_SOURCES)
-
-        fetch_size = min(page * limit, 10_000)
-        items: list[MemberActivityItem] = []
-        counts: dict[str, int] = {}
-        for doc_type in selected:
-            spec = _ACTIVITY_SOURCES[doc_type]
-            response = self._client.search(
-                index=read_alias(spec["resource"]),
-                body={
-                    "size": fetch_size,
-                    "track_total_hits": True,
-                    "_source": spec["fields"],
-                    "query": _member_link_query(normalized_id, spec["filters"]),
-                    "sort": [{spec["sort"]: {"order": "desc", "missing": "_last"}}],
+        selected = self._reads.selected(types, ActivityKind)
+        response = self._client.search(
+            index=[read_alias(kind) for kind in selected],
+            allow_partial_search_results=False,
+            body={
+                "from": offset,
+                "size": limit,
+                "track_total_hits": True,
+                "_source": list(self._reads.activity_fields),
+                "runtime_mappings": {
+                    "activity_date": {
+                        "type": "date",
+                        "script": self._reads.activity_date_script,
+                    }
                 },
+                "query": _member_link_query(
+                    normalized_id,
+                    [
+                        {
+                            "bool": {
+                                "should": [
+                                    {"term": {"source_type": "bill"}},
+                                    {"term": {"_index": read_alias("amendment")}},
+                                ],
+                                "minimum_should_match": 1,
+                            },
+                        }
+                    ],
+                ),
+                "sort": [
+                    {"activity_date": {"order": "desc", "missing": "_last"}},
+                    {"id": "asc"},
+                ],
+                "aggs": {
+                    "counts": {
+                        "filters": {
+                            "filters": {
+                                kind.value: {"term": {"_index": read_alias(kind)}}
+                                for kind in selected
+                            }
+                        }
+                    }
+                },
+            },
+        )
+        SearchCompletion.model_validate(response.body).require_complete()
+        counts = {
+            kind.value: bucket.doc_count
+            for kind, bucket in ActivityTotals.model_validate(
+                response.body
+            ).counts.items()
+        }
+        items: list[MemberActivityItem] = []
+        for hit in response.get("hits", {}).get("hits", []):
+            source = hit.get("_source", {})
+            try:
+                kind = ActivityKind(str(source.get("id") or "").partition(":")[0])
+            except ValueError as exc:
+                raise IncompleteSearchError(
+                    "Activity record has no canonical id"
+                ) from exc
+            parse = (
+                _bill_activity_item
+                if kind == ActivityKind.BILL
+                else _amendment_activity_item
             )
-            hits = response.get("hits", {})
-            total = hits.get("total", 0)
-            counts[doc_type] = total.get("value", 0) if isinstance(total, dict) else int(total)
-            for hit in hits.get("hits", []):
-                item = spec["parse"](hit.get("_source", {}), normalized_id)
-                if item.id:
-                    items.append(item)
-
-        items.sort(key=lambda item: item.date or "", reverse=True)
-        start = (page - 1) * limit
+            items.append(parse(source, normalized_id))
         return MemberActivityResponse(
-            items=items[start : start + limit],
+            items=items,
             total=sum(counts.values()),
             counts=counts,
             page=page,
             limit=limit,
+            max_result_window=self._reads.max_result_window,
         )
 
     def get_summaries(self, bioguide_ids: list[str]) -> dict[str, MemberSummary]:
@@ -381,17 +449,24 @@ class MemberService:
         )
 
     def _recent_activity(self, bioguide_id: str, limit: int = 20) -> list[ActivityItem]:
+        self._reads.offset(1, limit)
         response = self._client.search(
             index=read_alias("bill"),
+            allow_partial_search_results=False,
             body={
                 "size": limit,
                 "track_total_hits": False,
+                "_source": list(self._reads.activity_fields),
                 "query": _member_link_query(
                     bioguide_id, [{"term": {"source_type": "bill"}}]
                 ),
-                "sort": [{"update_date": {"order": "desc", "missing": "_last"}}],
+                "sort": [
+                    {"update_date": {"order": "desc", "missing": "_last"}},
+                    {"id": "asc"},
+                ],
             },
         )
+        SearchCompletion.model_validate(response.body).require_complete()
         activity: list[ActivityItem] = []
         for hit in response.get("hits", {}).get("hits", []):
             source = hit.get("_source", {})

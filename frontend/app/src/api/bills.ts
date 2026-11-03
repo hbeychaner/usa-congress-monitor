@@ -1,36 +1,13 @@
 import { apiGet } from './client';
-import type { components } from '../shared/contracts/api';
+import type * as Contracts from '../shared/contracts/api';
 
-export type BillSummary = {
-  bill_id: string;
-  title: string;
-  congress: number | null;
-  bill_type: string | null;
-  number: number | null;
-  chamber: string | null;
-  updated_at?: string | null;
-  vote_count?: number;
-};
+export type BillSummary = Contracts.BillSummary;
+export type BillsResponse = Contracts.BillsResponse;
+export type BillDetailResponse = Contracts.BillDetailResponse;
+export type BillVotesResponse = Contracts.BillVotesResponse;
 
-export type BillsResponse = {
-  bills: BillSummary[];
-  total: number;
-};
-
-export type BillDetailResponse = components['schemas']['BillDetailResponse'];
-export type BillVotesResponse = components['schemas']['BillVotesResponse'];
-
-export type SimilarBill = {
-  bill_id: string;
-  title: string;
-  congress: number | null;
-  score: number;
-};
-
-export type SimilarBillsResponse = {
-  bill_id: string;
-  similar: SimilarBill[];
-};
+export type SimilarBill = Contracts.SimilarBill;
+export type SimilarBillsResponse = Contracts.SimilarBillsResponse;
 
 export type BillFilters = {
   query?: string;

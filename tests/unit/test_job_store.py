@@ -94,6 +94,18 @@ def test_job_store_terminal_updates_do_not_overwrite_cancelled_window(tmp_path):
     assert store.coverage("bill")[0]["status"] == "cancelled"
 
 
+def test_job_store_retry_does_not_overwrite_cancelled_window(tmp_path):
+    store = JobStore(tmp_path / "jobs.sqlite3")
+    job = store.create("ingest", "cancel-before-retry", {"resources": ["bill"]})
+    store.mark_running(job["id"])
+    store.cancel(job["id"], "cancelled by operator")
+
+    store.mark_retrying(job["id"], "late network failure")
+
+    assert store.get(job["id"])["status"] == "cancelled"
+    assert store.coverage("bill")[0]["status"] == "cancelled"
+
+
 def test_job_store_requeue_refreshes_already_queued_job(tmp_path):
     store = JobStore(tmp_path / "jobs.sqlite3")
     job = store.create("index", "index:refresh", {"resource": "bill"})

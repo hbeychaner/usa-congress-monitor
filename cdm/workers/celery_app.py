@@ -11,19 +11,35 @@ celery_app = Celery("congress_tracker", broker=get_config().queue.rabbitmq_url)
 celery_app.conf.update(
     task_default_queue=get_config().queue.celery_task_queue,
     task_routes={
-        "cdm.workers.tasks.run_ingest_job": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.run_index_job": {"queue": get_config().queue.celery_index_queue},
-        "cdm.workers.tasks.schedule_daily_ingest": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.schedule_coverage_gaps": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.schedule_static_refresh": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.schedule_govinfo_refresh": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.schedule_topic_training": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.schedule_vote_refresh": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.schedule_member_graph_build": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.schedule_perspective_build": {"queue": get_config().queue.celery_ingest_queue},
-        "cdm.workers.tasks.trim_logs": {"queue": get_config().queue.celery_maintenance_queue},
-        "cdm.workers.tasks.recover_failed_ingest_jobs": {"queue": get_config().queue.celery_maintenance_queue},
-        "cdm.workers.tasks.run_retention_maintenance": {"queue": get_config().queue.celery_ingest_queue},
+        **{
+            f"cdm.workers.tasks.{name}": {
+                "queue": get_config().queue.celery_ingest_queue
+            }
+            for name in (
+                "run_ingest_job",
+                "schedule_daily_ingest",
+                "schedule_coverage_gaps",
+                "schedule_static_refresh",
+                "schedule_govinfo_refresh",
+                "schedule_topic_training",
+                "schedule_vote_refresh",
+                "schedule_member_graph_build",
+                "schedule_perspective_build",
+                "run_retention_maintenance",
+            )
+        },
+        "cdm.workers.tasks.run_analytics_job": {
+            "queue": get_config().queue.celery_analytics_queue
+        },
+        "cdm.workers.tasks.run_index_job": {
+            "queue": get_config().queue.celery_index_queue
+        },
+        "cdm.workers.tasks.trim_logs": {
+            "queue": get_config().queue.celery_maintenance_queue
+        },
+        "cdm.workers.tasks.recover_failed_ingest_jobs": {
+            "queue": get_config().queue.celery_maintenance_queue
+        },
     },
     task_queues=None,
     worker_prefetch_multiplier=max(1, get_config().queue.rabbitmq_prefetch // 100),

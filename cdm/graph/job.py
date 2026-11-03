@@ -4,87 +4,76 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
 from datetime import UTC, datetime
-
-from elasticsearch import Elasticsearch
+from uuid import uuid4
 
 from cdm.graph.collaboration import CollaborationGraphBuilder
-from cdm.graph.models import MemberEdge, Signal
-from cdm.graph.runner import BuildState, GraphBuildRunner
+from cdm.graph.models import GraphVersionPointer, MemberEdge, Signal, StagedGraph
 from cdm.graph.store import BillSignatureReader, GraphStore, RollCallReader
 from cdm.graph.topics import TopicGraphBuilder, TopicModelReader
 from cdm.graph.voting import VotingGraphBuilder
+from cdm.jobs.analytics import AnalysisProgress
 
 
 class GraphBuildJob:
     """Runs the requested signal builds and records stage, versions and outcome."""
 
     def __init__(
-        self, client: Elasticsearch, analysis_index: str, runner: GraphBuildRunner | None = None
+        self,
+        store: GraphStore,
+        bills: BillSignatureReader,
+        rolls: RollCallReader,
+        topics: TopicModelReader,
+        report: Callable[[AnalysisProgress], None],
     ) -> None:
-        self.client = client
-        self.analysis_index = analysis_index
-        self.store = GraphStore(client)
-        self.runner = runner
+        self.store = store
+        self._bills = bills
+        self._rolls = rolls
+        self._topics = topics
+        self._report = report
 
-    def _builders(self) -> dict[Signal, Callable[[str], Iterator[MemberEdge]]]:
-        return {
-            Signal.COLLABORATION: self._collaboration_edges,
-            Signal.VOTING: self._voting_edges,
-            Signal.TOPIC: self._topic_edges,
-        }
-
-    def _collaboration_edges(self, version: str) -> Iterator[MemberEdge]:
-        bills = list(BillSignatureReader(self.client).read())
-        print(f"Read {len(bills):,} bills")
-        return CollaborationGraphBuilder(bills, version).build()
-
-    def _voting_edges(self, version: str) -> Iterator[MemberEdge]:
-        rolls = list(RollCallReader(self.client).read())
-        print(f"Read {len(rolls):,} roll calls")
-        return VotingGraphBuilder(rolls, version).build()
-
-    def _topic_edges(self, version: str) -> Iterator[MemberEdge]:
-        model = TopicModelReader(self.client, self.analysis_index)
+    def _build(self, pointer: GraphVersionPointer) -> Iterator[MemberEdge]:
+        version = pointer.graph_version
+        if pointer.signal is Signal.VOTING:
+            rolls = list(self._rolls.read())
+            pointer.congresses = sorted({roll.congress for roll in rolls})
+            return VotingGraphBuilder(rolls, version).build()
+        bills = list(self._bills.read())
+        pointer.congresses = sorted({bill.congress for bill in bills})
+        if pointer.signal is Signal.COLLABORATION:
+            return CollaborationGraphBuilder(bills, version).build()
+        model = self._topics
         topic_version = model.latest_version()
         if topic_version is None:
             raise RuntimeError("no trained topic model; run topic training first")
+        pointer.source_model_version = topic_version
         assignments = model.assignments(topic_version)
-        bills = list(BillSignatureReader(self.client).read())
-        print(f"Read {len(bills):,} bills, {len(assignments):,} topic assignments ({topic_version})")
         return TopicGraphBuilder(
             bills, assignments, model.labels(topic_version), version
         ).build()
 
-    def _report(self, **fields: object) -> None:
-        if self.runner is not None:
-            self.runner.update(**fields)
+    def stage(self, signal: Signal) -> StagedGraph:
+        """Write a candidate to the injected store without publishing its pointer."""
+        pointer = GraphVersionPointer(
+            signal=signal,
+            graph_version=f"{datetime.now(UTC):%Y%m%dT%H%M%SZ}-{uuid4().hex}",
+        )
+        written = self.store.write_edges(self._build(pointer))
+        pointer.built_at = datetime.now(UTC)
+        return StagedGraph(pointer=pointer, written=written)
 
     def run(self, signals: Sequence[Signal] = ()) -> dict[Signal, str]:
-        builders = self._builders()
-        requested = list(signals) or list(builders)
+        requested = list(signals) or list(Signal)
         versions: dict[Signal, str] = {}
-        try:
-            self.store.ensure_index()
-            for signal in requested:
-                self._report(stage=signal.value)
-                version = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-                written = self.store.write_edges(builders[signal](version))
-                self.store.publish(signal, version)
-                stale = self.store.prune(signal)
-                versions[signal] = version
-                print(f"{signal}: wrote {written:,} edges as {version}; pruned: {stale or 'none'}")
-        except Exception as error:
-            self._report(
-                state=BuildState.FAILED,
-                message=str(error)[:500],
-                finished_at=datetime.now(UTC),
+        self.store.ensure_index()
+        for signal in requested:
+            self._report(AnalysisProgress(stage=signal.value, versions=versions))
+            staged = self.stage(signal)
+            pointer = staged.pointer
+            self._report(AnalysisProgress(stage="publishing", versions=versions))
+            self.store.publish(pointer)
+            versions[signal] = pointer.graph_version
+            print(
+                f"{signal}: wrote {staged.written:,} edges as {pointer.graph_version}"
             )
-            raise
-        self._report(
-            state=BuildState.SUCCEEDED,
-            stage="done",
-            message=None,
-            finished_at=datetime.now(UTC),
-            versions=versions,
-        )
+        self._report(AnalysisProgress(stage="done", progress=1.0, versions=versions))
         return versions

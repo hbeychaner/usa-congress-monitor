@@ -313,19 +313,19 @@ name = "congress-tracker"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "bertopic" },
     { name = "bs4" },
     { name = "celery" },
     { name = "elasticsearch" },
     { name = "en-core-web-md" },
     { name = "fastapi" },
+    { name = "numpy" },
     { name = "openai" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
+    { name = "pyyaml" },
     { name = "redis" },
     { name = "requests" },
-    { name = "sentence-transformers" },
     { name = "spacy" },
     { name = "sqlalchemy" },
     { name = "uvicorn", extra = ["standard"] },
@@ -338,28 +338,42 @@ dev = [
 ]
 
 [package.dev-dependencies]
+analysis = [
+    { name = "bertopic" },
+    { name = "sentence-transformers" },
+]
 dev = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
+release = [
+    { name = "celery" },
+    { name = "elasticsearch" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "pytest" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "sqlalchemy" },
+]
 
 [package.metadata]
 requires-dist = [
-    { name = "bertopic", specifier = ">=0.17" },
     { name = "bs4", specifier = "==0.0.2" },
     { name = "celery", specifier = ">=5.4,<6" },
     { name = "elasticsearch", specifier = "==9.3.0" },
     { name = "en-core-web-md", url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl" },
     { name = "fastapi", specifier = ">=0.116.0,<1" },
+    { name = "numpy", specifier = ">=2,<3" },
     { name = "openai", specifier = "==1.61.1" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==9.0.2" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = "==1.3.0" },
     { name = "python-dotenv", specifier = "==1.0.1" },
+    { name = "pyyaml", specifier = ">=6,<7" },
     { name = "redis", specifier = ">=5.0,<6" },
     { name = "requests" },
-    { name = "sentence-transformers", specifier = ">=3" },
     { name = "spacy", specifier = ">=3.8,<4" },
     { name = "sqlalchemy", specifier = ">=2.0,<3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.35.0,<1" },
@@ -367,9 +381,23 @@ requires-dist = [
 provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
+analysis = [
+    { name = "bertopic", specifier = ">=0.17" },
+    { name = "sentence-transformers", specifier = ">=3" },
+]
 dev = [
     { name = "pytest", specifier = "==9.0.2" },
     { name = "pytest-asyncio", specifier = "==1.3.0" },
+]
+release = [
+    { name = "celery", specifier = ">=5.4,<6" },
+    { name = "elasticsearch", specifier = "==9.3.0" },
+    { name = "pydantic", specifier = ">=2.0" },
+    { name = "pydantic-settings", specifier = ">=2.15.0" },
+    { name = "pytest", specifier = "==9.0.2" },
+    { name = "pyyaml", specifier = ">=6,<7" },
+    { name = "requests" },
+    { name = "sqlalchemy", specifier = ">=2.0,<3" },
 ]
 
 [[package]]

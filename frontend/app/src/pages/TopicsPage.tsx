@@ -10,21 +10,20 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchPolicyAreaTrends, fetchSubjects } from '../api/subjects';
-import type { PolicyAreaTrendsResponse, SubjectsResponse } from '../api/subjects';
+import type { SubjectsResponse } from '../api/subjects';
 import { fetchMetasubject, fetchMetasubjectTrends, fetchTopicTrends, fetchTopics } from '../api/topics';
 import type {
   MetasubjectTrendSeries,
-  MetasubjectTrendsResponse,
-  RelatedMetasubject,
   TopicSummary,
   TopicTrendSeries,
-  TopicTrendsResponse,
-  TopicsResponse,
 } from '../api/topics';
 import { TrendLineChart } from '../components/TrendLineChart';
+import { AnalysisNotice } from '../components/AnalysisNotice';
+import { LabelOrigin } from '../components/LabelOrigin';
+import { useRead } from '../hooks/useRead';
 import type { TrendSeries } from '../components/TrendLineChart';
 
 const TOPIC_PAGE_SIZE = 24;
@@ -179,38 +178,21 @@ function PolicyAreaChart({ areas }: { areas: SubjectsResponse['policy_areas'] })
 
 export function TopicsPage() {
   const navigate = useNavigate();
-  const [data, setData] = useState<TopicsResponse | null>(null);
-  const [subjects, setSubjects] = useState<SubjectsResponse | null>(null);
-  const [trends, setTrends] = useState<TopicTrendsResponse | null>(null);
-  const [policyTrends, setPolicyTrends] = useState<PolicyAreaTrendsResponse | null>(null);
-  const [groupTrends, setGroupTrends] = useState<MetasubjectTrendsResponse | null>(null);
+  const { data, error, loading } = useRead(fetchTopics);
+  const { data: subjects, error: subjectsError } = useRead(fetchSubjects);
+  const trendRequest = useCallback(() => fetchTopicTrends(10), []);
+  const policyRequest = useCallback(() => fetchPolicyAreaTrends(10), []);
+  const { data: trends, error: trendsError, loading: trendsLoading } = useRead(trendRequest);
+  const { data: policyTrends, error: policyError, loading: policyLoading } = useRead(policyRequest);
+  const { data: groupTrends, error: groupsError, loading: groupsLoading } = useRead(fetchMetasubjectTrends);
   const [groupView, setGroupView] = useState<GroupView>('count');
   const [groupFilter, setGroupFilter] = useState<number | null>(null);
-  const [related, setRelated] = useState<RelatedMetasubject[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const relatedRequest = useCallback(async () => groupFilter === null ? null : fetchMetasubject(groupFilter), [groupFilter]);
+  const { data: relatedDetail, error: relatedError } = useRead(relatedRequest);
+  const related = relatedDetail?.related ?? [];
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'size' | 'label'>('size');
   const [limit, setLimit] = useState(TOPIC_PAGE_SIZE);
-
-  useEffect(() => {
-    fetchTopics()
-      .then(setData)
-      .catch((err) => setError((err as Error).message))
-      .finally(() => setLoading(false));
-    fetchSubjects().then(setSubjects).catch(() => setSubjects(null));
-    fetchTopicTrends(10).then(setTrends).catch(() => setTrends(null));
-    fetchPolicyAreaTrends(10).then(setPolicyTrends).catch(() => setPolicyTrends(null));
-    fetchMetasubjectTrends().then(setGroupTrends).catch(() => setGroupTrends(null));
-  }, []);
-
-  useEffect(() => {
-    if (groupFilter === null) {
-      setRelated([]);
-      return;
-    }
-    fetchMetasubject(groupFilter).then((detail) => setRelated(detail.related)).catch(() => setRelated([]));
-  }, [groupFilter]);
 
   const topics = useMemo(() => data?.topics ?? [], [data]);
   const totalAssigned = useMemo(
@@ -262,15 +244,24 @@ export function TopicsPage() {
         </Text>
       </Flex>
 
-      {loading && <Text as="p">Loading topics…</Text>}
-      {error && <Text as="p" color="red">Failed to load topics: {error}</Text>}
-      {!loading && !error && topics.length === 0 && (
-        <Card size="3">
-          <Text as="p" color="gray">
-            No trained topic model yet. Run <code>scripts/train_topic_model.py</code> to populate topics.
-          </Text>
-        </Card>
-      )}
+      <AnalysisNotice label="Topics" analysis={data?.analysis} error={error} loading={loading} />
+      <AnalysisNotice label="CRS subjects" error={subjectsError} />
+
+      <Card size="3">
+        <Heading size="4" mb="1">Policy Area Activity Over Time</Heading>
+        <AnalysisNotice error={policyError} loading={policyLoading} />
+        <Text as="p" size="2" color="gray" mb="3">
+          Bills introduced per year in the largest CRS policy areas. Click a line to browse its bills; drag or scroll to zoom.
+        </Text>
+        {policySeries.length > 0 ? (
+          <TrendLineChart
+            series={policySeries}
+            onSeriesClick={(name) => navigate(`/bills?subject=${encodeURIComponent(name)}`)}
+          />
+        ) : !policyError && !policyLoading ? (
+          <Text as="p" color="gray">No CRS policy-area data indexed yet.</Text>
+        ) : null}
+      </Card>
 
       {topics.length > 0 && (
         <>
@@ -290,21 +281,6 @@ export function TopicsPage() {
           </Grid>
 
           <Card size="3">
-            <Heading size="4" mb="1">Policy Area Activity Over Time</Heading>
-            <Text as="p" size="2" color="gray" mb="3">
-              Bills introduced per year in the largest CRS policy areas. Click a line to browse its bills; drag or scroll to zoom.
-            </Text>
-            {policySeries.length > 0 ? (
-              <TrendLineChart
-                series={policySeries}
-                onSeriesClick={(name) => navigate(`/bills?subject=${encodeURIComponent(name)}`)}
-              />
-            ) : (
-              <Text as="p" color="gray">No CRS policy-area data indexed yet.</Text>
-            )}
-          </Card>
-
-          <Card size="3">
             <Flex justify="between" align="center" wrap="wrap" gap="3" mb="1">
               <Heading size="4">Subject Groups Over Time</Heading>
               <SegmentedControl.Root
@@ -318,6 +294,7 @@ export function TopicsPage() {
             <Text as="p" size="2" color="gray" mb="3">
               Topics grouped into broad subject areas, by year introduced. Click a band to list its topics below.
             </Text>
+            <AnalysisNotice analysis={groupTrends?.analysis} error={groupsError} loading={groupsLoading} />
             {groupSeries.length > 0 ? (
               <TrendLineChart
                 series={groupSeries}
@@ -328,13 +305,12 @@ export function TopicsPage() {
                   if (match) setGroupFilter(match.metasubject_id);
                 }}
               />
-            ) : (
-              <Text as="p" color="gray">No subject groups yet; they appear after the next model training run.</Text>
-            )}
+            ) : null}
           </Card>
 
           <Card size="3">
             <Heading size="4" mb="1">Discovered Topic Activity</Heading>
+            <AnalysisNotice analysis={trends?.analysis} error={trendsError} loading={trendsLoading} />
             <Text as="p" size="2" color="gray" mb="3">
               Bills per year for the largest machine-discovered topics. Click a line to open the topic.
             </Text>
@@ -347,12 +323,17 @@ export function TopicsPage() {
                   if (match) navigate(`/topics/${match.topic_id}`);
                 }}
               />
-            ) : (
-              <TopTopicsChart topics={[...topics].sort((a, b) => b.size - a.size)} />
-            )}
+            ) : trends?.analysis.state === 'empty' ? (
+              <>
+                <Text as="p" color="gray">Showing topic sizes instead of a time series.</Text>
+                <TopTopicsChart topics={[...topics].sort((a, b) => b.size - a.size)} />
+              </>
+            ) : null}
           </Card>
 
           <Card size="3">
+            <AnalysisNotice label="Related subject groups" analysis={relatedDetail?.analysis} error={relatedError} />
+            {relatedDetail ? <LabelOrigin origin={relatedDetail.metasubject} /> : null}
             <Flex justify="between" align="center" wrap="wrap" gap="3" mb="3">
               <Heading size="4">All Topics ({filtered.length})</Heading>
               {activeGroup ? (
@@ -401,6 +382,7 @@ export function TopicsPage() {
                   <Heading size="3" mb="1" style={{ textTransform: 'capitalize' }}>
                     <Link to={`/topics/${topic.topic_id}`}>{topic.label}</Link>
                   </Heading>
+                  <LabelOrigin origin={topic} />
                   <Text as="p" size="2" color="gray" mb="2">{topic.size.toLocaleString()} bills</Text>
                   <Flex gap="1" wrap="wrap">
                     {topic.top_words.slice(0, 6).map((word) => (

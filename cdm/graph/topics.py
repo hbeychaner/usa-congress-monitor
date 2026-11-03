@@ -16,10 +16,10 @@ from elasticsearch.helpers import scan
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict
 
+from cdm.config.topic_analysis import TopicId
 from cdm.graph.models import BillSignature, CongressEdgeStats, MemberEdge, Signal
+from cdm.store.topic_publication import TopicPublicationStore
 from cdm.utils.topic_terms import dedupe_terms, keyword_label
-
-OUTLIER_TOPIC = -1
 
 Matrix = NDArray[np.float32]
 
@@ -37,20 +37,19 @@ class TopicSettings(BaseModel):
 class TopicModelReader:
     """Reads the latest topic model's labels and bill assignments."""
 
-    def __init__(self, client: Elasticsearch, index: str) -> None:
+    def __init__(
+        self,
+        client: Elasticsearch,
+        index: str,
+        publications: TopicPublicationStore | None = None,
+    ) -> None:
         self.client = client
         self.index = index
+        self.publications = publications or TopicPublicationStore(client, index)
 
     def latest_version(self) -> str | None:
-        response = self.client.search(
-            index=self.index,
-            size=1,
-            query={"term": {"kind": "topic"}},
-            sort=[{"trained_at": {"order": "desc"}}],
-            source_includes=["model_version"],
-        )
-        hits = response["hits"]["hits"]
-        return hits[0]["_source"]["model_version"] if hits else None
+        run = self.publications.current()
+        return run.model_version if run else None
 
     def _scan(self, version: str, kind: str) -> Iterator[dict[str, Any]]:
         query = {
@@ -61,14 +60,19 @@ class TopicModelReader:
                 ]
             }
         }
-        for hit in scan(self.client, index=self.index, query={"query": query}):
+        for hit in scan(
+            self.client,
+            index=self.index,
+            query={"query": query},
+            allow_partial_search_results=False,
+        ):
             yield hit["_source"]
 
     def assignments(self, version: str) -> dict[str, int]:
         return {
             source["doc_id"]: int(source["topic_id"])
             for source in self._scan(version, "assignment")
-            if int(source["topic_id"]) != OUTLIER_TOPIC
+            if int(source["topic_id"]) != TopicId.OUTLIER
         }
 
     def labels(self, version: str) -> dict[int, str]:
@@ -108,7 +112,7 @@ class TopicGraphBuilder:
         settings = self.settings
         counts: dict[int, Matrix] = {}
         for bill in self.bills:
-            topic = topics.get(self.assignments.get(bill.id, OUTLIER_TOPIC))
+            topic = topics.get(self.assignments.get(bill.id, TopicId.OUTLIER))
             if topic is None:
                 continue
             matrix = counts.setdefault(
@@ -137,11 +141,16 @@ class TopicGraphBuilder:
         positive = np.flatnonzero(row > 0)
         if len(positive) <= self.settings.top_k:
             return positive
-        best = np.argpartition(row[positive], -self.settings.top_k)[-self.settings.top_k :]
+        best = np.argpartition(row[positive], -self.settings.top_k)[
+            -self.settings.top_k :
+        ]
         return positive[best]
 
     def _shared_topics(
-        self, first: NDArray[np.float32], second: NDArray[np.float32], topic_ids: list[int]
+        self,
+        first: NDArray[np.float32],
+        second: NDArray[np.float32],
+        topic_ids: list[int],
     ) -> list[str]:
         overlap = first * second
         best = np.argsort(overlap)[::-1][: self.settings.shared_topics]
@@ -152,14 +161,16 @@ class TopicGraphBuilder:
         ]
 
     def build(self) -> Iterator[MemberEdge]:
-        member_ids = sorted({
-            member
-            for bill in self.bills
-            if self.assignments.get(bill.id, OUTLIER_TOPIC) != OUTLIER_TOPIC
-            for member in (*bill.sponsor_ids, *bill.cosponsor_ids)
-        })
+        member_ids = sorted(
+            {
+                member
+                for bill in self.bills
+                if self.assignments.get(bill.id, TopicId.OUTLIER) != TopicId.OUTLIER
+                for member in (*bill.sponsor_ids, *bill.cosponsor_ids)
+            }
+        )
         members = {member: position for position, member in enumerate(member_ids)}
-        topic_ids = sorted(set(self.assignments.values()) - {OUTLIER_TOPIC})
+        topic_ids = sorted(set(self.assignments.values()) - {TopicId.OUTLIER})
         topics = {topic: position for position, topic in enumerate(topic_ids)}
         by_congress = self._counts(members, topics)
         if not by_congress:
@@ -167,7 +178,9 @@ class TopicGraphBuilder:
 
         total: Matrix = np.sum(list(by_congress.values()), axis=0)
         document_frequency = (total > 0).sum(axis=0)
-        idf = (np.log((1 + len(members)) / (1 + document_frequency)) + 1).astype(np.float32)
+        idf = (np.log((1 + len(members)) / (1 + document_frequency)) + 1).astype(
+            np.float32
+        )
         total_vectors = self._vectors(total, idf)
         total_scores = self._scores(total, total_vectors)
         congress_scores = {

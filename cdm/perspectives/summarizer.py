@@ -43,6 +43,6 @@ class ApproachSummarizer:
             f"Topic: {topic}\nGroup: {group}\nSubject areas: {', '.join(subjects)}\n"
             f"Distinctive phrases: {', '.join(terms)}\n"
             f"Sample bills:\n{samples}\n\nSummary sentence:",
-        )
+        ).content
         sentence = " ".join(reply.strip().strip("\"'").split())
         return sentence if 0 < len(sentence.split()) <= MAX_WORDS else ""

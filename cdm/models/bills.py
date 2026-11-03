@@ -4,10 +4,9 @@ Each model includes per-field descriptions that explain what each attribute answ
 """
 
 import logging
-from collections.abc import Mapping
 from datetime import datetime, time
 from enum import StrEnum
-from typing import Annotated, Any, Optional, Protocol, Union
+from typing import Annotated, Any, Optional, Union
 
 import requests
 from bs4 import BeautifulSoup
@@ -16,11 +15,19 @@ from pydantic import (
     ConfigDict,
     Field,
     HttpUrl,
+    TypeAdapter,
     ValidationError,
     field_validator,
     model_validator,
 )
 
+from cdm.contracts.hydration import (
+    BillDetailClient,
+    BillDetailFetcher,
+    BillDetailKind,
+    DetailEvidence,
+    HydrationAssessment,
+)
 from cdm.data_collection.client import CDGClient
 from cdm.data_collection.id_utils import UrlIdParser
 from cdm.models.people import Chamber, Member, Sponsor, SponsorRef
@@ -37,12 +44,6 @@ from cdm.models.validators import convert_law_type, normalize_chamber
 from cdm.utils.json_types import JsonObject
 
 logger = logging.getLogger(__name__)
-
-
-class BillDetailClient(Protocol):
-    """Minimal client contract required to fetch paginated bill details."""
-
-    def get_json(self, endpoint: str) -> Mapping[str, Any]: ...
 
 
 # The API returns CountUrl envelopes for these fields (never expanded lists).
@@ -1072,9 +1073,10 @@ class Bill(EntityBase):
     ] = None
     full_text: Annotated[str, Field(description="What the full bill text is.")] = ""
     detail_hydration: Annotated[
-        dict[str, JsonObject],
+        dict[BillDetailKind, DetailEvidence],
         Field(description="Pagination and completeness metadata for bill details."),
     ] = Field(default_factory=dict)
+    hydration_assessment: HydrationAssessment = Field(default_factory=HydrationAssessment)
 
     # Fields from original data
     congress: Annotated[int, Field(description="Which Congress the bill belongs to.")]
@@ -1177,7 +1179,10 @@ class Bill(EntityBase):
                         resp = client.session.get(
                             str(getattr(fmt, "url", "")), timeout=(10, 120)
                         )
+                        resp.raise_for_status()
                         html = resp.text
+                        if not html.strip():
+                            raise ValueError("Formatted bill text response is empty")
                         soup = BeautifulSoup(html, "html.parser")
                         full_text = soup.get_text()
                     except requests.RequestException as e:
@@ -1191,101 +1196,53 @@ class Bill(EntityBase):
                     return full_text
         return ""
 
-    def add_bill_details(self, client: CDGClient, max_pages: int = 100):
+    def add_bill_details(self, client: CDGClient, max_pages: int = 100) -> None:
         """Populate the bill with related actions, summaries, and linked entities."""
-        """
-        Retrieve additional data for a bill.
-
-        Args:
-            client: A CDGClient object.
-        """
-        bill_data = {}
-        # Currently available endpoints for additional data on bills
-        additional_bill_data = {
-            "actions": "actions",
-            "amendments": "amendments",
-            "committees": "committees",
-            "cosponsors": "cosponsors",
-            "relatedBills": "relatedbills",
-            "subjects": "subjects",
-            "summaries": "summaries",
-            "textVersions": "text",
-            "titles": "titles",
-        }
-        if max_pages < 1:
-            raise ValueError("max_pages must be positive")
-        congress = self.congress
-        bill_type = self.type.lower()
-        bill_number = self.number
-        for key, endpoint in additional_bill_data.items():
-            data, metadata = self._fetch_detail_collection_with_metadata(
-                client,
-                f"bill/{congress}/{bill_type}/{bill_number}/{endpoint}",
-                key,
-                max_pages,
+        fetcher = BillDetailFetcher(client, max_pages)
+        payload: JsonObject = self.model_dump(mode="json", by_alias=True)
+        evidence: dict[BillDetailKind, DetailEvidence] = {}
+        for kind in BillDetailKind:
+            result = fetcher.fetch(
+                f"bill/{self.congress}/{self.type.lower()}/{self.number}/{kind.endpoint}",
+                kind,
             )
-            bill_data[key] = data
-            self.detail_hydration[key] = metadata
-
-        self.actions = [
-            Action(**x)
-            for x in bill_data.get("actions", [])
-            if isinstance(bill_data.get("actions"), list)
-        ]
-        self.amendments = [
-            Amendment(**x)
-            for x in bill_data.get("amendments", [])
-            if isinstance(bill_data.get("amendments"), list)
-        ]
-        self.cosponsors = [
-            Sponsor(**x)
-            for x in bill_data.get("cosponsors", [])
-            if isinstance(bill_data.get("cosponsors"), list)
-        ]
-        # relatedBills may be either a list of BillMetadata dicts or a CountUrl-style dict
-        rb = bill_data.get("relatedBills")
-        if isinstance(rb, dict) and rb.get("count") is not None and rb.get("url"):
-            self.related_bills = CountUrl(**rb)
-        elif isinstance(rb, list):
-            self.related_bills = [BillMetadata(**x) for x in rb]
-        else:
-            self.related_bills = None
-        subjects_data = bill_data["subjects"]
-        if not isinstance(subjects_data, dict):
-            subjects_data = {}
-        legislative_subjects = [
-            LegislativeSubject(**x)
-            for x in subjects_data.get("legislativeSubjects", [])
-        ]
-        policy_area = (
-            PolicyArea(**subjects_data["policyArea"])
-            if "policyArea" in subjects_data
-            else PolicyArea(name="")
-        )
-        self.subjects = Subjects(
-            legislative_subjects=legislative_subjects, policy_area=policy_area
-        )
-        self.summaries = [
-            Summary(**x)
-            for x in bill_data.get("summaries", [])
-            if isinstance(bill_data.get("summaries"), list)
-        ]
-        # textVersions may be a list of TextVersion dicts or a CountUrl dict
-        tv = bill_data.get("textVersions")
-        if isinstance(tv, dict) and tv.get("count") is not None and tv.get("url"):
-            self.text_versions = CountUrl(**tv)
-        elif isinstance(tv, list):
-            self.text_versions = [TextVersion(**x) for x in tv]
-        else:
-            self.text_versions = None
-        titles = bill_data.get("titles")
-        self.titles = [Title(**x) for x in titles] if isinstance(titles, list) else []
-        self.full_text = self.add_full_text(client)
+            evidence[kind] = result.evidence
+            previous = payload.get(kind)
+            if isinstance(result.data, list):
+                if not result.evidence.complete and isinstance(previous, list):
+                    previous_records = TypeAdapter(list[JsonObject]).validate_python(previous)
+                    payload[kind] = fetcher.distinct(previous_records + result.data)
+                else:
+                    payload[kind] = result.data
+            elif kind is BillDetailKind.SUBJECTS and "count" not in result.data:
+                if isinstance(previous, dict) and "count" not in previous and not result.evidence.complete:
+                    merged = {**previous, **{
+                        key: value for key, value in result.data.items() if value is not None
+                    }}
+                    old_subjects = previous.get("legislativeSubjects")
+                    new_subjects = result.data.get("legislativeSubjects")
+                    if isinstance(old_subjects, list) and isinstance(new_subjects, list):
+                        merged["legislativeSubjects"] = fetcher.distinct(
+                            TypeAdapter(list[JsonObject]).validate_python(old_subjects + new_subjects)
+                        )
+                    payload[kind] = merged
+                else:
+                    payload[kind] = result.data
+            elif result.evidence.complete or previous is None:
+                payload[kind] = result.data
+        updated = Bill.model_validate(payload)
+        full_text = updated.add_full_text(client)
+        for kind in BillDetailKind:
+            setattr(self, kind.attribute, getattr(updated, kind.attribute))
+        if full_text:
+            self.full_text = full_text
+        self.detail_hydration = evidence
+        self.hydration_assessment = HydrationAssessment.assess(evidence)
 
     @staticmethod
     def _fetch_detail_collection(
         client: BillDetailClient, endpoint: str, key: str, max_pages: int
-    ) -> list[dict] | dict:
+    ) -> list[JsonObject] | JsonObject:
         """Fetch every page of a detail collection or preserve its envelope."""
         records, _ = Bill._fetch_detail_collection_with_metadata(
             client, endpoint, key, max_pages
@@ -1295,58 +1252,14 @@ class Bill(EntityBase):
     @staticmethod
     def _fetch_detail_collection_with_metadata(
         client: BillDetailClient, endpoint: str, key: str, max_pages: int
-    ) -> tuple[list[dict] | dict, JsonObject]:
+    ) -> tuple[list[JsonObject] | JsonObject, JsonObject]:
         """Fetch a detail collection and return records with completeness metadata."""
-        records: list[dict] = []
-        next_endpoint: str | None = endpoint
-        visited: set[str] = set()
-        page_count = 0
-        expected_count: int | None = None
-        for _ in range(1, max_pages + 1):
-            if next_endpoint is None or next_endpoint in visited:
-                if next_endpoint in visited:
-                    raise RuntimeError(f"Pagination loop detected for {key}")
-                break
-            visited.add(next_endpoint)
-            page_count += 1
-            response = client.get_json(next_endpoint)
-            value = response.get(key)
-            if not isinstance(value, list):
-                metadata = {
-                    "page_count": page_count,
-                    "expected_count": value.get("count")
-                    if isinstance(value, dict)
-                    else None,
-                    "fetched_count": 0,
-                    "state": "envelope" if isinstance(value, dict) else "empty",
-                    "complete": False,
-                }
-                return value if isinstance(value, dict) else [], metadata
-            records.extend(item for item in value if isinstance(item, dict))
-            pagination = response.get("pagination")
-            if isinstance(pagination, Mapping) and pagination.get("total") is not None:
-                try:
-                    expected_count = int(str(pagination["total"]))
-                except (TypeError, ValueError):
-                    expected_count = None
-            next_value = (
-                pagination.get("next") if isinstance(pagination, Mapping) else None
-            )
-            next_endpoint = str(next_value) if next_value else None
-            if next_endpoint is None:
-                break
-        else:
-            raise RuntimeError(
-                f"Pagination limit of {max_pages} pages exceeded for {key}"
-            )
-        metadata = {
-            "page_count": page_count,
-            "expected_count": expected_count,
-            "fetched_count": len(records),
-            "state": "expanded",
-            "complete": expected_count is None or len(records) >= expected_count,
-        }
-        return records, metadata
+        result = BillDetailFetcher(client, max_pages).fetch(endpoint, BillDetailKind(key))
+        metadata = result.evidence.model_dump(
+            mode="json",
+            include={"page_count", "expected_count", "fetched_count", "state", "complete"},
+        )
+        return result.data, metadata
 
     def build_id(self) -> str:
         """Return a canonical id for this bill instance."""

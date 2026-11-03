@@ -1,7 +1,7 @@
 import { apiGet } from './client';
-import type { components } from '../shared/contracts/api';
+import type * as Contracts from '../shared/contracts/api';
 
-export type SearchResponse = components['schemas']['SearchResponse'];
+export type SearchResponse = Contracts.SearchResponse;
 
 export type SearchParams = {
     query: string;

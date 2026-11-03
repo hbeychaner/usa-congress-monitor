@@ -1,5 +1,6 @@
 import hashlib
 import zipfile
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -79,14 +80,27 @@ def test_download_writes_artifact_and_manifest(tmp_path):
     assert not list(tmp_path.rglob("*.part"))
 
 
-def test_download_reuses_verified_artifact_without_request(tmp_path):
+def test_download_reuses_verified_artifact_without_request(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     session = StubSession(StubResponse(b"<billstatus />"))
-    downloader = GovInfoDownloader(tmp_path, session=session)
+    store = GovInfoManifestStore(tmp_path / "govinfo.sqlite3")
+    downloader = GovInfoDownloader(tmp_path, session=session, manifest_store=store)
     first = downloader.download(package())
+    metadata = store.get(package())
+    assert metadata is not None
+    fetched_at = metadata["fetched_at"]
+    monkeypatch.setattr(
+        GovInfoDownloader, "_now", staticmethod(lambda: "2099-01-01T00:00:00Z")
+    )
     second = downloader.download(package())
 
     assert second == first
     assert len(session.calls) == 1
+    retained = store.get(package())
+    assert retained is not None and retained["fetched_at"] == fetched_at
+    store.engine.dispose()
 
 
 def test_download_accepts_not_modified_response(tmp_path):

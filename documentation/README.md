@@ -1,602 +1,95 @@
-# Congress Tracker
+# Congress Tracker documentation
 
-## Worker Service
+Understand how source records become searchable bills, member activity, votes,
+topics, and graphs. These repository pages are the **canonical documentation**.
+The [GitHub wiki](https://github.com/hbeychaner/usa-congress-monitor/wiki) is a
+publication target, not a second editing location.
 
-The production execution path separates durable state from message delivery:
+**Current local scope (2026-11-03):** controlled Compose API/UI and one
+index/maintenance worker are running after verified backup/native retirement.
+Acquisition, analytics publication, Beat and automatic retention scheduling are
+off. [Acceptance evidence and remaining limits](OPERATIONS_RUNBOOK.md#controlled-cutover-acceptance)
+distinguish this scoped release from historical completeness or unattended
+production certification.
 
-| Component | Responsibility | Durable state |
-|---|---|---|
-| Celery Beat | Enqueues the daily UTC ingest window at 02:00 | SQLite job record |
-| RabbitMQ | Delivers ingest and indexing messages | Persistent broker volume |
-| Celery worker | Runs ingest and indexing tasks | SQLite job lifecycle |
-| `JobStore` | Owns idempotency, status, attempts, and errors | `JOB_DB_PATH` SQLite database |
-| `IngestRunner` | Pulls Congress.gov lists and publishes details | Redis Stream entries |
-| `RedisIndexingRunner` | Consumes, transforms, and bulk-upserts records | Redis pending-entry state |
-| OpenSearch | Serves indexed documents and aliases | OpenSearch indices |
+## Start here
 
-[C4 worker architecture diagram](../worker-architecture.mmd)
-
-The C4 boundary separates four kinds of state: RabbitMQ transports Celery
-messages, SQLite records job identity and lifecycle, Redis Streams are the
-durable replayable ingest handoff, and OpenSearch is the searchable projection.
-The worker task is orchestration; `IngestRunner` and `RedisIndexingRunner` own
-the domain behavior and can be tested independently of Celery.
-
-### Job lifecycle
-
-Jobs use a deterministic idempotency key derived from their kind and payload.
-The lifecycle is `queued -> running -> retrying -> succeeded` or `failed`. A worker marks
-the job running before work begins and marks it succeeded only after all work,
-including child indexing jobs, has been dispatched successfully.
-
-Celery is configured with late acknowledgements and worker-loss requeue.
-Transient task failures retry without a fixed terminal count, using capped
-exponential backoff. Non-transient failures remain terminal, and a scheduled
-recovery task requeues transient failures stranded by older workers. The task functions are thin
-wrappers; ingest, transformation, validation, and checkpoint semantics remain
-in ordinary Python services so they can be tested without a broker.
-
-### Retry and failure behavior
-
-- Congress.gov request retries remain inside the API client.
-- Celery retries transient task-level failures indefinitely; `CELERY_RETRY_MAX`
-  remains the bound for non-transient failures.
-- Backoff is capped by `CELERY_RETRY_BACKOFF_MAX` seconds.
-- Index checkpoints advance only after `bulk_upsert()` reports no errors.
-- A failed batch is retried from its prior offset; already committed batches
-  are skipped on restart.
-- A source fingerprint resets indexing to offset zero when the durable input
-  file changes.
-
-### Daily ingestion
-
-Celery Beat schedules `schedule_daily_ingest` at 02:00 UTC and
-`recover_failed_ingest_jobs` every 10 minutes. The daily task submits a
-two-day overlapping window ending on the current UTC date, includes only
-date-windowed and valid Congress-scoped resources, and excludes static/global
-endpoints. The overlap catches late API updates; canonical IDs and OpenSearch
-upserts make it idempotent.
-
-The recovery task also redispatches ingest jobs that have remained queued in
-SQLite for more than 24 hours without a broker delivery. This repairs a lost
-handoff after a worker or RabbitMQ interruption while avoiding duplicate
-redispatch of normally queued historical work.
-
-### Historical backfills
-
-Use the submission CLI for backfills rather than invoking worker internals:
-
-```bash
-uv run python scripts/submit_ingest.py \
-  --outdir data/full_history \
-  --resources bill,committee \
-  --from-date 2020-01-01T00:00:00Z \
-  --to-date 2020-12-31T23:59:59Z \
-  --fetch-items \
-  --index-batch-size 500
-```
-
-The same payload produces the same job ID. Existing ingest files and indexing
-checkpoints prevent completed work from being repeated unnecessarily.
-
-Local commands:
-
-```bash
-make services                # macOS: containers plus launchd agents
-make ingest-service-status   # inspect ingest, index, and Beat agents
-```
-
-The macOS launchd installer manages separate ingest, index, and Beat agents with
-`RunAtLoad` and `KeepAlive`. The ingest agent uses the long task limits required
-for historical recovery jobs; all three agents reconnect after broker or process
-failure. Do not run duplicate foreground workers or Beat alongside these agents.
-For Linux production workers, use a process manager and choose concurrency
-based on API rate limits and OpenSearch capacity.
-
-### GovInfo coverage audits
-
-Before scaling a historical GovInfo run, compare the discovered package
-inventory with the durable per-job manifests:
-
-```bash
-uv run python scripts/report_govinfo_coverage.py \
-  --congress 118 \
-  --manifest-root data/full_history/govinfo \
-  --out data/full_history/govinfo/coverage-report-118.json
-```
-
-The report classifies each expected package as `available`, `failed`,
-`not_available`, or `pending`. It exits with status 2 while failed or pending
-packages remain, and preserves the non-available distinctions for acceptance
-reporting. A parsed package counts as available.
-
-## Setup
-
-### Prerequisites
-- Python 3.13+
-- [uv](https://docs.astral.sh/uv/) package manager
-- Docker (for local OpenSearch)
-- A [Congress.gov API key](https://api.congress.gov/sign-up/)
-
-### Install dependencies
-
-```bash
-# Install uv if you don't have it
-brew install uv
-
-# Create .venv and install all dependencies (reads pyproject.toml)
-uv sync --all-extras
-
-# Activate the virtual environment (optional — prefix commands with 'uv run' instead)
-source .venv/bin/activate
-```
-
-### Environment variables
-
-Create a `.env` file in the project root:
-
-```
-CONGRESS_API_KEY=your_key_here
-ELASTIC_API_URL=http://localhost:9200
-ELASTIC_API_KEY=...          # preferred over user/password
-ES_LOCAL_PASSWORD=...        # local dev only
-RABBITMQ_URL=amqp://guest:guest@localhost:5672/
-JOB_DB_PATH=data/jobs.sqlite3
-OPENAI_API_KEY=...           # optional — generative features
-```
-
-### Start local OpenSearch
-
-```bash
-# Requires Docker Desktop running
-cd elastic-start-local && ./start.sh
-```
-
-### Run tests
-
-```bash
-PYTHONPATH=. uv run pytest -q
-```
-
----
-
-## Architecture
-
-```
-cdm/                    — Congress Data Model (core library)
-  data_collection/
-    client.py            — Congress.gov HTTP client; enforces rate limiting
-                           on every request via an injected/default TokenBucket
-  utils/
-    rate_limiter.py      — Thread-safe token bucket (default 4800 req/hr)
-  ingest/               — API collection pipeline
-    resource_config.py  — Per-resource metadata (scope, date params, etc.)
-    runner.py           — Single-resource ingest (list + items, concurrent)
-    pipeline.py         — Multi-resource orchestration
-    archive.py          — Compressed SQLite record archives and list caches
-    checkpoint.py       — Resume state tracking
-  jobs/store.py         — SQLite job ledger and idempotency store
-  workers/              — Celery app, beat schedule, thin task wrappers (tasks.py), and
-                          injected runners/planners/services wired by runtime.WorkerContainer
-  store/                — OpenSearch integration
-    index_manager.py    — Loads opensearch_mappings.yaml, manages indices
-    opensearch.py       — Bulk upsert helpers
-    indexer.py          — Transforms records into OpenSearch documents
-    batch_indexing.py   — StreamIndexer: Redis Stream consumer and bulk indexing
-  backend/              — FastAPI app (bill/member/search/state/admin services)
-  contracts/            — API request/response schemas used by cdm/backend
-
-scripts/
-  submit_ingest.py      — Idempotent RabbitMQ/Celery job submission CLI
-  queue_full_ingest.py  — Durable, batched full-historical-plan job submission
-  create_indices.py     — OpenSearch index creation/update/status CLI
-  queue_govinfo_bulk.py     — Discover/queue GovInfo bulk package jobs
-  reconcile_govinfo_bulk.py — Submit a reconciliation replay job
-  report_govinfo_coverage.py — Coverage report for discovered vs archived GovInfo packages
-  health_check.py       — Dependency/backlog health check (`make health-check`)
-  job_status.py         — Durable job-state summary (`make status`)
-  monitor_ingest_progress.py — Live ingest/index throughput monitor (`make monitor`)
-  migrate_jsonl_to_sqlite.py — One-time JSONL archive → SQLite migration helper
-  backfill_bill_member_links.py — One-off backfill of sponsor/cosponsor bioguide-id fields
-                                  on documents indexed before that field existed
-  ingest_district_boundaries.py — One-time import of 119th-Congress district boundaries
-
-documentation/
-  opensearch_mappings.yaml  — Single source of truth for all 18 OpenSearch indices
-  README.md                 — This file
-```
-
-### Ingest pipeline
-
-Resources are classified into three scopes:
-
-| Scope | Strategy | Examples |
-|---|---|---|
-| `date_window` | Uses configured date parameter names | bill, committee, member, nomination, … |
-| `congress_scoped` | Requires a Congress path parameter | law |
-| `static` | No server-side incremental filter | amendment, house_vote, congress, and reference collections |
-
-Item fetches use a `ThreadPoolExecutor`. A single `TokenBucket` rate limiter
-(worker default: 4800 req/hr) is injected into `IngestRunner` and shared by
-every per-thread `CDGClient`, which enforces it on every HTTP call (both list
-pages and item fetches) so the pipeline stays within the API's 4 800 req/hr
-limit with one coordinated budget instead of per-client throttling. Each
-deduplicated item is published directly to the resource's Redis Stream;
-consumer-group pending state provides crash recovery. List pages and item
-records are compressed and deduplicated in per-resource SQLite databases.
-
-
-### Full-history ingest
-
-For durable queue submission, use `scripts/queue_full_ingest.py`; it creates
-idempotent jobs for static resources, date windows, and Congress-scoped
-resources. Jobs use SQLite checkpoints and avoid large local JSON or JSONL
-staging files.
-
-For a complete historical legislation corpus, discover and queue official
-GovInfo packages into a precreated versioned OpenSearch index:
-
-```bash
-uv run python scripts/queue_govinfo_bulk.py --congress 118
-uv run python scripts/queue_govinfo_bulk.py \
-  --congress 118 --queue --staging-version 118 \
-  --outdir data/full_history/govinfo
-```
-
-The first command is a dry run. Queueing requires `--staging-version`; workers
-fail closed if that physical staging index does not exist. Switch aliases only
-after package, document, and reconciliation acceptance checks pass.
-
-### OpenSearch indices
-
-17 indices defined in `documentation/opensearch_mappings.yaml`:
-
-| Index | Description |
+| Your question | Read |
 |---|---|
-| `legislation` | Bills and resolutions |
-| `amendment` | Floor and committee amendments |
-| `communication` | House and Senate communications |
-| `committee` | Standing, select, and joint committees |
-| `committee_meeting` | Committee meeting records |
-| `committee_print` | Committee print publications |
-| `committee_report` | Committee reports |
-| `congressional_record` | Bound and daily Congressional Record |
-| `hearing` | Congressional hearings |
-| `house_vote` | House roll-call votes |
-| `member` | Members of Congress |
-| `nomination` | Presidential nominations |
-| `treaty` | Treaties |
-| `congress_ref` | Reference anchor per Congress (116–119) |
-| `house_requirement` | Statutory reporting requirements |
-| `sponsorship` | Bridge index: member ↔ legislation |
-| `vote_position` | Bridge index: member ↔ house_vote |
+| What should we simplify, make robust, or implement next? | [Engineering improvement plan](IMPLEMENTATION_PLAN.md) |
+| What runs, and why are there several databases? | [Architecture](architecture.md) |
+| Can I see the system rather than just read about it? | [Visual atlas: C4, data flow, relationships, and request sequence](reference/visuals.md) |
+| What are the records, identifiers, fields, and relationships? | [Data structures](reference/data-models.md) |
+| Where does each record go, and what can be searched? | [Indexing and storage reference](reference/indexing.md) |
+| How are records fetched, retried, replayed, and refreshed? | [Ingestion guide](guides/ingestion.md) |
+| What do topics, perspectives, similarity, and graph edges mean? | [Analytics guide](guides/analytics.md) |
+| Which page calls which endpoint and service? | [API and frontend reference](reference/api-and-frontend.md) |
+| Which class, function, or field implements this? | [Generated source symbol index](reference/symbols/README.md) |
+| How do I configure, run, test, or deploy it? | [Configuration and deployment](guides/configuration-and-deployment.md) |
+| How do I recover failed jobs or restore state? | [Operations runbook](OPERATIONS_RUNBOOK.md) |
+| How do I update the docs and prepare the wiki? | [Documentation maintenance](CONTRIBUTING.md) |
 
-Create or update all indices:
+### Suggested reading paths
+
+- **First-time reader:** architecture -> visual atlas -> data structures ->
+  ingestion -> indexing -> API and frontend.
+- **Data investigator:** data structures -> indexing -> analytics -> source
+  symbols for the relevant package. A diagram edge is a logical identifier
+  reference, not a database-enforced foreign key.
+- **Operator:** root [quick start](../README.md#quick-start) -> configuration
+  and deployment -> ingestion -> operations runbook.
+- **Contributor:** architecture -> subsystem guide -> exact source declaration ->
+  related tests -> [improvement roadmap](IMPLEMENTATION_PLAN.md) ->
+  documentation maintenance.
+
+## The mental model
+
+1. Congress.gov and GovInfo supply legislative records; Voteview supplies
+   additional roll calls, positions, and voting metadata.
+2. SQLite owns durable job history and replayable acquisition state.
+   RabbitMQ delivers work; it is not the job ledger.
+3. Acquisition publishes records into Redis Streams. Indexing turns them into
+   searchable projections; acknowledging a stream record is not the same as
+   marking an acquisition job complete.
+4. Bills from multiple sources converge on canonical bill IDs. Full text is
+   stored on bill documents, not in a separate bill-text index.
+5. Elasticsearch serves indexed entities and derived analysis. Python modules
+   retain historical `opensearch` names; the shipped containers use
+   **Elasticsearch**, not interchangeable OpenSearch binaries.
+6. FastAPI exposes typed responses; React renders them. Offline analytics and
+   admin-triggered builds add projections, not new authoritative source facts.
+
+## Reference material and provenance
+
+The prose documents source behavior, not a claim that a particular deployment
+has completed all historical backfills. Check durable coverage and live health
+before drawing conclusions about missing records.
+
+| Reference | Status |
+|---|---|
+| [Mapping definitions](opensearch_mappings.yaml) | Executable mapping input, despite the historical filename |
+| [Generated endpoint specifications](generated_endpoint_specs.json) | Captured endpoint catalogue; runtime specs live in [source](../cdm/data_collection/specs) |
+| [Original upstream endpoint docs](original) | Upstream reference snapshots, not application API documentation |
+| [Original OpenAPI JSON](original/swagger.json) / [YAML](original/swagger.yaml) | Congress.gov snapshots, not FastAPI's `/openapi.json` |
+| [Spec comparison report](specs_swagger_report.json) | Historical comparison artifact |
+| [September failure reconciliation](FAILURE_RECONCILIATION_2026-09-07.md) | Dated incident report, not current operating instructions |
+| [Frontend style guide](../frontend/STYLE_GUIDE.md) | UI design conventions |
+| [Frontend implementation plan](../frontend/WEB_APP_IMPLEMENTATION_PLAN.md) | Historical planning context; source and current reference take precedence |
+
+## Visuals and wiki
+
+The [visual atlas](reference/visuals.md) embeds Mermaid diagrams for rendering
+on GitHub and in the wiki. Editable `.mmd` files remain in
+[diagrams](diagrams); the worker C4 container view remains at the repository
+[root](../worker-architecture.mmd) for existing links.
+
+To regenerate references and prepare a local, unpublished wiki:
 
 ```bash
-uv run python scripts/create_indices.py            # create all
-uv run python scripts/create_indices.py --status   # show index stats
-uv run python scripts/create_indices.py --update   # update mappings in place
+uv run python tools/build_documentation.py --wiki documentation/wiki
+uv run python tools/build_documentation.py --check --wiki documentation/wiki
 ```
 
----
-
-# Data Structures Overview
-
-This diagram summarizes the core data models, their relationships, and the field(s) used as unique identifiers where applicable. Composite IDs are noted when a single field is not sufficient.
-
-## Using the Client
-
-The project uses its native `CDGClient` to wrap the Congress.gov API. The client reads the API key from `CONGRESS_API_KEY`, and response models are defined in `cdm.models`.
-
-```python
-from cdm.data_collection.client import get_client
-from cdm.data_collection.endpoint_registry import get_spec
-
-client = get_client()  # reads CONGRESS_API_KEY from environment
-spec = get_spec("member_list")
-response = client.request_for_spec(spec, runtime_params={"pageSize": 5})
-```
-
-## Using Endpoint Specs
-
-Endpoint specs live under `cdm/data_collection/specs/` and are registered by name via
-`cdm.data_collection.endpoint_registry`. Each spec describes the path, query params,
-and the Pydantic response model used to validate results. `CDGClient.request_for_spec`
-performs the request and returns the raw JSON mapping; `CDGClient.get_json` is used
-for arbitrary URLs (e.g. a `detailUrl` embedded in a prior response).
-
-```python
-from cdm.data_collection.client import get_client
-from cdm.data_collection.endpoint_registry import get_spec
-
-client = get_client(api_key="YOUR_API_KEY")
-
-list_spec = get_spec("bill_list")
-page = client.request_for_spec(list_spec, runtime_params={"offset": 0, "pageSize": 250})
-```
-
-For multi-page aggregation and rate-limited, checkpointed ingestion across an entire
-resource, use `IngestRunner`/`Pipeline` in `cdm/ingest/` rather than looping over
-`request_for_spec` by hand — see "Ingest pipeline" below. The single remaining
-low-level pagination helper, `resolve_pagination` in `cdm/data_collection/utils.py`,
-normalizes the different pagination conventions used across endpoints and is what
-`IngestRunner` calls internally.
-
-## Data Collection Orchestration
-
-> **Note:** the `cdm/data_collection/collector.py` module this section used to document
-> was unused dead code and has been removed. Current ingest orchestration lives in
-> `cdm/ingest/pipeline.py` and `cdm/ingest/runner.py`, dispatched via
-> `cdm/workers/tasks.py` Celery tasks.
-
-
-## Daily Window Collector
-
-Use cdm/data_collection/daily_collector.py to gather all top-level list endpoints in a
-24-hour window, fetch detail records for each item URL, and collect member metadata
-referenced by any details. Outputs are written as JSON files grouped by endpoint name.
-
-## Streamlit App
-
-The Streamlit app now lives under app/. Launch it from the repository root with:
-
-```
-streamlit run app/dashboard.py
-```
-
-Additional Streamlit pages are located in app/pages.
-
-## Documentation Index
-
-- [AmendmentEndpoint.md](AmendmentEndpoint.md)
-- [BillEndpoint.md](BillEndpoint.md)
-- [BoundCongressionalRecordEndpoint.md](BoundCongressionalRecordEndpoint.md)
-- [CommitteeEndpoint.md](CommitteeEndpoint.md)
-- [CommitteeMeetingEndpoint.md](CommitteeMeetingEndpoint.md)
-- [CommitteePrintEndpoint.md](CommitteePrintEndpoint.md)
-- [CommitteeReportEndpoint.md](CommitteeReportEndpoint.md)
-- [CongressEndpoint.md](CongressEndpoint.md)
-- [CRSReportEndpoint.md](CRSReportEndpoint.md)
-- [DailyCongressionalRecordEndpoint.md](DailyCongressionalRecordEndpoint.md)
-- [HearingEndpoint.md](HearingEndpoint.md)
-- [HouseCommunicationEndpoint.md](HouseCommunicationEndpoint.md)
-- [HouseRequirementEndpoint.md](HouseRequirementEndpoint.md)
-- [HouseRollCallVoteEndpoint.md](HouseRollCallVoteEndpoint.md)
-- [MemberEndpoint.md](MemberEndpoint.md)
-- [NominationEndpoint.md](NominationEndpoint.md)
-- [SenateCommunicationEndpoint.md](SenateCommunicationEndpoint.md)
-- [SummariesEndpoint.md](SummariesEndpoint.md)
-- [TreatyEndpoint.md](TreatyEndpoint.md)
-
-## People & Identity
-
-```mermaid
-classDiagram
-  direction TB
-  class Member
-  Member : +bioguide_id [ID]
-  Member : +first_name
-  Member : +middle_name
-  Member : +last_name
-  Member : +full_name
-  Member : +party
-  Member : +state
-  Member : +district
-  Member : +url
-  Member : +is_original_cosponsor
-  Member : +is_by_request
-  class Sponsor
-  Sponsor : +sponsorship_date
-  Sponsor : +sponsorship_withdrawn_date
-  Member <|-- Sponsor
-
-  class Depiction {
-    +image_url
-    +attribution
-  }
-  class Term {
-    +chamber
-    +start_year
-    +end_year
-  }
-  Member o-- Depiction
-  Member o-- Term
-```
-
-## Bills & Amendments
-
-```mermaid
-classDiagram
-  direction TB
-  class Bill {
-    +congress
-    +type
-    +number [ID*]
-    +title
-    +update_date
-  }
-  class BillLatestAction {
-    +action_date
-    +text
-  }
-  class Action {
-    +action_date
-    +text
-  }
-  class Summary {
-    +action_date
-    +action_desc
-    +version_code
-  }
-  class TextVersion {
-    +date
-    +type
-  }
-  class Title {
-    +title
-    +title_type
-  }
-  class LawMetadata {
-    +number [ID*]
-    +law_type
-  }
-  class Subjects {
-    +legislative_subjects
-    +policy_area
-  }
-  class PolicyArea {
-    +name
-    +update_date
-  }
-  class LegislativeSubject {
-    +name
-    +update_date
-  }
-  class CommitteeMetadata {
-    +system_code [ID]
-    +name
-  }
-  class Amendment {
-    +congress
-    +type
-    +number [ID*]
-    +update_date
-  }
-
-  Bill o-- BillLatestAction
-  Bill o-- Action
-  Bill o-- Summary
-  Bill o-- TextVersion
-  Bill o-- Title
-  Bill o-- LawMetadata
-  Bill o-- Subjects
-  Subjects o-- PolicyArea
-  Subjects o-- LegislativeSubject
-  Bill o-- CommitteeMetadata
-  Bill o-- Sponsor
-  Bill o-- Amendment
-
-  Amendment o-- Action
-  Amendment o-- Member
-  Amendment o-- TextVersion
-```
-
-## Congressional Records
-
-```mermaid
-classDiagram
-  direction TB
-  class CongressionalRecordIssue {
-    +Id [ID]
-    +Congress
-    +Issue
-    +PublishDate
-  }
-  class BoundCongressionalRecord {
-    +id [ID]
-    +congress
-    +volume
-    +issue
-  }
-  class DailyCongressionalRecordIssue {
-    +volume_number [ID*]
-    +issue_number [ID*]
-  }
-```
-
-## List-level API Items (1/3)
-
-```mermaid
-classDiagram
-  direction TB
-  class MemberListItem {
-    +bioguideId [ID]
-    +name
-    +updateDate
-  }
-  class CommitteeListItem {
-    +systemCode [ID]
-    +name
-    +updateDate
-  }
-  class CommitteeReportListItem {
-    +cmte_rpt_id [ID]
-    +citation
-  }
-  class CommitteePrintListItem {
-    +jacketNumber [ID]
-  }
-  class CommitteeMeetingListItem {
-    +eventId [ID]
-  }
-  class HearingListItem {
-    +jacketNumber [ID]
-  }
-```
-
-## List-level API Items (2/3)
-
-```mermaid
-classDiagram
-  direction TB
-  class HouseCommunicationListItem {
-    +congress
-    +communicationType
-    +number [ID*]
-  }
-  class SenateCommunicationListItem {
-    +congress
-    +communicationType
-    +number [ID*]
-  }
-  class HouseRequirementListItem {
-    +number [ID]
-  }
-  class HouseRollCallVoteListItem {
-    +identifier [ID]
-    +rollCallNumber
-  }
-```
-
-## List-level API Items (3/3)
-
-```mermaid
-classDiagram
-  direction TB
-  class NominationListItem {
-    +citation [ID*]
-    +number
-  }
-  class CRSReportListItem {
-    +id [ID]
-    +title
-  }
-  class BillListItem {
-    +congress
-    +type
-    +number [ID*]
-  }
-  class AmendmentListItem {
-    +congress
-    +type
-    +number [ID*]
-  }
-  class TreatyListItem {
-    +congressReceived
-    +number [ID*]
-  }
-  class LawListItem {
-    +congress
-    +number [ID*]
-  }
-
-  %% [ID]  = single-field unique identifier
-  %% [ID*] = composite identifier; typically requires (congress + type + number) or similar
-```
-
-## ID Notes
-- **Bills**: typically identified by `(congress, type, number)`.
-- **Amendments**: typically identified by `(congress, type, number)`.
-- **Treaties**: typically identified by `(congressReceived, number, suffix)`.
-- **House/Senate communications**: often `(congress, communicationType.code, number)`.
+The output includes `Home.md`, `_Sidebar.md`, `_Footer.md`, and flat wiki page
+names with rewritten internal links. The output directory is ignored by Git.
+Nothing is uploaded, committed, or pushed by these commands.

@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
 from elasticsearch import Elasticsearch
@@ -14,6 +15,7 @@ from cdm.perspectives.models import (
     TopicPerspectives,
 )
 from cdm.store.perspective_repository import PerspectiveRepository
+from cdm.store.topic_publication import TopicPublicationStore
 
 CONGRESS = 119
 VERSION = "v1"
@@ -71,7 +73,9 @@ def _topic(
 
 
 def _service(topics: list[TopicPerspectives]) -> PartyService:
-    return PartyService(FakeRepository(topics), PerspectiveConfig())
+    publications = MagicMock(spec=TopicPublicationStore)
+    publications.current.return_value = None
+    return PartyService(FakeRepository(topics), PerspectiveConfig(), publications)
 
 
 def test_overview_ranks_topics_by_each_partys_bills() -> None:
@@ -108,13 +112,19 @@ def test_topic_hides_clusters_that_failed_the_gate() -> None:
     assert _service([_topic(1, 30, 5)]).topic(CONGRESS, 99) is None
 
 
-def test_repository_actions_carry_version_and_identity() -> None:
-    repository = PerspectiveRepository(MagicMock(spec=Elasticsearch), "analysis")
+def test_repository_snapshot_carries_version_and_identity() -> None:
+    client = MagicMock(spec=Elasticsearch, indices=MagicMock())
+    repository = PerspectiveRepository(client, "analysis")
 
-    actions = list(
-        repository.actions(VERSION, "2026-01-01T00:00:00+00:00", [_topic(7, 1, 1)])
+    assert (
+        repository.replace(
+            CONGRESS, VERSION, datetime(2026, 1, 1, tzinfo=UTC), [_topic(7, 1, 1)]
+        )
+        == 1
     )
 
-    assert actions[0]["_id"] == f"party_topic:{VERSION}:{CONGRESS}:7"
-    assert actions[0]["kind"] == "party_topic"
-    assert actions[0]["topic_id"] == 7
+    document = client.index.call_args.kwargs
+    assert document["id"] == f"party_topic_publication:{CONGRESS}"
+    assert document["document"]["model_version"] == VERSION
+    assert document["document"]["results"][0]["topic_id"] == 7
+    client.delete_by_query.assert_not_called()

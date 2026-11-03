@@ -1,115 +1,28 @@
 import { apiGet } from './client';
+import type * as Contracts from '../shared/contracts/api';
 
-export type TopicSummary = {
-  topic_id: number;
-  name: string;
-  label: string;
-  size: number;
-  top_words: string[];
-  metasubject_id: number | null;
-};
+export type TopicSummary = Contracts.TopicSummary;
+export type TopicsResponse = Contracts.TopicsResponse;
+export type TopicTrendPoint = Contracts.TopicTrendPoint;
+export type TopicBill = Contracts.TopicBill;
+export type RelatedTopic = Contracts.RelatedTopic;
+export type TopicDetailResponse = Contracts.TopicDetailResponse;
+export type TopicAssignmentItem = Contracts.TopicAssignmentItem;
+export type BillTopicsResponse = Contracts.BillTopicsResponse;
+export type MemberTopicTrendPoint = Contracts.MemberTopicTrendPoint;
+export type MemberTopicsResponse = Contracts.MemberTopicsResponse;
+export type TopicTrendSeries = Contracts.TopicTrendSeries;
+export type TopicTrendsResponse = Contracts.TopicTrendsResponse;
+export type MetasubjectSummary = Contracts.MetasubjectSummary;
+export type MetasubjectsResponse = Contracts.MetasubjectsResponse;
+export type MetasubjectTrendSeries = Contracts.MetasubjectTrendSeries;
+export type MetasubjectTrendsResponse = Contracts.MetasubjectTrendsResponse;
+export type RelatedMetasubject = Contracts.RelatedMetasubject;
+export type MetasubjectDetailResponse = Contracts.MetasubjectDetailResponse;
 
-export type TopicsResponse = {
-  topics: TopicSummary[];
-  model_version: string | null;
-  trained_at: string | null;
-};
-
-export type TopicTrendPoint = {
-  timestamp: string;
-  frequency: number;
-  words: string | null;
-};
-
-export type TopicBill = {
-  bill_id: string;
-  title: string | null;
-  probability: number;
-};
-
-export type RelatedTopic = {
-  topic_id: number;
-  label: string;
-  similarity: number;
-};
-
-export type TopicDetailResponse = {
-  topic: TopicSummary;
-  related: RelatedTopic[];
-  model_version: string | null;
-  trend: TopicTrendPoint[];
-  top_bills: TopicBill[];
-};
-
-export type TopicAssignmentItem = {
-  topic_id: number;
-  label: string;
-  probability: number;
-};
-
-export type BillTopicsResponse = {
-  bill_id: string;
-  topics: TopicAssignmentItem[];
-  model_version: string | null;
-};
-
-export type MemberTopicTrendPoint = {
-  period: string;
-  topic_id: number;
-  label: string;
-  count: number;
-};
-
-export type MemberTopicsResponse = {
-  bioguide_id: string;
-  topics: { label: string; weight: number; topic_id?: number | null }[];
-  trend: MemberTopicTrendPoint[];
-  model_version: string | null;
-  subjects: { label: string; weight: number }[];
-  policy_areas: { label: string; weight: number }[];
-};
-
-export type TopicTrendSeries = {
-  topic_id: number;
-  label: string;
-  points: TopicTrendPoint[];
-};
-
-export type TopicTrendsResponse = {
-  series: TopicTrendSeries[];
-  model_version: string | null;
-};
-
-export type MetasubjectSummary = {
-  metasubject_id: number;
-  name: string;
-  size: number;
-  top_words: string[];
-  topic_ids: number[];
-};
-
-export type MetasubjectTrendSeries = {
-  metasubject_id: number;
-  label: string;
-  points: TopicTrendPoint[];
-};
-
-export type MetasubjectTrendsResponse = {
-  series: MetasubjectTrendSeries[];
-  model_version: string | null;
-};
-
-export type RelatedMetasubject = {
-  metasubject_id: number;
-  name: string;
-  similarity: number;
-};
-
-export type MetasubjectDetailResponse = {
-  metasubject: MetasubjectSummary;
-  related: RelatedMetasubject[];
-  model_version: string | null;
-};
+export function fetchMetasubjects(): Promise<MetasubjectsResponse> {
+  return apiGet<MetasubjectsResponse>('/api/v1/topics/metasubjects');
+}
 
 export function fetchMetasubject(metasubjectId: number): Promise<MetasubjectDetailResponse> {
   return apiGet<MetasubjectDetailResponse>(`/api/v1/topics/metasubjects/${metasubjectId}`);

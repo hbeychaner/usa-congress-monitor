@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import Literal, NewType
 
 from pydantic import (
     BaseModel,
@@ -13,11 +14,67 @@ from pydantic import (
     field_validator,
 )
 
+from cdm.contracts.base import ResponseModel
+
+MappingField = NewType("MappingField", str)
+
+
+class GraphMapping(BaseModel):
+    type: str = "object"
+    dynamic: bool | Literal["strict"] | None = None
+    index: bool = True
+    enabled: bool = True
+    properties: dict[MappingField, GraphMapping] = Field(default_factory=dict)
+
+    def differences(self, actual: GraphMapping, path: str = "") -> list[str]:
+        problems: list[str] = []
+        if (
+            self.type != actual.type
+            or self.index != actual.index
+            or self.enabled != actual.enabled
+            or self.dynamic is not None
+            and self.dynamic != actual.dynamic
+        ):
+            problems.append(f"{path or '<root>'}: incompatible mapping")
+        for name, expected in self.properties.items():
+            field_path = f"{path}.{name}" if path else name
+            if name not in actual.properties:
+                problems.append(f"{field_path}: missing mapping")
+            else:
+                problems.extend(
+                    expected.differences(actual.properties[name], field_path)
+                )
+        return problems
+
+
+class GraphIndexDefinition(BaseModel):
+    mappings: GraphMapping
+
 
 class Signal(StrEnum):
     COLLABORATION = "collaboration"
     VOTING = "voting"
     TOPIC = "topic"
+
+
+class BuildState(StrEnum):
+    IDLE = "idle"
+    RUNNING = "running"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+
+
+class GraphBuildStatus(ResponseModel):
+    state: BuildState = BuildState.IDLE
+    job_id: str | None = None
+    started: bool | None = None
+    pid: int | None = None
+    stage: str | None = None
+    message: str | None = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    updated_at: datetime | None = None
+    versions: dict[Signal, str] = Field(default_factory=dict)
 
 
 class PartyGroup(StrEnum):
@@ -81,6 +138,8 @@ class RollCallVotes(BaseModel):
     party_split: bool = False
     yea_ids: list[str] = Field(default_factory=list)
     nay_ids: list[str] = Field(default_factory=list)
+    present_ids: list[str] = Field(default_factory=list)
+    not_voting_ids: list[str] = Field(default_factory=list)
 
 
 class CongressEdgeStats(BaseModel):
@@ -138,6 +197,8 @@ class GraphVersionPointer(BaseModel):
     signal: Signal
     graph_version: str
     built_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    source_model_version: str | None = None
+    congresses: list[int] | None = None
 
     @computed_field
     @property
@@ -147,3 +208,8 @@ class GraphVersionPointer(BaseModel):
     @staticmethod
     def pointer_id(signal: Signal) -> str:
         return f"{DocumentKind.POINTER}:{signal}"
+
+
+class StagedGraph(BaseModel):
+    pointer: GraphVersionPointer
+    written: int = Field(ge=0)

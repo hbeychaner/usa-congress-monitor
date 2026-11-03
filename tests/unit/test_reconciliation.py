@@ -1,8 +1,32 @@
+from pathlib import Path
+from unittest.mock import Mock
+
+import pytest
+from elasticsearch import Elasticsearch
+
 from cdm.ingest.archive import SQLiteRecordArchive
 from cdm.ingest.reconciliation import (
+    TargetInventory,
     reconcile_bill_sources,
     replay_govinfo_archives,
 )
+
+
+@pytest.fixture(autouse=True)
+def isolated_staging_inventory(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        TargetInventory,
+        "read",
+        classmethod(
+            lambda cls, client, target: TargetInventory(
+                requested=target,
+                physical_indices=[target],
+                aliases=[],
+                mapped_fields=[],
+                existing_documents=0,
+            )
+        ),
+    )
 
 
 def source(name, package_id):
@@ -14,20 +38,22 @@ def source(name, package_id):
 
 
 def test_reconcile_prefers_status_and_preserves_summary_and_provenance():
-    result = reconcile_bill_sources([
-        {
-            "id": "bill:118:hr:1",
-            "title": "Official status title",
-            "actions": [{"text": "Introduced"}],
-            "source_metadata": source("govinfo:billstatus", "BILLSTATUS-118hr1"),
-        },
-        {
-            "id": "bill:118:hr:1",
-            "title": "Summary title",
-            "summaries": [{"text": "A summary"}],
-            "source_metadata": source("govinfo:billsum", "BILLSUM-118hr1"),
-        },
-    ])
+    result = reconcile_bill_sources(
+        [
+            {
+                "id": "bill:118:hr:1",
+                "title": "Official status title",
+                "actions": [{"text": "Introduced"}],
+                "source_metadata": source("govinfo:billstatus", "BILLSTATUS-118hr1"),
+            },
+            {
+                "id": "bill:118:hr:1",
+                "title": "Summary title",
+                "summaries": [{"text": "A summary"}],
+                "source_metadata": source("govinfo:billsum", "BILLSUM-118hr1"),
+            },
+        ]
+    )
 
     record = result["records"][0]
     assert record["title"] == "Official status title"
@@ -37,7 +63,7 @@ def test_reconcile_prefers_status_and_preserves_summary_and_provenance():
         "BILLSTATUS-118hr1",
         "BILLSUM-118hr1",
     ]
-    assert record["reconciliation"]["status"] == "complete"
+    assert record["reconciliation"]["status"] == "partial"
     assert record["reconciliation"]["conflicts"][0]["selected_source"] == (
         "govinfo:billstatus"
     )
@@ -45,19 +71,21 @@ def test_reconcile_prefers_status_and_preserves_summary_and_provenance():
 
 
 def test_reconcile_unions_lists_and_skips_text_children():
-    result = reconcile_bill_sources([
-        {
-            "id": "bill:118:hr:1",
-            "subjects": [{"name": "Health"}],
-            "source_metadata": source("govinfo:billstatus", "status"),
-        },
-        {
-            "id": "bill:118:hr:1",
-            "subjects": [{"name": "Health"}, {"name": "Labor"}],
-            "source_metadata": source("govinfo:billsum", "summary"),
-        },
-        {"id": "bill-text:118:hr:1:ih", "full_text": "text"},
-    ])
+    result = reconcile_bill_sources(
+        [
+            {
+                "id": "bill:118:hr:1",
+                "subjects": [{"name": "Health"}],
+                "source_metadata": source("govinfo:billstatus", "status"),
+            },
+            {
+                "id": "bill:118:hr:1",
+                "subjects": [{"name": "Health"}, {"name": "Labor"}],
+                "source_metadata": source("govinfo:billsum", "summary"),
+            },
+            {"id": "bill-text:118:hr:1:ih", "full_text": "text"},
+        ]
+    )
 
     assert result["parent_count"] == 1
     assert result["skipped_count"] == 1
@@ -125,6 +153,35 @@ def test_replay_archives_reconciles_and_writes_parent_and_text_resources(
     assert report["write"]["parents"]["updated"] == 1
     assert report["write"]["text_versions"]["updated"] == 1
     assert (tmp_path / "report.json").exists()
+
+
+def test_bulk_rejection_cannot_write_a_completed_reconciliation_report(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    archive_root = tmp_path / "archives"
+    archive = SQLiteRecordArchive(archive_root / "package", 0)
+    archive.write("bill", {"id": "bill:118:hr:1", "title": "Rejected"})
+    archive.engine.dispose()
+    bulk = Mock(
+        return_value=(
+            0,
+            [{"index": {"_index": "staging", "_id": "bill:118:hr:1", "status": 400}}],
+        )
+    )
+    monkeypatch.setattr("cdm.store.opensearch.bulk", bulk)
+    client = Mock(spec=Elasticsearch, indices=Mock())
+    report = tmp_path / "report.json"
+    with pytest.raises(RuntimeError, match="bill:118:hr:1"):
+        replay_govinfo_archives(
+            archive_root,
+            client,
+            target_index="staging",
+            report_path=report,
+        )
+    bulk.assert_called_once()
+    assert not report.exists()
+    assert len(archive.records("bill")) == 1
 
 
 def test_replay_quarantines_invalid_text_documents(tmp_path, monkeypatch):

@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
+from cdm.contracts.base import ResponseModel
+from cdm.contracts.labels import LabelProvenance
 from cdm.graph.models import PartyGroup
 
 MAJOR_PARTIES: tuple[PartyGroup, ...] = (PartyGroup.DEMOCRATIC, PartyGroup.REPUBLICAN)
 
 
-class PerspectiveBill(BaseModel):
+class PerspectiveBill(ResponseModel):
     """One bill's text and sponsoring party, ready to cluster."""
 
     doc_id: str
@@ -23,7 +25,7 @@ class PerspectiveBill(BaseModel):
     bipartisan: bool = False
 
 
-class PartyShare(BaseModel):
+class PartyShare(ResponseModel):
     """How many of a perspective's bills one party sponsored."""
 
     party: PartyGroup
@@ -33,7 +35,7 @@ class PartyShare(BaseModel):
     lean: float
 
 
-class Perspective(BaseModel):
+class Perspective(LabelProvenance):
     """One cluster of a topic's bills within one Congress."""
 
     model_config = ConfigDict(frozen=True)
@@ -48,12 +50,12 @@ class Perspective(BaseModel):
     parties: list[PartyShare] = Field(default_factory=list)
 
 
-class BillRef(BaseModel):
+class BillRef(ResponseModel):
     doc_id: str
     title: str
 
 
-class TermUse(BaseModel):
+class TermUse(ResponseModel):
     """A phrase with the evidence behind it: how many bills and sponsors use it."""
 
     term: str
@@ -62,7 +64,7 @@ class TermUse(BaseModel):
     examples: list[BillRef] = Field(default_factory=list)
 
 
-class SubjectUse(BaseModel):
+class SubjectUse(ResponseModel):
     """A CRS subject a group's bills carry more often than the other group's."""
 
     name: str
@@ -70,7 +72,7 @@ class SubjectUse(BaseModel):
     share: float
 
 
-class PartyTerms(BaseModel):
+class PartyTerms(ResponseModel):
     """Bigrams one party's bills in a topic use more than the other party's."""
 
     party: PartyGroup
@@ -81,7 +83,7 @@ class PartyTerms(BaseModel):
     summary: str = ""
 
 
-class BilateralSupport(BaseModel):
+class BilateralSupport(ResponseModel):
     """How much of a topic's legislation draws cosponsors from both parties."""
 
     bills: int
@@ -96,14 +98,14 @@ class BilateralSupport(BaseModel):
     summary: str = ""
 
 
-class PartyBillCount(BaseModel):
+class PartyBillCount(ResponseModel):
     """Bills in a topic whose primary sponsor belongs to one party."""
 
     party: PartyGroup
     bills: int
 
 
-class TopicPerspectives(BaseModel):
+class TopicPerspectives(ResponseModel):
     """One topic's party contrast and clusters; clusters count only when ``passed``."""
 
     congress: int

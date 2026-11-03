@@ -1,0 +1,310 @@
+"""Validated bill-detail retrieval evidence, not a global coverage certificate."""
+
+from __future__ import annotations
+
+import json
+from collections.abc import Mapping
+from datetime import UTC, datetime
+from enum import StrEnum
+from typing import Literal, NewType, Protocol
+
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    TypeAdapter,
+    model_validator,
+)
+
+from cdm.config.source_policy import SourceName
+from cdm.utils.json_types import JsonObject
+
+DetailIdentity = NewType("DetailIdentity", str)
+
+
+class BillDetailKind(StrEnum):
+    ACTIONS = "actions"
+    AMENDMENTS = "amendments"
+    COMMITTEES = "committees"
+    COSPONSORS = "cosponsors"
+    RELATED_BILLS = "relatedBills"
+    SUBJECTS = "subjects"
+    SUMMARIES = "summaries"
+    TEXT_VERSIONS = "textVersions"
+    TITLES = "titles"
+
+    @property
+    def endpoint(self) -> str:
+        return "text" if self is self.TEXT_VERSIONS else self.value.lower()
+
+    @property
+    def attribute(self) -> str:
+        if self is self.RELATED_BILLS:
+            return "related_bills"
+        if self is self.TEXT_VERSIONS:
+            return "text_versions"
+        return self.value
+
+
+class HydrationStatus(StrEnum):
+    UNKNOWN = "unknown"
+    PARTIAL = "partial"
+    COMPLETE = "complete"
+
+
+class DetailState(StrEnum):
+    EXPANDED = "expanded"
+    OBJECT = "object"
+    ENVELOPE = "envelope"
+
+
+class DetailEvidence(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    page_count: int = Field(ge=1)
+    expected_count: int | None = Field(default=None, ge=0)
+    fetched_count: int = Field(ge=0)
+    state: DetailState
+    complete: bool
+    reason: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def require_consistent_counts(self) -> DetailEvidence:
+        if self.complete and (
+            self.state is DetailState.ENVELOPE
+            or self.expected_count is not None
+            and self.fetched_count != self.expected_count
+        ):
+            raise ValueError("Complete detail evidence requires expanded, exact counts")
+        return self
+
+
+class HydrationAssessment(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    schema_version: Literal[1] = 1
+    status: HydrationStatus = HydrationStatus.UNKNOWN
+    source: SourceName = SourceName.UNKNOWN
+    assessed_at: AwareDatetime | None = None
+    details: dict[BillDetailKind, DetailEvidence] = Field(default_factory=dict)
+    reason: str = Field(
+        default="No versioned bill-detail hydration evidence is available.",
+        min_length=1,
+    )
+
+    @model_validator(mode="after")
+    def require_evidence(self) -> HydrationAssessment:
+        if self.status is not HydrationStatus.UNKNOWN:
+            if self.source is not SourceName.CONGRESS or self.assessed_at is None:
+                raise ValueError(
+                    "Assessed bill details require their source and assessment time"
+                )
+            complete = set(self.details) == set(BillDetailKind) and all(
+                detail.complete for detail in self.details.values()
+            )
+            if (self.status is HydrationStatus.COMPLETE) != complete:
+                raise ValueError(
+                    "Hydration status disagrees with required detail evidence"
+                )
+            if not self.details:
+                raise ValueError("An assessed status requires detail evidence")
+        return self
+
+    @classmethod
+    def assess(
+        cls, details: Mapping[BillDetailKind, DetailEvidence]
+    ) -> HydrationAssessment:
+        if not details:
+            return cls(source=SourceName.CONGRESS)
+        complete = set(details) == set(BillDetailKind) and all(
+            detail.complete for detail in details.values()
+        )
+        return cls(
+            status=HydrationStatus.COMPLETE if complete else HydrationStatus.PARTIAL,
+            source=SourceName.CONGRESS,
+            assessed_at=datetime.now(UTC),
+            details=dict(details),
+            reason=(
+                "All required Congress API detail collections were retrieved; "
+                "this does not certify full text, other sources or historical coverage."
+                if complete
+                else "One or more required Congress API detail collections remain unresolved."
+            ),
+        )
+
+    @classmethod
+    def from_record(cls, record: Mapping[str, object]) -> HydrationAssessment:
+        return HydrationRecord.model_validate(record).hydration_assessment or cls()
+
+
+class HydrationRecord(BaseModel):
+    hydration_assessment: HydrationAssessment | None = None
+
+
+class BillDetailClient(Protocol):
+    def get_json(self, endpoint: str) -> Mapping[str, object]: ...
+
+
+class Pagination(BaseModel):
+    total: int | None = Field(default=None, ge=0, strict=True)
+    next: str | None = Field(default=None, min_length=1)
+
+
+class CountEnvelope(BaseModel):
+    count: int = Field(ge=0, strict=True)
+    url: str = Field(min_length=1)
+
+
+class DetailResult(BaseModel):
+    data: list[JsonObject] | JsonObject
+    evidence: DetailEvidence
+
+
+class BillDetailFetcher:
+    """Validate response shapes and pagination before certifying a detail field."""
+
+    def __init__(self, client: BillDetailClient, max_pages: int) -> None:
+        if max_pages < 1:
+            raise ValueError("max_pages must be positive")
+        self._client = client
+        self._max_pages = max_pages
+
+    @staticmethod
+    def distinct(records: list[JsonObject]) -> list[JsonObject]:
+        seen: dict[DetailIdentity, JsonObject] = {}
+        result: list[JsonObject] = []
+        for record in records:
+            identity = record.get("id")
+            if identity is None:
+                identity = record.get("url")
+            if identity is not None and (
+                isinstance(identity, bool)
+                or not isinstance(identity, (str, int))
+                or isinstance(identity, str)
+                and not identity.strip()
+            ):
+                raise ValueError("Bill-detail identity must be a string or integer")
+            key = DetailIdentity(
+                f"id:{identity}"
+                if identity is not None
+                else json.dumps(record, sort_keys=True, separators=(",", ":"))
+            )
+            if key in seen and seen[key] != record:
+                raise RuntimeError("Conflicting records share a bill-detail identity")
+            if key not in seen:
+                seen[key] = record
+                result.append(record)
+        return result
+
+    def fetch(self, endpoint: str, kind: BillDetailKind) -> DetailResult:
+        records: list[JsonObject] = []
+        subjects: JsonObject = {}
+        visited: set[str] = set()
+        expected: int | None = None
+        next_endpoint: str | None = endpoint
+        object_complete = True
+        subjects_list_present = False
+        for page_count in range(1, self._max_pages + 1):
+            if next_endpoint in visited:
+                raise RuntimeError(f"Pagination loop detected for {kind}")
+            if next_endpoint is None:
+                raise RuntimeError(f"Missing next endpoint for {kind}")
+            visited.add(next_endpoint)
+            response = TypeAdapter(JsonObject).validate_python(
+                self._client.get_json(next_endpoint)
+            )
+            if kind not in response:
+                raise ValueError(f"Missing {kind} in bill detail response")
+            value = response[kind]
+            raw_pagination = response.get("pagination")
+            pagination = Pagination.model_validate(
+                {} if raw_pagination is None else raw_pagination
+            )
+            if pagination.total is not None:
+                if expected is not None and expected != pagination.total:
+                    raise RuntimeError(f"Source count changed during {kind} pagination")
+                expected = pagination.total
+            if isinstance(value, dict) and ("count" in value or "url" in value):
+                envelope = CountEnvelope.model_validate(value)
+                if expected is not None and expected != envelope.count:
+                    raise RuntimeError(f"Conflicting source counts for {kind}")
+                if records or pagination.next:
+                    raise ValueError(
+                        f"Unexpected count envelope within {kind} pagination"
+                    )
+                empty = envelope.count == 0
+                return DetailResult(
+                    data=(
+                        {"legislativeSubjects": []}
+                        if kind is BillDetailKind.SUBJECTS
+                        else []
+                    )
+                    if empty
+                    else value,
+                    evidence=DetailEvidence(
+                        page_count=page_count,
+                        expected_count=envelope.count,
+                        fetched_count=0,
+                        state=DetailState.EXPANDED if empty else DetailState.ENVELOPE,
+                        complete=empty,
+                        reason="Authoritative empty collection."
+                        if empty
+                        else "Count/URL envelope was not expanded.",
+                    ),
+                )
+            if kind is BillDetailKind.SUBJECTS:
+                if not isinstance(value, dict):
+                    raise ValueError(
+                        "Subjects must be an object, not a collection envelope"
+                    )
+                if "legislativeSubjects" not in value:
+                    object_complete = False
+                else:
+                    subjects_list_present = True
+                    records.extend(
+                        TypeAdapter(list[JsonObject]).validate_python(
+                            value["legislativeSubjects"]
+                        )
+                    )
+                if "policyArea" in value:
+                    area = value["policyArea"]
+                    if area is not None:
+                        TypeAdapter(JsonObject).validate_python(area)
+                    if "policyArea" in subjects and subjects["policyArea"] != area:
+                        raise RuntimeError(
+                            "Policy area changed during subjects pagination"
+                        )
+                    subjects["policyArea"] = area
+            else:
+                records.extend(TypeAdapter(list[JsonObject]).validate_python(value))
+            next_endpoint = pagination.next
+            if not next_endpoint:
+                break
+        else:
+            raise RuntimeError(
+                f"Pagination limit of {self._max_pages} pages exceeded for {kind}"
+            )
+        distinct = self.distinct(records)
+        complete = object_complete and (expected is None or len(distinct) == expected)
+        if kind is BillDetailKind.SUBJECTS:
+            if subjects_list_present:
+                subjects["legislativeSubjects"] = distinct
+            data: list[JsonObject] | JsonObject = subjects
+        else:
+            data = distinct
+        return DetailResult(
+            data=data,
+            evidence=DetailEvidence(
+                page_count=page_count,
+                expected_count=expected,
+                fetched_count=len(distinct),
+                state=DetailState.OBJECT
+                if kind is BillDetailKind.SUBJECTS
+                else DetailState.EXPANDED,
+                complete=complete,
+                reason="Response shape validated and pagination exhausted."
+                if complete
+                else "Missing subjects collection or distinct count disagrees with source expectation.",
+            ),
+        )

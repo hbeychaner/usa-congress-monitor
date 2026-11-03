@@ -1,15 +1,17 @@
 import { apiGet, apiPost } from './client';
+import type * as Contracts from '../shared/contracts/api';
 
-export type TopicTrainingStatus = {
-    state: 'idle' | 'running' | 'succeeded' | 'failed';
-    started?: boolean | null;
-    stage?: string | null;
-    progress?: number | null;
-    message?: string | null;
-    model_version?: string | null;
-    started_at?: string | null;
-    finished_at?: string | null;
-};
+export type TopicTrainingStatus = Contracts.TopicTrainingStatus;
+export type MemberGraphStatus = Contracts.GraphBuildStatus;
+export type IngestProgressJob = Contracts.IngestProgressJob;
+export type BackfillProgress = Contracts.BackfillProgress;
+export type IngestProgressResponse = Contracts.IngestProgressResponse;
+export type JobStatusCounts = Contracts.JobStatusCounts;
+export type GovInfoCoverage = Contracts.GovInfoCoverage;
+export type StagingStatus = Contracts.StagingStatus;
+export type AdminIngestSnapshot = Contracts.AdminIngestSnapshot;
+export type IndexStatus = Contracts.IndexStatus;
+export type SystemStatusResponse = Contracts.SystemStatusResponse;
 
 export function fetchTopicTraining(): Promise<TopicTrainingStatus> {
     return apiGet<TopicTrainingStatus>('/api/v1/admin/topic-training');
@@ -18,16 +20,6 @@ export function fetchTopicTraining(): Promise<TopicTrainingStatus> {
 export function startTopicTraining(): Promise<TopicTrainingStatus> {
     return apiPost<TopicTrainingStatus>('/api/v1/admin/topic-training');
 }
-
-export type MemberGraphStatus = {
-    state: 'idle' | 'running' | 'succeeded' | 'failed';
-    started?: boolean | null;
-    stage?: string | null;
-    message?: string | null;
-    started_at?: string | null;
-    finished_at?: string | null;
-    versions?: Record<string, string>;
-};
 
 export function fetchMemberGraph(): Promise<MemberGraphStatus> {
     return apiGet<MemberGraphStatus>('/api/v1/admin/member-graph');
@@ -45,84 +37,6 @@ export function startPerspectives(): Promise<MemberGraphStatus> {
     return apiPost<MemberGraphStatus>('/api/v1/admin/perspectives');
 }
 
-export type IngestProgressJob = {
-    job_id: string;
-    status: string;
-    resource: string;
-    congress: number | null;
-    from_date: string | null;
-    to_date: string | null;
-    fetch_items: boolean;
-    hydrated: number;
-    discovered: number;
-    target: number;
-    remaining: number;
-    rate_per_hour: number;
-    eta: string | null;
-};
-
-export type BackfillProgress = {
-    total: number;
-    succeeded: number;
-    pending: number;
-    failed: number;
-    percent: number;
-    rate_per_hour: number;
-    eta: string | null;
-    batches_pending: number;
-};
-
-export type IngestProgressResponse = {
-    hydrated: number;
-    discovered: number;
-    target: number;
-    remaining: number;
-    active_jobs: number;
-    activity: 'continuing' | 'stalled' | 'waiting' | 'queued' | 'idle';
-    last_progress_at: string | null;
-    jobs: IngestProgressJob[];
-    backfill: BackfillProgress | null;
-};
-
-export type JobStatusCounts = {
-    queued: number;
-    running: number;
-    retrying: number;
-    succeeded: number;
-    failed: number;
-};
-
-export type GovInfoCoverage = {
-    congress: number;
-    expected: number;
-    available: number;
-    pending: number;
-    failed: number;
-    not_available: number;
-    complete: boolean;
-    report_found: boolean;
-};
-
-export type StagingStatus = {
-    index: string;
-    exists: boolean;
-    documents: number;
-    production_alias_target: string | null;
-    connected: boolean;
-};
-
-export type AdminIngestSnapshot = {
-    congress: number;
-    govinfo: GovInfoCoverage;
-    govinfo_jobs: JobStatusCounts;
-    govinfo_batch_jobs: JobStatusCounts;
-    index_jobs: JobStatusCounts;
-    reconcile_jobs: JobStatusCounts;
-    staging: StagingStatus;
-    ready_for_reconciliation: boolean;
-    ready_for_cutover: boolean;
-};
-
 export function fetchIngestProgress(): Promise<IngestProgressResponse> {
     return apiGet<IngestProgressResponse>('/api/v1/admin/ingest-progress');
 }
@@ -130,18 +44,6 @@ export function fetchIngestProgress(): Promise<IngestProgressResponse> {
 export function fetchAdminIngestSnapshot(): Promise<AdminIngestSnapshot> {
     return apiGet<AdminIngestSnapshot>('/api/v1/admin/ingest-snapshot');
 }
-
-export type IndexStatus = {
-    name: string;
-    documents: number;
-};
-
-export type SystemStatusResponse = {
-    search_connected: boolean;
-    indices: IndexStatus[];
-    jobs: Record<string, JobStatusCounts>;
-    generated_at: string | null;
-};
 
 export function fetchSystemStatus(): Promise<SystemStatusResponse> {
     return apiGet<SystemStatusResponse>('/api/v1/admin/system-status');

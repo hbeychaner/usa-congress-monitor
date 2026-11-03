@@ -1,112 +1,19 @@
 import { apiGet } from './client';
+import type * as Contracts from '../shared/contracts/api';
 
-import type { PartyGroup } from './graph';
-
-export type PartyTopicEntry = {
-  topic_id: number;
-  label: string;
-  bills: number;
-  topic_bills: number;
-  share_of_party: number;
-  share_of_topic: number;
-  summary: string;
-};
-
-export type PartyRanking = {
-  party: PartyGroup;
-  total_bills: number;
-  topics: PartyTopicEntry[];
-};
-
-export type BilateralTopicEntry = {
-  topic_id: number;
-  label: string;
-  bills: number;
-  bipartisan_bills: number;
-  share: number;
-  terms: TermUse[];
-  subjects: SubjectUse[];
-  summary: string;
-};
-
-export type PartiesResponse = {
-  congress: number | null;
-  congresses: number[];
-  model_version: string | null;
-  parties: PartyRanking[];
-  bilateral: BilateralTopicEntry[];
-};
-
-export type BillRef = {
-  doc_id: string;
-  title: string;
-};
-
-export type TermUse = {
-  term: string;
-  bills: number;
-  sponsors: number;
-  examples: BillRef[];
-};
-
-export type SubjectUse = {
-  name: string;
-  bills: number;
-  share: number;
-};
-
-export type PartyTerms = {
-  party: PartyGroup;
-  bills: number;
-  terms: TermUse[];
-  subjects: SubjectUse[];
-  sample_titles: string[];
-  summary: string;
-};
-
-export type BilateralSupport = {
-  bills: number;
-  bipartisan_bills: number;
-  share: number;
-  bilateral: boolean;
-  terms: TermUse[];
-  subjects: SubjectUse[];
-  sample_titles: string[];
-  summary: string;
-};
-
-export type PartyShare = {
-  party: PartyGroup;
-  bills: number;
-  share: number;
-  lean: number;
-};
-
-export type Perspective = {
-  label: string;
-  size: number;
-  terms: string[];
-  sample_titles: string[];
-  parties: PartyShare[];
-};
-
-export type PartyTopicDetail = {
-  congress: number;
-  topic_id: number;
-  topic_label: string;
-  bills: number;
-  silhouette: number | null;
-  stability: number | null;
-  passed: boolean;
-  party_terms: PartyTerms[];
-  bilateral: BilateralSupport | null;
-  perspectives: Perspective[];
-  skipped_reason: string;
-};
-
-export type PartyTopicResponse = {
-  topic: PartyTopicDetail;
-};
+export type PartyTopicEntry = Contracts.PartyTopicEntry;
+export type PartyRanking = Contracts.PartyRanking;
+export type BilateralTopicEntry = Contracts.BilateralTopicEntry;
+export type PartiesResponse = Contracts.PartiesResponse;
+export type BillRef = Contracts.BillRef;
+export type TermUse = Contracts.TermUse;
+export type SubjectUse = Contracts.SubjectUse;
+export type PartyTerms = Contracts.PartyTerms;
+export type BilateralSupport = Contracts.BilateralSupport;
+export type PartyShare = Contracts.PartyShare;
+export type Perspective = Contracts.Perspective;
+export type PartyTopicDetail = Contracts.TopicPerspectives;
+export type PartyTopicResponse = Contracts.PartyTopicResponse;
 
 export function fetchParties(congress?: number): Promise<PartiesResponse> {
   const query = congress === undefined ? '' : `?congress=${congress}`;

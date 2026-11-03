@@ -12,6 +12,7 @@ from kombu.exceptions import OperationalError
 from redis import Redis
 
 from cdm.config.app_config import RedisConfig
+from cdm.contracts.hydration import HydrationAssessment
 from cdm.ingest.archive import JsonlRecordArchive
 from cdm.ingest.govinfo import (
     GovInfoBillsParser,
@@ -23,6 +24,7 @@ from cdm.ingest.govinfo import (
 )
 from cdm.ingest.reconciliation import replay_govinfo_archives
 from cdm.ingest.redis_stream import RedisRecordStream
+from cdm.ingest.source_contract import SnapshotEvidence, SourceCheck, SourceMetadata
 from cdm.jobs.payloads import (
     GovInfoBatchPayload,
     GovInfoPackagePayload,
@@ -79,10 +81,10 @@ class GovInfoPackageRunner:
         self._rate_limiter = rate_limiter
         self._collections = {
             GovInfoCollection.BILLSTATUS: GovInfoCollectionSpec(
-                GovInfoBillStatusParser(), "bill", "govinfo-billstatus-v1"
+                GovInfoBillStatusParser(), "bill", "govinfo-billstatus-v3"
             ),
             GovInfoCollection.BILLSUM: GovInfoCollectionSpec(
-                GovInfoBillSummaryParser(), "bill", "govinfo-billsum-v1"
+                GovInfoBillSummaryParser(), "bill", "govinfo-billsum-v2"
             ),
             GovInfoCollection.BILLS: GovInfoCollectionSpec(
                 GovInfoBillsParser(), "bill_text", "govinfo-bills-v1"
@@ -118,17 +120,49 @@ class GovInfoPackageRunner:
             rate_limiter=self._rate_limiter,
         ).download(package)
         record = spec.parser.parse(artifact.read_bytes(), package)
+        metadata = manifest.get(package)
+        if metadata is None:
+            raise RuntimeError(
+                f"Missing durable source-fetch evidence: {package.package_id}"
+            )
+        check = SourceCheck.model_validate(metadata)
+        record["source_checked_at"] = (
+            check.fetched_at.isoformat() if check.fetched_at is not None else None
+        )
+        artifact_hash = GovInfoDownloader._sha256(artifact)
+        provenance = SourceMetadata.model_validate(record["source_metadata"])
+        provenance.sha256 = artifact_hash
+        provenance.parser_version = spec.parser_version
+        record["source_metadata"] = provenance.model_dump(
+            mode="json", exclude_none=True
+        )
+        if spec.resource == "bill":
+            record["hydration_assessment"] = HydrationAssessment(
+                source=provenance.source,
+                reason="GovInfo source evidence does not assess Congress API detail retrieval.",
+            ).model_dump(mode="json")
+        if "source_snapshot" in record:
+            snapshot = SnapshotEvidence.model_validate(record["source_snapshot"])
+            snapshot.checked_at = check.fetched_at
+            record["source_snapshot"] = snapshot.model_dump(mode="json")
         manifest.upsert(
             package,
             status="parsed",
             path=str(artifact),
             byte_count=artifact.stat().st_size,
-            sha256=GovInfoDownloader._sha256(artifact),
+            sha256=artifact_hash,
             parser_version=spec.parser_version,
-            fetched_at=GovInfoDownloader._now(),
+            fetched_at=check.fetched_at.isoformat()
+            if check.fetched_at is not None
+            else None,
         )
-        JsonlRecordArchive(outdir, int(job["attempts"])).write(
-            spec.resource, record, record_id=package.package_id
+        snapshot_root = outdir.with_name(
+            f"{job_id}:{artifact_hash}:{spec.parser_version}:{record['source_checked_at']}"
+        )
+        JsonlRecordArchive(snapshot_root, int(job["attempts"])).write(
+            spec.resource,
+            record,
+            record_id=package.package_id,
         )
         stream_name = RedisRecordStream.stream_name(job_id, spec.resource)
         RedisRecordStream(
@@ -141,7 +175,7 @@ class GovInfoPackageRunner:
             preserve_raw=True,
             consumer_group=self._redis_config.redis_consumer_group,
             expected_count=1,
-            archive_root=str(outdir),
+            archive_root=str(snapshot_root),
             target_index=payload.target_index,
             replace=payload.replace,
             # A re-parse must not collide with the previous run's succeeded index job.
@@ -198,5 +232,6 @@ class ReconciliationRunner:
             report_path=Path(payload.report_path),
             preserve_raw=payload.preserve_raw,
         )
+        response = JobResult.model_validate({"job_id": job_id, **result})
         self._store.mark_succeeded(job_id)
-        return JobResult(job_id=job_id, **result)
+        return response

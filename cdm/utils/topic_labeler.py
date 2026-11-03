@@ -10,74 +10,97 @@ from __future__ import annotations
 
 import logging
 
+from pydantic import BaseModel
+
+from cdm.contracts.labels import LabelFallbackReason, LabelResult, LabelSource
 from cdm.utils.ollama_client import OllamaClient
 from cdm.utils.topic_records import TopicSummaryRow
+from cdm.utils.topic_terms import keyword_label, topic_label
 
 logger = logging.getLogger(__name__)
 
-_SYSTEM_PROMPT = (
-    "You name clusters of US Congressional bills. Given keywords and sample "
-    "bill texts, reply with ONLY a title of 2-6 words in plain English, "
-    "title case, no quotes, no trailing punctuation. Do not mention "
-    "Congress, bills, acts, or legislation in the title. Name the subject "
-    "shared by ALL samples, not a detail of one. Use neutral wording that "
-    "does not imply support or opposition. If the samples concern "
-    "individual people or places (private relief, honorary namings, "
-    "commemorations), ignore the specific names and title the kind of "
-    "measure, e.g. 'Private Relief for Individuals' or 'Post Office Namings'."
-)
 
-PROMPT_KEYWORDS = 15
-PROMPT_SAMPLES = 8
-SAMPLE_CHARS = 220
-
-
-def _prompt(top_words: list[str], docs: list[str]) -> str:
-    samples = "\n".join(f"- {doc[:SAMPLE_CHARS]}" for doc in docs[:PROMPT_SAMPLES])
-    return (
-        f"Keywords: {', '.join(top_words[:PROMPT_KEYWORDS])}\n"
-        f"Sample bills:\n{samples}\n\n"
-        "Topic title:"
+class TopicLabelConfig(BaseModel):
+    system_prompt: str = (
+        "You name clusters of US Congressional bills. Given keywords and sample "
+        "bill texts, reply with ONLY a title of 2-6 words in plain English, "
+        "title case, no quotes, no trailing punctuation. Do not mention "
+        "Congress, bills, acts, or legislation in the title. Name the subject "
+        "shared by ALL samples, not a detail of one. Use neutral wording that "
+        "does not imply support or opposition. If the samples concern "
+        "individual people or places (private relief, honorary namings, "
+        "commemorations), ignore the specific names and title the kind of "
+        "measure, e.g. 'Private Relief for Individuals' or 'Post Office Namings'."
     )
-
-
-def _clean_label(text: str) -> str:
-    label = text.strip().strip('"').strip("'").rstrip(".").strip()
-    # Models occasionally prefix "Topic title:" despite instructions.
-    _, _, tail = label.rpartition(":")
-    label = (tail or label).strip()
-    words = label.split()
-    if not words or len(words) > 8:
-        return ""
-    return " ".join(words)
+    prompt_keywords: int = 15
+    prompt_samples: int = 8
+    sample_chars: int = 220
+    max_words: int = 8
 
 
 class TopicLabeler:
-    """Titles topics through Ollama; unusable or missing replies yield no label."""
+    """Titles topics through Ollama with recorded keyword fallbacks."""
 
-    def __init__(self, ollama: OllamaClient) -> None:
+    def __init__(
+        self, ollama: OllamaClient, config: TopicLabelConfig | None = None
+    ) -> None:
         self.ollama = ollama
+        self.config = config or TopicLabelConfig()
 
-    def generate(self, top_words: list[str], representative_docs: list[str]) -> str:
-        """One short title, or "" when unavailable/unusable."""
-        reply = self.ollama.chat(_SYSTEM_PROMPT, _prompt(top_words, representative_docs))
-        return _clean_label(reply)
+    def generate(
+        self,
+        top_words: list[str],
+        representative_docs: list[str],
+        *,
+        fallback_label: str = "General",
+    ) -> LabelResult:
+        samples = "\n".join(
+            f"- {doc[: self.config.sample_chars]}"
+            for doc in representative_docs[: self.config.prompt_samples]
+        )
+        keywords = keyword_label(top_words)
+        return self.ollama.label(
+            self.config.system_prompt,
+            f"Keywords: {', '.join(top_words[: self.config.prompt_keywords])}\n"
+            f"Sample bills:\n{samples}\n\nTopic title:",
+            LabelResult(
+                label=keywords or fallback_label,
+                label_source=LabelSource.KEYWORDS
+                if keywords
+                else LabelSource.DETERMINISTIC,
+            ),
+            max_words=self.config.max_words,
+        )
 
     def label_topics(
         self,
         summaries: list[TopicSummaryRow],
         representative_docs: dict[int, list[str]],
-    ) -> dict[int, str]:
-        """Labels for every non-outlier topic; skips topics Ollama can't label."""
-        if not self.ollama.is_available():
+    ) -> dict[int, LabelResult]:
+        """Every non-outlier topic retains its label's actual origin."""
+        available = self.ollama.is_available()
+        if not available:
             logger.warning("ollama unreachable; using keyword labels")
-            return {}
-        labels: dict[int, str] = {}
+        labels: dict[int, LabelResult] = {}
         for topic in summaries:
             topic_id = topic.topic_id
             if topic_id == -1:
                 continue
-            label = self.generate(topic.top_words, representative_docs.get(topic_id, []))
-            if label:
-                labels[topic_id] = label
+            labels[topic_id] = (
+                self.generate(
+                    topic.top_words,
+                    representative_docs.get(topic_id, []),
+                    fallback_label=topic.label or topic_label(topic.name, topic_id),
+                )
+                if available
+                else LabelResult(
+                    label=topic.label
+                    or keyword_label(topic.top_words)
+                    or topic_label(topic.name, topic_id),
+                    label_source=LabelSource.KEYWORDS
+                    if topic.top_words
+                    else LabelSource.DETERMINISTIC,
+                    fallback_reason=LabelFallbackReason.UNAVAILABLE,
+                )
+            )
         return labels

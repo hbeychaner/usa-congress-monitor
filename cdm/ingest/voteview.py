@@ -103,7 +103,7 @@ class CsvRow(BaseModel):
 
 class MemberRow(CsvRow):
     chamber: MemberChamber
-    icpsr: str
+    icpsr: int = Field(gt=0)
     party_code: float | None = None
     bioguide_id: str | None = None
 
@@ -142,7 +142,7 @@ class RollCallRow(CsvRow):
 
 class VoteRow(CsvRow):
     roll_number: int = Field(alias="rollnumber")
-    icpsr: str
+    icpsr: int = Field(gt=0)
     cast_code: int
 
     @property
@@ -298,7 +298,9 @@ class RollCallDocument(BaseModel):
         for party in _MAJOR_PARTIES:
             yea, nay = tallies[party][Position.YEA], tallies[party][Position.NAY]
             if yea != nay:
-                self.party_positions[party] = Position.YEA if yea > nay else Position.NAY
+                self.party_positions[party] = (
+                    Position.YEA if yea > nay else Position.NAY
+                )
 
         self.party_split = (
             len(self.party_positions) == len(_MAJOR_PARTIES)
@@ -323,30 +325,42 @@ class RollCallBuilder:
         self.members_path = members
         self.rollcalls_path = rollcalls
         self.votes_path = votes
+        self._president_ids: set[int] = set()
 
-    def _load_members(self) -> dict[str, Member]:
-        members: dict[str, Member] = {}
+    def _load_members(self) -> dict[int, Member]:
+        members: dict[int, Member] = {}
         for row in CsvReader(MemberRow).read(self.members_path):
-            if row.chamber is MemberChamber.PRESIDENT or not row.bioguide_id:
+            if row.chamber is MemberChamber.PRESIDENT:
+                self._president_ids.add(row.icpsr)
                 continue
-            members[row.icpsr] = Member(bioguide_id=row.bioguide_id, party=row.party)
+            if not row.bioguide_id:
+                raise ValueError(f"Voteview member {row.icpsr} has no bioguide ID")
+            member = Member(bioguide_id=row.bioguide_id, party=row.party)
+            if row.icpsr in members and members[row.icpsr] != member:
+                raise ValueError(f"Conflicting Voteview member {row.icpsr}")
+            members[row.icpsr] = member
         return members
 
     def _load_positions(
-        self, members: dict[str, Member]
+        self, members: dict[int, Member]
     ) -> dict[int, list[tuple[str, Position]]]:
         positions: dict[int, list[tuple[str, Position]]] = defaultdict(list)
         for row in CsvReader(VoteRow).read(self.votes_path):
             member = members.get(row.icpsr)
             if member is not None:
                 positions[row.roll_number].append((member.bioguide_id, row.position))
+            elif row.icpsr not in self._president_ids:
+                raise ValueError(f"Voteview vote has unlinked ICPSR {row.icpsr}")
         return positions
 
     def build(self) -> Iterator[RollCallDocument]:
         members = self._load_members()
         positions = self._load_positions(members)
+        rows = list(CsvReader(RollCallRow).read(self.rollcalls_path))
+        if set(positions) != {row.roll_number for row in rows}:
+            raise ValueError("Voteview roll calls and linked positions do not match")
         parties = {member.bioguide_id: member.party for member in members.values()}
-        for row in CsvReader(RollCallRow).read(self.rollcalls_path):
+        for row in rows:
             document = RollCallDocument(
                 **row.model_dump(exclude={"vote_desc", "dtl_desc"}),
                 description=row.description,
@@ -383,10 +397,6 @@ class VoteIngestor:
                 (document.to_index_document() for document in builder.build()),
                 replace=True,
             )
-            if result.get("errors"):
-                raise RuntimeError(
-                    f"rollcall bulk errors: {result.get('error_details')}"
-                )
             total += int(result["updated"])
         return total
 

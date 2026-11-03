@@ -87,17 +87,25 @@ class JobRecoveryService:
     ORPHAN_CUTOFF = timedelta(minutes=60)
     INGEST_ORPHAN_CUTOFF = timedelta(days=1)
     ORPHAN_BATCH_LIMIT = 25
-    ORPHAN_KINDS = (JobKind.GOVINFO_BULK.value, JobKind.GOVINFO_BULK_BATCH.value)
+    ORPHAN_KINDS = (
+        JobKind.GOVINFO_BULK.value,
+        JobKind.GOVINFO_BULK_BATCH.value,
+        JobKind.TOPIC_TRAINING.value,
+        JobKind.MEMBER_GRAPH.value,
+        JobKind.PERSPECTIVES.value,
+    )
     # Index jobs are re-sent only when the broker queue is nearly empty,
     # topping it up to the high watermark.
     INDEX_LOW_WATERMARK = 500
     INDEX_HIGH_WATERMARK = 2000
     INDEX_QUEUED_CUTOFF = timedelta(minutes=5)
-    ACTIVE_BATCH_STATUSES = frozenset({
-        JobStatus.QUEUED,
-        JobStatus.RUNNING,
-        JobStatus.RETRYING,
-    })
+    ACTIVE_BATCH_STATUSES = frozenset(
+        {
+            JobStatus.QUEUED,
+            JobStatus.RUNNING,
+            JobStatus.RETRYING,
+        }
+    )
 
     def __init__(
         self,
@@ -175,7 +183,16 @@ class JobRecoveryService:
 
     def _failed_candidates(self) -> list[JobRow]:
         """Failed ingest jobs wait until no ingest job is active, to spare the API budget."""
-        failed = self._store.failed()
+        failed = [
+            job
+            for job in self._store.failed()
+            if job["kind"]
+            not in {
+                JobKind.TOPIC_TRAINING,
+                JobKind.MEMBER_GRAPH,
+                JobKind.PERSPECTIVES,
+            }
+        ]
         if not self._store.has_active(JobKind.INGEST.value):
             return failed
         return [job for job in failed if job["kind"] != JobKind.INGEST]
@@ -197,6 +214,16 @@ class JobRecoveryService:
             if job["id"] in seen:
                 continue
             seen.add(job["id"])
+            if (
+                job["kind"]
+                in {JobKind.TOPIC_TRAINING, JobKind.MEMBER_GRAPH, JobKind.PERSPECTIVES}
+                and job["status"] in {JobStatus.RUNNING, JobStatus.RETRYING}
+                and job["attempts"] >= self._queues.celery_retry_max
+            ):
+                self._store.mark_failed(
+                    job["id"], "analytics worker lost; attempt limit reached"
+                )
+                continue
             if job["kind"] == JobKind.GOVINFO_BULK and job["id"] in batched:
                 continue
             if job["status"] == JobStatus.FAILED and not (
@@ -293,10 +320,12 @@ class RetentionService:
         # per-job archive is the durable replay source, so delete streams
         # immediately instead of waiting out the ledger retention window.
         existing_ids = self._store.all_ids()
-        terminal_ids = self._store.ids_with_status((
-            JobStatus.SUCCEEDED.value,
-            JobStatus.CANCELLED.value,
-        ))
+        terminal_ids = self._store.ids_with_status(
+            (
+                JobStatus.SUCCEEDED.value,
+                JobStatus.CANCELLED.value,
+            )
+        )
         deleted = 0
         for key in self._redis.scan_iter(match=f"{self.STREAM_PREFIX}*", count=1000):
             name = key.decode() if isinstance(key, bytes) else str(key)
@@ -369,5 +398,7 @@ class GovInfoRefreshScheduler:
             ).to_json()
             if self._submitter.exists(JobKind.GOVINFO_BULK.value, payload):
                 continue
-            queued.append(self._submitter.submit(JobKind.GOVINFO_BULK.value, payload)["id"])
+            queued.append(
+                self._submitter.submit(JobKind.GOVINFO_BULK.value, payload)["id"]
+            )
         return congress, queued

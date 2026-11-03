@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 
+from cdm.config.source_policy import SourcePolicy
+from cdm.contracts.hydration import HydrationAssessment
 from cdm.data_collection.id_utils import UrlIdParser
 from cdm.store.index_manager import lemma_field_paths
 from cdm.store.opensearch import resource_target
@@ -17,9 +19,7 @@ from cdm.utils.lemmatize import lemmatize_texts
 # Hydrated bill items get a ":{introduced_date}" suffix in the ingest runner
 # (multi-version disambiguation); the index key is the canonical 4-part id so
 # hydrated docs upsert over their skeleton list records.
-_BILL_ID_DATE_SUFFIX = re.compile(
-    r"^(bill:\d+:[a-z]+:\d+):\d{4}-\d{2}-\d{2}(?:[T ].*)?$"
-)
+_BILL_ID_DATE_SUFFIX = re.compile(SourcePolicy().bill_id_pattern)
 
 
 def _bioguide_ids(value: object) -> list[str]:
@@ -82,6 +82,9 @@ def to_document(
     """
     _, metadata = resource_target(resource)
     doc = {**record, **metadata}
+    doc.pop("source_snapshot", None)
+    doc.pop("source_snapshot_unavailable_reason", None)
+    doc.pop("source_checked_at", None)
     if ingest_metadata:
         doc.update(dict(ingest_metadata))
     if not doc.get("id"):
@@ -99,6 +102,9 @@ def to_document(
         doc["cosponsor_bioguide_ids"] = _bioguide_ids(doc.get("cosponsors"))
 
     if resource == "bill":
+        assessment = HydrationAssessment.from_record(doc)
+        doc["hydration_assessment"] = assessment.model_dump(mode="json")
+        doc["hydration_status"] = assessment.status.value
         match = _BILL_ID_DATE_SUFFIX.match(str(doc.get("id") or ""))
         if match:
             doc["id"] = match.group(1)

@@ -11,13 +11,11 @@ from typing import NoReturn
 from celery.signals import worker_init
 
 from cdm.config import get_config
-from cdm.graph.runner import GraphBuildRunner
 from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
+from cdm.jobs.analytics import GraphRequest, PerspectiveRequest, TopicRequest
 from cdm.jobs.store import JobKind
-from cdm.perspectives.launcher import PerspectiveBuildLauncher
 from cdm.utils.json_types import JsonObject
 from cdm.utils.log_trimmer import LogTrimmer
-from cdm.utils.topic_training import start_training
 from cdm.workers.celery_app import celery_app
 from cdm.workers.dispatch import TaskName
 from cdm.workers.results import JobResult
@@ -84,6 +82,16 @@ def run_reconciliation_job(self: object, job_id: str) -> JsonObject:
     return _execute(self, job_id, _container().reconciliation_runner.run)
 
 
+@celery_app.task(
+    bind=True,
+    name=TaskName.RUN_ANALYTICS.value,
+    soft_time_limit=get_config().queue.celery_analytics_soft_time_limit,
+    time_limit=get_config().queue.celery_analytics_time_limit,
+)
+def run_analytics_job(self: object, job_id: str) -> JsonObject:
+    return _execute(self, job_id, _container().analytics_runner.run)
+
+
 @celery_app.task(name="cdm.workers.tasks.schedule_daily_ingest")
 def schedule_daily_ingest() -> JsonObject:
     container = _container()
@@ -120,22 +128,23 @@ def schedule_static_refresh() -> JsonObject:
 @celery_app.task(name="cdm.workers.tasks.schedule_topic_training")
 def schedule_topic_training() -> JsonObject:
     """Start a topic-model retrain unless one is already running."""
-    status = start_training()
-    return {"started": status.started, "state": status.state.value}
+    return _container().analytics_jobs.submit(TopicRequest()).model_dump(mode="json")
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_member_graph_build")
 def schedule_member_graph_build() -> JsonObject:
     """Start a member graph rebuild unless one is already running."""
-    status = GraphBuildRunner().start()
-    return {"started": status.started, "state": status.state.value}
+    return _container().analytics_jobs.submit(GraphRequest()).model_dump(mode="json")
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_perspective_build")
 def schedule_perspective_build() -> JsonObject:
     """Rebuild the current Congress's party perspectives unless a build is running."""
-    status = PerspectiveBuildLauncher().start()
-    return {"started": status.started, "state": status.state.value}
+    return (
+        _container()
+        .analytics_jobs.submit(PerspectiveRequest(top_topics=None))
+        .model_dump(mode="json")
+    )
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_vote_refresh")

@@ -1,16 +1,11 @@
 import { apiGet } from './client';
-import type { components } from '../shared/contracts/api';
+import type * as Contracts from '../shared/contracts/api';
 
-export type MemberProfileResponse = components['schemas']['MemberProfileResponse'];
-export type MemberSummary = components['schemas']['MemberSummary'];
-export type MemberActivityResponse = components['schemas']['MemberActivityResponse'];
-export type MemberActivityItem = components['schemas']['MemberActivityItem'];
-export type MembersResponse = {
-    members: MemberSummary[];
-    total: number;
-    page: number;
-    limit: number;
-};
+export type MemberProfileResponse = Contracts.MemberProfileResponse;
+export type MemberSummary = Contracts.MemberSummary;
+export type MemberActivityResponse = Contracts.MemberActivityResponse;
+export type MemberActivityItem = Contracts.MemberActivityItem;
+export type MembersResponse = Contracts.MembersResponse;
 
 export type MemberFilters = {
     query?: string;

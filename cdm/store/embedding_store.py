@@ -6,15 +6,16 @@ import hashlib
 from collections.abc import Iterable, Iterator
 from datetime import UTC, datetime
 from enum import StrEnum
+from itertools import batched
 
 import numpy as np
 from elasticsearch import Elasticsearch, NotFoundError
-from elasticsearch.helpers import bulk, scan
+from elasticsearch.helpers import bulk
 from pydantic import BaseModel, Field
 
+from cdm.config.topic_analysis import EmbeddingCache, EmbeddingSearchConfig
+from cdm.store.client import SearchCompletion
 from cdm.utils.json_types import JsonObject
-
-KNN_CANDIDATE_FACTOR = 10
 
 
 class EmbeddingField(StrEnum):
@@ -39,17 +40,13 @@ class SimilarDocument(BaseModel):
     score: float
 
 
-class PruneReport(BaseModel):
-    deleted: int = 0
-
-
-def _batches(items: list[str], size: int) -> Iterator[list[str]]:
-    for start in range(0, len(items), size):
-        yield items[start : start + size]
+class EmbeddingNeighbors(BaseModel):
+    source_found: bool
+    neighbors: list[SimilarDocument]
 
 
 class EmbeddingStore:
-    """Reads, writes, prunes, and searches the embeddings index for one model."""
+    """Reads, writes, and searches the embeddings index for one model."""
 
     def __init__(
         self,
@@ -58,47 +55,48 @@ class EmbeddingStore:
         *,
         index: str,
         batch_docs: int,
+        settings: EmbeddingSearchConfig | None = None,
     ) -> None:
         self.client = client
         self.model = model
         self.index = index
         self.batch_docs = batch_docs
+        self._settings = settings or EmbeddingSearchConfig()
 
     def content_hash(self, text: str) -> str:
         """Hash of model + text, so changing either invalidates the cached vector."""
         digest = hashlib.sha256(f"{self.model}\0{text}".encode())
         return digest.hexdigest()
 
+    @staticmethod
+    def namespace(base_index: str, model: str) -> str:
+        return f"{base_index}-{hashlib.sha256(model.encode()).hexdigest()}"
+
     def ensure_index(self, dims: int) -> None:
+        cache = EmbeddingCache(index=self.index, model=self.model, dimensions=dims)
         if self.client.indices.exists(index=self.index):
-            return
-        self.client.indices.create(
-            index=self.index,
-            mappings={
-                "properties": {
-                    EmbeddingField.MODEL: {"type": "keyword"},
-                    EmbeddingField.CONTENT_HASH: {"type": "keyword", "index": False},
-                    EmbeddingField.EMBEDDED_AT: {"type": "date"},
-                    EmbeddingField.EMBEDDING: {
-                        "type": "dense_vector",
-                        "dims": dims,
-                        "index": True,
-                        "similarity": "cosine",
-                    },
-                }
-            },
-        )
+            cache.verify_mapping(
+                self.client.indices.get_mapping(index=self.index)[self.index][
+                    "mappings"
+                ]
+            )
+        else:
+            self.client.indices.create(index=self.index, mappings=cache.mappings())
 
     def fetch_fresh(self, expected: dict[str, str]) -> dict[str, np.ndarray]:
         """Return cached vectors whose stored hash equals the expected hash."""
         fresh: dict[str, np.ndarray] = {}
         if not self.client.indices.exists(index=self.index):
             return fresh
-        for ids in _batches(list(expected), self.batch_docs):
+        for ids in batched(expected, self.batch_docs):
             response = self.client.mget(
                 index=self.index,
                 ids=ids,
-                source_includes=[EmbeddingField.CONTENT_HASH, EmbeddingField.EMBEDDING],
+                source_includes=[
+                    EmbeddingField.MODEL,
+                    EmbeddingField.CONTENT_HASH,
+                    EmbeddingField.EMBEDDING,
+                ],
             )
             for doc in response["docs"]:
                 source = doc.get("_source") if doc.get("found") else None
@@ -106,6 +104,10 @@ class EmbeddingStore:
                     source
                     and source[EmbeddingField.CONTENT_HASH] == expected[doc["_id"]]
                 ):
+                    if source[EmbeddingField.MODEL] != self.model:
+                        raise ValueError(
+                            "Embedding cache contains a vector from another model"
+                        )
                     fresh[doc["_id"]] = np.asarray(
                         source[EmbeddingField.EMBEDDING], dtype=np.float32
                     )
@@ -114,6 +116,10 @@ class EmbeddingStore:
     def save(self, records: Iterable[EmbeddingRecord]) -> None:
         def actions() -> Iterator[JsonObject]:
             for record in records:
+                if record.model != self.model:
+                    raise ValueError(
+                        "Cannot write another model's vector to this embedding cache"
+                    )
                 yield {
                     "_index": self.index,
                     "_id": record.doc_id,
@@ -122,52 +128,56 @@ class EmbeddingStore:
 
         bulk(self.client, actions(), chunk_size=self.batch_docs)
 
-    def prune(self, keep_ids: set[str]) -> PruneReport:
-        """Delete vectors for bills outside ``keep_ids`` or from another model."""
-        report = PruneReport()
-        if not self.client.indices.exists(index=self.index):
-            return report
-        stale: list[str] = []
-        for hit in scan(
-            self.client,
-            index=self.index,
-            query={"query": {"match_all": {}}, "_source": [EmbeddingField.MODEL]},
-        ):
-            other_model = hit["_source"].get(EmbeddingField.MODEL) != self.model
-            if other_model or hit["_id"] not in keep_ids:
-                stale.append(hit["_id"])
-        for ids in _batches(stale, self.batch_docs):
-            bulk(
-                self.client,
-                ({"_op_type": "delete", "_index": self.index, "_id": i} for i in ids),
-                raise_on_error=False,
-            )
-        report.deleted = len(stale)
-        return report
-
-    def similar(self, doc_id: str, size: int) -> list[SimilarDocument]:
+    def similar(
+        self,
+        doc_id: str,
+        size: int,
+        *,
+        cache: EmbeddingCache | None = None,
+        model: str | None = None,
+    ) -> EmbeddingNeighbors:
         """Nearest bills by cosine similarity, excluding the bill itself."""
+        index = cache.index if cache else self.index
+        model = cache.model if cache else (model or self.model)
+        if cache:
+            cache.verify_mapping(
+                self.client.indices.get_mapping(index=index)[index]["mappings"]
+            )
         try:
             got = self.client.get(
-                index=self.index,
+                index=index,
                 id=doc_id,
-                source_includes=[EmbeddingField.EMBEDDING],
+                source_includes=[EmbeddingField.MODEL, EmbeddingField.EMBEDDING],
             )
-        except NotFoundError:
-            return []
+        except NotFoundError as exc:
+            if isinstance(exc.body, dict) and exc.body.get("found") is False:
+                return EmbeddingNeighbors(source_found=False, neighbors=[])
+            raise
+        if got["_source"][EmbeddingField.MODEL] != model:
+            raise ValueError("Embedding cache contains a vector from another model")
         response = self.client.search(
-            index=self.index,
+            index=index,
             size=size,
             source=False,
+            allow_partial_search_results=False,
             knn={
                 "field": EmbeddingField.EMBEDDING,
                 "query_vector": got["_source"][EmbeddingField.EMBEDDING],
                 "k": size,
-                "num_candidates": size * KNN_CANDIDATE_FACTOR,
-                "filter": {"bool": {"must_not": [{"ids": {"values": [doc_id]}}]}},
+                "num_candidates": size * self._settings.candidate_factor,
+                "filter": {
+                    "bool": {
+                        "filter": [{"term": {EmbeddingField.MODEL: model}}],
+                        "must_not": [{"ids": {"values": [doc_id]}}],
+                    }
+                },
             },
         )
-        return [
-            SimilarDocument(doc_id=hit["_id"], score=float(hit["_score"]))
-            for hit in response["hits"]["hits"]
-        ]
+        SearchCompletion.model_validate(response.body).require_complete()
+        return EmbeddingNeighbors(
+            source_found=True,
+            neighbors=[
+                SimilarDocument(doc_id=hit["_id"], score=float(hit["_score"]))
+                for hit in response["hits"]["hits"]
+            ],
+        )

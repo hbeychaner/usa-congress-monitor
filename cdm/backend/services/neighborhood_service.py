@@ -6,13 +6,14 @@ from collections import defaultdict
 
 from pydantic import BaseModel, Field
 
-from cdm.backend.services.graph_service import GraphService
+from cdm.backend.services.graph_service import GraphReadSnapshot, GraphService
 from cdm.backend.services.member_metasubject_overlay import (
     MemberMetasubjectOverlayBuilder,
 )
 from cdm.backend.services.member_service import MemberService
 from cdm.backend.services.member_subject_overlay import MemberSubjectOverlayBuilder
 from cdm.backend.services.member_topic_overlay import MemberTopicOverlayBuilder
+from cdm.contracts.analysis import AnalysisStatus
 from cdm.contracts.api import (
     GraphLink,
     GraphNode,
@@ -122,10 +123,13 @@ class NeighborhoodService:
         total = sum(query.weights[signal] for signal in query.signals)
         if total <= 0:
             return 0.0
-        return sum(
-            query.weights[signal] * signal_scores.get(signal, 0.0)
-            for signal in query.signals
-        ) / total
+        return (
+            sum(
+                query.weights[signal] * signal_scores.get(signal, 0.0)
+                for signal in query.signals
+            )
+            / total
+        )
 
     def allowed_members(
         self, member_ids: list[str], query: NeighborhoodQuery
@@ -139,16 +143,15 @@ class NeighborhoodService:
         }
 
     def links_among(
-        self, member_ids: list[str], query: NeighborhoodQuery
-    ) -> tuple[dict[Signal, str], list[GraphLink]]:
-        """Blended links between the given members, with the signal versions used."""
-        versions = {
-            signal: version
-            for signal in query.signals
-            if (version := self.graph.active_version(signal)) is not None
-        }
+        self,
+        member_ids: list[str],
+        query: NeighborhoodQuery,
+        snapshot: GraphReadSnapshot,
+    ) -> list[GraphLink]:
+        """Blended links between members, using the caller's pinned publications."""
+        versions = snapshot.versions
         if not versions or len(member_ids) < 2:
-            return versions, []
+            return []
         scaler = SignalScaler()
         pairs: dict[PairKey, dict[Signal, float]] = defaultdict(dict)
         topics: dict[PairKey, list[str]] = {}
@@ -157,7 +160,9 @@ class NeighborhoodService:
             edges = self.graph.edges(
                 version, signal, member_ids, query.congress, size, neighbors=member_ids
             )
-            scaler.fit(signal, [self.graph.score(edge, query.congress) for edge in edges])
+            scaler.fit(
+                signal, [self.graph.score(edge, query.congress) for edge in edges]
+            )
             self._collect(pairs, edges, signal, scaler, query.congress, topics)
         members = set(member_ids)
         links = [
@@ -174,27 +179,38 @@ class NeighborhoodService:
             and (blended := self._blend(signal_scores, query)) > 0
         ]
         links.sort(key=lambda link: link.score, reverse=True)
-        return versions, links
+        return links
 
     def neighborhood(self, query: NeighborhoodQuery) -> NeighborhoodResponse:
-        versions = {
-            signal: version
-            for signal in query.signals
-            if (version := self.graph.active_version(signal)) is not None
-        }
+        include_topics = query.include_topics or query.include_metasubjects
+        snapshot = self.graph.snapshot(query.signals, include_topics=include_topics)
+        versions = snapshot.versions
         if not versions:
-            return NeighborhoodResponse(seeds=query.seeds, congress=query.congress)
+            return NeighborhoodResponse(
+                seeds=query.seeds,
+                congress=query.congress,
+                analysis=snapshot.analysis(set(), query.congress),
+                topic_analysis=AnalysisStatus.for_model(
+                    snapshot.topic_model_version, snapshot.topic_model_version, False
+                )
+                if include_topics
+                else None,
+            )
 
         scaler = SignalScaler()
         seed_edges: dict[Signal, list[MemberEdge]] = {}
         for signal, version in versions.items():
             seed_edges[signal] = self.graph.edges(
-                version, signal, query.seeds, query.congress,
+                version,
+                signal,
+                query.seeds,
+                query.congress,
                 query.limit * CANDIDATE_FACTOR * len(query.seeds),
             )
-            scaler.fit(signal, [
-                self.graph.score(edge, query.congress) for edge in seed_edges[signal]
-            ])
+            scaler.fit(
+                signal,
+                [self.graph.score(edge, query.congress) for edge in seed_edges[signal]],
+            )
 
         pairs: dict[PairKey, dict[Signal, float]] = defaultdict(dict)
         topics: dict[PairKey, list[str]] = {}
@@ -210,13 +226,15 @@ class NeighborhoodService:
                     candidates[seed][other] = blended
 
         summaries = self.members.get_summaries(
-            query.seeds + sorted({other for ranked in candidates.values() for other in ranked})
+            query.seeds
+            + sorted({other for ranked in candidates.values() for other in ranked})
         )
         kept: list[str] = []
         for ranked in candidates.values():
             ordered = sorted(ranked, key=ranked.__getitem__, reverse=True)
             eligible = [
-                other for other in ordered
+                other
+                for other in ordered
                 if other in summaries and self._allowed(summaries[other], query)
             ]
             kept.extend(other for other in eligible[: query.limit] if other not in kept)
@@ -226,8 +244,12 @@ class NeighborhoodService:
             self._collect(
                 pairs,
                 self.graph.edges(
-                    version, signal, kept, query.congress,
-                    max(1, len(kept) * len(node_ids)), neighbors=node_ids,
+                    version,
+                    signal,
+                    kept,
+                    query.congress,
+                    max(1, len(kept) * len(node_ids)),
+                    neighbors=node_ids,
                 ),
                 signal,
                 scaler,
@@ -251,17 +273,29 @@ class NeighborhoodService:
         ]
         links.sort(key=lambda link: link.score, reverse=True)
         overlay = (
-            self.topic_overlay.build(node_ids, query.congress, query.topics_per_member)
+            self.topic_overlay.build(
+                node_ids,
+                query.congress,
+                query.topics_per_member,
+                snapshot.topic_model_version,
+            )
             if query.include_topics
             else None
         )
         subjects = (
-            self.subject_overlay.build(node_ids, query.congress, query.subjects_per_member)
+            self.subject_overlay.build(
+                node_ids, query.congress, query.subjects_per_member
+            )
             if query.include_subjects
             else None
         )
         metasubjects = (
-            self.metasubject_overlay.build(node_ids, query.congress, query.metasubjects_per_member)
+            self.metasubject_overlay.build(
+                node_ids,
+                query.congress,
+                query.metasubjects_per_member,
+                snapshot.topic_model_version,
+            )
             if query.include_metasubjects
             else None
         )
@@ -269,6 +303,24 @@ class NeighborhoodService:
             seeds=query.seeds,
             congress=query.congress,
             versions=versions,
+            analysis=snapshot.analysis(
+                {
+                    signal
+                    for link in links
+                    for signal, score in link.signal_scores.items()
+                    if score > 0
+                },
+                query.congress,
+            ),
+            topic_analysis=AnalysisStatus.for_model(
+                snapshot.topic_model_version,
+                snapshot.topic_model_version,
+                bool(
+                    (overlay and overlay.links) or (metasubjects and metasubjects.links)
+                ),
+            )
+            if include_topics
+            else None,
             nodes=[
                 GraphNode(
                     member=summaries[member_id],

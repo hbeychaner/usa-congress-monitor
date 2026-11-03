@@ -12,6 +12,12 @@ x-app: &app
     - redis
 
 services:
+  backend:
+    <<: *app
+    command: uvicorn cdm.backend.app:app --host 0.0.0.0 --port 8000
+    ports:
+      - "127.0.0.1:8000:8000"
+
   rabbitmq:
     image: rabbitmq:3.13-alpine
     restart: unless-stopped
@@ -26,7 +32,7 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
+    command: [ "redis-server", "--appendonly", "yes" ]
     ports:
       - "6379:6379"
     volumes:
@@ -35,22 +41,36 @@ services:
   worker:
     <<: *app
     command: >
-      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork
-      --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO
-      --queues=congress-ingest
+      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest
 
   worker-index:
     <<: *app
     command: >
-      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork
-      --concurrency=2 --max-tasks-per-child=200 --loglevel=INFO
-      --queues=congress-index
+      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=2 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-index
+
+  worker-bulk:
+    <<: *app
+    command: >
+      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=1 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-bulk,congress-sync
+
+  worker-maintenance:
+    <<: *app
+    command: >
+      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=1 --max-tasks-per-child=200 --loglevel=INFO --queues=congress-maintenance
+
+  worker-analytics:
+    <<: *app
+    cpus: ${ANALYTICS_CPUS:-2}
+    mem_limit: ${ANALYTICS_MEMORY:-8g}
+    environment:
+      TOKENIZERS_PARALLELISM: "false"
+    command: >
+      celery -A cdm.workers.celery_app:celery_app worker --pool=prefork --concurrency=1 --max-tasks-per-child=1 --loglevel=INFO --queues=congress-analytics
 
   beat:
     <<: *app
     command: >
-      celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO
-      --schedule=/workspace/data/celerybeat-schedule
+      celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO --schedule=/workspace/data/celerybeat-schedule
 
 volumes:
   rabbitmq-data:

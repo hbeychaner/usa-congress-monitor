@@ -1,26 +1,23 @@
 import { Card, Flex, Heading, Text } from '@radix-ui/themes';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
-import { fetchSimilarBills, type SimilarBillsResponse } from '../api/bills';
+import { fetchSimilarBills } from '../api/bills';
+import { AnalysisNotice } from './AnalysisNotice';
+import { useRead } from '../hooks/useRead';
 
 type Props = { billId: string };
 
 export function SimilarBillsCard({ billId }: Props) {
-    const [response, setResponse] = useState<SimilarBillsResponse | null>(null);
-
-    useEffect(() => {
-        setResponse(null);
-        fetchSimilarBills(billId).then(setResponse).catch(() => setResponse(null));
-    }, [billId]);
-
-    if (!response || response.similar.length === 0) return null;
+    const request = useCallback(() => fetchSimilarBills(billId), [billId]);
+    const { data: response, error, loading } = useRead(request);
 
     return (
         <Card size="3">
             <Heading size="4" mb="2">Similar bills</Heading>
+            <AnalysisNotice analysis={response?.analysis} error={error} loading={loading} />
             <Flex direction="column" gap="3">
-                {response.similar.map((bill) => (
+                {response?.similar.map((bill) => (
                     <Flex direction="column" key={bill.bill_id}>
                         <Link to={`/bills/${encodeURIComponent(bill.bill_id)}`}>{bill.title}</Link>
                         <Text size="1" color="gray">

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from cdm.backend.errors import AnalysisNotBuiltError
 from cdm.config import PerspectiveConfig
+from cdm.contracts.analysis import AnalysisState, AnalysisStatus
 from cdm.contracts.api import (
     BilateralTopicEntry,
     PartiesResponse,
@@ -13,14 +15,19 @@ from cdm.contracts.api import (
 from cdm.graph.models import PartyGroup
 from cdm.perspectives.models import MAJOR_PARTIES, TopicPerspectives
 from cdm.store.perspective_repository import PerspectiveRepository
+from cdm.store.topic_publication import TopicPublicationStore
 
 
 class PartyService:
     def __init__(
-        self, repository: PerspectiveRepository, config: PerspectiveConfig
+        self,
+        repository: PerspectiveRepository,
+        config: PerspectiveConfig,
+        publications: TopicPublicationStore,
     ) -> None:
         self.repository = repository
         self.config = config
+        self.publications = publications
 
     def overview(self, congress: int | None) -> PartiesResponse:
         congresses = self.repository.congresses()
@@ -36,6 +43,7 @@ class PartyService:
                 model_version=None,
                 parties=[],
                 bilateral=[],
+                analysis=AnalysisStatus(state=AnalysisState.NOT_BUILT),
             )
         topics, version = self.repository.read(chosen)
         return PartiesResponse(
@@ -44,10 +52,21 @@ class PartyService:
             model_version=version,
             parties=[self._ranking(party, topics) for party in MAJOR_PARTIES],
             bilateral=self._bilateral(topics),
+            analysis=self._analysis(version, bool(topics)),
+        )
+
+    def _analysis(self, version: str | None, has_results: bool) -> AnalysisStatus:
+        run = self.publications.current()
+        return AnalysisStatus.for_model(
+            version, run.model_version if run else None, has_results
         )
 
     def topic(self, congress: int, topic_id: int) -> PartyTopicResponse | None:
-        topics, _ = self.repository.read(congress)
+        topics, version = self.repository.read(congress)
+        if version is None:
+            raise AnalysisNotBuiltError(
+                "No party analysis has been published for this Congress."
+            )
         for topic in topics:
             if topic.topic_id == topic_id:
                 gated = (
@@ -55,7 +74,9 @@ class PartyService:
                     if topic.passed
                     else topic.model_copy(update={"perspectives": []})
                 )
-                return PartyTopicResponse(topic=gated)
+                return PartyTopicResponse(
+                    topic=gated, analysis=self._analysis(version, True)
+                )
         return None
 
     def _ranking(

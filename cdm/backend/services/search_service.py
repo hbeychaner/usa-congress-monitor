@@ -2,60 +2,68 @@
 
 from __future__ import annotations
 
-import logging
-
 from elasticsearch import Elasticsearch
 
 from cdm.backend.services.state_service import StateService
+from cdm.config.query_reads import QueryReadConfig, SearchKind
 from cdm.contracts.api import SearchResponse, SearchResultItem
+from cdm.store.client import SearchCompletion
 from cdm.store.opensearch import read_alias
 from cdm.utils.json_types import JsonObject
 from cdm.utils.lemmatize import try_lemmatize_query
 
-SUPPORTED_TYPES = {"member", "state", "bill"}
-logger = logging.getLogger(__name__)
-
 
 class SearchService:
-    def __init__(self, client: Elasticsearch, states: StateService) -> None:
+    def __init__(
+        self,
+        client: Elasticsearch,
+        states: StateService,
+        reads: QueryReadConfig | None = None,
+    ) -> None:
         self._client = client
         self._states = states
+        self._reads = reads or QueryReadConfig()
 
     def search(self, q: str, types: str, limit: int) -> SearchResponse:
-        normalized_types = self._normalized_types(types)
+        self._reads.offset(1, limit)
+        self._reads.text(q, "q")
+        normalized_types = [
+            kind.value for kind in self._reads.selected(types, SearchKind)
+        ]
         query = q.strip()
         if not query:
             return SearchResponse(
                 query=q, types=normalized_types, limit=limit, results=[]
             )
 
-        per_type_limit = max(1, min(limit, 50))
         results: list[SearchResultItem] = []
 
         if "state" in normalized_types:
-            results.extend(self._state_results(query, per_type_limit))
+            results.extend(self._state_results(query, limit))
 
-        try:
-            if "member" in normalized_types:
-                results.extend(self.search_members(query, per_type_limit))
-            if "bill" in normalized_types:
-                results.extend(self._search_bills(query, per_type_limit))
-        except Exception as exc:
-            logger.warning(
-                "OpenSearch search unavailable; returning partial results", exc_info=exc
-            )
+        if "member" in normalized_types:
+            results.extend(self.search_members(query, limit))
+        if "bill" in normalized_types:
+            results.extend(self._search_bills(query, limit))
 
         return SearchResponse(
             query=q,
             types=normalized_types,
             limit=limit,
-            results=results[:limit],
+            results=results,
         )
 
     def search_members(self, query: str, limit: int) -> list[SearchResultItem]:
+        self._reads.offset(1, limit)
+        self._reads.text(query, "q")
+        body = self._member_query(query, limit)
+        body["_source"] = list(self._reads.member_search_fields)
         response = self._client.search(
-            index=read_alias("member"), body=self._member_query(query, limit)
+            index=read_alias("member"),
+            body=body,
+            allow_partial_search_results=False,
         )
+        SearchCompletion.model_validate(response.body).require_complete()
         hits = response.get("hits", {}).get("hits", [])
         items: list[SearchResultItem] = []
         for hit in hits:
@@ -87,10 +95,14 @@ class SearchService:
         return items
 
     def _search_bills(self, query: str, limit: int) -> list[SearchResultItem]:
+        body = self._bill_query(query, limit)
+        body["_source"] = list(self._reads.bill_search_fields)
         response = self._client.search(
             index=read_alias("bill"),
-            body=self._bill_query(query, limit),
+            body=body,
+            allow_partial_search_results=False,
         )
+        SearchCompletion.model_validate(response.body).require_complete()
         hits = response.get("hits", {}).get("hits", [])
         items: list[SearchResultItem] = []
         for hit in hits:
@@ -136,14 +148,6 @@ class SearchService:
         return results
 
     @staticmethod
-    def _normalized_types(types: str) -> list[str]:
-        selected = [t.strip().lower() for t in types.split(",") if t.strip()]
-        filtered = [t for t in selected if t in SUPPORTED_TYPES]
-        if filtered:
-            return filtered
-        return ["member", "state", "bill"]
-
-    @staticmethod
     def _normalize_member_id(raw_id: str) -> str:
         if raw_id.startswith("person:"):
             return raw_id.split(":", 1)[1]
@@ -183,7 +187,7 @@ class SearchService:
         return {
             "size": size,
             "query": {"bool": {"should": should, "minimum_should_match": 1}},
-            "sort": ["_score"],
+            "sort": ["_score", {"id": "asc"}],
         }
 
     @staticmethod
@@ -218,5 +222,5 @@ class SearchService:
         return {
             "size": size,
             "query": {"bool": {"should": should, "minimum_should_match": 1}},
-            "sort": ["_score"],
+            "sort": ["_score", {"id": "asc"}],
         }

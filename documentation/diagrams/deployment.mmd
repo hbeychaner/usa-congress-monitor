@@ -1,0 +1,42 @@
+flowchart TB
+    browser["Browser"]
+
+    subgraph local["Local - controlled Compose runtime"]
+        vite["React / Vite :5173"]
+        fastapi["FastAPI :8000"]
+        operations["Celery operations worker<br/>Index + maintenance queues / one slot"]
+        infra["Retained Docker infrastructure<br/>Elasticsearch, RabbitMQ, Redis"]
+        disk[("Repository data / models / logs")]
+        optins["Off by default<br/>Acquisition / analytics / Beat / Kibana"]
+        vite --> fastapi
+        fastapi --> infra
+        operations --> infra
+        operations --> disk
+        fastapi --> disk
+        operations -.->|"Separate profile approval"| optins
+    end
+
+    subgraph cloud["GCP design - not certified by local acceptance"]
+        lb["HTTPS load balancer + IAP"]
+        fe["Cloud Run frontend<br/>nginx static assets"]
+        api["Cloud Run API<br/>private VPC access"]
+        subgraph vpc["Private VPC"]
+            worker["Worker VM<br/>Celery, Beat, RabbitMQ, Redis"]
+            search["Search VM<br/>Elasticsearch"]
+            wd[("Persistent worker disk<br/>data, logs, models, Docker volumes")]
+            sd[("Persistent search disk")]
+            worker --> wd
+            worker --> search
+            search --> sd
+        end
+        lb -->|"default path"| fe
+        lb -->|"/api/* and API documentation"| api
+        api --> worker
+        api --> search
+        limitation["Worker-local files are NOT mounted on Cloud Run.<br/>File-backed admin status/builds need deployment-aware handling."]
+        api -.-> limitation
+        wd -.-> limitation
+    end
+
+    browser -->|"local option"| vite
+    browser -->|"cloud option"| lb

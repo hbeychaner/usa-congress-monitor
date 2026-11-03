@@ -12,7 +12,9 @@ MIN_BILLS = 2
 
 
 class TopicOverlay:
-    def __init__(self, nodes: list[GraphTopicNode], links: list[GraphTopicLink]) -> None:
+    def __init__(
+        self, nodes: list[GraphTopicNode], links: list[GraphTopicLink]
+    ) -> None:
         self.nodes = nodes
         self.links = links
 
@@ -22,8 +24,13 @@ class MemberTopicOverlayBuilder:
         self.bills = bills
         self.topics = topics
 
-    def build(self, member_ids: list[str], congress: int | None, per_member: int) -> TopicOverlay:
-        version, _ = self.topics.latest_model_version()
+    def build(
+        self,
+        member_ids: list[str],
+        congress: int | None,
+        per_member: int,
+        version: str | None,
+    ) -> TopicOverlay:
         if not version or not member_ids:
             return TopicOverlay([], [])
         bills = self.bills.by_member(member_ids, congress)
@@ -36,14 +43,21 @@ class MemberTopicOverlayBuilder:
             for topic_id, count in counts.most_common(per_member):
                 if count >= MIN_BILLS:
                     links.append(
-                        GraphTopicLink(member=member, topic_id=topic_id, share=count / total, bills=count)
+                        GraphTopicLink(
+                            member=member,
+                            topic_id=topic_id,
+                            share=count / total,
+                            bills=count,
+                        )
                     )
         summaries = self.topics.topic_summaries(version)
         topic_ids = sorted({link.topic_id for link in links})
         nodes = [
             GraphTopicNode(
                 topic_id=topic_id,
-                label=summaries[topic_id].label if topic_id in summaries else f"Topic {topic_id}",
+                label=summaries[topic_id].label
+                if topic_id in summaries
+                else f"Topic {topic_id}",
             )
             for topic_id in topic_ids
         ]

@@ -14,6 +14,7 @@ from cdm.contracts.api import (
     StateTimelineResponse,
     TimelineMember,
 )
+from cdm.store.client import SearchCompletion
 from cdm.store.opensearch import read_alias
 
 _STATE_CODES = {
@@ -142,12 +143,16 @@ class StateService:
                     senate_members.append(member)
 
         if from_congress is not None:
-            house_members = [m for m in house_members if m.congress_end >= from_congress]
+            house_members = [
+                m for m in house_members if m.congress_end >= from_congress
+            ]
             senate_members = [
                 m for m in senate_members if m.congress_end >= from_congress
             ]
         if to_congress is not None:
-            house_members = [m for m in house_members if m.congress_start <= to_congress]
+            house_members = [
+                m for m in house_members if m.congress_start <= to_congress
+            ]
             senate_members = [
                 m for m in senate_members if m.congress_start <= to_congress
             ]
@@ -171,7 +176,9 @@ class StateService:
         response = self._client.search(
             index=read_alias("member"),
             body={"size": 10000, "query": {"match_all": {}}},
+            allow_partial_search_results=False,
         )
+        SearchCompletion.model_validate(response.body).require_complete()
         return [hit["_source"] for hit in response["hits"]["hits"]]
 
     def _fetch_districts(self, state_code: str) -> dict[str, Any]:

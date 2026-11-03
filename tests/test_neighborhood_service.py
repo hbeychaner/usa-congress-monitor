@@ -1,15 +1,23 @@
 from typing import cast
+from unittest.mock import Mock
 
 import pytest
+from elastic_transport import ObjectApiResponse
 
-from cdm.backend.services.graph_service import MAX_EDGE_RESULTS, GraphService
+from cdm.backend.services.graph_service import (
+    GraphReadSnapshot,
+    GraphService,
+)
 from cdm.backend.services.member_service import MemberService
 from cdm.backend.services.neighborhood_service import (
     NeighborhoodQuery,
     NeighborhoodService,
 )
+from cdm.config.query_reads import QueryReadConfig
 from cdm.contracts.api import MemberSummary
-from cdm.graph.models import MemberEdge, PartyGroup, Signal
+from cdm.graph.models import GraphVersionPointer, MemberEdge, PartyGroup, Signal
+from cdm.graph.store import GraphStore
+from cdm.store.topic_publication import TopicPublicationStore
 
 
 def _edge(signal: Signal, member: str, neighbor: str, score: float) -> MemberEdge:
@@ -20,7 +28,11 @@ def _edge(signal: Signal, member: str, neighbor: str, score: float) -> MemberEdg
 
 def _summary(member_id: str, party: str, chamber: str) -> MemberSummary:
     return MemberSummary(
-        bioguide_id=member_id, display_name=member_id, party=party, state="X", chamber=chamber
+        bioguide_id=member_id,
+        display_name=member_id,
+        party=party,
+        state="X",
+        chamber=chamber,
     )
 
 
@@ -35,17 +47,35 @@ class FakeMembers(MemberService):
 class FakeGraph(GraphService):
     def __init__(self) -> None:
         self.table = {
-            Signal.COLLABORATION: [_edge(Signal.COLLABORATION, "A", "B", 0.02), _edge(Signal.COLLABORATION, "A", "C", 0.01)],
-            Signal.VOTING: [_edge(Signal.VOTING, "A", "B", 0.9), _edge(Signal.VOTING, "A", "C", 0.3)],
+            Signal.COLLABORATION: [
+                _edge(Signal.COLLABORATION, "A", "B", 0.02),
+                _edge(Signal.COLLABORATION, "A", "C", 0.01),
+            ],
+            Signal.VOTING: [
+                _edge(Signal.VOTING, "A", "B", 0.9),
+                _edge(Signal.VOTING, "A", "C", 0.3),
+            ],
         }
 
-    def active_version(self, signal: Signal) -> str | None:
-        return "v1"
+    def snapshot(
+        self, signals: list[Signal], *, include_topics: bool = False
+    ) -> GraphReadSnapshot:
+        return GraphReadSnapshot(
+            pointers={
+                signal: GraphVersionPointer(
+                    signal=signal, graph_version="v1", source_model_version="v1"
+                )
+                for signal in signals
+            },
+            topic_model_version="v1",
+        )
 
     def edges(self, version, signal, members, congress, size, neighbors=None):
         return [
-            edge for edge in self.table[signal]
-            if edge.member in members and (neighbors is None or edge.neighbor in neighbors)
+            edge
+            for edge in self.table[signal]
+            if edge.member in members
+            and (neighbors is None or edge.neighbor in neighbors)
         ]
 
 
@@ -57,7 +87,11 @@ def service() -> NeighborhoodService:
         "C": _summary("C", "Republican", "House of Representatives"),
     }
     return NeighborhoodService(
-        FakeGraph(), FakeMembers(members), None, None, None  # type: ignore[arg-type]
+        FakeGraph(),
+        FakeMembers(members),
+        None,
+        None,
+        None,  # type: ignore[arg-type]
     )
 
 
@@ -96,8 +130,12 @@ def test_shared_topics_are_carried_to_links(service: NeighborhoodService):
     graph = cast(FakeGraph, service.graph)
     graph.table[Signal.TOPIC] = [
         MemberEdge(
-            graph_version="v1", signal=Signal.TOPIC, member="A", neighbor="B",
-            score=0.6, shared_topics=["health care"],
+            graph_version="v1",
+            signal=Signal.TOPIC,
+            member="A",
+            neighbor="B",
+            score=0.6,
+            shared_topics=["health care"],
         )
     ]
     query = NeighborhoodQuery(seeds=["A"], weights={Signal.TOPIC: 1.0})
@@ -106,14 +144,12 @@ def test_shared_topics_are_carried_to_links(service: NeighborhoodService):
 
 
 def test_edge_query_size_is_capped_to_result_window() -> None:
-    class RecordingClient:
-        size = 0
-
-        def search(self, **kwargs):  # type: ignore[no-untyped-def]
-            self.size = kwargs["size"]
-            return {"hits": {"hits": []}}
-
-    client = RecordingClient()
-    graph = GraphService(client, None)  # type: ignore[arg-type]
+    client = Mock()
+    client.search.return_value = ObjectApiResponse(
+        {"timed_out": False, "_shards": {"failed": 0}, "hits": {"hits": []}}, Mock()
+    )
+    graph = GraphService(
+        GraphStore(client), Mock(spec=MemberService), Mock(spec=TopicPublicationStore)
+    )
     graph.edges("v1", Signal.TOPIC, ["A"], None, 50_000, neighbors=["B"])
-    assert client.size == MAX_EDGE_RESULTS
+    assert client.search.call_args.kwargs["size"] == QueryReadConfig().max_result_window

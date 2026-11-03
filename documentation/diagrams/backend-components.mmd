@@ -1,29 +1,40 @@
-C4Component
-    title Congress Tracker — application components (serving path)
+---
+title: Congress Tracker - C4 level 3 serving components
+config:
+  flowchart:
+    curve: linear
+    nodeSpacing: 55
+    rankSpacing: 100
+---
+flowchart LR
+    pages["Web: React routes and pages<br/>Entities / search / graphs / admin"]
+    wrappers["Web: handwritten API wrappers<br/>Shared apiGet / apiPost"]
+    types["Web: OpenAPI schema types<br/>Generated; partially adopted by wrappers"]
+    routes["API: typed route handlers<br/>Request validation / dependency declarations"]
+    providers["API: dependency providers<br/>Container composition and cached services"]
+    query["API: entity and search services<br/>Bills / members / committees / states / votes"]
+    analysis["API: analysis query services<br/>Topics / perspectives / graphs / neighborhoods"]
+    admin["API: admin services and launchers<br/>Jobs / coverage / local rebuild controls"]
+    contracts["API: Pydantic response contracts"]
+    es[("Elasticsearch<br/>Entity aliases and analysis indices")]
+    jobs[("SQLite job ledger")]
+    tasks["Celery task dispatch"]
+    local[("Local status / artifacts / subprocesses")]
 
-    Person(user, "User")
-    ContainerDb(search, "Search Store", "Elasticsearch", "Read aliases: congress-legislation-read, congress-member-read, …")
+    pages --> wrappers
+    types -.-> wrappers
+    wrappers -->|"HTTP / JSON"| routes
+    providers -.->|"Injects collaborators"| routes
+    routes --> query
+    routes --> analysis
+    routes --> admin
+    query --> es
+    analysis --> es
+    query -.-> contracts
+    analysis -.-> contracts
+    admin --> jobs
+    admin --> tasks
+    admin --> local
 
-    Container_Boundary(fe, "Web App (frontend/app)") {
-        Component(pages, "Pages", "React", "SearchPage, BillDetailPage, MemberProfilePage (activity feed), TopicsPage.")
-        Component(apiclient, "API Client", "TypeScript", "Typed fetchers generated from the backend OpenAPI contract.")
-    }
-
-    Container_Boundary(be, "Backend API (cdm/backend)") {
-        Component(routes, "Routes", "FastAPI routers", "/api/v1/bills, /members, /members/{id}/activity, /search, /topics.")
-        Component(billsvc, "bill_service", "Python", "Bill list/detail; full_text served inline from the bill document.")
-        Component(membersvc, "member_service", "Python", "Profiles + merged bill/amendment activity via bioguide-id links.")
-        Component(searchsvc, "search_service", "Python", "Cross-index query with lemma multi-fields.")
-        Component(osclient, "Search Client", "elasticsearch-py", "Shared client; alias-based routing per resource.")
-    }
-
-    Rel(user, pages, "Uses")
-    Rel(pages, apiclient, "Calls")
-    Rel(apiclient, routes, "HTTPS JSON")
-    Rel(routes, billsvc, "Delegates")
-    Rel(routes, membersvc, "Delegates")
-    Rel(routes, searchsvc, "Delegates")
-    Rel(billsvc, osclient, "Queries")
-    Rel(membersvc, osclient, "Queries")
-    Rel(searchsvc, osclient, "Queries")
-    Rel(osclient, search, "Search/Get via read aliases")
+    classDef component fill:#e4f0fb,stroke:#1168bd,color:#172b4d
+    class pages,wrappers,types,routes,providers,query,analysis,admin,contracts component
