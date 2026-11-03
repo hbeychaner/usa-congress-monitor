@@ -4,6 +4,14 @@
 
 ### Added
 
+- Evidence-based hydration recovery now distinguishes co-sponsorship episodes
+  from people, validates actual `count`/`countIncludingWithdrawnCosponsors`
+  pagination semantics and counts a subjects policy area once. Same-episode
+  contradictions and changing/mismatched counts still fail. Optional active
+  counts are retained in source-only evidence and generated frontend contracts.
+  The expanded acquisition stopped safely before serving writes when these
+  cases appeared; the exact live failure now proves 70 episodes/67 active and
+  111 subject rows (110 legislative plus one policy area).
 - Read-only local Compose capacity admission before managed startup, covering
   selected profiles across both projects, existing containers, unknown/unbounded
   services and explicit memory/disk safety reserves. It refuses oversized

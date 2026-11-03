@@ -1211,7 +1211,7 @@ class Bill(EntityBase):
             if isinstance(result.data, list):
                 if not result.evidence.complete and isinstance(previous, list):
                     previous_records = TypeAdapter(list[JsonObject]).validate_python(previous)
-                    payload[kind] = fetcher.distinct(previous_records + result.data)
+                    payload[kind] = fetcher.distinct(previous_records + result.data, kind)
                 else:
                     payload[kind] = result.data
             elif kind is BillDetailKind.SUBJECTS and "count" not in result.data:
@@ -1223,7 +1223,8 @@ class Bill(EntityBase):
                     new_subjects = result.data.get("legislativeSubjects")
                     if isinstance(old_subjects, list) and isinstance(new_subjects, list):
                         merged["legislativeSubjects"] = fetcher.distinct(
-                            TypeAdapter(list[JsonObject]).validate_python(old_subjects + new_subjects)
+                            TypeAdapter(list[JsonObject]).validate_python(old_subjects + new_subjects),
+                            kind,
                         )
                     payload[kind] = merged
                 else:

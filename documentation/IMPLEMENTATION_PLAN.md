@@ -66,6 +66,20 @@ Work proceeds in this order:
    resume. This experiment neither indexes serving rows nor changes ledger
    statuses, schedules, aliases or analysis pointers.
 
+   The expanded v1 stage preserved **27 candidates**, then correctly stopped:
+   Congress 103 S.11 contains a member who withdrew and later rejoined.
+   Member URL alone was not a co-sponsorship-episode identity. Actual pagination
+   reports **70 episodes, 67 active**, and its subjects count is **111 rows:
+   110 legislative subjects plus one policy area**. Retrieval now preserves
+   date-distinguished episodes, validates active/overall counts separately and
+   counts policy area once. Contradictory same-episode records still fail.
+   Offline regressions and the exact live bill verify the complete corrected
+   proof; a source count mismatch remains partial, never forced complete.
+   Existing proof stays readable, but the stricter v2 acquisition stage must
+   refetch the frozen identities rather than silently reusing v1 certification.
+   All 3,047 serving sequence/primary terms remained unchanged; the three
+   original failed jobs and absent topic publication were preserved.
+
    Next: finish and verify this acquisition stage, account explicitly for every
    unresolved identity, compare complete projections in a bounded shadow target,
    verify retained/richer fields and conflicts, then apply receipted,

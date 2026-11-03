@@ -69,17 +69,21 @@ formats describe where published representations can be fetched.
 
 `detail_hydration` is a dictionary of per-endpoint completeness observations:
 each value contains `page_count`, `expected_count`, `fetched_count`, `state`,
-and `complete`. The keys used by hydration include `relatedBills` and
+and `complete`; versioned detail evidence also records a reason and optional
+expected/fetched active co-sponsorship counts. Overall co-sponsor counts include
+withdrawn episodes; subject counts include a nonempty policy-area row once,
+alongside distinct legislative subjects. They are not unique active-member or
+legislative-subject-only counts. The keys used by hydration include `relatedBills` and
 `textVersions`, rather than the normalized model attribute names.
 The YAML mapping's flat `detail_hydration` object does not declare those
 per-endpoint keys, so these observations are available in `_source` but are not
 automatically searchable at their actual paths.
 
 `Bill.add_bill_details()` fetches nine related endpoints and fills normalized
-collections and text. It fetches committees and records their completeness,
-but the current method does not assign that fetched committee collection to
-`self.committees`. A hydrated bill is therefore not proof that every
-relationship attribute was populated by this method.
+collections and text. All nine collections, including committees, validate
+before assignment to the original bill. The versioned `HydrationAssessment`
+is source-only; the derived root status is searchable. A complete assessment
+certifies those retrievals, not global historical, text or freshness coverage.
 
 | Supporting model | Important fields and relationship |
 |---|---|

@@ -69,6 +69,172 @@ class HydrationFixture:
 
 
 class TestDetailRetrieval:
+    @pytest.mark.parametrize("identity_field", ["url", "id"])
+    def test_cosponsor_identity_includes_its_sponsorship_episode(
+        self, identity_field: str
+    ) -> None:
+        records: list[JsonObject] = [
+            {
+                identity_field: "member-identity",
+                "sponsorshipDate": "1993-02-03",
+                "sponsorshipWithdrawnDate": "1993-02-03",
+            },
+            {
+                identity_field: "member-identity",
+                "sponsorshipDate": "1993-06-07",
+                "sponsorshipWithdrawnDate": None,
+            },
+        ]
+        result = HydrationFixture.fetch(
+            {
+                "cosponsors": records,
+                "pagination": {"count": 1, "countIncludingWithdrawnCosponsors": 2},
+            },
+            BillDetailKind.COSPONSORS,
+        )
+        assert result.data == records
+        assert result.evidence.complete
+        assert result.evidence.expected_count == result.evidence.fetched_count == 2
+        assert result.evidence.expected_active_count == 1
+        assert result.evidence.fetched_active_count == 1
+
+    def test_same_cosponsor_episode_with_conflicting_withdrawal_still_fails(
+        self,
+    ) -> None:
+        with pytest.raises(RuntimeError, match="Conflicting"):
+            HydrationFixture.fetch(
+                {
+                    "cosponsors": [
+                        {
+                            "url": "member",
+                            "sponsorshipDate": "1993-02-03",
+                            "sponsorshipWithdrawnDate": None,
+                        },
+                        {
+                            "url": "member",
+                            "sponsorshipDate": "1993-02-03",
+                            "sponsorshipWithdrawnDate": "1993-02-04",
+                        },
+                    ]
+                },
+                BillDetailKind.COSPONSORS,
+            )
+
+    def test_active_cosponsor_count_mismatch_cannot_certify_complete(self) -> None:
+        result = HydrationFixture.fetch(
+            {
+                "cosponsors": [
+                    {"url": "member-a", "sponsorshipDate": "1993-02-03"},
+                    {"url": "member-b", "sponsorshipDate": "1993-06-07"},
+                ],
+                "pagination": {"count": 1, "countIncludingWithdrawnCosponsors": 2},
+            },
+            BillDetailKind.COSPONSORS,
+        )
+        assert not result.evidence.complete
+        assert result.evidence.fetched_count == result.evidence.expected_count == 2
+
+    @pytest.mark.parametrize("count_field", ["count", "total"])
+    def test_real_source_count_alias_prevents_false_completeness(
+        self, count_field: str
+    ) -> None:
+        result = HydrationFixture.fetch(
+            {"actions": [{"id": "one"}], "pagination": {count_field: 2}}
+        )
+        assert result.evidence.expected_count == 2
+        assert not result.evidence.complete
+
+    def test_real_source_count_must_not_change_between_pages(self) -> None:
+        client = Mock(spec=CDGClient)
+        client.get_json.side_effect = [
+            {"actions": [{"id": "one"}], "pagination": {"count": 2, "next": "second"}},
+            {"actions": [{"id": "two"}], "pagination": {"count": 3}},
+        ]
+        with pytest.raises(RuntimeError, match="count changed"):
+            BillDetailFetcher(client, 2).fetch("first", BillDetailKind.ACTIONS)
+
+    def test_conflicting_generic_count_aliases_fail(self) -> None:
+        with pytest.raises(ValueError, match="count"):
+            HydrationFixture.fetch(
+                {"actions": [], "pagination": {"count": 0, "total": 1}}
+            )
+
+    @pytest.mark.parametrize(
+        "pagination",
+        [
+            {"count": 2, "countIncludingWithdrawnCosponsors": 1},
+            {"total": 1, "countIncludingWithdrawnCosponsors": 2},
+            {"count": True},
+        ],
+    )
+    def test_inconsistent_cosponsor_counts_fail(self, pagination: JsonObject) -> None:
+        with pytest.raises(ValueError):
+            HydrationFixture.fetch(
+                {"cosponsors": [], "pagination": pagination},
+                BillDetailKind.COSPONSORS,
+            )
+
+    def test_active_cosponsor_count_must_not_change_between_pages(self) -> None:
+        client = Mock(spec=CDGClient)
+        client.get_json.side_effect = [
+            {
+                "cosponsors": [],
+                "pagination": {
+                    "count": 1,
+                    "countIncludingWithdrawnCosponsors": 2,
+                    "next": "second",
+                },
+            },
+            {
+                "cosponsors": [],
+                "pagination": {"count": 2, "countIncludingWithdrawnCosponsors": 2},
+            },
+        ]
+        with pytest.raises(RuntimeError, match="count changed"):
+            BillDetailFetcher(client, 2).fetch("first", BillDetailKind.COSPONSORS)
+
+    @pytest.mark.parametrize("repeat_policy", [False, True])
+    def test_subject_count_includes_policy_area_once(self, repeat_policy: bool) -> None:
+        client = Mock(spec=CDGClient)
+        policy: JsonObject = {"name": "Health"}
+        client.get_json.side_effect = [
+            {
+                "subjects": {
+                    "legislativeSubjects": [{"name": "First"}],
+                    "policyArea": policy,
+                },
+                "pagination": {"count": 3, "next": "second"},
+            },
+            {
+                "subjects": {
+                    "legislativeSubjects": [{"name": "Second"}],
+                    **({"policyArea": policy} if repeat_policy else {}),
+                },
+                "pagination": {"count": 3},
+            },
+        ]
+        result = BillDetailFetcher(client, 2).fetch("first", BillDetailKind.SUBJECTS)
+        assert result.evidence.complete
+        assert result.evidence.fetched_count == result.evidence.expected_count == 3
+        assert result.data == {
+            "legislativeSubjects": [{"name": "First"}, {"name": "Second"}],
+            "policyArea": policy,
+        }
+
+    @pytest.mark.parametrize("policy", [None, {}])
+    def test_empty_policy_placeholder_does_not_satisfy_source_count(
+        self, policy: JsonObject | None
+    ) -> None:
+        result = HydrationFixture.fetch(
+            {
+                "subjects": {"legislativeSubjects": [], "policyArea": policy},
+                "pagination": {"count": 1},
+            },
+            BillDetailKind.SUBJECTS,
+        )
+        assert not result.evidence.complete
+        assert result.evidence.fetched_count == 0
+
     @pytest.mark.parametrize(
         "subjects",
         [
@@ -197,6 +363,46 @@ class TestDetailRetrieval:
 
 
 class TestHydrationAssessment:
+    def test_hydration_preserves_withdrawn_and_rejoined_cosponsor(self) -> None:
+        person: JsonObject = {
+            "bioguideId": "T000001",
+            "firstName": "Test",
+            "lastName": "Member",
+            "fullName": "Test Member",
+            "state": "CA",
+            "url": "https://api.congress.gov/v3/member/T000001",
+        }
+        bill = HydrationFixture.bill()
+        bill.add_bill_details(
+            HydrationFixture.client(
+                {
+                    BillDetailKind.COSPONSORS: {
+                        "cosponsors": [
+                            {
+                                **person,
+                                "sponsorshipDate": "1993-02-03",
+                                "sponsorshipWithdrawnDate": "1993-02-03",
+                            },
+                            {
+                                **person,
+                                "sponsorshipDate": "1993-06-07",
+                                "sponsorshipWithdrawnDate": None,
+                            },
+                        ],
+                        "pagination": {
+                            "count": 1,
+                            "countIncludingWithdrawnCosponsors": 2,
+                        },
+                    }
+                }
+            )
+        )
+        assert bill.hydration_assessment.status is HydrationStatus.COMPLETE
+        assert isinstance(bill.cosponsors, list)
+        assert len(bill.cosponsors) == 2
+        assert bill.cosponsors[0].sponsorship_withrawn_date is not None
+        assert bill.cosponsors[1].sponsorship_withrawn_date is None
+
     @pytest.mark.parametrize("model", [Member, Sponsor])
     @pytest.mark.parametrize("direct_name", [None, "Alternate display name"])
     def test_member_alias_roundtrip_preserves_authoritative_name(
@@ -353,6 +559,37 @@ class TestHydrationAssessment:
                 complete=True,
                 reason="Invalid count",
             )
+
+    @pytest.mark.parametrize(
+        ("expected_active", "fetched_active", "complete"),
+        [(3, 1, False), (1, 3, False), (1, 2, True), (1, None, True)],
+    )
+    def test_invalid_active_evidence_is_rejected(
+        self,
+        expected_active: int,
+        fetched_active: int | None,
+        complete: bool,
+    ) -> None:
+        with pytest.raises(ValidationError):
+            DetailEvidence(
+                page_count=1,
+                expected_count=2,
+                fetched_count=2,
+                expected_active_count=expected_active,
+                fetched_active_count=fetched_active,
+                state=DetailState.EXPANDED,
+                complete=complete,
+                reason="Contradictory active count",
+            )
+
+    def test_evidence_without_active_counts_remains_readable(self) -> None:
+        evidence = DetailEvidence.model_validate_json(
+            '{"page_count":1,"expected_count":2,"fetched_count":2,'
+            '"state":"expanded","complete":true,"reason":"Legacy evidence"}'
+        )
+        assert evidence.complete
+        assert evidence.expected_active_count is None
+        assert evidence.fetched_active_count is None
 
     def test_indexing_does_not_invent_complete_from_legacy_label(
         self, monkeypatch: pytest.MonkeyPatch

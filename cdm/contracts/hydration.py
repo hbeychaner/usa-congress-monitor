@@ -4,16 +4,18 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Literal, NewType, Protocol
 
 from pydantic import (
+    AliasChoices,
     AwareDatetime,
     BaseModel,
     ConfigDict,
     Field,
     TypeAdapter,
+    field_validator,
     model_validator,
 )
 
@@ -63,18 +65,45 @@ class DetailEvidence(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     page_count: int = Field(ge=1)
-    expected_count: int | None = Field(default=None, ge=0)
-    fetched_count: int = Field(ge=0)
+    expected_count: int | None = Field(
+        default=None,
+        ge=0,
+        description="Expected collection rows, including withdrawn co-sponsorships or a subjects policy-area row.",
+    )
+    fetched_count: int = Field(
+        ge=0,
+        description="Distinct retrieved collection rows, not necessarily distinct people or legislative subjects.",
+    )
+    expected_active_count: int | None = Field(
+        default=None,
+        ge=0,
+        description="Source-reported active co-sponsorship count, when available.",
+    )
+    fetched_active_count: int | None = Field(
+        default=None,
+        ge=0,
+        description="Retrieved co-sponsorship episodes without a withdrawal date.",
+    )
     state: DetailState
     complete: bool
     reason: str = Field(min_length=1)
 
     @model_validator(mode="after")
     def require_consistent_counts(self) -> DetailEvidence:
+        if (
+            self.fetched_active_count is not None
+            and self.fetched_active_count > self.fetched_count
+            or self.expected_active_count is not None
+            and self.expected_count is not None
+            and self.expected_active_count > self.expected_count
+        ):
+            raise ValueError("Active counts cannot exceed total detail counts")
         if self.complete and (
             self.state is DetailState.ENVELOPE
             or self.expected_count is not None
             and self.fetched_count != self.expected_count
+            or self.expected_active_count is not None
+            and self.fetched_active_count != self.expected_active_count
         ):
             raise ValueError("Complete detail evidence requires expanded, exact counts")
         return self
@@ -148,7 +177,52 @@ class BillDetailClient(Protocol):
 
 class Pagination(BaseModel):
     total: int | None = Field(default=None, ge=0, strict=True)
+    count: int | None = Field(default=None, ge=0, strict=True)
+    including_withdrawn: int | None = Field(
+        default=None, alias="countIncludingWithdrawnCosponsors", ge=0, strict=True
+    )
     next: str | None = Field(default=None, min_length=1)
+
+    def expected_total(self, kind: BillDetailKind) -> int | None:
+        counts = (
+            (self.total, self.including_withdrawn)
+            if kind is BillDetailKind.COSPONSORS
+            else (self.total, self.count)
+        )
+        known = {value for value in counts if value is not None}
+        if len(known) > 1:
+            raise ValueError(f"Conflicting pagination count aliases for {kind}")
+        total = next(iter(known), None)
+        if (
+            kind is BillDetailKind.COSPONSORS
+            and total is not None
+            and self.count is not None
+            and self.count > total
+        ):
+            raise ValueError(
+                "Active cosponsor count exceeds total including withdrawals"
+            )
+        return total
+
+
+class CosponsorshipEpisode(BaseModel):
+    sponsorship_date: date | None = Field(
+        default=None,
+        validation_alias=AliasChoices("sponsorshipDate", "sponsorship_date"),
+    )
+    withdrawn_date: date | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "sponsorshipWithdrawnDate",
+            "sponsorship_withdrawn_date",
+            "sponsorship_withrawn_date",
+        ),
+    )
+
+    @field_validator("sponsorship_date", "withdrawn_date", mode="before")
+    @classmethod
+    def normalize_blank_date(cls, value: object) -> object:
+        return None if value == "" else value
 
 
 class CountEnvelope(BaseModel):
@@ -171,7 +245,9 @@ class BillDetailFetcher:
         self._max_pages = max_pages
 
     @staticmethod
-    def distinct(records: list[JsonObject]) -> list[JsonObject]:
+    def distinct(
+        records: list[JsonObject], kind: BillDetailKind | None = None
+    ) -> list[JsonObject]:
         seen: dict[DetailIdentity, JsonObject] = {}
         result: list[JsonObject] = []
         for record in records:
@@ -190,6 +266,16 @@ class BillDetailFetcher:
                 if identity is not None
                 else json.dumps(record, sort_keys=True, separators=(",", ":"))
             )
+            if kind is BillDetailKind.COSPONSORS and identity is not None:
+                episode = CosponsorshipEpisode.model_validate(record)
+                if episode.sponsorship_date is not None:
+                    key = DetailIdentity(
+                        "cosponsor:"
+                        + json.dumps(
+                            [str(identity), episode.sponsorship_date.isoformat()],
+                            separators=(",", ":"),
+                        )
+                    )
             if key in seen and seen[key] != record:
                 raise RuntimeError("Conflicting records share a bill-detail identity")
             if key not in seen:
@@ -202,6 +288,7 @@ class BillDetailFetcher:
         subjects: JsonObject = {}
         visited: set[str] = set()
         expected: int | None = None
+        expected_active: int | None = None
         next_endpoint: str | None = endpoint
         object_complete = True
         subjects_list_present = False
@@ -221,10 +308,17 @@ class BillDetailFetcher:
             pagination = Pagination.model_validate(
                 {} if raw_pagination is None else raw_pagination
             )
-            if pagination.total is not None:
-                if expected is not None and expected != pagination.total:
+            page_expected = pagination.expected_total(kind)
+            if page_expected is not None:
+                if expected is not None and expected != page_expected:
                     raise RuntimeError(f"Source count changed during {kind} pagination")
-                expected = pagination.total
+                expected = page_expected
+            if kind is BillDetailKind.COSPONSORS and pagination.count is not None:
+                if expected_active is not None and expected_active != pagination.count:
+                    raise RuntimeError(
+                        "Active cosponsor count changed during pagination"
+                    )
+                expected_active = pagination.count
             if isinstance(value, dict) and ("count" in value or "url" in value):
                 envelope = CountEnvelope.model_validate(value)
                 if expected is not None and expected != envelope.count:
@@ -246,6 +340,10 @@ class BillDetailFetcher:
                         page_count=page_count,
                         expected_count=envelope.count,
                         fetched_count=0,
+                        expected_active_count=expected_active,
+                        fetched_active_count=0
+                        if kind is BillDetailKind.COSPONSORS
+                        else None,
                         state=DetailState.EXPANDED if empty else DetailState.ENVELOPE,
                         complete=empty,
                         reason="Authoritative empty collection."
@@ -285,8 +383,25 @@ class BillDetailFetcher:
             raise RuntimeError(
                 f"Pagination limit of {self._max_pages} pages exceeded for {kind}"
             )
-        distinct = self.distinct(records)
-        complete = object_complete and (expected is None or len(distinct) == expected)
+        distinct = self.distinct(records, kind)
+        active = (
+            sum(
+                CosponsorshipEpisode.model_validate(record).withdrawn_date is None
+                for record in distinct
+            )
+            if kind is BillDetailKind.COSPONSORS
+            else None
+        )
+        fetched = len(distinct) + (
+            int(bool(subjects.get("policyArea")))
+            if kind is BillDetailKind.SUBJECTS
+            else 0
+        )
+        complete = (
+            object_complete
+            and (expected is None or fetched == expected)
+            and (expected_active is None or active == expected_active)
+        )
         if kind is BillDetailKind.SUBJECTS:
             if subjects_list_present:
                 subjects["legislativeSubjects"] = distinct
@@ -298,13 +413,15 @@ class BillDetailFetcher:
             evidence=DetailEvidence(
                 page_count=page_count,
                 expected_count=expected,
-                fetched_count=len(distinct),
+                fetched_count=fetched,
+                expected_active_count=expected_active,
+                fetched_active_count=active,
                 state=DetailState.OBJECT
                 if kind is BillDetailKind.SUBJECTS
                 else DetailState.EXPANDED,
                 complete=complete,
                 reason="Response shape validated and pagination exhausted."
                 if complete
-                else "Missing subjects collection or distinct count disagrees with source expectation.",
+                else "Missing subjects collection or distinct/active count disagrees with source expectation.",
             ),
         )

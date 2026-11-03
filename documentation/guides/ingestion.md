@@ -184,6 +184,18 @@ Nonzero count/URL envelopes remain incomplete; authoritative zero is explicit
 empty evidence. Object-shaped subjects preserve policy area and expand
 `legislativeSubjects`; a missing list is not an empty list.
 
+Counts follow actual endpoint semantics, not just array lengths. Pagination
+accepts `count` and the legacy `total` spelling, rejects contradictory totals
+and detects changes between pages. Co-sponsors are identified by member identity
+**and sponsorship date**: withdrawing and later rejoining is two preserved
+episodes, not a conflicting duplicate person. Contradictions within the same
+episode still fail. `countIncludingWithdrawnCosponsors` is the overall expected
+row count; `count` is the separate active count. Optional `expected_active_count`
+and `fetched_active_count` retain that distinction in detail evidence, and both
+must agree before completeness. Subject pagination includes a nonempty policy
+area as one row alongside distinct legislative subjects, counted once even when
+repeated across pages. Neither counter is a distinct-member/support score.
+
 All nine relationship updates, including committees, validate before the original
 bill mutates. Partial responses preserve existing richer arrays.
 `add_full_text()` separately retrieves formatted text, rejects unsuccessful HTTP
@@ -205,6 +217,8 @@ complete. GovInfo BILLSTATUS v3 and BILLSUM v2 normalization emit source-specifi
 unknown API assessments in new immutable snapshots; existing snapshots are not
 rewritten. Full text, other sources, freshness, and resource/history coverage
 remain independent obligations.
+Existing assessment records remain readable with the new optional count fields;
+this change does not retroactively recertify or relabel them.
 
 Successful items are archived before publication under a write lock.
 Ordinary item exceptions are logged and counted, and processing continues.

@@ -217,7 +217,9 @@ export type CongressGroup = {
 
 export type DetailEvidence = {
     complete: boolean;
+    expected_active_count?: number | null;
     expected_count?: number | null;
+    fetched_active_count?: number | null;
     fetched_count: number;
     page_count: number;
     reason: string;

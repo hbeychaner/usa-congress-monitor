@@ -208,6 +208,11 @@ staging under the actual operations-container limit. No serving rows or failed
 job statuses have changed. The stage is not a full-history/freshness certificate,
 and must pass projection comparison, preservation/conflict checks and conditional
 write/rollback gates before serving repair.
+The expanded stage stopped at 27 candidates on legitimate withdrawn/rejoined
+co-sponsor history. The corrected producer now verifies the exact failure's
+70 episodes/67 active and 111 subject rows, including one policy area. Preserve
+the v1 archive for comparison; stricter v2 retrieval refetches all frozen
+identities rather than declaring older count evidence newly certified.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
