@@ -580,6 +580,10 @@ selector. This changes the declared mapping artifact, not live indices/data.
 Final offline validation passes **883 tests**, with **144 external/integration
 opt-ins skipped**; those skips are not a claim of upstream acceptance. The
 separately executed isolated release gates remain recorded above.
+The first remote CI run exposed a Compose CLI portability issue in the test
+harness: overriding `PWD` did not also change its actual working directory.
+Rendering now runs from the isolated project directory, retaining exact mount
+assertions and reporting observed mounts on failure; runtime topology is unchanged.
 
 **Acceptance:**
 

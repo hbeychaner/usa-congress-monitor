@@ -275,6 +275,7 @@ class TestComposeOperations:
                 "--format",
                 "json",
             ],
+            cwd=tmp_path,
             env=environment,
             text=True,
             capture_output=True,
@@ -306,7 +307,7 @@ class TestComposeOperations:
             and mount.source == str(tmp_path)
             and mount.target == str(tmp_path)
             for mount in mounts
-        )
+        ), mounts
         for name in (
             "worker",
             "worker-bulk",

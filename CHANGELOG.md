@@ -4,6 +4,9 @@
 
 ### Added
 
+- Portable offline Compose-rendering checks: the subprocess working directory
+  now matches its isolated project/PWD, avoiding runner-dependent absolute-mount
+  failures without weakening the mount or queue assertions.
 - An explicit source-only legislation mapping for versioned bill hydration
   assessments. Full-suite mapping validation exposed the missing declaration;
   CI now includes those audits. Evidence stays in `_source`, while the existing

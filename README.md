@@ -366,6 +366,10 @@ fixture-driven ingest tests don't incur real wall-clock delay. Tests that
 assert on retry/backoff timing (e.g. `tests/unit/test_client.py`) override
 this locally and are unaffected.
 
+Compose rendering tests run from their isolated project directory with a
+matching `PWD`, keeping absolute archive-mount checks independent of the runner's
+Compose environment handling.
+
 The repository validation baseline is:
 
 ```bash
