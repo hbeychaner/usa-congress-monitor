@@ -80,6 +80,15 @@ Work proceeds in this order:
    All 3,047 serving sequence/primary terms remained unchanged; the three
    original failed jobs and absent topic publication were preserved.
 
+   The stricter v2 stage then stopped at **15 candidates** on Congress 103
+   S.J.Res.106: its source count of two represents **two relationships to one
+   related bill**, not two distinct bills. Page-size-one probes repeat the full
+   grouped bill at both offsets. The producer counts distinct nested links once
+   and retains the distinct top-level count separately. Missing nested lists,
+   duplicate links and contradictory bill metadata remain explicit failures or
+   partial evidence. Preserve both older archives; v3 refetches stronger proof.
+   No serving rows, failed-job outcomes or publication pointers were changed.
+
    Next: finish and verify this acquisition stage, account explicitly for every
    unresolved identity, compare complete projections in a bounded shadow target,
    verify retained/richer fields and conflicts, then apply receipted,

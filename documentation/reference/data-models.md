@@ -78,6 +78,9 @@ legislative-subject-only counts. The keys used by hydration include `relatedBill
 The YAML mapping's flat `detail_hydration` object does not declare those
 per-endpoint keys, so these observations are available in `_source` but are not
 automatically searchable at their actual paths.
+Related-bill totals measure nested relationships, not unique related bills.
+Optional `fetched_record_count` preserves the separate top-level object count;
+older evidence omitting it remains readable but is not newly recertified.
 
 `Bill.add_bill_details()` fetches nine related endpoints and fills normalized
 collections and text. All nine collections, including committees, validate

@@ -177,8 +177,8 @@ For bills, [`Bill.add_bill_details()`](../../cdm/models/bills.py) requests:
 `summaries`, `text`, and `titles`.
 [`BillDetailFetcher`](../../cdm/contracts/hydration.py) follows pagination,
 detects cycles/changing totals/conflicting identities, enforces the page bound,
-and validates response shapes. Expected counts must match distinct retrieved
-records exactly. A valid exhausted pagination protocol can establish retrieval
+and validates response shapes. Expected counts must match distinct source-counted
+entries exactly. A valid exhausted pagination protocol can establish retrieval
 completeness when no count is supplied; this is not authoritative global coverage.
 Nonzero count/URL envelopes remain incomplete; authoritative zero is explicit
 empty evidence. Object-shaped subjects preserve policy area and expand
@@ -195,6 +195,13 @@ and `fetched_active_count` retain that distinction in detail evidence, and both
 must agree before completeness. Subject pagination includes a nonempty policy
 area as one row alongside distinct legislative subjects, counted once even when
 repeated across pages. Neither counter is a distinct-member/support score.
+Related-bill pagination counts distinct nested `relationshipDetails`, not
+unique bill objects: one bill can carry both an identical-bill and a procedural
+relationship. Repeated grouped bills on different pages do not multiply links.
+Missing relationship lists remain incomplete; conflicting bill metadata still
+fails. `fetched_record_count` separately reports distinct top-level records
+(legislative subjects for the object-shaped subjects response), while
+`fetched_count` reports the endpoint's source-counted entries.
 
 All nine relationship updates, including committees, validate before the original
 bill mutates. Partial responses preserve existing richer arrays.

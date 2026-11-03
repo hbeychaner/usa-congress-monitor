@@ -221,6 +221,7 @@ export type DetailEvidence = {
     expected_count?: number | null;
     fetched_active_count?: number | null;
     fetched_count: number;
+    fetched_record_count?: number | null;
     page_count: number;
     reason: string;
     state: DetailState;

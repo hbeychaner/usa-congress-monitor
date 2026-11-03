@@ -69,6 +69,80 @@ class HydrationFixture:
 
 
 class TestDetailRetrieval:
+    def test_related_bill_count_measures_relationships_not_bill_objects(self) -> None:
+        record: JsonObject = {
+            "url": "related-bill",
+            "relationshipDetails": [
+                {"identifiedBy": "CRS", "type": "Identical bill"},
+                {"identifiedBy": "Senate", "type": "Procedurally related"},
+            ],
+        }
+        client = Mock(spec=CDGClient)
+        client.get_json.side_effect = [
+            {"relatedBills": [record], "pagination": {"count": 2, "next": "page2"}},
+            {"relatedBills": [record], "pagination": {"count": 2}},
+        ]
+        result = BillDetailFetcher(client, 2).fetch(
+            "endpoint", BillDetailKind.RELATED_BILLS
+        )
+        assert result.data == [record]
+        assert result.evidence.complete
+        assert result.evidence.page_count == 2
+        assert result.evidence.expected_count == result.evidence.fetched_count == 2
+        assert result.evidence.fetched_record_count == 1
+
+    def test_duplicate_relationships_do_not_satisfy_source_count(self) -> None:
+        relationship: JsonObject = {"identifiedBy": "CRS", "type": "Identical bill"}
+        result = HydrationFixture.fetch(
+            {
+                "relatedBills": [
+                    {
+                        "url": "related-bill",
+                        "relationshipDetails": [relationship, relationship],
+                    }
+                ],
+                "pagination": {"count": 2},
+            },
+            BillDetailKind.RELATED_BILLS,
+        )
+        assert not result.evidence.complete
+        assert result.evidence.fetched_count == 1
+
+    @pytest.mark.parametrize(
+        "record",
+        [{"url": "related-bill"}, {"url": "related-bill", "relationshipDetails": None}],
+    )
+    def test_missing_relationship_collection_is_not_complete(
+        self, record: JsonObject
+    ) -> None:
+        result = HydrationFixture.fetch(
+            {"relatedBills": [record], "pagination": {"count": 1}},
+            BillDetailKind.RELATED_BILLS,
+        )
+        assert not result.evidence.complete
+        assert result.evidence.fetched_count == 0
+        assert result.evidence.fetched_record_count == 1
+
+    def test_conflicting_related_bill_metadata_still_fails(self) -> None:
+        with pytest.raises(RuntimeError, match="Conflicting"):
+            HydrationFixture.fetch(
+                {
+                    "relatedBills": [
+                        {
+                            "url": "same-bill",
+                            "title": "Original",
+                            "relationshipDetails": [],
+                        },
+                        {
+                            "url": "same-bill",
+                            "title": "Changed",
+                            "relationshipDetails": [],
+                        },
+                    ]
+                },
+                BillDetailKind.RELATED_BILLS,
+            )
+
     @pytest.mark.parametrize("identity_field", ["url", "id"])
     def test_cosponsor_identity_includes_its_sponsorship_episode(
         self, identity_field: str
@@ -588,6 +662,7 @@ class TestHydrationAssessment:
             '"state":"expanded","complete":true,"reason":"Legacy evidence"}'
         )
         assert evidence.complete
+        assert evidence.fetched_record_count is None
         assert evidence.expected_active_count is None
         assert evidence.fetched_active_count is None
 

@@ -68,11 +68,16 @@ class DetailEvidence(BaseModel):
     expected_count: int | None = Field(
         default=None,
         ge=0,
-        description="Expected collection rows, including withdrawn co-sponsorships or a subjects policy-area row.",
+        description="Expected source-counted entries: related-bill relationships, co-sponsorship episodes, or subject entries including policy area.",
     )
     fetched_count: int = Field(
         ge=0,
-        description="Distinct retrieved collection rows, not necessarily distinct people or legislative subjects.",
+        description="Distinct source-counted entries, not necessarily distinct top-level objects.",
+    )
+    fetched_record_count: int | None = Field(
+        default=None,
+        ge=0,
+        description="Distinct top-level collection records before counting nested relationships or policy area.",
     )
     expected_active_count: int | None = Field(
         default=None,
@@ -230,6 +235,13 @@ class CountEnvelope(BaseModel):
     url: str = Field(min_length=1)
 
 
+class RelatedBillRelationships(BaseModel):
+    relationship_details: list[JsonObject] | None = Field(
+        default=None,
+        validation_alias=AliasChoices("relationshipDetails", "relationship_details"),
+    )
+
+
 class DetailResult(BaseModel):
     data: list[JsonObject] | JsonObject
     evidence: DetailEvidence
@@ -340,6 +352,7 @@ class BillDetailFetcher:
                         page_count=page_count,
                         expected_count=envelope.count,
                         fetched_count=0,
+                        fetched_record_count=0,
                         expected_active_count=expected_active,
                         fetched_active_count=0
                         if kind is BillDetailKind.COSPONSORS
@@ -397,6 +410,16 @@ class BillDetailFetcher:
             if kind is BillDetailKind.SUBJECTS
             else 0
         )
+        if kind is BillDetailKind.RELATED_BILLS:
+            fetched = 0
+            for record in distinct:
+                relationships = RelatedBillRelationships.model_validate(
+                    record
+                ).relationship_details
+                if relationships is None:
+                    object_complete = False
+                else:
+                    fetched += len(self.distinct(relationships))
         complete = (
             object_complete
             and (expected is None or fetched == expected)
@@ -414,6 +437,7 @@ class BillDetailFetcher:
                 page_count=page_count,
                 expected_count=expected,
                 fetched_count=fetched,
+                fetched_record_count=len(distinct),
                 expected_active_count=expected_active,
                 fetched_active_count=active,
                 state=DetailState.OBJECT
@@ -422,6 +446,6 @@ class BillDetailFetcher:
                 complete=complete,
                 reason="Response shape validated and pagination exhausted."
                 if complete
-                else "Missing subjects collection or distinct/active count disagrees with source expectation.",
+                else "Missing required nested collection or source-counted/active entries disagree with source expectation.",
             ),
         )

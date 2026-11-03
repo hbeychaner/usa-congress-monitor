@@ -4,6 +4,13 @@
 
 ### Added
 
+- Related-bill hydration now reconciles source counts against distinct nested
+  relationships, while separately retaining the top-level record count.
+  Congress 103 S.J.Res.106 proves two relationships to one bill; page-size-one
+  requests repeat that fully grouped bill, which must not multiply its links.
+  Missing relationship lists and duplicate links cannot establish completeness;
+  conflicting bill metadata still fails. Recovery v2 stopped safely at15
+  candidates; stronger evidence is refetched rather than retroactively relabeled.
 - Evidence-based hydration recovery now distinguishes co-sponsorship episodes
   from people, validates actual `count`/`countIncludingWithdrawnCosponsors`
   pagination semantics and counts a subjects policy area once. Same-episode

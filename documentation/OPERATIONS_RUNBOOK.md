@@ -213,6 +213,11 @@ co-sponsor history. The corrected producer now verifies the exact failure's
 70 episodes/67 active and 111 subject rows, including one policy area. Preserve
 the v1 archive for comparison; stricter v2 retrieval refetches all frozen
 identities rather than declaring older count evidence newly certified.
+V2 subsequently stopped at15 candidates on grouped related-bill counts.
+S.J.Res.106 has two relationships to one bill, repeated intact across
+page-size-one offsets. Count distinct nested links once, retain the separate
+top-level record count, and refetch v3 proof; neither prior archive is silently
+recertified. Missing relationship lists or contradictory metadata remain gates.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove

@@ -60,6 +60,8 @@ rehydration, including null alternate names, without weakening validation.
 Episode-aware co-sponsor retrieval preserves withdrawal/rejoining history and
 checks active and overall source counts separately. Subject counts include the
 policy-area row; contradictory source counts still fail closed.
+Related-bill totals count nested relationships, not unique bill objects; evidence
+also retains the distinct top-level record count so these cannot be confused.
 The [local readiness gates](documentation/IMPLEMENTATION_PLAN.md#local-readiness-follow-through)
 remain in progress; isolated retrieval candidates are not repaired serving rows.
 
