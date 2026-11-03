@@ -62,6 +62,9 @@ checks active and overall source counts separately. Subject counts include the
 policy-area row; contradictory source counts still fail closed.
 Related-bill totals count nested relationships, not unique bill objects; evidence
 also retains the distinct top-level record count so these cannot be confused.
+Action retrieval reconciles source-row counts separately from distinct action
+bodies and retains anonymous duplicate multiplicities in source-only proof.
+Duplicates do not invent event identities or waive pagination/count checks.
 The [local readiness gates](documentation/IMPLEMENTATION_PLAN.md#local-readiness-follow-through)
 remain in progress; isolated retrieval candidates are not repaired serving rows.
 

@@ -69,6 +69,92 @@ class HydrationFixture:
 
 
 class TestDetailRetrieval:
+    def test_anonymous_action_rows_retain_duplicate_evidence(self) -> None:
+        action: JsonObject = {"actionDate": "1990-09-27", "text": "Passed"}
+        other: JsonObject = {"actionDate": "1990-09-28", "text": "Signed"}
+        client = Mock(spec=CDGClient)
+        client.get_json.side_effect = [
+            {"actions": [action, action], "pagination": {"count": 3, "next": "second"}},
+            {"actions": [other], "pagination": {"count": 3}},
+        ]
+        result = BillDetailFetcher(client, 2).fetch("first", BillDetailKind.ACTIONS)
+        assert result.evidence.complete
+        assert result.data == [action, other]
+        assert result.evidence.fetched_count == 3
+        assert result.evidence.fetched_record_count == 2
+        assert len(result.evidence.repeated_actions) == 1
+        assert result.evidence.repeated_actions[0].record == action
+        assert result.evidence.repeated_actions[0].occurrences == 2
+        assert result.evidence.page_count == 2
+
+    @pytest.mark.parametrize("expected", [1, 3])
+    def test_anonymous_action_duplicates_do_not_waive_raw_count_mismatch(
+        self, expected: int
+    ) -> None:
+        action: JsonObject = {"text": "Passed"}
+        result = HydrationFixture.fetch(
+            {"actions": [action, action], "pagination": {"count": expected}}
+        )
+        assert not result.evidence.complete
+        assert result.evidence.fetched_count == 2
+
+    def test_anonymous_action_duplicates_without_count_retain_multiplicity(
+        self,
+    ) -> None:
+        action: JsonObject = {"text": "Passed"}
+        result = HydrationFixture.fetch({"actions": [action, action]})
+        assert result.evidence.complete
+        assert result.evidence.fetched_count == 2
+        assert result.evidence.fetched_record_count == 1
+        assert result.evidence.repeated_actions[0].occurrences == 2
+
+    def test_explicit_action_identity_conflict_still_fails(self) -> None:
+        with pytest.raises(RuntimeError, match="Conflicting"):
+            HydrationFixture.fetch(
+                {
+                    "actions": [
+                        {"id": "a", "text": "Passed"},
+                        {"id": "a", "text": "Failed"},
+                    ]
+                }
+            )
+
+    def test_other_anonymous_collections_still_require_distinct_counts(self) -> None:
+        result = HydrationFixture.fetch(
+            {
+                "titles": [{"title": "Same"}, {"title": "Same"}],
+                "pagination": {"count": 2},
+            },
+            BillDetailKind.TITLES,
+        )
+        assert not result.evidence.complete
+
+    def test_action_counts_match_the_historical_35_row_31_body_shape(self) -> None:
+        distinct: list[JsonObject] = [
+            {"actionDate": "1990-09-27", "text": f"Action {number}"}
+            for number in range(31)
+        ]
+        rows = distinct[:4] + distinct
+        client = Mock(spec=CDGClient)
+        client.get_json.side_effect = [
+            {"actions": rows[:20], "pagination": {"count": 35, "next": "second"}},
+            {"actions": rows[20:], "pagination": {"count": 35}},
+        ]
+        result = BillDetailFetcher(client, 2).fetch("first", BillDetailKind.ACTIONS)
+        evidence = result.evidence
+        assert evidence.complete
+        assert evidence.expected_count == evidence.fetched_count == 35
+        assert evidence.fetched_record_count == len(result.data) == 31
+        assert len(evidence.repeated_actions) == 4
+        assert all(action.occurrences == 2 for action in evidence.repeated_actions)
+        assert (
+            DetailEvidence.model_validate_json(evidence.model_dump_json()) == evidence
+        )
+        malformed = evidence.model_dump()
+        malformed["fetched_record_count"] = 32
+        with pytest.raises(ValidationError, match="reconcile"):
+            DetailEvidence.model_validate(malformed)
+
     def test_related_bill_count_measures_relationships_not_bill_objects(self) -> None:
         record: JsonObject = {
             "url": "related-bill",

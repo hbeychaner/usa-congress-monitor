@@ -81,6 +81,10 @@ automatically searchable at their actual paths.
 Related-bill totals measure nested relationships, not unique related bills.
 Optional `fetched_record_count` preserves the separate top-level object count;
 older evidence omitting it remains readable but is not newly recertified.
+For actions, `fetched_count` measures returned rows and `fetched_record_count`
+measures distinct normalized bodies. Source-only `repeated_actions` records
+anonymous repeated bodies and their occurrence counts without inventing event
+identities. Older proof without this optional list remains readable.
 
 `Bill.add_bill_details()` fetches nine related endpoints and fills normalized
 collections and text. All nine collections, including committees, validate

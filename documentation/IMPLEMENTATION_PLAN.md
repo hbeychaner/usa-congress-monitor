@@ -89,6 +89,16 @@ Work proceeds in this order:
    partial evidence. Preserve both older archives; v3 refetches stronger proof.
    No serving rows, failed-job outcomes or publication pointers were changed.
 
+   V3 preserved **121 complete candidates** and stopped on Congress 101 S.198.
+   The API returned all **35 action rows** over two pages, containing only
+   **31 distinct bodies** (four repeated anonymous actions). Action proof now
+   distinguishes raw source-row counts from distinct normalized bodies and
+   retains repeated bodies/multiplicities. No event identity is invented.
+   Explicit-ID duplicates/conflicts, missing/excess rows and pagination guards
+   remain strict. Retain the 121 older complete proofs with their original
+   source revision; their stricter distinct-count success already implies no
+   collapsed action rows, so resumption does not relabel or refetch them.
+
    Next: finish and verify this acquisition stage, account explicitly for every
    unresolved identity, compare complete projections in a bounded shadow target,
    verify retained/richer fields and conflicts, then apply receipted,

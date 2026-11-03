@@ -177,7 +177,7 @@ For bills, [`Bill.add_bill_details()`](../../cdm/models/bills.py) requests:
 `summaries`, `text`, and `titles`.
 [`BillDetailFetcher`](../../cdm/contracts/hydration.py) follows pagination,
 detects cycles/changing totals/conflicting identities, enforces the page bound,
-and validates response shapes. Expected counts must match distinct source-counted
+and validates response shapes. Expected counts must match source-counted
 entries exactly. A valid exhausted pagination protocol can establish retrieval
 completeness when no count is supplied; this is not authoritative global coverage.
 Nonzero count/URL envelopes remain incomplete; authoritative zero is explicit
@@ -202,6 +202,15 @@ Missing relationship lists remain incomplete; conflicting bill metadata still
 fails. `fetched_record_count` separately reports distinct top-level records
 (legislative subjects for the object-shaped subjects response), while
 `fetched_count` reports the endpoint's source-counted entries.
+For actions, the source count measures returned rows, including identical
+anonymous bodies. `fetched_count` retains that row count, while normalized
+`actions` and `fetched_record_count` remain distinct. `repeated_actions` stores
+each repeated anonymous body and its occurrence count in source-only evidence;
+it does not assert multiple distinct real-world events. Repeated explicit
+IDs/URLs cannot satisfy completeness, and contradictory explicit identities,
+changing counts, pagination cycles and missing/excess rows remain failures or
+partial evidence. Other collections keep their endpoint-specific distinct
+count rules.
 
 All nine relationship updates, including committees, validate before the original
 bill mutates. Partial responses preserve existing richer arrays.

@@ -224,6 +224,7 @@ export type DetailEvidence = {
     fetched_record_count?: number | null;
     page_count: number;
     reason: string;
+    repeated_actions?: Array<RepeatedAction>;
     state: DetailState;
 };
 
@@ -231,7 +232,7 @@ export type DetailState = 'expanded' | 'object' | 'envelope';
 
 export type DistrictFeature = {
     geometry: {
-        [key: string]: JsonValue;
+        [key: string]: pydantic__types__JsonValue;
     };
     id: string;
     properties: DistrictProperties;
@@ -392,7 +393,9 @@ export type JobStatusCounts = {
     succeeded: number;
 };
 
-export type JsonValue = unknown;
+export type JsonObject = {
+    [key: string]: cdm__utils__json_types__JsonValue;
+};
 
 export type LabelFallbackReason = 'disabled' | 'unavailable' | 'request_failed' | 'invalid_response' | 'name_collision';
 
@@ -668,6 +671,11 @@ export type RelatedTopic = {
     topic_id: number;
 };
 
+export type RepeatedAction = {
+    occurrences: number;
+    record: JsonObject;
+};
+
 export type SearchResponse = {
     limit: number;
     ordering: 'grouped';
@@ -923,12 +931,22 @@ export type VoteSummary = {
     vote_type: string | null;
 };
 
+export type cdm__utils__json_types__JsonValue = string | number | number | boolean | Array<cdm__utils__json_types__JsonValue> | {
+    [key: string]: cdm__utils__json_types__JsonValue;
+} | null;
+
+export type pydantic__types__JsonValue = unknown;
+
 export type BillsResponseWritable = {
     bills: Array<BillSummary>;
     limit: number;
     max_result_window: number;
     page: number;
     total: number;
+};
+
+export type JsonObjectWritable = {
+    [key: string]: cdm__utils__json_types__JsonValueWritable;
 };
 
 export type MemberActivityResponseWritable = {
@@ -949,6 +967,10 @@ export type MembersResponseWritable = {
     page: number;
     total: number;
 };
+
+export type cdm__utils__json_types__JsonValueWritable = string | number | number | boolean | Array<cdm__utils__json_types__JsonValueWritable> | {
+    [key: string]: cdm__utils__json_types__JsonValueWritable;
+} | null;
 
 export type CancelAnalyticsApiV1AdminAnalyticsJobIdCancelPostData = {
     body?: never;

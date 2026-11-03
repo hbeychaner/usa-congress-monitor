@@ -4,6 +4,11 @@
 
 ### Added
 
+- Action hydration distinguishes source rows from distinct normalized bodies.
+  Repeated anonymous actions retain their bodies and occurrence counts in
+  source-only evidence; explicit-identity duplicates/conflicts and raw count
+  mismatches still block completeness. Regression coverage reproduces the
+  historical 35-row/31-body response without inventing event identities.
 - Curated wiki publication limited to current code and operating reference.
   Plans and incident reports remain repository-only; explicitly marked
   historical sections are omitted from otherwise current chapters. Navigation

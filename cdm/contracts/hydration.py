@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from collections.abc import Mapping
 from datetime import UTC, date, datetime
 from enum import StrEnum
@@ -61,6 +62,13 @@ class DetailState(StrEnum):
     ENVELOPE = "envelope"
 
 
+class RepeatedAction(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    record: JsonObject
+    occurrences: int = Field(ge=2)
+
+
 class DetailEvidence(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -68,16 +76,20 @@ class DetailEvidence(BaseModel):
     expected_count: int | None = Field(
         default=None,
         ge=0,
-        description="Expected source-counted entries: related-bill relationships, co-sponsorship episodes, or subject entries including policy area.",
+        description="Expected source-counted entries: action rows, related-bill relationships, co-sponsorship episodes, or subject entries including policy area.",
     )
     fetched_count: int = Field(
         ge=0,
-        description="Distinct source-counted entries, not necessarily distinct top-level objects.",
+        description="Retrieved source-counted entries; action rows retain anonymous duplicates, while normalized top-level records remain distinct.",
     )
     fetched_record_count: int | None = Field(
         default=None,
         ge=0,
         description="Distinct top-level collection records before counting nested relationships or policy area.",
+    )
+    repeated_actions: list[RepeatedAction] = Field(
+        default_factory=list,
+        description="Repeated anonymous action bodies and their source-row multiplicities, not a count of separate real-world events.",
     )
     expected_active_count: int | None = Field(
         default=None,
@@ -95,6 +107,19 @@ class DetailEvidence(BaseModel):
 
     @model_validator(mode="after")
     def require_consistent_counts(self) -> DetailEvidence:
+        if self.repeated_actions and (
+            self.fetched_record_count is None
+            or (
+                self.fetched_record_count
+                + sum(action.occurrences - 1 for action in self.repeated_actions)
+                > self.fetched_count
+            )
+            or self.complete
+            and self.fetched_record_count
+            + sum(action.occurrences - 1 for action in self.repeated_actions)
+            != self.fetched_count
+        ):
+            raise ValueError("Repeated action evidence must reconcile row counts")
         if (
             self.fetched_active_count is not None
             and self.fetched_active_count > self.fetched_count
@@ -420,6 +445,27 @@ class BillDetailFetcher:
                     object_complete = False
                 else:
                     fetched += len(self.distinct(relationships))
+        repeated_actions: list[RepeatedAction] = []
+        if kind is BillDetailKind.ACTIONS:
+            frequencies = Counter(
+                DetailIdentity(
+                    json.dumps(record, sort_keys=True, separators=(",", ":"))
+                )
+                for record in records
+                if record.get("id") is None and record.get("url") is None
+            )
+            repeated_actions = [
+                RepeatedAction(
+                    record=TypeAdapter(JsonObject).validate_json(body),
+                    occurrences=count,
+                )
+                for body, count in frequencies.items()
+                if count > 1
+            ]
+            fetched = len(records)
+            object_complete = fetched == len(distinct) + sum(
+                action.occurrences - 1 for action in repeated_actions
+            )
         complete = (
             object_complete
             and (expected is None or fetched == expected)
@@ -438,6 +484,7 @@ class BillDetailFetcher:
                 expected_count=expected,
                 fetched_count=fetched,
                 fetched_record_count=len(distinct),
+                repeated_actions=repeated_actions,
                 expected_active_count=expected_active,
                 fetched_active_count=active,
                 state=DetailState.OBJECT
