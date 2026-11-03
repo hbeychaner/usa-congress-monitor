@@ -99,6 +99,15 @@ Work proceeds in this order:
    source revision; their stricter distinct-count success already implies no
    collapsed action rows, so resumption does not relabel or refetch them.
 
+   Resumption preserved **254 complete candidates** before Congress 101 S.431:
+   related-bill pagination reports **four nested rows**, including an identical
+   anonymous procedural relationship twice, yielding **three distinct
+   relationships across two bills**. Nested source lists retain multiplicity;
+   proof now separately records distinct relationship counts. Repeated grouped
+   pages cannot multiply rows. Retain all older successful proofs and their
+   revision provenance: distinct-count success already implies no collapsed
+   nested relationship rows; no retrospective relabeling is needed.
+
    Next: finish and verify this acquisition stage, account explicitly for every
    unresolved identity, compare complete projections in a bounded shadow target,
    verify retained/richer fields and conflicts, then apply receipted,

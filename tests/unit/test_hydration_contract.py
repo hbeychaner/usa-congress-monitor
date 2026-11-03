@@ -177,7 +177,7 @@ class TestDetailRetrieval:
         assert result.evidence.expected_count == result.evidence.fetched_count == 2
         assert result.evidence.fetched_record_count == 1
 
-    def test_duplicate_relationships_do_not_satisfy_source_count(self) -> None:
+    def test_duplicate_relationship_rows_are_preserved_not_invented_links(self) -> None:
         relationship: JsonObject = {"identifiedBy": "CRS", "type": "Identical bill"}
         result = HydrationFixture.fetch(
             {
@@ -191,8 +191,79 @@ class TestDetailRetrieval:
             },
             BillDetailKind.RELATED_BILLS,
         )
+        assert result.evidence.complete
+        assert result.evidence.fetched_count == 2
+        assert result.evidence.fetched_relationship_count == 1
+        assert result.evidence.fetched_record_count == 1
+        assert isinstance(result.data, list)
+        assert result.data[0]["relationshipDetails"] == [relationship, relationship]
+
+    @pytest.mark.parametrize("expected", [3, 5])
+    def test_related_duplicate_rows_do_not_waive_count_mismatches(
+        self, expected: int
+    ) -> None:
+        relationship: JsonObject = {
+            "identifiedBy": "Senate",
+            "type": "Procedurally related",
+        }
+        result = HydrationFixture.fetch(
+            {
+                "relatedBills": [
+                    {
+                        "url": "bill-one",
+                        "relationshipDetails": [
+                            {"identifiedBy": "Senate", "type": "Companion bill"},
+                            relationship,
+                            relationship,
+                        ],
+                    },
+                    {"url": "bill-two", "relationshipDetails": [relationship]},
+                ],
+                "pagination": {"count": expected},
+            },
+            BillDetailKind.RELATED_BILLS,
+        )
         assert not result.evidence.complete
-        assert result.evidence.fetched_count == 1
+        assert result.evidence.fetched_count == 4
+        assert result.evidence.fetched_relationship_count == 3
+
+    def test_repeated_grouped_pages_do_not_multiply_nested_duplicate_rows(self) -> None:
+        relationship: JsonObject = {
+            "identifiedBy": "Senate",
+            "type": "Procedurally related",
+        }
+        records: list[JsonObject] = [
+            {
+                "url": "bill-one",
+                "relationshipDetails": [
+                    {"identifiedBy": "Senate", "type": "Companion bill"},
+                    relationship,
+                    relationship,
+                ],
+            },
+            {"url": "bill-two", "relationshipDetails": [relationship]},
+        ]
+        client = Mock(spec=CDGClient)
+        client.get_json.side_effect = [
+            {"relatedBills": records, "pagination": {"count": 4, "next": "second"}},
+            {"relatedBills": records, "pagination": {"count": 4}},
+        ]
+        result = BillDetailFetcher(client, 2).fetch(
+            "first", BillDetailKind.RELATED_BILLS
+        )
+        assert result.evidence.complete
+        assert result.data == records
+        assert result.evidence.fetched_count == 4
+        assert result.evidence.fetched_relationship_count == 3
+        assert result.evidence.fetched_record_count == 2
+        assert (
+            DetailEvidence.model_validate_json(result.evidence.model_dump_json())
+            == result.evidence
+        )
+        malformed = result.evidence.model_dump()
+        malformed["fetched_relationship_count"] = 5
+        with pytest.raises(ValidationError, match="cannot exceed"):
+            DetailEvidence.model_validate(malformed)
 
     @pytest.mark.parametrize(
         "record",
@@ -208,6 +279,32 @@ class TestDetailRetrieval:
         assert not result.evidence.complete
         assert result.evidence.fetched_count == 0
         assert result.evidence.fetched_record_count == 1
+
+    @pytest.mark.parametrize("conflict", [False, True])
+    def test_explicit_relationship_duplicates_cannot_certify(
+        self, conflict: bool
+    ) -> None:
+        response: JsonObject = {
+            "relatedBills": [
+                {
+                    "url": "bill-one",
+                    "relationshipDetails": [
+                        {"id": "link", "type": "Companion bill"},
+                        {
+                            "id": "link",
+                            "type": "Changed" if conflict else "Companion bill",
+                        },
+                    ],
+                }
+            ],
+            "pagination": {"count": 2},
+        }
+        if conflict:
+            with pytest.raises(RuntimeError, match="Conflicting"):
+                HydrationFixture.fetch(response, BillDetailKind.RELATED_BILLS)
+        else:
+            result = HydrationFixture.fetch(response, BillDetailKind.RELATED_BILLS)
+            assert not result.evidence.complete
 
     def test_conflicting_related_bill_metadata_still_fails(self) -> None:
         with pytest.raises(RuntimeError, match="Conflicting"):

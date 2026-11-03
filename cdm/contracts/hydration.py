@@ -80,12 +80,17 @@ class DetailEvidence(BaseModel):
     )
     fetched_count: int = Field(
         ge=0,
-        description="Retrieved source-counted entries; action rows retain anonymous duplicates, while normalized top-level records remain distinct.",
+        description="Retrieved source-counted entries; action and nested relationship rows retain anonymous duplicates, while top-level records remain distinct.",
     )
     fetched_record_count: int | None = Field(
         default=None,
         ge=0,
         description="Distinct top-level collection records before counting nested relationships or policy area.",
+    )
+    fetched_relationship_count: int | None = Field(
+        default=None,
+        ge=0,
+        description="Distinct nested related-bill relationships, deduplicated within each related bill; source row counts can include repeated anonymous relationships.",
     )
     repeated_actions: list[RepeatedAction] = Field(
         default_factory=list,
@@ -107,6 +112,11 @@ class DetailEvidence(BaseModel):
 
     @model_validator(mode="after")
     def require_consistent_counts(self) -> DetailEvidence:
+        if (
+            self.fetched_relationship_count is not None
+            and self.fetched_relationship_count > self.fetched_count
+        ):
+            raise ValueError("Distinct relationships cannot exceed source rows")
         if self.repeated_actions and (
             self.fetched_record_count is None
             or (
@@ -435,8 +445,10 @@ class BillDetailFetcher:
             if kind is BillDetailKind.SUBJECTS
             else 0
         )
+        fetched_relationship_count: int | None = None
         if kind is BillDetailKind.RELATED_BILLS:
             fetched = 0
+            fetched_relationship_count = 0
             for record in distinct:
                 relationships = RelatedBillRelationships.model_validate(
                     record
@@ -444,7 +456,17 @@ class BillDetailFetcher:
                 if relationships is None:
                     object_complete = False
                 else:
-                    fetched += len(self.distinct(relationships))
+                    distinct_relationships = self.distinct(relationships)
+                    fetched += len(relationships)
+                    fetched_relationship_count += len(distinct_relationships)
+                    identified = [
+                        relationship
+                        for relationship in relationships
+                        if relationship.get("id") is not None
+                        or relationship.get("url") is not None
+                    ]
+                    if len(identified) != len(self.distinct(identified)):
+                        object_complete = False
         repeated_actions: list[RepeatedAction] = []
         if kind is BillDetailKind.ACTIONS:
             frequencies = Counter(
@@ -484,6 +506,7 @@ class BillDetailFetcher:
                 expected_count=expected,
                 fetched_count=fetched,
                 fetched_record_count=len(distinct),
+                fetched_relationship_count=fetched_relationship_count,
                 repeated_actions=repeated_actions,
                 expected_active_count=expected_active,
                 fetched_active_count=active,

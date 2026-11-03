@@ -195,9 +195,12 @@ and `fetched_active_count` retain that distinction in detail evidence, and both
 must agree before completeness. Subject pagination includes a nonempty policy
 area as one row alongside distinct legislative subjects, counted once even when
 repeated across pages. Neither counter is a distinct-member/support score.
-Related-bill pagination counts distinct nested `relationshipDetails`, not
+Related-bill pagination counts nested `relationshipDetails` rows, not
 unique bill objects: one bill can carry both an identical-bill and a procedural
 relationship. Repeated grouped bills on different pages do not multiply links.
+Repeated anonymous nested rows are preserved in the returned relationship list;
+`fetched_relationship_count` separately counts distinct relationships within
+each related bill. Multiplicity does not prove separate real-world links.
 Missing relationship lists remain incomplete; conflicting bill metadata still
 fails. `fetched_record_count` separately reports distinct top-level records
 (legislative subjects for the object-shaped subjects response), while

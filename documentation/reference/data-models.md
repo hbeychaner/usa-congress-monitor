@@ -78,7 +78,10 @@ legislative-subject-only counts. The keys used by hydration include `relatedBill
 The YAML mapping's flat `detail_hydration` object does not declare those
 per-endpoint keys, so these observations are available in `_source` but are not
 automatically searchable at their actual paths.
-Related-bill totals measure nested relationships, not unique related bills.
+Related-bill totals measure nested relationship rows, not unique related bills.
+The nested lists preserve anonymous duplicate rows. Optional
+`fetched_relationship_count` counts distinct relationships within each bill,
+without multiplying grouped bill records repeated across pages.
 Optional `fetched_record_count` preserves the separate top-level object count;
 older evidence omitting it remains readable but is not newly recertified.
 For actions, `fetched_count` measures returned rows and `fetched_record_count`

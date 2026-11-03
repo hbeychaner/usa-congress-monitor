@@ -222,6 +222,7 @@ export type DetailEvidence = {
     fetched_active_count?: number | null;
     fetched_count: number;
     fetched_record_count?: number | null;
+    fetched_relationship_count?: number | null;
     page_count: number;
     reason: string;
     repeated_actions?: Array<RepeatedAction>;

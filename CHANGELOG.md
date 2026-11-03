@@ -4,6 +4,12 @@
 
 ### Added
 
+- Related-bill hydration preserves anonymous nested relationship row
+  multiplicities and separately reports distinct relationships per bill.
+  Repeated grouped pages do not multiply counts; explicit-identity duplicates,
+  conflicting metadata, missing collections and source-count mismatches remain
+  incomplete or fail. The exact historical response has four rows, three
+  distinct relationships and two related bills.
 - Action hydration distinguishes source rows from distinct normalized bodies.
   Repeated anonymous actions retain their bodies and occurrence counts in
   source-only evidence; explicit-identity duplicates/conflicts and raw count
