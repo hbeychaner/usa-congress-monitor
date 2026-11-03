@@ -157,6 +157,7 @@ class Member(EntityBase):
     full_name: Annotated[
         str,
         Field(
+            serialization_alias="fullName",
             validation_alias=AliasChoices(
                 "fullName", "name", "directOrderName", "invertedOrderName"
             ),

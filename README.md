@@ -50,6 +50,16 @@ analytics publication, automatic retention scheduling and Beat remain disabled.
 Scoped release acceptance passed; this is not full-history, full-load or
 unattended-operation certification. See the [dated Gate 4 evidence and limits](documentation/OPERATIONS_RUNBOOK.md#controlled-cutover-acceptance).
 
+Managed startup now checks the combined local Compose memory limits, existing
+containers and host free disk before starting services. Run `make stack-capacity`
+for a read-only report. This admission check does not certify ingestion capacity,
+freshness, sustained performance or independent-host durability.
+Historical recovery probes also exposed a member-name serialization defect:
+canonical `fullName` output now preserves valid names through alias-based
+rehydration, including null alternate names, without weakening validation.
+The [local readiness gates](documentation/IMPLEMENTATION_PLAN.md#local-readiness-follow-through)
+remain in progress; isolated retrieval candidates are not repaired serving rows.
+
 ## Documentation
 
 Start with the [documentation home](documentation/README.md), organized by the

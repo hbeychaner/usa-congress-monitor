@@ -4,6 +4,16 @@
 
 ### Added
 
+- Read-only local Compose capacity admission before managed startup, covering
+  selected profiles across both projects, existing containers, unknown/unbounded
+  services and explicit memory/disk safety reserves. It refuses oversized
+  topologies without resizing Docker, stopping containers or deleting state.
+- Canonical member full-name serialization preserves authoritative names during
+  alias-based hydration round trips. Historical live probes reproduced null-name
+  validation failures and silent alternate-name replacement; regressions cover
+  both without relaxing required names or changing snake-case storage output.
+  Eleven identical isolated retrieval probes pass after the fix; serving data,
+  failed jobs and analysis pointers remain unchanged.
 - Portable offline Compose-rendering checks: the subprocess working directory
   now matches its isolated project/PWD, avoiding runner-dependent absolute-mount
   failures without weakening the mount or queue assertions.

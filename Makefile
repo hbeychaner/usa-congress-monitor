@@ -4,6 +4,7 @@
 .PHONY: up down restart stack-status env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-maintenance worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
 
 COMPOSE := docker compose
+.PHONY: stack-capacity
 STACK_PROFILES ?= operations
 export COMPOSE_PROFILES = $(STACK_PROFILES)
 
@@ -52,9 +53,14 @@ local-stop: require-docker
 stack-up:
 	@sh scripts/stack.sh check
 	@echo "Starting Compose stack with profiles: $(STACK_PROFILES)"
+	@$(MAKE) env-init ensure-docker
+	@$(MAKE) stack-capacity
 	@$(MAKE) local
 	@$(COMPOSE) -f docker-compose.fullstack.yml up -d --build --wait --wait-timeout 180 --renew-anon-volumes --remove-orphans
 	@echo "Full stack started: frontend=http://localhost:5173 backend=http://localhost:8000"
+
+stack-capacity: require-docker
+	@uv run --frozen python scripts/check_stack_capacity.py --profiles "$(STACK_PROFILES)"
 
 stack-down: require-docker
 	@echo "Stopping full container stack..."
@@ -161,4 +167,5 @@ help:
 	@printf "  stack-up    - Start full containerized stack (infra, api, worker, beat, frontend)\n"
 	@printf "  stack-down  - Stop full containerized stack\n"
 	@printf "  stack-logs  - Tail logs for full containerized stack\n"
+	@printf "  stack-capacity - Read-only memory/disk admission check for STACK_PROFILES\n"
 	@printf "  contracts-sync - Regenerate frontend API types from backend OpenAPI\n"

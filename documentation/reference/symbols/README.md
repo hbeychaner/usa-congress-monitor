@@ -16,20 +16,21 @@ remain authoritative in source. Follow the narrative chapters for intent.
 |---|---:|---:|
 | [backend](backend.md) | 40 | 410 |
 | [composition](composition.md) | 2 | 30 |
-| [config](config.md) | 5 | 230 |
+| [config](config.md) | 6 | 234 |
 | [contracts](contracts.md) | 7 | 561 |
 | [data_collection](data_collection.md) | 23 | 63 |
+| [deployment](deployment.md) | 2 | 49 |
 | [frontend](frontend.md) | 50 | 2087 |
 | [graph](graph.md) | 11 | 423 |
 | [ingest](ingest.md) | 15 | 547 |
 | [jobs](jobs.md) | 4 | 161 |
 | [models](models.md) | 15 | 870 |
 | [perspectives](perspectives.md) | 13 | 190 |
-| [scripts](scripts.md) | 26 | 122 |
+| [scripts](scripts.md) | 27 | 123 |
 | [store](store.md) | 12 | 170 |
 | [tools](tools.md) | 4 | 99 |
 | [topics](topics.md) | 3 | 55 |
 | [utils](utils.md) | 15 | 206 |
 | [workers](workers.md) | 14 | 205 |
 
-Total: 259 source files; 6429 declarations.
+Total: 263 source files; 6483 declarations.

@@ -72,6 +72,11 @@ jobs:
           tests/integration/test_pipeline_failures.py
           tests/integration/test_release_images.py
           tests/unit/test_deployment.py
+          tests/unit/test_local_capacity.py
+          cdm/deployment/capacity.py
+          cdm/config/local_capacity.py
+          scripts/check_stack_capacity.py
+          cdm/models/people.py
           tests/unit/test_job_lifecycle.py
           tests/unit/test_read_boundary.py
           tests/test_config_container.py
@@ -168,6 +173,7 @@ jobs:
           tests/unit/test_worker_tasks.py
           tests/unit/test_documentation.py
           tests/unit/test_deployment.py
+          tests/unit/test_local_capacity.py
           tests/unit/test_read_boundary.py
           tests/test_config_container.py
           tests/unit/test_topic_training_job.py

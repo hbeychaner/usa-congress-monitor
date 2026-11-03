@@ -116,6 +116,16 @@ Redis's retained snapshot required roughly 835 MB after restoration; lowering
 its limit to 128 MiB caused an observed startup OOM and is not safe here.
 The optional analytics worker alone allows 8 GiB, so the complete topology does
 not fit this measured budget. Do not enable it without a separate capacity plan.
+`make stack-capacity STACK_PROFILES=operations` performs the read-only admission
+check also required by `make up`, before any Compose services start. It counts
+both rendered Compose projects, selected profiles, other running containers
+and larger retained limits without double-counting selected services. Missing
+memory limits, unknown profiles, Docker/metadata failures, combined limits plus
+a 256 MiB Docker reserve exceeding VM memory, or less than 8 GiB host disk free
+space refuse startup. These are safety floors, not measured working-set budgets.
+Direct `docker compose` commands bypass the Make guard. Existing inactive-profile
+containers still consume capacity; changing profiles does not prove they stopped.
+The check never resizes Docker, lowers heap, deletes state or stops containers.
 `OPERATIONS_MEMORY`, `WORKER_MEMORY`, `WORKER_CPUS`, `ANALYTICS_MEMORY`,
 `ANALYTICS_CPUS` and `REDIS_MEMORY` are explicit overrides; do not lower search
 heap or discard retained state just to force the stack into memory.

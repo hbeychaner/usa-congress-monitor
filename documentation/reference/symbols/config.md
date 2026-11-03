@@ -151,6 +151,15 @@ No declarations in this module.
 - field: [`AppConfig.graph_repair: GraphRepairConfig`](../../../cdm/config/app_config.py#L236)
 - function: [`get_config() -> AppConfig`](../../../cdm/config/app_config.py#L240)
 
+## cdm/config/local_capacity.py
+
+[Source](../../../cdm/config/local_capacity.py)
+
+- class: [`LocalCapacityPolicy(BaseModel)`](../../../cdm/config/local_capacity.py#L6)
+- field: [`LocalCapacityPolicy.docker_reserve_bytes: int`](../../../cdm/config/local_capacity.py#L7)
+- field: [`LocalCapacityPolicy.minimum_free_disk_bytes: int`](../../../cdm/config/local_capacity.py#L8)
+- field: [`LocalCapacityPolicy.command_timeout_seconds: int`](../../../cdm/config/local_capacity.py#L9)
+
 ## cdm/config/query_reads.py
 
 [Source](../../../cdm/config/query_reads.py)

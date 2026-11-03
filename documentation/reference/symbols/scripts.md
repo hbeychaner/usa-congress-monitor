@@ -44,6 +44,12 @@ Generated from declarations; see the catalogue scope in the index.
 - function: [`parse_args() -> PerspectiveRequest`](../../../scripts/build_perspectives.py#L12)
 - function: [`main() -> None`](../../../scripts/build_perspectives.py#L32)
 
+## scripts/check_stack_capacity.py
+
+[Source](../../../scripts/check_stack_capacity.py)
+
+- function: [`main() -> int`](../../../scripts/check_stack_capacity.py#L18)
+
 ## scripts/create_indices.py
 
 [Source](../../../scripts/create_indices.py)

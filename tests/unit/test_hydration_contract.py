@@ -21,6 +21,7 @@ from cdm.data_collection.client import CDGClient
 from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 from cdm.ingest.runner import IngestRunner, Resource
 from cdm.models.bills import Bill, BillMetadata
+from cdm.models.people import Member, Sponsor
 from cdm.store.index_manager import load_definitions
 from cdm.store.indexer import to_document
 from cdm.utils.json_types import JsonObject
@@ -196,6 +197,49 @@ class TestDetailRetrieval:
 
 
 class TestHydrationAssessment:
+    @pytest.mark.parametrize("model", [Member, Sponsor])
+    @pytest.mark.parametrize("direct_name", [None, "Alternate display name"])
+    def test_member_alias_roundtrip_preserves_authoritative_name(
+        self, model: type[Member], direct_name: str | None
+    ) -> None:
+        member = model.model_validate(
+            {
+                "bioguideId": "T000001",
+                "firstName": "Test",
+                "lastName": "Member",
+                "fullName": "Test Member",
+                "directOrderName": direct_name,
+                "invertedOrderName": None,
+                "state": "CA",
+            }
+        )
+        restored = model.model_validate(member.model_dump(mode="json", by_alias=True))
+        assert restored.full_name == member.full_name == "Test Member"
+        assert restored == member
+        assert member.model_dump(mode="json")["full_name"] == "Test Member"
+
+    def test_hydration_preserves_sponsor_with_null_alternate_names(self) -> None:
+        bill = Bill.model_validate(
+            {
+                **HydrationFixture.bill().model_dump(mode="json", by_alias=True),
+                "sponsors": [
+                    {
+                        "bioguideId": "T000001",
+                        "firstName": "Test",
+                        "lastName": "Member",
+                        "fullName": "Test Member",
+                        "directOrderName": None,
+                        "invertedOrderName": None,
+                        "state": "CA",
+                    }
+                ],
+            }
+        )
+        bill.add_bill_details(HydrationFixture.client())
+        assert bill.hydration_assessment.status is HydrationStatus.COMPLETE
+        assert isinstance(bill.sponsors, list)
+        assert bill.sponsors[0].full_name == "Test Member"
+
     def test_bill_assessment_uses_all_required_details(self) -> None:
         bill = HydrationFixture.bill()
         bill.add_bill_details(HydrationFixture.client())

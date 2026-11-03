@@ -190,6 +190,30 @@ data pruning, commit/push or remote wiki publication is implied.
 
 ## Recovery
 
+### Local readiness recovery in progress
+
+The approved follow-through is local-only, retaining all source-supported
+historical scopes and current freshness. See the ordered
+[capacity/recovery/lineage/soak gates](IMPLEMENTATION_PLAN.md#local-readiness-follow-through).
+Run `make stack-capacity` before expanding roles; the current VM cannot admit
+the default acquisition or analytics expansion. Do not resize Docker, lower
+search heap, delete backups or requeue the three uncapped historical failures
+to bypass this result.
+
+An exact, checksummed before-image census covers all 3,047 unproven legislation
+rows. Bounded live retrieval exposed and fixed a shared member-name alias
+round-trip failure; all eleven representative identities then retrieved valid
+complete detail assessments. Twelve candidates have passed isolated acquisition
+staging under the actual operations-container limit. No serving rows or failed
+job statuses have changed. The stage is not a full-history/freshness certificate,
+and must pass projection comparison, preservation/conflict checks and conditional
+write/rollback gates before serving repair.
+
+The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
+Mac cannot provide independent-host failover; its on-host backups do not prove
+off-host disaster recovery. Keep these limitations visible rather than converting
+a smoke test or local restart into a production acceptance result.
+
 Before requeueing exhausted jobs, create a timestamped ledger backup:
 
 ```sh

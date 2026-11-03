@@ -7,12 +7,100 @@ publication are implemented; approved controlled Compose cutover and scoped
 release acceptance are complete. R16 lightweight wiki preparation, refreshed
 documentation/visuals and the publication-ready wiki are complete. Historical findings below describe the
 original assessment unless followed by dated implementation evidence.
-**Scope:** the current working tree, including the existing staged deployment
-configuration. This is not a production health or data-completeness certification.
+**Scope:** the published controlled deployment plus the local-readiness work
+below. This is not a production health or data-completeness certification.
 
 [Documentation home](README.md) | [Current architecture](architecture.md) |
 [Data/indexing behavior](reference/indexing.md) |
 [Original frontend requirements](../frontend/WEB_APP_IMPLEMENTATION_PLAN.md)
+
+## Local readiness follow-through
+
+**2026-11-03, in progress; not release acceptance:** the user selected local-only
+work, retaining **all source-supported historical scopes plus ongoing current
+freshness**. Cloud deployment, pruning and automatic activation are not approved.
+The targets are a real 24-hour continuous observation, 5 read requests/second,
+p95 latency at most 2 seconds during bounded ingestion, source checks within
+24 hours for supported current data, no lost acknowledged writes and recovery
+within 15 minutes. Independent-host failover and off-host backup/restore remain
+unmet on the selected single-Mac topology; local restart evidence cannot satisfy
+them. Code reduction remains a separate later change.
+
+Work proceeds in this order:
+
+1. **Capacity/scope admission.** The host has 16 GiB RAM; Docker exposes
+   8,319,770,624 bytes and host disk has about 22 GiB free. Controlled declared
+   memory limits total 7,918,845,952 bytes. `make stack-capacity` now checks both
+   rendered projects and other running containers, with a 256 MiB Docker reserve
+   and 8 GiB host disk floor, before managed startup. Actual controlled admission
+   passes; adding acquisition or analytics fails without starting services.
+   This is a point-in-time safety check, not working-set/load certification.
+   Additional analytics capacity still needs a measured local execution plan.
+2. **Frozen, bounded recovery before live indexing.** The three failed jobs
+   remain failed: uncapped bill hydration for Congresses 94, 95 and 117, each
+   configured with concurrency four. All thirteen bounded bill-list probes
+   (91, 92, 93, 94, 95, 100-104, 107, 117, 119) were reachable; reachability and
+   list counts do not certify supported detail/history completeness. Exact
+   before-images/sequence terms for all 3,047 unproven rows are frozen with SHA
+   `516259dd9de0d9cd8f2144a9cd21a2b7ee2fd4d7af73f257f95129c2732ee9bd`.
+   None has the legacy subject/hydration markers that would suppress a stale-only
+   refresh when upstream is unchanged.
+
+   One exact identity from each affected Congress initially produced two
+   successful hydrations and nine validation failures. The shared member
+   full-name field lacked a canonical serialization alias: round-tripping
+   `by_alias=True` could select null alternate-name aliases or silently replace
+   the authoritative name. Canonical `fullName` serialization fixes the producer
+   without relaxing input validation or changing default snake-case storage.
+   All eleven identical live probes then retrieved complete versioned detail
+   assessments. These are isolated candidates, not serving-row repairs.
+
+   The resumable frozen-identity acquisition experiment runs serially inside the
+   existing operations container, not a new worker/profile. A one-new-record
+   check passed under its real 1 GiB limit: twelve verified candidates were
+   staged at that checkpoint, including the eleven probe results. It shares the existing API rate
+   limiter, stops at the first error/incomplete/mismatched identity, and checks
+   8 GiB disk free, a 1 GiB archive-size limit and 256 MiB cgroup memory headroom.
+   Each process is bounded to 40,000 request tokens, excluding transport retries
+   and text downloads. Atomic progress receipts and the SQLite archive support
+   resume. This experiment neither indexes serving rows nor changes ledger
+   statuses, schedules, aliases or analysis pointers.
+
+   Next: finish and verify this acquisition stage, account explicitly for every
+   unresolved identity, compare complete projections in a bounded shadow target,
+   verify retained/richer fields and conflicts, then apply receipted,
+   version-conditional changes. Only afterward recover the three original job
+   scopes and certify discovery/hydration/indexing identities/counts for every
+   required history/resource scope. No bulk requeue or legacy relabel substitutes
+   for that evidence; the 3,047-row stage alone cannot close all history gaps.
+3. **Analytics lineage/publication.** Freeze and verify the approved corpus
+   identities, source versions, model/configuration and content checksums before
+   rebuilding collaboration/topics. Current topic publication is absent; the
+   older collaboration/topic pointers still have uncertified scope/lineage.
+   Preserve the verified voting pointer and sibling history. Fit/rehearse under
+   measured local capacity, validate complete candidate manifests, and require
+   pointer preconditions and rollback evidence before any publication.
+4. **Sustained operation and recovery acceptance.** Start the qualifying soak
+   only after the actual bounded ingest/index path is ready. Record offered
+   load, errors, latency distributions, ingestion progress, resource pressure
+   and observation gaps; laptop sleep or missing intervals must not count as a
+   continuous pass. Exercise controlled interruption/redelivery and restore
+   with before/after acknowledged-job/document identities and measured recovery
+   time. Existing test results are prerequisites, not the 24-hour result.
+   Independent-host replication and off-host restore require a genuinely separate
+   local machine/storage target or remain explicitly blocked; no cloud rollout
+   is implied.
+
+Close out with actual gate outcomes, source/README/changelog/runbook updates,
+green validation and a source-pinned wiki publication. Do not mark all four
+complete, start code reduction or advertise unattended/HA acceptance while the
+remaining gates are open.
+
+This checkpoint passes **125 focused Python cases and 15 documentation cases**,
+Ruff and focused Pyright with zero errors/warnings, frontend contract freshness,
+full canonical reference checks and actual controlled admission/expansion refusal.
+The retained API remains ready. These results validate the fixes above, not the
+unexecuted full-history recovery, analytics publication or sustained-load targets.
 
 ## Executive assessment
 
