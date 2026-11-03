@@ -39,6 +39,15 @@ class DocumentationConfig(BaseModel):
     source_ref: str = "main"
     python_roots: tuple[str, ...] = ("cdm", "scripts", "tools")
     link_pattern: str = r"(?<!!)\[(?:`[^`]*`|[^\]\n])+\]\(([^)\n]+)\)"
+    wiki_files: tuple[str, ...] = (
+        "README.md",
+        "architecture.md",
+        "OPERATIONS_RUNBOOK.md",
+        "CONTRIBUTING.md",
+    )
+    wiki_directories: tuple[str, ...] = ("guides", "reference")
+    repository_only_start: str = "<!-- wiki:repository-only:start -->"
+    repository_only_end: str = "<!-- wiki:repository-only:end -->"
 
     @property
     def documentation(self) -> Path:
@@ -277,6 +286,25 @@ class DocumentationBuilder:
             result += f"#{parsed.fragment}"
         return result
 
+    def wiki_text(self, path: Path) -> str:
+        lines: list[str] = []
+        repository_only = False
+        for line in path.read_text(encoding="utf-8").splitlines(keepends=True):
+            marker = line.strip()
+            if marker == self.config.repository_only_start:
+                if repository_only:
+                    raise ValueError(f"Nested repository-only wiki block: {path}")
+                repository_only = True
+            elif marker == self.config.repository_only_end:
+                if not repository_only:
+                    raise ValueError(f"Unmatched repository-only wiki end: {path}")
+                repository_only = False
+            elif not repository_only:
+                lines.append(line)
+        if repository_only:
+            raise ValueError(f"Unclosed repository-only wiki block: {path}")
+        return "".join(lines)
+
     def build_wiki(self, output: Path, *, check: bool) -> None:
         if output.resolve() == self.config.documentation.resolve():
             raise ValueError("Wiki output must not overwrite canonical documentation")
@@ -286,13 +314,19 @@ class DocumentationBuilder:
             if output.resolve() not in path.resolve().parents
             and "wiki" not in path.relative_to(self.config.documentation).parts
             and "original" not in path.relative_to(self.config.documentation).parts
+            and (
+                path.relative_to(self.config.documentation).as_posix()
+                in self.config.wiki_files
+                or path.relative_to(self.config.documentation).parts[0]
+                in self.config.wiki_directories
+            )
         }
         names = [self.wiki_name(path) for path in sources]
         if len(set(names)) != len(names):
             raise ValueError("Wiki page names collide")
         pages: dict[Path, str] = {}
         for path in sorted(sources):
-            text = path.read_text(encoding="utf-8")
+            text = self.wiki_text(path)
             text = re.sub(
                 self.config.link_pattern,
                 lambda match, path=path: match.group(0).replace(
@@ -312,7 +346,6 @@ class DocumentationBuilder:
         pages[output / "_Sidebar.md"] = (
             "## Congress Tracker\n\n"
             "[Home](Home)\n\n"
-            "- [Engineering improvement plan](IMPLEMENTATION_PLAN)\n\n"
             "### Understand\n"
             "- [Architecture](architecture)\n"
             "- [Visual atlas](reference-visuals)\n"

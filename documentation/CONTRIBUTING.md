@@ -8,11 +8,6 @@ Edit repository documentation. Do not independently edit the wiki or generated
 reference pages. The wiki is a reproducible publication copy with rewritten
 links and its own navigation.
 
-Use the [engineering improvement plan](IMPLEMENTATION_PLAN.md) for cross-solution
-scope, sequencing and current-versus-target decisions. Update its finding status
-with test/migration evidence when implementing related changes; historical
-feature checklists are not completion evidence.
-
 | Content | Edit here |
 |---|---|
 | Architecture and explanations | Markdown chapters under `documentation` |
@@ -118,6 +113,15 @@ The ignored `documentation/wiki` directory contains:
 - `_Footer.md`: canonical-source reminder;
 - flat page filenames such as `reference-indexing.md` and `guides-ingestion.md`;
 - source-reference pages per package and a rendered Mermaid atlas.
+
+The wiki publishes current implementation and operating reference only: the
+documentation home, architecture, runbook, maintenance guide, and chapters under
+`guides/` and `reference/`. Root-level plans, incident reports and other internal
+records are not published. Keep their repository copies for provenance.
+Repository-only historical sections inside an otherwise current chapter use
+paired `<!-- wiki:repository-only:start -->` and
+`<!-- wiki:repository-only:end -->` markers on their own lines. The builder
+omits those sections from the wiki and rejects unmatched or nested markers.
 
 Internal chapter links become wiki page links. Source, diagram, mapping,
 upstream snapshot and other non-wiki links become absolute GitHub repository

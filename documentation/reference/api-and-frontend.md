@@ -484,7 +484,7 @@ uploads them for seven days. Inspect a downloaded trace with
 
 These are browser-contract fixtures, not a live backend, search-index, image,
 queue-recovery, or deployment acceptance test. Those controlled integration and
-release gates remain tracked separately in [R11](../IMPLEMENTATION_PLAN.md#r11).
+release gates are separate checks.
 The same workflow now runs a separate
 [controlled pipeline gate](../OPERATIONS_RUNBOOK.md#controlled-pipeline-acceptance)
 against disposable Redis/Elasticsearch, including the real-index query-budget

@@ -67,6 +67,11 @@ remain in progress; isolated retrieval candidates are not repaired serving rows.
 
 ## Documentation
 
+The published [wiki](https://github.com/hbeychaner/usa-congress-monitor/wiki)
+contains current implementation and operating reference. Planning, incident
+history and repository-only evidence are retained in the repository, not
+published as wiki pages.
+
 Start with the [documentation home](documentation/README.md), organized by the
 questions you need answered:
 

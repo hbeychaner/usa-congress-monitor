@@ -4,6 +4,11 @@
 
 ### Added
 
+- Curated wiki publication limited to current code and operating reference.
+  Plans and incident reports remain repository-only; explicitly marked
+  historical sections are omitted from otherwise current chapters. Navigation
+  no longer advertises planning/history pages, and regression tests prevent
+  excluded content from returning during regeneration.
 - Related-bill hydration now reconciles source counts against distinct nested
   relationships, while separately retaining the top-level record count.
   Congress 103 S.J.Res.106 proves two relationships to one bill; page-size-one

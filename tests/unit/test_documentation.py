@@ -131,6 +131,76 @@ class TestDocumentationBuilder:
         with pytest.raises(ValueError, match="overwrite"):
             builder.build_wiki(docs, check=False)
 
+    def test_wiki_publishes_current_reference_not_plans_or_incidents(
+        self, tmp_path: Path
+    ) -> None:
+        docs = tmp_path / "documentation"
+        docs.mkdir()
+        for name in (
+            "README.md",
+            "IMPLEMENTATION_PLAN.md",
+            "FUTURE_PLANS.md",
+            "FAILURE_RECONCILIATION_2026-09-07.md",
+        ):
+            (docs / name).write_text(f"# {name}\n", encoding="utf-8")
+        reference = docs / "reference"
+        reference.mkdir()
+        (reference / "indexing.md").write_text("# Indexing\n", encoding="utf-8")
+        wiki = tmp_path / "published"
+        self.builder(tmp_path).build_wiki(wiki, check=False)
+        assert {path.name for path in wiki.iterdir()} == {
+            "Home.md",
+            "reference-indexing.md",
+            "_Sidebar.md",
+            "_Footer.md",
+        }
+        assert "IMPLEMENTATION_PLAN" not in (wiki / "_Sidebar.md").read_text()
+        assert (docs / "IMPLEMENTATION_PLAN.md").exists()
+
+    def test_wiki_omits_repository_only_history_without_changing_source(
+        self, tmp_path: Path
+    ) -> None:
+        docs = tmp_path / "documentation"
+        docs.mkdir()
+        source = docs / "README.md"
+        content = (
+            "# Current behavior\n\n"
+            "<!-- wiki:repository-only:start -->\n"
+            "## Prior incident\nHistorical detail\n"
+            "<!-- wiki:repository-only:end -->\n"
+            "## Operations\nCurrent commands\n"
+        )
+        source.write_text(content, encoding="utf-8")
+        wiki = tmp_path / "published"
+        builder = self.builder(tmp_path)
+        builder.build_wiki(wiki, check=False)
+        builder.build_wiki(wiki, check=True)
+        published = (wiki / "Home.md").read_text()
+        assert "Current behavior" in published and "Current commands" in published
+        assert "Prior incident" not in published
+        assert "wiki:repository-only" not in published
+        assert source.read_text() == content
+
+    @pytest.mark.parametrize(
+        "content",
+        [
+            "<!-- wiki:repository-only:end -->\n",
+            "<!-- wiki:repository-only:start -->\n",
+            (
+                "<!-- wiki:repository-only:start -->\n"
+                "<!-- wiki:repository-only:start -->\n"
+            ),
+        ],
+    )
+    def test_wiki_rejects_malformed_repository_only_blocks(
+        self, tmp_path: Path, content: str
+    ) -> None:
+        docs = tmp_path / "documentation"
+        docs.mkdir()
+        (docs / "README.md").write_text(content, encoding="utf-8")
+        with pytest.raises(ValueError, match="repository-only"):
+            self.builder(tmp_path).build_wiki(tmp_path / "published", check=False)
+
     def test_wiki_only_does_not_invoke_source_or_visual_generation(
         self, tmp_path: Path
     ) -> None:

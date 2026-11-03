@@ -28,9 +28,9 @@ remain authoritative in source. Follow the narrative chapters for intent.
 | [perspectives](perspectives.md) | 13 | 190 |
 | [scripts](scripts.md) | 27 | 123 |
 | [store](store.md) | 12 | 170 |
-| [tools](tools.md) | 4 | 99 |
+| [tools](tools.md) | 4 | 105 |
 | [topics](topics.md) | 3 | 55 |
 | [utils](utils.md) | 15 | 206 |
 | [workers](workers.md) | 14 | 205 |
 
-Total: 263 source files; 6499 declarations.
+Total: 263 source files; 6505 declarations.

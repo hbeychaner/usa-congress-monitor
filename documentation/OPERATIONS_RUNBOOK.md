@@ -124,6 +124,7 @@ Use `make up`, `make stack-status`, and `make health-check` afterward. The old
 native targets now fail with this migration guidance; no agent is uninstalled
 or service switched by an ordinary startup/test run.
 
+<!-- wiki:repository-only:start -->
 ## Controlled cutover acceptance
 
 **2026-11-03, approved controlled scope:** old checkout-owned API/Vite processes
@@ -188,8 +189,11 @@ complete, and 3,047 legacy hydration rows still lack proof. Yellow replica healt
 does not certify durability. No full-load, Mac wake/engine-start, cloud cutover,
 data pruning, commit/push or remote wiki publication is implied.
 
+<!-- wiki:repository-only:end -->
+
 ## Recovery
 
+<!-- wiki:repository-only:start -->
 ### Local readiness recovery in progress
 
 The approved follow-through is local-only, retaining all source-supported
@@ -223,6 +227,8 @@ The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
 off-host disaster recovery. Keep these limitations visible rather than converting
 a smoke test or local restart into a production acceptance result.
+
+<!-- wiki:repository-only:end -->
 
 Before requeueing exhausted jobs, create a timestamped ledger backup:
 
@@ -405,7 +411,9 @@ This does not certify replica durability, current upstream freshness or a live
 restore. Before any separately approved live repair, revalidate captured
 document versions, aliases, pointers, backups and resource budgets.
 Additive mapping fields cannot simply be removed for rollback.
+<!-- wiki:repository-only:start -->
 Follow the [ordered rollout](IMPLEMENTATION_PLAN.md#ordered-graph-repair-rollout).
+<!-- wiki:repository-only:end -->
 
 ### Bounded Live Schema and Source Repair
 
@@ -459,6 +467,7 @@ the isolated restore proves raw source/schema reconstruction, not replica,
 alias-cutover or power-loss durability. Yellow health with available primaries
 does not certify replica protection.
 
+<!-- wiki:repository-only:start -->
 On 2026-11-03 UTC, approved gate two completed: all 1,148,223 historical graph
 documents were backed up and restore-tested, the eight mapping paths were
 added, and exactly 1,824 Congress 114 sources were repaired (1,322 House/502
@@ -469,6 +478,8 @@ were zero. Total application index operations were exactly 1,824. The successful
 `repair-applied.json` binds the sealed plan and all per-write receipts.
 At gate-two closeout, original pointers were unchanged; voting publication followed at gate three.
 No live source rollback, index recreation, worker restart, commit or push occurred.
+
+<!-- wiki:repository-only:end -->
 
 ### Sealed Voting-Only Graph Promotion
 
@@ -545,6 +556,7 @@ CAS-restores the exact original raw source. Both old and candidate edges remain;
 there is no pruning, source rollback, alias cutover or worker restart.
 Repeat the real API/browser check without pointer pinning after publication.
 
+<!-- wiki:repository-only:start -->
 On 2026-11-03 UTC, approved voting promotion completed. The new version is
 `20261103T091601Z-4b9d26b3167844a790a5f1aded61143f`: **116,450 edges** over
 Congresses **113-119**, including **48,655** with searchable Congress 114 evidence.
@@ -612,6 +624,8 @@ The existing search container has `restart=no`, unlike the revised Compose
 specification. It was started without recreation or policy changes; do not assume
 it will restart with Docker. Yellow cluster health also does not establish
 replica availability or a production recovery certificate.
+
+<!-- wiki:repository-only:end -->
 
 ## Controlled Pipeline Acceptance
 
@@ -721,9 +735,10 @@ backup/restore drill remain outside this gate.
 Durable admission/retry/cancellation/recovery is separately checked by existing
 SQLite-backed unit tests in the same workflow. Production alias cutover/rollback,
 image/resource/queue-routing release smoke (below), full restore, and
-sustained-operation acceptance remain separate [R11](IMPLEMENTATION_PLAN.md#r11)
-gates. No deployment is authorized by passing this suite alone.
+sustained-operation acceptance remain separate checks. No deployment is
+authorized by passing this suite alone.
 
+<!-- wiki:repository-only:start -->
 The bounded handoff comparison uses the same 100 synthetic bills, 25-document
 bulks, real normalization (warmed before timing), SQLite archive and isolated
 Elasticsearch/Redis fixtures. Both paths preserve all 100 records. One local run
@@ -733,6 +748,8 @@ consumer group; it is **not a Redis-free implementation**. This small serial
 fixture does not establish backpressure, large-corpus memory, concurrent-reader,
 mid-write crash or shared-rate-limit equivalence. Keep Redis Streams and the
 existing recovery boundaries; transport removal is not justified by this result.
+
+<!-- wiki:repository-only:end -->
 
 ## Release Image and Routing Acceptance
 

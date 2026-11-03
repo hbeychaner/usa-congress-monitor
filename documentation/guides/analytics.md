@@ -471,16 +471,22 @@ bridge indices have no implemented population path and are not dependencies of
 these builders; their zero counts must not trigger invented bridge rows.
 Retain them pending an explicit schema-scope decision.
 
+<!-- wiki:repository-only:start -->
 The original read-only live audit found 109,691 scoped bill inputs (11 without sponsor
 IDs), 12,621 roll calls and active collaboration/voting/topic edge counts of
 114,566/110,341/125,086. At that audit, voting omitted Congress 114: all 1,824 source
-roll calls then had no linked member positions. Their cached vote CSVs represent
+roll calls then had no linked member positions.
+<!-- wiki:repository-only:end -->
+
+Voteview vote CSVs represent
 ICPSR IDs as integral decimals while member CSVs use integer strings. Typed
 integer IDs now join these representations exactly and reject fractional or
 invalid values; unknown non-President links and mismatched roll-call sets fail
 before replacement output. Presidents remain explicitly excluded.
+<!-- wiki:repository-only:start -->
 Offline reconstruction recovers all 1,322 House and 502 Senate roll calls,
 including 984/310 party-split votes, without requests or live writes.
+<!-- wiki:repository-only:end -->
 
 The source reader refuses records with no linked positions, but accepts valid
 present/not-voting-only records; the scorer still uses only yea/nay.
@@ -488,6 +494,7 @@ Topic source scans reject partial search results. The live topic graph has no
 versioned source-model lineage and the configured topic store has no current
 publication, so its lineage cannot be inferred from timestamps or labels.
 
+<!-- wiki:repository-only:start -->
 Approved gate two added all eight mapping paths, including `shared_topics`, and
 repaired exactly those 1,824 sources with CAS and per-write receipts. Complete
 12,621-record source verification and a full 1,148,223-document graph backup/
@@ -501,6 +508,7 @@ edges. All old graph bodies/versions remain; only the voting pointer changed.
 The physical graph now contains 1,264,673 documents, including historical
 versions and pointers. Collaboration/topic remain on their original pointers;
 topic lineage is still unknown. No workers have resumed.
+<!-- wiki:repository-only:end -->
 
 [VotingGraphPromotion](../../cdm/graph/promotion.py) verifies the applied repair
 and sealed candidate, stages create-only edges, captures their exact versions,
@@ -509,8 +517,10 @@ desktop/narrow Playwright results and decodes each embedded typed API response
 to prove candidate identity, Congress 114 availability and finite voting links.
 `publish()` revalidates the evidence and CAS-switches only the voting pointer;
 rollback restores the exact old raw pointer without removing either edge set.
+<!-- wiki:repository-only:start -->
 Real API/browser acceptance passed both against the pinned candidate and,
 after publication, the ordinary unpinned serving API.
+<!-- wiki:repository-only:end -->
 See the [promotion procedure](../OPERATIONS_RUNBOOK.md#sealed-voting-only-graph-promotion).
 
 ### Sealed staging and rollback evidence
@@ -538,13 +548,14 @@ preconditions. Exact original source bodies and raw pointers must be restored;
 Elasticsearch sequence numbers themselves are not reversible. Owned indices
 are removed before an acceptance marker is written, including on failure.
 
+<!-- wiki:repository-only:start -->
 The 2026-11-03 rehearsal captured 12,621 roll calls and exactly 1,824 repair
 candidates (1,322 House, 502 Senate). The isolated candidate has 116,450 voting
 edges over Congresses 113-119, including 48,655 with searchable Congress 114
 evidence. Full cloned source/pointer rollback passed; this is not live
 publication, corpus freshness or global completeness certification.
-See the [commands and artifact contract](../OPERATIONS_RUNBOOK.md#sealed-graph-repair-rehearsal)
-and [ordered approval gates](../IMPLEMENTATION_PLAN.md#ordered-graph-repair-rollout).
+<!-- wiki:repository-only:end -->
+See the [commands and artifact contract](../OPERATIONS_RUNBOOK.md#sealed-graph-repair-rehearsal).
 
 ## 6. Rebuilds, retention, and operational checks
 

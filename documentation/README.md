@@ -5,18 +5,15 @@ topics, and graphs. These repository pages are the **canonical documentation**.
 The [GitHub wiki](https://github.com/hbeychaner/usa-congress-monitor/wiki) is a
 publication target, not a second editing location.
 
-**Current local scope (2026-11-03):** controlled Compose API/UI and one
-index/maintenance worker are running after verified backup/native retirement.
-Acquisition, analytics publication, Beat and automatic retention scheduling are
-off. [Acceptance evidence and remaining limits](OPERATIONS_RUNBOOK.md#controlled-cutover-acceptance)
-distinguish this scoped release from historical completeness or unattended
-production certification.
+The managed local stack serves the API/UI and one index/maintenance worker.
+Additional acquisition, analytics and scheduler roles require explicit profile
+selection and capacity admission. See [configuration and deployment](guides/configuration-and-deployment.md)
+for the supported topology and resource checks.
 
 ## Start here
 
 | Your question | Read |
 |---|---|
-| What should we simplify, make robust, or implement next? | [Engineering improvement plan](IMPLEMENTATION_PLAN.md) |
 | What runs, and why are there several databases? | [Architecture](architecture.md) |
 | Can I see the system rather than just read about it? | [Visual atlas: C4, data flow, relationships, and request sequence](reference/visuals.md) |
 | What are the records, identifiers, fields, and relationships? | [Data structures](reference/data-models.md) |
@@ -39,8 +36,7 @@ production certification.
 - **Operator:** root [quick start](../README.md#quick-start) -> configuration
   and deployment -> ingestion -> operations runbook.
 - **Contributor:** architecture -> subsystem guide -> exact source declaration ->
-  related tests -> [improvement roadmap](IMPLEMENTATION_PLAN.md) ->
-  documentation maintenance.
+  related tests -> documentation maintenance.
 
 ## The mental model
 
@@ -72,9 +68,7 @@ before drawing conclusions about missing records.
 | [Original upstream endpoint docs](original) | Upstream reference snapshots, not application API documentation |
 | [Original OpenAPI JSON](original/swagger.json) / [YAML](original/swagger.yaml) | Congress.gov snapshots, not FastAPI's `/openapi.json` |
 | [Spec comparison report](specs_swagger_report.json) | Historical comparison artifact |
-| [September failure reconciliation](FAILURE_RECONCILIATION_2026-09-07.md) | Dated incident report, not current operating instructions |
 | [Frontend style guide](../frontend/STYLE_GUIDE.md) | UI design conventions |
-| [Frontend implementation plan](../frontend/WEB_APP_IMPLEMENTATION_PLAN.md) | Historical planning context; source and current reference take precedence |
 
 ## Visuals and wiki
 
