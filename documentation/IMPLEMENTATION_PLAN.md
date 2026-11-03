@@ -108,6 +108,16 @@ Work proceeds in this order:
    revision provenance: distinct-count success already implies no collapsed
    nested relationship rows; no retrospective relabeling is needed.
 
+   The next run reached **1,495 complete candidates** before a Congress API
+   read timeout on Congress 94 S.12. Its later full-item retry passed, reaching
+   **1,496**. The isolated staging runner now has bounded request-exception
+   recovery using the existing failure classifier: three item attempts,
+   30/60-second cooldowns and six extra network retries per process, in addition
+   to existing client retries. Eight focused recovery cases and clean helper
+   lint/types verify recovery, exhaustion and permanent-error rejection.
+   The archive snapshot and original failed checkpoint remain retained.
+   Validation/safety failures still stop immediately; no serving writes occur.
+
    Next: finish and verify this acquisition stage, account explicitly for every
    unresolved identity, compare complete projections in a bounded shadow target,
    verify retained/richer fields and conflicts, then apply receipted,

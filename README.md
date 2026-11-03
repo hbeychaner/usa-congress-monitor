@@ -69,6 +69,9 @@ bodies and retains anonymous duplicate multiplicities in source-only proof.
 Duplicates do not invent event identities or waive pagination/count checks.
 The [local readiness gates](documentation/IMPLEMENTATION_PLAN.md#local-readiness-follow-through)
 remain in progress; isolated retrieval candidates are not repaired serving rows.
+The isolated backfill's checkpoint distinguishes `retrying` from `failed`;
+bounded network recovery preserves candidates without weakening count checks.
+This staging experiment does not change application job/client retry policy.
 
 ## Documentation
 

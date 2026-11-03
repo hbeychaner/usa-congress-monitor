@@ -4,6 +4,12 @@
 
 ### Added
 
+- Bounded network recovery for the isolated local-readiness acquisition
+  experiment: three full-item attempts with 30/60-second cooldowns and six
+  extra network retries per process, using the existing failure classifier.
+  Checkpoints expose retry state; validation/storage/safety failures still stop.
+  All 1,495 retained candidates were preserved and the timed-out bill passed
+  unchanged on retry. Application job/client retry policy is unchanged.
 - Related-bill hydration preserves anonymous nested relationship row
   multiplicities and separately reports distinct relationships per bill.
   Repeated grouped pages do not multiply counts; explicit-identity duplicates,

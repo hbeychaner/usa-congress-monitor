@@ -223,6 +223,23 @@ page-size-one offsets. Count distinct nested links once, retain the separate
 top-level record count, and refetch v3 proof; neither prior archive is silently
 recertified. Missing relationship lists or contradictory metadata remain gates.
 
+The isolated v3 acquisition checkpoint is
+`data/local-readiness-hydration-v3/checkpoint.json`; it is not an application
+ledger job. A stopped network attempt preserved 1,495 complete candidates;
+an integrity-checked archive snapshot was retained before resuming the exact
+failed bill. The staging runner now uses the existing `FailureClassifier` only
+for request exceptions: at most three full-item attempts with 30/60-second
+cooldowns, and at most six extra network retries across a process. These are
+additional to the API client's existing bounded HTTP attempts. The same shared
+rate limiter, request-token, memory, disk and archive limits still apply.
+`retrying`, `retry_attempt`, `retry_after_seconds` and
+`network_retries_this_process` make recovery visible in the checkpoint.
+Validation/count/identity/storage failures stop without this retry path.
+Exhaustion leaves a failed checkpoint and preserved archive, not success.
+The exact Congress 94 S.12 retry passed, reaching 1,496 candidates with zero
+serving writes. This is staging-only recovery, not a production client retry
+policy change or proof of historical completeness.
+
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
 off-host disaster recovery. Keep these limitations visible rather than converting
