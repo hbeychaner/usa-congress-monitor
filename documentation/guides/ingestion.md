@@ -58,6 +58,23 @@ Explicit field enrichment and freshness work are separate, bounded operations.
 Only acquire upstream data that is required and absent from both Elasticsearch
 and usable local inputs. A list-only cache is not proof of full-detail
 availability, but neither is it a reason to download the same metadata again.
+[`CreateOnlyBillWriter`](../../cdm/store/create_only.py) provides the controlled
+replay write boundary. Inject a client, a pinned
+[`CreateOnlyTarget`](../../cdm/config/create_only.py) and bounded settings.
+Every bulk action is `create`, never update/upsert/replacement. A conflict is
+reported as already present only after canonical source-identity validation.
+Created rows must match their exact acknowledged source and sequence/primary
+term. A partially rejected batch raises with both verified successes and explicit
+rejections; callers retain intents before requests and persist those outcomes.
+An ambiguous transport response is not a success. Reconciliation may safely
+repeat the same create-only action, but must not claim an unacknowledged earlier
+creation as acknowledged. Seal inputs, projections and controller bytes before
+execution, and verify exact identities afterward.
+
+This boundary does not change ordinary `IndexPayload`/Redis upsert semantics or
+turn `--refresh-stale` into missing-only selection. Controlled replay is a
+separate, explicitly approved operation; existing workers need not be expanded
+or source acquisition enabled.
 See [manual serving repair safety](../OPERATIONS_RUNBOOK.md#manual-serving-repair-safety)
 for a separately approved repair of existing fields.
 

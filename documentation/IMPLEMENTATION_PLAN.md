@@ -423,6 +423,16 @@ Work proceeds in this order:
    index retained metadata. Any additional detail/freshness acquisition needs its
    own evidenced field-level gap. Failed-job outcomes, historical source
    variants and all prior recovery receipts remain preserved.
+
+   **2026-11-04 local-only replay implementation:** an isolated typed
+   `CreateOnlyBillWriter` now enforces atomic creation, pinned topology,
+   canonical identities, exact successful source/version readback and explicit
+   partial rejection. Existing conflicts are read and preserved, not merged.
+   The approved execution groups are Congress 94/95 crossed with `hr`, `s`,
+   `sconres`, `sjres` and `sres`; exact missing-ID manifests, not date-only jobs,
+   determine membership. Normal ingestion and worker routing are unchanged.
+   Projection/shadow rehearsal, API canary and live identity closure remain
+   required before claiming that any of the 26,694 gaps is recovered.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus
    identities, source versions, model/configuration and content checksums before
    rebuilding collaboration/topics. Current topic publication is absent; the

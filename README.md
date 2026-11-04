@@ -75,6 +75,8 @@ Data availability varies by source and scope. Bill pages distinguish unknown,
 partial and complete detail-retrieval evidence; missing text or analysis does
 not necessarily mean the bill itself is missing.
 Missing completeness evidence alone is not a reason to re-ingest a record.
+Controlled local replay uses create-only writes; ordinary ingestion still uses
+the merge behavior described in the ingestion guide.
 Complete detail retrieval does not guarantee full-text availability.
 Collection counts or links alone do not prove detail completeness.
 Completeness describes an individual bill, not whether a whole Congress has

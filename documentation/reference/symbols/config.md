@@ -151,6 +151,19 @@ No declarations in this module.
 - field: [`AppConfig.graph_repair: GraphRepairConfig`](../../../cdm/config/app_config.py#L236)
 - function: [`get_config() -> AppConfig`](../../../cdm/config/app_config.py#L240)
 
+## cdm/config/create_only.py
+
+[Source](../../../cdm/config/create_only.py)
+
+- class: [`CreateOnlyTarget(BaseModel)`](../../../cdm/config/create_only.py#L11)
+- field: [`CreateOnlyTarget.cluster_uuid: str`](../../../cdm/config/create_only.py#L14)
+- field: [`CreateOnlyTarget.index_name: IndexName`](../../../cdm/config/create_only.py#L15)
+- field: [`CreateOnlyTarget.index_uuid: str`](../../../cdm/config/create_only.py#L16)
+- field: [`CreateOnlyTarget.aliases: tuple[AliasName, ...]`](../../../cdm/config/create_only.py#L17)
+- class: [`CreateOnlySettings(BaseModel)`](../../../cdm/config/create_only.py#L20)
+- field: [`CreateOnlySettings.maximum_batch_size: int`](../../../cdm/config/create_only.py#L23)
+- field: [`CreateOnlySettings.request_timeout: float`](../../../cdm/config/create_only.py#L24)
+
 ## cdm/config/local_capacity.py
 
 [Source](../../../cdm/config/local_capacity.py)

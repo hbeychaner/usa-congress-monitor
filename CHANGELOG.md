@@ -4,6 +4,12 @@
 
 ### Added
 
+- Added a typed, atomic create-only bill writer for controlled local replay.
+  It pins the cluster, physical index UUID and alias bindings; validates source
+  identities; disables transport retries; verifies exact created sources and
+  versions; and treats conflicts as existing records only after readback.
+  Partial failures retain verified successes and explicit rejected identities.
+  Ordinary ingest/upsert and worker routing are unchanged.
 - Reconciled historical recovery by actual Elasticsearch presence rather than
   missing modern completeness proof. Across the 64,426 captured identities,
   37,732 already have serving documents; the other 26,694 have retained local
