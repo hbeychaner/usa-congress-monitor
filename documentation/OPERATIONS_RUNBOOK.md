@@ -310,9 +310,24 @@ Keep `execution-acquisition-20261104.json`, `audit-receipt.json`,
 `audit-manifest.jsonl` and `acquisition-preservation.json` beside the sealed
 archive. None of these candidates has nonblank full text; never erase retained
 GovInfo text because the staged Congress API representation lacks it.
-Next, review production projection/merge preservation and conflicts in an owned
-shadow target before conditional repair. Acquisition alone cannot authorize
-promotion or close an original failed scope.
+Subsequent exact production-merge inventory found 484 committee count/URL
+descriptors that would become invalid list entries, plus 16 empty slots. Guarded
+shadow rehearsal expands only pure descriptors with the exact bill/collection
+target and equal audited count, never discarding real committee data or unknown
+extra fields. Empty slots become explicit empty lists. All 500 accepted candidates
+pass exact readback, nine-collection reconciliation and idempotent ordinary
+replay. Descriptor and empty cases both reject stale writes and pass conditional
+rollback/reapplication. Eight focused guard tests and six existing repair tests
+pass, with clean lint/types.
+
+All serving sources/versions, aliases/mappings and protected analysis state are
+unchanged. Retain `merge-review-20261104/` and `guarded-shadow-20261104/`, including
+the sealed guarded receipt, projections and per-record pointer resolutions.
+The owned unaliased shadow remains available for conditional-plan verification.
+Next is a live canary and separately bounded version-conditional repair, not
+ordinary additive replay. Default application merge behavior is unchanged.
+Shadow validation alone cannot authorize promotion or close an original failed
+scope.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
@@ -844,6 +859,16 @@ then compare real projections in an owned unaliased shadow index. Confirm
 mapping compatibility, field preservation, stale-version rejection and
 conditional rollback before changing serving rows. Refresh drained consumers
 when the evidence schema has changed, then verify a live API canary.
+
+A legacy count/URL descriptor is not a collection record. Ordinary additive
+merging can mix it into an expanded record list; such a mixture must not be
+certified complete. In an explicitly bounded repair, expand only a pure
+descriptor whose bill/collection URL and count agree with a fully audited fresh
+list, retaining the original descriptor in the sealed before-image. Extra fields,
+real collection records, changed targets or count disagreements require explicit
+conflict review, not replacement by assumption. Verify empty collections
+explicitly and recheck all collection proof after projection. This procedure does
+not change the default application's merge policy.
 
 Apply only the accepted merged sources, conditional on their original versions.
 Persist and fsync an intent before submission and the exact returned

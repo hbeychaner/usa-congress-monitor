@@ -4,6 +4,15 @@
 
 ### Added
 
+- Validated all 500 Congress 94 recovery candidates in an owned unaliased shadow.
+  Exact ordinary-merge inventory found 484 legacy committee count/URL descriptors
+  that would become invalid list entries, plus 16 empty slots. A narrow repair
+  rehearsal expands only matching descriptors with equal verified counts,
+  preserves actual records/richer fields, makes empty collections explicit and
+  verifies exact readback, idempotent ordinary replay, stale-write rejection and
+  conditional rollback/reapplication. Serving sources/versions, mappings and
+  analysis state are unchanged. Ordinary application merging is not changed;
+  live repair remains a separate conditional-write gate.
 - Completed and independently audited the first 500-record Congress 94 recovery
   chunk: exact identities, archive integrity, model validation and all nine
   collection counts passed. All serving originals/versions remain unchanged.

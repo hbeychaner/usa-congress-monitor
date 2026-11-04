@@ -216,10 +216,41 @@ Work proceeds in this order:
 
    Retain `execution-acquisition-20261104.json`, `audit-receipt.json`,
    `audit-manifest.jsonl` and `acquisition-preservation.json` beside the sealed
-   archive. Next: preservation-aware production projection/merge comparison and
-   owned-shadow conflict/rollback validation before conditional serving repair.
-   Additive merges are not assumed safe for these rich existing sources.
-   This staged acquisition is not live repair, complete failed-scope recovery
+   archive.
+
+   **2026-11-04 guarded projection/shadow validation passed:** inventory of the
+   real production projection/additive merge found **484 invalid committee
+   mixtures** and 16 otherwise-valid merges. Those 484 originals contain pure
+   count/URL descriptors, not expanded committee records; treating the descriptor
+   as a list item creates an invalid committee. None of these 500 originals has
+   nonblank full text or `source_metadata`; do not generalize this batch as proof
+   of arbitrary richer GovInfo reconciliation.
+
+   The bounded candidate planner expands only a pure descriptor whose bill,
+   collection URL and count match the independently audited fresh committee list.
+   Actual records or extra descriptor fields are not discarded; unsupported
+   targets/counts/shapes stop. Sixteen empty slots become explicit empty lists.
+   All other fields retain exact ordinary-merge behavior. Eight focused guards
+   cover input immutability, richer text/metadata preservation, extra real
+   committee data, wrong endpoints/identities and count drift; six existing repair
+   regressions also pass, with clean Ruff/Pyright.
+
+   An owned unaliased shadow reproduced all ordinary merges exactly, then applied
+   the guarded candidates conditionally. All 500 sources and nine collection
+   counts passed readback; replay through actual `bulk_upsert` is idempotent.
+   Both descriptor and empty-slot cases reject stale writes and pass conditional
+   rollback/reapplication. Mapping is unchanged; every original serving
+   source/version, alias and protected analysis token remains unchanged.
+   Retain `merge-review-20261104/` and `guarded-shadow-20261104/`; the latter's
+   `guarded-shadow-receipt.json` seals accepted projections with SHA
+   `5d2d9cdae9d16ef1f917bd0a0bd6efac403b33de2ddaf2bef0c62ca210621689`.
+   The unaliased owned shadow is retained for conditional-plan verification.
+
+   Next: a live API canary followed by explicitly bounded conditional repair,
+   with the existing intent/acknowledgement and exact readback gates. Do not feed
+   these records back through ordinary additive merging or reuse an earlier
+   sparse-row receipt as authorization. Default application merge behavior has
+   not changed. Shadow success is not live repair, complete failed-scope recovery
    or the sustained ingest/index acceptance run.
 
    Next: recover the three original job scopes and certify
