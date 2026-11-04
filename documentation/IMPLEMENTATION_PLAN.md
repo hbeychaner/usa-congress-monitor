@@ -320,10 +320,60 @@ Work proceeds in this order:
    version and proof drift, manifest changes, ambiguous intents, duplicate API
    identities, reappearing shadows and invalid remaining rosters.
 
-   Next: acquire the remaining 499 under the approved exclusive execution policy,
-   unchanged 1 GiB allocation, 256 MiB headroom floor and 10,000-token process cap.
-   Audit the complete new archive before any merge rehearsal or conditional
-   serving repair. The normal consumer must be restored on completion or failure.
+   **2026-11-04 second chunk acquired, audited and repaired:** the remaining
+   499 acquired successfully using 5,071 request tokens and zero extra network
+   retries, without OOM. The supervisor restored and broker-verified the original
+   consumer. Independent SQLite integrity, exact identities, stored-name models
+   and all nine collection counts pass for all 500. The archive SHA is
+   `3d3aaa5fcaf5e191290463f0c6e64b825fbc435cbf6c5d8e9937d8151fcb95b3`;
+   audit-manifest SHA is
+   `cf2e8d82b15b4ba9bff0f1ac850503c4577db987f635e7aa5b33350e3ca40a6a`.
+   Seven text-version rows exist, but no nonblank full text.
+
+   Read-only merge review stopped on two sparse originals,
+   `bill:94:hjres:1022` and `bill:94:hjres:148`: both omit `full_text`,
+   `amendments` and `text_versions`; one also omits empty `cosponsors`.
+   These are absent fields, not explicit null text or lost nonblank content.
+   A separate control bundle corrects the probes' presence assumptions using
+   the existing nullable API contract and the common count-validating repair
+   validator. The raw missing fields remain missing in accepted/stored sources.
+   Missing nonempty collections, explicit invalid text, uncertain writes and
+   all earlier preservation gates still reject. Earlier sealed helpers are
+   unchanged. Forty-one targeted control/CAS cases pass with warnings as errors,
+   clean Ruff and zero Pyright errors/warnings.
+
+   Actual ordinary inventory again found 484 invalid committee-pointer merges
+   and 16 empty slots. The new owned shadow passed exact candidate readback,
+   all collection proof, real idempotent replay and two stale-CAS/rollback probes,
+   without mapping expansion or serving changes. The accepted receipt SHA is
+   `5aa0bfa158fd8269ef84f2c54d48174a57d09ffb8a0d882fdc45f23dee195d6d`.
+   A real API canary preceded 499 more frozen-version writes. All **500**
+   acknowledgements, sources/returned versions and distinct actual API responses
+   passed final checks, including the two sparse cases. Only the exact owned
+   shadow was retired after another full readback. The final API receipt SHA is
+   `f3f2bbb581a16d1193a19bffe1696c31773289fb1f8dbbd2941640a3747a6471`.
+   Keep the complete audit, review, shadow, intent/acknowledgement, API and
+   retirement receipts. Default application merging, serving mappings/aliases,
+   protected analysis and original failed-job outcomes remain unchanged.
+
+   **2026-11-04 third chunk prepared and smoke-verified:** chained verification
+   excludes the second 500 acknowledged repairs from its sealed roster, leaving
+   a derived **5,163** unresolved Congress 94 identities, not a fresh census.
+   The next disjoint 500 originals/versions and acquisition metadata are sealed
+   in `data/local-readiness-scope-recovery/congress-94-existing-0003/`.
+   Manifest SHA is
+   `9066957f7ba466edcbb15bb1756d8096c2a216e9194217888afb19ee82fd1ff0`.
+   The one-record exclusive smoke stages `bill:94:hjres:181` without OOM or
+   serving writes, restores the consumer and passes independent archive/model
+   and nine-collection checks. All 500 new serving originals remain exact, with
+   zero overlap with the 1,000 identities repaired in the first two chunks.
+   CI run `41840694166` for source `959d0a4` completed successfully.
+
+   Next: acquire the third chunk's remaining 499 under the same approved
+   exclusive execution policy, unchanged 1 GiB allocation, 256 MiB headroom
+   floor and 10,000-token process cap. Restore the normal consumer on completion
+   or failure; complete audit, preservation rehearsal and conditional repair
+   remain separate gates.
 
    Next: recover the three original job scopes and certify
    discovery/hydration/indexing identities/counts for every

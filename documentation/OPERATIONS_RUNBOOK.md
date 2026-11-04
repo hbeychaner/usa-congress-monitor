@@ -378,8 +378,39 @@ originals/versions remain unchanged. Keep the execution receipt, acquisition log
 and `smoke-verification.json`, plus
 `selection-congress-94-existing-0002/continuation-receipt.json`. Twenty-six
 continuation/acquisition/supervisor tests and lint/types pass. The remaining 499
-are ready for the same supervised acquisition; complete audit, shadow validation
-and conditional repair are separate later gates.
+subsequently completed acquisition with 5,071 request tokens, no extra network
+retries and no OOM; the original consumer was restored and broker-verified.
+
+**2026-11-04 second chunk repair complete:** all 500 archived identities and
+nine collection counts pass independent audit. Archive SHA is
+`3d3aaa5fcaf5e191290463f0c6e64b825fbc435cbf6c5d8e9937d8151fcb95b3`.
+Two sparse originals (`bill:94:hjres:1022`, `bill:94:hjres:148`) omit text and
+audited-empty collection fields. Separate control probes now respect existing
+model/API presence semantics without adding fields to those sources, changing
+the default merge policy or modifying earlier sealed implementations.
+Forty-one control/CAS cases, lint and types pass; missing nonempty collections
+and explicit invalid text still reject.
+
+The new owned shadow passed all 500 exact/count/idempotency checks and two
+stale-CAS/rollback probes. The real API canary and remaining 499 conditional
+writes passed, with fsynced intent/acknowledgement journals, exact source/version
+readback and all 500 distinct actual API checks. Accepted receipt SHA is
+`5aa0bfa158fd8269ef84f2c54d48174a57d09ffb8a0d882fdc45f23dee195d6d`;
+final API receipt SHA is
+`f3f2bbb581a16d1193a19bffe1696c31773289fb1f8dbbd2941640a3747a6471`.
+The exact owned unaliased shadow was retired only after final verification.
+Serving mappings/aliases, protected analysis and original failed jobs remain
+unchanged. Retain all audit, review, guarded plan, journal, API and retirement
+evidence in the batch directory.
+
+The third disjoint batch is sealed in
+`data/local-readiness-scope-recovery/congress-94-existing-0003/`, with manifest
+SHA `9066957f7ba466edcbb15bb1756d8096c2a216e9194217888afb19ee82fd1ff0`.
+Its derived remaining roster contains 5,163 identities, not a fresh census.
+The one-record exclusive smoke for `bill:94:hjres:181` passes independent archive,
+model and nine-collection checks and restores the consumer. All 500 new serving
+originals remain unchanged and disjoint from the 1,000 prior chunk repairs.
+The remaining 499 are ready for supervised acquisition under unchanged guards.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
@@ -942,6 +973,13 @@ bulk continuation. Verify actual exposed collection content and hydration proof,
 not just HTTP status or counts; source readback covers fields the DTO omits.
 Retire only the exact owned, unaliased shadow after complete source/version and
 API verification, retaining before-images, accepted candidates and journals.
+
+Compare API values using the actual DTO's nullable/default semantics, while
+retaining exact raw-source readback. Omitted text is not necessarily a stored
+empty string. An omitted collection can match an empty API list only when
+independently retrieved, versioned proof and normalized count validation certify
+zero entries. Never turn unknown or nonzero missing data into a successful empty
+result, or silently materialize missing fields in accepted sources.
 
 ### Failure Boundaries Covered
 

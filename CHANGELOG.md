@@ -4,6 +4,16 @@
 
 ### Added
 
+- Completed the second 500-record Congress 94 recovery chunk through independent
+  archive audit, guarded shadow rehearsal, conditional serving repair, all 500
+  actual API checks and owned-shadow retirement. The remaining acquisition used
+  5,071 request tokens with no extra network retries or OOM and restored the
+  original consumer. Isolated control probes now respect genuinely omitted
+  text/empty fields and the existing nullable API contract without changing
+  stored absence or weakening nonempty collection-count checks. Forty-one
+  control/CAS regressions pass; serving mappings and protected analysis remain
+  unchanged. Sealed the third disjoint 500-record batch and verified its
+  one-record exclusive smoke, with all new serving originals unchanged.
 - Rechecked reported test failures before continuing historical recovery:
   the normal Python suite passes 966 cases with 144 intentionally gated
   integration cases, frontend tests pass 67 cases, browser fixtures pass 42

@@ -49,6 +49,7 @@ credentials each time.
 
 Use the `localhost` addresses above so the browser origin matches the default
 configuration.
+API routes use the `/api/v1` prefix; the API documentation lists the endpoints.
 
 ## Using the app
 
