@@ -524,6 +524,57 @@ Work proceeds in this order:
    provenance and real readback, not another create-only replay.
    Full content, broader history/resources, freshness and sustained-operation
    acceptance remain open.
+
+   **2026-11-04 local archived content promoted:** all **459** retained records
+   passed independent SQLite integrity, model and nine-collection count checks.
+   The frozen 500-record interrupted scope was unchanged before execution.
+   Fresh projection found all 459 committee pointers unsafe for ordinary merge;
+   the guarded shadow expanded only matching endpoint/count descriptors and
+   restored archived subject evidence. It passed exact readback, repeat-replay
+   idempotence and two distinct conditional rollback/stale-write probes.
+   A new owned controller bundle handles this pointer-only scope without editing
+   any previously sealed helper. Forty-eight repair/create-only regressions pass.
+
+   A real one-record API canary preceded the remaining **458** conditional writes.
+   All **459** sources/acknowledged versions and actual API collection payloads
+   match the accepted plan, including **500 committee source rows** and the
+   archived subject data. The other **41** original source/version images remain
+   exact. Only the exact owned unaliased shadow was retired; mappings, aliases,
+   protected analysis and original failed-job history are unchanged. No upstream
+   acquisition, new workers or allocation increase was used for this promotion.
+   Retain `data/local-readiness-local-enrichment-20261104/`; accepted-plan SHA is
+   `03239d19404d70eb6abe9316e3faf2f044d4d54bde41c125900c060295a51d65`.
+
+   **2026-11-04 official historical law-text path verified; not yet served:**
+   official directory discovery supplies four volume XML files, not individual
+   law XML URLs, for volumes **89-92**. The sealed decoded files total
+   **62,931,303 bytes**. A reusable typed streaming reader validates checksums,
+   source scope, law identity and citations, retaining older reprints' original
+   citations and explicit unknown session metadata. Per-law failures are
+   surfaced as quarantine records, never silent skips.
+
+   The final matching gate compares indexed law identity, PDF volume/page and
+   XML bill reference. Of **645** indexed references, **573** pass (**203** in
+   Congress 94 and **370** in Congress 95), with **7,201,441** extracted text
+   characters. All have independent XML bill-reference confirmation.
+   **68** have conflicting reference/citation evidence and **4** lack an
+   accepted matching law. Seven of the **1,535** XML law components are explicitly
+   quarantined; **1,528** are parsed. These counts describe different scopes:
+   a rejected component is not automatically one missing indexed bill.
+   No Congress API request, PDF OCR or serving text write was used.
+
+   Retain `data/local-readiness-statutes-20261104/`, especially the stronger final
+   `verified/` manifest/text/quarantine evidence; the earlier preliminary match
+   report is not promotion authority. Eighteen reader regressions and focused
+   preservation/import-boundary checks pass. Next freeze provenance-aware
+   projections for only the **573** verified enacted-law texts, rehearse and
+   conditionally promote them with explicit law/version labeling. Resolve the
+   other **72** references independently; do not lower matching requirements to
+   inflate coverage. Also compare the retained bulk law catalog with the newly
+   restored metadata records: the **645** pre-existing PDF references are not an
+   inventory of every available enacted law. Remaining metadata-only detail
+   acquisition and wider history/freshness/analytics/sustained-operation gates
+   are still open.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus
    identities, source versions, model/configuration and content checksums before
    rebuilding collaboration/topics. Current topic publication is absent; the

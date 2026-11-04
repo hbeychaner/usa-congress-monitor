@@ -450,6 +450,26 @@ are not the outstanding sustained-operation acceptance. Missing full details
 and text are not certified complete, and original failed hydration jobs remain
 historical failures rather than being relabeled by metadata replay.
 
+**Subsequent local-content enrichment:** the 459 complete archived bills retained
+from the deliberately interrupted third acquisition have now passed independent
+nine-collection audit, pointer-aware shadow rehearsal and conditional serving
+promotion. A real API canary preceded the remaining writes; all 459 actual API
+responses and exact stored source/versions passed. This restores 500 committee
+rows and the archived subject evidence without new acquisition. The other 41
+original source/version images are unchanged. The exact owned shadow was
+retired; preserve `data/local-readiness-local-enrichment-20261104/`, including
+the frozen inputs, projection, fsynced journals and final API/retirement receipts.
+Original acquisition failure history remains unchanged.
+
+**Historical law-text staging:** four official Statutes XML volumes are sealed
+under `data/local-readiness-statutes-20261104/`. Use the final `verified/`
+evidence, not its preliminary report: 573 of 645 indexed references have
+independently matched law identity, PDF citation and XML bill reference.
+Another 68 conflict and four lack an accepted match; seven XML components
+are explicitly quarantined. No Congress API requests or serving text writes
+were performed. These are enacted-law texts, not proof of available earlier bill
+drafts. The next serving gate must retain this distinction and source provenance.
+
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
 off-host disaster recovery. Keep these limitations visible rather than converting

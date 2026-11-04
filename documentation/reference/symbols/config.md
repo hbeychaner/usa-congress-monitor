@@ -210,6 +210,20 @@ No declarations in this module.
 - field: [`SourcePolicy.billstatus_fields: dict[FieldName, str]`](../../../cdm/config/source_policy.py#L69)
 - function: [`SourcePolicy.rank(self, source: SourceName, field: FieldName) -> int`](../../../cdm/config/source_policy.py#L87)
 
+## cdm/config/statutes.py
+
+[Source](../../../cdm/config/statutes.py)
+
+- class: [`StatutesSettings(BaseModel)`](../../../cdm/config/statutes.py#L6)
+- field: [`StatutesSettings.namespace: str`](../../../cdm/config/statutes.py#L9)
+- field: [`StatutesSettings.dc_namespace: str`](../../../cdm/config/statutes.py#L10)
+- field: [`StatutesSettings.root_tag: str`](../../../cdm/config/statutes.py#L11)
+- field: [`StatutesSettings.law_tag: str`](../../../cdm/config/statutes.py#L12)
+- field: [`StatutesSettings.citation_pattern: str`](../../../cdm/config/statutes.py#L13)
+- field: [`StatutesSettings.law_citation_pattern: str`](../../../cdm/config/statutes.py#L14)
+- field: [`StatutesSettings.page_identifier_pattern: str`](../../../cdm/config/statutes.py#L17)
+- field: [`StatutesSettings.block_elements: frozenset[str]`](../../../cdm/config/statutes.py#L18)
+
 ## cdm/config/topic_analysis.py
 
 [Source](../../../cdm/config/topic_analysis.py)

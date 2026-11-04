@@ -4,6 +4,21 @@
 
 ### Added
 
+- Reused the interrupted acquisition to enrich 459 Congress 94 bills locally:
+  500 expanded committee rows and the archived subject/detail evidence passed
+  independent collection audits, owned-shadow rehearsal, conditional serving
+  writes and all 459 real API checks. The other 41 original records stayed
+  source/version-exact. No acquisition, extra workers or expanded allocation
+  was needed; the owned shadow was retired and failed-job history preserved.
+- Added a typed streaming reader for sealed official Statutes at Large XML.
+  It preserves original citations for reprints, leaves missing law-session
+  metadata unknown, checks independent law identity/citation evidence and
+  exposes explicit per-law quarantine alongside a fail-fast reader.
+  Four retained bulk volumes supplied verified enacted-law text for 573 of
+  645 indexed historical references, without Congress API calls or PDF OCR.
+  The remaining 72 references did not pass matching; seven XML components were
+  quarantined. Text is staged, not yet promoted to serving documents or
+  represented as earlier bill drafts.
 - Clarified that historical identity recovery is a baseline, not completion:
   full detail and full text wherever available remain required. Recovery now
   distinguishes indexed content, reusable local content, upstream availability,

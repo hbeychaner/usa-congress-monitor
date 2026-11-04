@@ -126,6 +126,41 @@ Keep the law/bill-version distinction and source provenance when assessing or
 adding another retrieval path. Neither a collection start date nor an unsupported
 format establishes that text is unavailable everywhere.
 
+### Historical enacted-law text from Statutes XML
+
+The official [STATUTE bulk collection](https://www.govinfo.gov/bulkdata/STATUTE)
+can provide structured text for enacted-law PDF references predating the BILLS
+collection. Discovery is volume-level: follow the official directory to
+`STATUTE-<volume>.xml`, not an assumed per-law XML filename.
+
+[`StatutesReader`](../../cdm/ingest/statutes.py) accepts a sealed
+[`StatuteVolume`](../../cdm/ingest/statutes.py) and injected
+[`StatutesSettings`](../../cdm/config/statutes.py). It performs no downloading,
+index writes or automatic scheduling. The adapter does not change ordinary
+Congress API ingestion or register a new resource in the worker pipeline.
+
+The reader checks the file SHA before and after a fully consumed stream, validates
+the volume root/namespace/scope, and returns typed Public/Private Law records with
+text, approval date, original citation, source URL and component/volume hashes.
+Volume books can contain older reprints: a law's Congress and original citation
+must not be inferred from its containing volume. Missing law-session metadata
+remains explicitly unknown. Inline word fragments and paragraph boundaries are
+preserved when extracting plain text.
+
+Use `records()` for fail-fast reading, or `scan()` for independent accepted laws
+and explicit `StatuteRejectedLaw` diagnostics. Persist every rejection; a scan
+with rejected components is not complete coverage. Wrong volume headers, malformed
+XML or changed file seals remain fatal rather than per-law quarantines.
+
+Before any existing-bill enrichment, independently match the indexed law
+kind/Congress/number, PDF citation volume/page and XML bill reference. Conflicting
+official metadata or links must not be silently corrected or labeled unavailable.
+Retain the original downloads and every unresolved reference for review.
+Serving promotion remains a separate preservation-aware conditional-write gate:
+preserve existing details/text, retain source/version provenance, and identify
+the result as enacted-law text rather than an earlier bill draft. Staged text
+alone does not make it available through the application.
+
 ## Congress API: entry points and planning
 
 [`IngestRunner`](../../cdm/ingest/runner.py) fetches one resource.
