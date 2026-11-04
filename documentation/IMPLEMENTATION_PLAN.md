@@ -118,6 +118,15 @@ Work proceeds in this order:
    The archive snapshot and original failed checkpoint remain retained.
    Validation/safety failures still stop immediately; no serving writes occur.
 
+   The bounded run then preserved **2,068 complete candidates** before
+   Congress 103 S.1653's full-text server disconnected. An untyped
+   `RuntimeError` wrapper hid the underlying request exception from staging.
+   The shared bill/amendment boundary now raises `FullTextDownloadError`,
+   retaining that explicit cause. The classifier and staging honor underlying
+   transient request failures only; permanent HTTP errors and parsing/validation
+   failures remain terminal. Existing attempt/cooldown/process budgets are
+   unchanged. The 2,068-candidate archive is snapshotted before resumption.
+
    Next: finish and verify this acquisition stage, account explicitly for every
    unresolved identity, compare complete projections in a bounded shadow target,
    verify retained/richer fields and conflicts, then apply receipted,

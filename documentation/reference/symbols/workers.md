@@ -47,9 +47,9 @@ No declarations in this module.
 
 [Source](../../../cdm/workers/failures.py)
 
-- class: [`FailureClassifier()`](../../../cdm/workers/failures.py#L10)
-- function: [`FailureClassifier.is_transient(self, exc: BaseException) -> bool`](../../../cdm/workers/failures.py#L59)
-- function: [`FailureClassifier.is_retryable_error(self, error: str \| None) -> bool`](../../../cdm/workers/failures.py#L75)
+- class: [`FailureClassifier()`](../../../cdm/workers/failures.py#L11)
+- function: [`FailureClassifier.is_transient(self, exc: BaseException) -> bool`](../../../cdm/workers/failures.py#L60)
+- function: [`FailureClassifier.is_retryable_error(self, error: str \| None) -> bool`](../../../cdm/workers/failures.py#L80)
 
 ## cdm/workers/govinfo_runner.py
 

@@ -26,6 +26,7 @@ from cdm.contracts.hydration import (
     BillDetailFetcher,
     BillDetailKind,
     DetailEvidence,
+    FullTextDownloadError,
     HydrationAssessment,
 )
 from cdm.data_collection.client import CDGClient
@@ -991,7 +992,7 @@ class Amendment(BaseModel):
                         soup = BeautifulSoup(html, "html.parser")
                         full_text = soup.get_text()
                     except requests.RequestException as e:
-                        raise RuntimeError(
+                        raise FullTextDownloadError(
                             f"Network error retrieving full text for text version {self.type}: {e}"
                         ) from e
                     except (AttributeError, TypeError) as e:
@@ -1186,7 +1187,7 @@ class Bill(EntityBase):
                         soup = BeautifulSoup(html, "html.parser")
                         full_text = soup.get_text()
                     except requests.RequestException as e:
-                        raise RuntimeError(
+                        raise FullTextDownloadError(
                             f"Network error retrieving full text for text version {self.type}: {e}"
                         ) from e
                     except (AttributeError, TypeError) as e:

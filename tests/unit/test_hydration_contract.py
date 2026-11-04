@@ -14,13 +14,14 @@ from cdm.contracts.hydration import (
     DetailEvidence,
     DetailResult,
     DetailState,
+    FullTextDownloadError,
     HydrationAssessment,
     HydrationStatus,
 )
 from cdm.data_collection.client import CDGClient
 from cdm.data_collection.specs.bill_specs import BILL_ITEM_SPEC
 from cdm.ingest.runner import IngestRunner, Resource
-from cdm.models.bills import Bill, BillMetadata
+from cdm.models.bills import Amendment, Bill, BillMetadata
 from cdm.models.people import Member, Sponsor
 from cdm.store.index_manager import load_definitions
 from cdm.store.indexer import to_document
@@ -66,6 +67,48 @@ class HydrationFixture:
         client = Mock(spec=CDGClient)
         client.get_json.return_value = response
         return BillDetailFetcher(client, 2).fetch("endpoint", kind)
+
+
+class TestFullTextNetworkBoundary:
+    @pytest.mark.parametrize("model", [Bill, Amendment])
+    @pytest.mark.parametrize(
+        "network_error",
+        [
+            requests.ConnectionError("remote disconnected"),
+            requests.ReadTimeout("slow response"),
+        ],
+    )
+    def test_download_preserves_typed_network_cause(
+        self,
+        model: type[Bill] | type[Amendment],
+        network_error: requests.RequestException,
+    ) -> None:
+        record = model.model_validate(
+            {
+                **HydrationFixture.bill().model_dump(mode="json", by_alias=True),
+                "sponsors": [],
+                "textVersions": [
+                    {
+                        "type": "Introduced",
+                        "date": None,
+                        "formats": [
+                            {
+                                "type": "Formatted Text",
+                                "url": "https://example.invalid/text",
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+        client = Mock(spec=CDGClient)
+        client.session = Mock()
+        client.session.get.side_effect = network_error
+        with pytest.raises(FullTextDownloadError, match="Network error") as caught:
+            record.add_full_text(client)
+        assert isinstance(caught.value, RuntimeError)
+        assert caught.value.__cause__ is network_error
+        assert record.full_text == ""
 
 
 class TestDetailRetrieval:

@@ -26,6 +26,10 @@ from cdm.utils.json_types import JsonObject
 DetailIdentity = NewType("DetailIdentity", str)
 
 
+class FullTextDownloadError(RuntimeError):
+    """Full-text retrieval failed; the chained request exception owns retryability."""
+
+
 class BillDetailKind(StrEnum):
     ACTIONS = "actions"
     AMENDMENTS = "amendments"

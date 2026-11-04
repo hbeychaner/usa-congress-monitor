@@ -219,6 +219,13 @@ All nine relationship updates, including committees, validate before the origina
 bill mutates. Partial responses preserve existing richer arrays.
 `add_full_text()` separately retrieves formatted text, rejects unsuccessful HTTP
 responses and empty bodies, and cannot establish historical/text completeness.
+Bill and amendment network failures raise `FullTextDownloadError` (a
+`RuntimeError` subtype) with the original request exception as their explicit
+cause. The shared failure classifier uses that cause: connection/timeouts and
+HTTP 429/5xx are transient; HTTP 4xx other than 429, parsing/empty-text errors
+and missing network causes are not. Generic `RuntimeError` wrappers do not gain
+network retry classification. This preserves existing retry limits and
+full-text validation rather than treating failed downloads as empty success.
 
 The runner and indexer derive `hydration_status` from the versioned
 `HydrationAssessment`, never from successful return alone. The assessment records

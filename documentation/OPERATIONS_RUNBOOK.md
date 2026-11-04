@@ -240,6 +240,15 @@ The exact Congress 94 S.12 retry passed, reaching 1,496 candidates with zero
 serving writes. This is staging-only recovery, not a production client retry
 policy change or proof of historical completeness.
 
+The run later preserved 2,068 complete candidates before a full-text server
+disconnect. Bill/amendment full-text retrieval now raises typed
+`FullTextDownloadError`, retaining the original request exception as its cause.
+Both normal job classification and isolated staging recognize only that typed
+network boundary; 404/permanent failures, missing causes and unrelated runtime
+errors do not gain retries. Staging retains the same three-attempt/six-extra-
+retry caps, cooldowns and resource checks. Preserve the 2,068-candidate snapshot
+and failed checkpoint before resuming the exact bill.
+
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
 off-host disaster recovery. Keep these limitations visible rather than converting

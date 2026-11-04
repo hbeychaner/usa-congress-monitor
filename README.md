@@ -71,7 +71,10 @@ The [local readiness gates](documentation/IMPLEMENTATION_PLAN.md#local-readiness
 remain in progress; isolated retrieval candidates are not repaired serving rows.
 The isolated backfill's checkpoint distinguishes `retrying` from `failed`;
 bounded network recovery preserves candidates without weakening count checks.
-This staging experiment does not change application job/client retry policy.
+This staging experiment does not increase application job/client retry limits.
+Full-text download failures now retain a typed network boundary and original
+request cause, so existing bounded retries recognize transient disconnects
+without retrying permanent HTTP or parsing failures.
 
 ## Documentation
 

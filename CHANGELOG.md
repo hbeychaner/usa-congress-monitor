@@ -4,6 +4,11 @@
 
 ### Added
 
+- Typed bill/amendment full-text download failures retain their original network
+  cause for shared retry classification and isolated backfill recovery.
+  Connection/timeouts and HTTP429/5xx remain transient; permanent HTTP failures,
+  parsing failures and untyped runtime errors do not gain retries. Existing
+  attempt, cooldown and staging process budgets are unchanged.
 - Bounded network recovery for the isolated local-readiness acquisition
   experiment: three full-item attempts with 30/60-second cooldowns and six
   extra network retries per process, using the existing failure classifier.

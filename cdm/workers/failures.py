@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import requests
 
+from cdm.contracts.hydration import FullTextDownloadError
 from cdm.ingest.govinfo import GovInfoDownloadError
 
 
@@ -57,6 +58,10 @@ class FailureClassifier:
     )
 
     def is_transient(self, exc: BaseException) -> bool:
+        if isinstance(exc, FullTextDownloadError):
+            return isinstance(
+                exc.__cause__, requests.RequestException
+            ) and self.is_transient(exc.__cause__)
         # Download failures wrap the network cause; classify by the cause.
         if isinstance(exc, GovInfoDownloadError) and isinstance(
             exc.__cause__, Exception
