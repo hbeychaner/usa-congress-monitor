@@ -68,10 +68,13 @@ To load data, follow the [ingestion guide](documentation/guides/ingestion.md)
 and review the [worker profiles and capacity requirements](documentation/guides/configuration-and-deployment.md#managed-stack-compose)
 before enabling acquisition. Submitting a job alone does not start its worker.
 Begin with a bounded scope rather than a full-history backfill.
+If you already have retained downloads, check which records are indexed first
+and reuse local data for missing records before downloading them again.
 
 Data availability varies by source and scope. Bill pages distinguish unknown,
 partial and complete detail-retrieval evidence; missing text or analysis does
 not necessarily mean the bill itself is missing.
+Missing completeness evidence alone is not a reason to re-ingest a record.
 Complete detail retrieval does not guarantee full-text availability.
 Collection counts or links alone do not prove detail completeness.
 Completeness describes an individual bill, not whether a whole Congress has

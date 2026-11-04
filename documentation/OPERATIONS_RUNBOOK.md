@@ -410,7 +410,24 @@ Its derived remaining roster contains 5,163 identities, not a fresh census.
 The one-record exclusive smoke for `bill:94:hjres:181` passes independent archive,
 model and nine-collection checks and restores the consumer. All 500 new serving
 originals remain unchanged and disjoint from the 1,000 prior chunk repairs.
-The remaining 499 are ready for supervised acquisition under unchanged guards.
+This proof-driven continuation was superseded by the user's existence-first
+criterion. Its acquisition was deliberately interrupted at 459 archived bills;
+SQLite integrity is `ok`, the original consumer is restored and broker-verified,
+the owned helper is removed and no serving writes occurred. Preserve the staged
+data; do not automatically resume or promote it. The execution receipt's failed
+state records intentional interruption, not OOM or a completed acquisition.
+
+The replacement read-only reconciliation scanned 344,672 serving root documents,
+24 physical user indices, 176 central archives and 59 bill-list caches. Of the
+64,426 captured identities, 37,732 already exist in serving and must be skipped.
+The remaining 26,694 are absent from indexed document/source IDs but have local
+list metadata: 16,979 in Congress 94 and 9,715 in Congress 95; Congress 117 has no
+identity gap. All 32,378 scoped archived bill identities are already indexed.
+The GovInfo XML downloads are for Congress 119, not these gaps. Evidence is under
+`data/local-readiness-presence-20261104/`; no upstream requests or serving writes
+were made. Prepare local-only replay of missing identities, separately deciding
+metadata versus full-detail output. Proof-only backlog counts are not ingestion
+requirements.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
@@ -931,6 +948,12 @@ This does not make a multi-item bulk atomic: successful items remain written,
 and replay converges without treating that partial success as batch completion.
 
 ### Manual Serving Repair Safety
+
+For presence-based historical recovery, first follow
+[existence-first reconciliation](guides/ingestion.md#reconcile-existing-data-before-historical-acquisition).
+Missing modern completeness evidence alone does not authorize re-downloading or
+repairing an existing bill. The procedure below is for separately approved
+changes to existing fields, not routine replay of already indexed identities.
 
 Ordinary bill `bulk_upsert` uses additive merging with conflict retries; it is
 not a version-conditional repair boundary. Never replay a staged candidate over

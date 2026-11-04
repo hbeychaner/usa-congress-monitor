@@ -4,6 +4,16 @@
 
 ### Added
 
+- Reconciled historical recovery by actual Elasticsearch presence rather than
+  missing modern completeness proof. Across the 64,426 captured identities,
+  37,732 already have serving documents; the other 26,694 have retained local
+  list records but no matching document in any of the 24 physical user indices.
+  All 32,378 scoped identities in 176 central bill archives are already indexed.
+  Stopped the redundant third existing-record acquisition at 459 archived bills,
+  verified archive integrity, restored the original consumer and retained all
+  evidence without serving writes. Further acquisition/promotion is paused;
+  prepare local-only replay for genuinely missing identities, distinguishing
+  list metadata from full detail and preserving existing documents.
 - Completed the second 500-record Congress 94 recovery chunk through independent
   archive audit, guarded shadow rehearsal, conditional serving repair, all 500
   actual API checks and owned-shadow retirement. The remaining acquisition used
@@ -63,7 +73,8 @@
   their owning documentation; cloud setup commands now live in the deployment
   guide rather than the introductory README.
 - Captured and independently reconciled all 64,426 canonical bill identities
-  for the three original failed scopes: 26,694 are missing and 35,573 existing
+  for the three original failed scopes: 26,694 were absent from the captured
+  serving inventory and 35,573 existing
   rows lack valid versioned completeness proof. Sealed the next 500 existing
   Congress 94 originals and separate upstream acquisition metadata without
   serving writes or failed-job relabeling. Five focused recovery-helper cases

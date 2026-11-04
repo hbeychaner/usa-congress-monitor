@@ -19,6 +19,48 @@ The [ingest](../reference/symbols/ingest.md),
 [job](../reference/symbols/jobs.md) symbol indexes provide declaration-level
 navigation alongside this operational guide.
 
+## Reconcile existing data before historical acquisition
+
+Historical gap filling starts with indexed identity presence, not the age or
+absence of a newer hydration assessment. An existing bill can contain useful
+data without certified collection completeness. Do not re-download or replay
+that bill merely to replace an unknown assessment with a complete one.
+Explicit field enrichment and freshness work are separate, bounded operations.
+
+1. Establish the intended cluster, physical indices and read/write aliases.
+   Compare canonical bill identities across serving and relevant legacy
+   representations, not just document counts or one source-type filter.
+   Normalize archive introduced-date suffixes using the normal indexer's
+   four-part bill identity; keep original payloads and variants intact.
+   An amendment or committee report with a bill-like identifier is not the
+   corresponding bill document.
+2. Leave already indexed identities alone for presence-based gap filling.
+   Preserve richer GovInfo data, source history and analysis/publication state.
+   A failed historical job is evidence about that job, not proof that each of
+   its records is missing.
+3. For genuinely missing identities, inspect retained archives, list caches and
+   GovInfo downloads before making upstream requests. Central job archives and
+   the record library use `records.sqlite3`; discovery caches use
+   `bill/list_records.sqlite3`. Read them without mutation. Validate identities
+   against payload fields rather than trusting filenames alone.
+4. Distinguish archived bill payloads from list metadata. A cached title,
+   introduction date and latest action are reusable data, but do not imply that
+   summaries, relationships or full text were downloaded. Local metadata can
+   support a metadata-only projection, with unknown detail evidence retained;
+   decide the required output before calling that projection complete.
+5. Rehearse the normal projection for only the missing identities, validate
+   mapping/API behavior and preserve original local inputs. Recheck presence
+   before submission and use a create-only boundary that cannot overwrite a
+   document appearing since the inventory. Verify exact readback and skipped
+   existing identities separately. Ordinary additive upsert is not that
+   no-overwrite boundary.
+
+Only acquire upstream data that is required and absent from both Elasticsearch
+and usable local inputs. A list-only cache is not proof of full-detail
+availability, but neither is it a reason to download the same metadata again.
+See [manual serving repair safety](../OPERATIONS_RUNBOOK.md#manual-serving-repair-safety)
+for a separately approved repair of existing fields.
+
 ## Congress API: entry points and planning
 
 [`IngestRunner`](../../cdm/ingest/runner.py) fetches one resource.

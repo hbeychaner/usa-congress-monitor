@@ -36,7 +36,16 @@ Work proceeds in this order:
    passes; adding acquisition or analytics fails without starting services.
    This is a point-in-time safety check, not working-set/load certification.
    Additional analytics capacity still needs a measured local execution plan.
-2. **Frozen, bounded recovery before live indexing.** The three failed jobs
+2. **Existence-first, bounded historical recovery.** The user's clarified
+   criterion is actual Elasticsearch presence: do not re-ingest existing
+   datapoints merely because newer completeness proof is missing. Inventory
+   indexed identities and retained local payloads first; use local data for
+   genuine gaps before acquiring anything upstream. The proof-driven
+   existing-record acquisition history below is retained as provenance, not
+   authorization to continue that strategy. The latest reconciliation and
+   replacement next step follow the third-chunk history.
+
+   The three failed jobs
    remain failed: uncapped bill hydration for Congresses 94, 95 and 117, each
    configured with concurrency four. All thirteen bounded bill-list probes
    (91, 92, 93, 94, 95, 100-104, 107, 117, 119) were reachable; reachability and
@@ -369,17 +378,51 @@ Work proceeds in this order:
    zero overlap with the 1,000 identities repaired in the first two chunks.
    CI run `41840694166` for source `959d0a4` completed successfully.
 
-   Next: acquire the third chunk's remaining 499 under the same approved
-   exclusive execution policy, unchanged 1 GiB allocation, 256 MiB headroom
-   floor and 10,000-token process cap. Restore the normal consumer on completion
-   or failure; complete audit, preservation rehearsal and conditional repair
-   remain separate gates.
+   **2026-11-04 existence-first correction and read-only reconciliation:**
+   deliberately interrupted the third acquisition after **459/500** bills
+   were archived. The verified supervisor restored and broker-checked the
+   original operations consumer and removed its owned helper. Its failed
+   execution receipt records intentional signal 15, container exit 137 without
+   OOM and zero serving writes; it is not an acquisition success. SQLite
+   integrity is `ok`; preserve all 459 records and partial download caches.
+   No third-batch promotion or further proof-only acquisition is authorized.
 
-   Next: recover the three original job scopes and certify
-   discovery/hydration/indexing identities/counts for every
-   required history/resource scope. No bulk requeue or legacy relabel substitutes
-   for that evidence; neither the earlier 3,047-row repair nor this 500-row
-   repair closes all history gaps.
+   Scanned all **344,672 root serving documents**, inspected all **24 physical
+   user indices** and their aliases, reconciled **176 central archives** and
+   **59 bill-list caches**, and classified all 64,426 frozen source identities.
+   No serving or local bill identities were unresolvable.
+
+   | Congress | Captured source identities | Already in serving; skip | Missing from Elasticsearch, retained in list caches |
+   |---|---:|---:|---:|
+   | 94 | 24,285 | 7,306 | 16,979 |
+   | 95 | 22,313 | 12,598 | 9,715 |
+   | 117 | 17,828 | 17,828 | 0 |
+   | Total | 64,426 | 37,732 | 26,694 |
+
+   No missing identity matched a document ID or source ID in any of the
+   physical user indices. The other bill-prefixed hits are amendments and
+   committee reports, not the missing bills. All **32,378** scoped identities
+   in central bill archives already exist in serving; none supplies a missing
+   bill's full archived payload. The 49,207 downloaded GovInfo XML packages
+   belong to Congress 119, outside these three scopes.
+   All 26,694 gaps have local list metadata, not certified full-detail archives.
+   Reconciliation evidence is under
+   `data/local-readiness-presence-20261104/`; its 64,426-row JSONL SHA is
+   `24c5dd436e6b6f56f28603ac46a98b3f4f1abd6d236485f211966f842b77f6d1`.
+   The audit used no upstream requests or serving writes. Counts describe
+   these captured source scopes, not all history or field-level completeness.
+   The previously derived 61,267 proof/recovery total is **not a re-ingest
+   backlog**.
+
+   Next: prepare a bounded **local-only replay of genuinely missing identities**.
+   Resolve the intended metadata-versus-detail output, validate cached candidates
+   and rehearse normal projection/API behavior before serving admission.
+   Use create-only writes with current-presence checks so existing or concurrently
+   appearing documents are skipped, not merged or replaced. Keep unknown detail
+   evidence honest; do not require re-fetching all nine collections merely to
+   index retained metadata. Any additional detail/freshness acquisition needs its
+   own evidenced field-level gap. Failed-job outcomes, historical source
+   variants and all prior recovery receipts remain preserved.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus
    identities, source versions, model/configuration and content checksums before
    rebuilding collaboration/topics. Current topic publication is absent; the
