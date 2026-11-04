@@ -95,6 +95,8 @@ Do not start extra workers manually to bypass a capacity refusal.
 If the app reports API Not Ready, check service status and health first.
 For failed jobs, restarts or backups, use the
 [operations runbook](documentation/OPERATIONS_RUNBOOK.md).
+Health warnings about failed jobs describe ingestion history, not automated
+test failures. Repairing some bills does not clear a job for an entire scope.
 
 ## Learn more
 

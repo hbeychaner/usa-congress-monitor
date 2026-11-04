@@ -284,6 +284,47 @@ Work proceeds in this order:
    arbitrary rich GovInfo reconciliation, close an original failed scope or
    satisfy sustained ingest/index acceptance.
 
+   **2026-11-04 tests and next historical chunk verified:** the complete normal
+   Python suite passes **966 tests**, with 144 upstream/integration cases
+   intentionally gated. Frontend tests pass 67 cases plus strict contract types;
+   isolated browser fixtures pass 42 cases with two opt-in live-voting checks
+   skipped. CI run `41837406434` completed successfully, including the disposable
+   Elasticsearch/Redis pipeline and publication-failure checks. No existing
+   broken test was reproduced; do not confuse durable failed ingestion jobs or
+   an unfinished CI run with failing automated tests.
+
+   Continuation verifies the previous accepted plan, intents, acknowledgements,
+   final API cases and retirement receipt, then independently reads all 500
+   repaired sources/versions again. Removing those exact identities from the
+   sealed 6,163-ID baseline yields a **derived 5,663-ID unresolved roster**,
+   not a fresh global census. The first 500 remaining identities now have sealed
+   originals/versions and authoritative acquisition metadata in
+   `data/local-readiness-scope-recovery/congress-94-existing-0002/`.
+   The manifest SHA is
+   `18743231295bd848ce363c00946283a4e284b72fd137c4581de7674f4d69cabd`.
+   Its separately sealed selection provenance is retained in
+   `selection-congress-94-existing-0002/continuation-receipt.json`.
+   The unchanged chunk preparer checks every selected serving row against the
+   baseline source/version and rejects already-complete or concurrently changed
+   rows; it never silently skips drift or selects the repaired batch again.
+
+   One-record exclusive acquisition passed for `bill:94:hconres:55`, using ten
+   request tokens and zero extra network retries, without OOM or serving writes.
+   The original operations consumer was restored and broker-verified. Independent
+   SQLite integrity, stored-name model validation and all nine collection counts
+   pass; every new batch serving source/version remains unchanged and both
+   batches are disjoint. API/frontend remain ready. Retain
+   `execution-smoke-20261104.json`, `acquisition-smoke-20261104.log` and
+   `smoke-verification.json`. Sixteen new continuation cases plus ten existing
+   acquisition/supervisor cases pass, with clean Ruff/Pyright. They cover source,
+   version and proof drift, manifest changes, ambiguous intents, duplicate API
+   identities, reappearing shadows and invalid remaining rosters.
+
+   Next: acquire the remaining 499 under the approved exclusive execution policy,
+   unchanged 1 GiB allocation, 256 MiB headroom floor and 10,000-token process cap.
+   Audit the complete new archive before any merge rehearsal or conditional
+   serving repair. The normal consumer must be restored on completion or failure.
+
    Next: recover the three original job scopes and certify
    discovery/hydration/indexing identities/counts for every
    required history/resource scope. No bulk requeue or legacy relabel substitutes

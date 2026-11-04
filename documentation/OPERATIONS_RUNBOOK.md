@@ -352,6 +352,35 @@ The acquisition checkpoint remains staging-only; separate repair receipts prove
 the 500 serving changes. Default application merging is unchanged, and this
 bounded repair does not close an original failed scope or certify all history.
 
+**2026-11-04 continuation test gate passed:** the complete normal Python suite
+passes 966 cases, with 144 upstream/integration cases intentionally gated.
+Frontend tests pass 67 cases; isolated browser fixtures pass 42 with two opt-in
+live-voting checks skipped. CI run `41837406434` succeeds, including isolated
+pipeline/publication failure checks. No failing repository test was reproduced.
+Failed durable ingestion rows are operational evidence, not automated test
+failures.
+
+The next 500-record batch is sealed in
+`data/local-readiness-scope-recovery/congress-94-existing-0002/`. Its manifest SHA
+is `18743231295bd848ce363c00946283a4e284b72fd137c4581de7674f4d69cabd`.
+Selection first verifies the previous repair/API/retirement seals and reads back
+all 500 acknowledged source versions, then excludes exactly those identities.
+The derived remaining Congress 94 roster has 5,663 identities; this is not a
+fresh global census. Every newly selected row must still match its original
+source/version and lack complete proof. The batch is disjoint from its
+predecessor.
+
+The new one-record exclusive smoke stages `bill:94:hconres:55` with ten request
+tokens, zero extra network retries, no OOM and no serving writes. The original
+consumer is restored and broker-verified. Independent SQLite integrity,
+stored-name model and nine-collection count checks pass; all 500 serving
+originals/versions remain unchanged. Keep the execution receipt, acquisition log
+and `smoke-verification.json`, plus
+`selection-congress-94-existing-0002/continuation-receipt.json`. Twenty-six
+continuation/acquisition/supervisor tests and lint/types pass. The remaining 499
+are ready for the same supervised acquisition; complete audit, shadow validation
+and conditional repair are separate later gates.
+
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
 off-host disaster recovery. Keep these limitations visible rather than converting

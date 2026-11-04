@@ -4,6 +4,15 @@
 
 ### Added
 
+- Rechecked reported test failures before continuing historical recovery:
+  the normal Python suite passes 966 cases with 144 intentionally gated
+  integration cases, frontend tests pass 67 cases, browser fixtures pass 42
+  cases with two opt-in live checks skipped, and CI's isolated recovery checks
+  pass. No failing repository test was reproduced. Sealed the next 500
+  unresolved Congress 94 identities only after re-verifying the previous 500
+  acknowledged repairs; a one-record exclusive acquisition smoke passed with
+  all new serving originals unchanged. Twenty-six continuation/acquisition
+  guards pass. Acquisition remains separate from serving repair.
 - Completed the first 500-record Congress 94 guarded serving repair: sealed
   candidates, frozen-version conditional writes, fsynced intent/acknowledgement
   journals and exact source/version readback. The live canary and all 500
