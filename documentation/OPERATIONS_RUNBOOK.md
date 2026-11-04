@@ -429,6 +429,27 @@ were made. Prepare local-only replay of missing identities, separately deciding
 metadata versus full-detail output. Proof-only backlog counts are not ingestion
 requirements.
 
+**Local-only replay is now complete:** 26,694 metadata projections passed an
+owned unaliased shadow, including a real richer-source conflict-preservation
+probe. A live API canary preceded the remaining creates. Every live source and
+acknowledged version matches its projection, all 37,732 pre-existing versions
+remain unchanged, and a fresh comparison finds all 64,426 captured identities
+present: 24,285 in Congress 94, 22,313 in Congress 95 and 17,828 in Congress 117.
+Twenty final API cases pass with honest unknown detail evidence. No upstream
+requests, new workers, additional Docker allocation, source requeues or changes
+to serving mappings/aliases and protected analysis were required.
+
+Retain `data/local-readiness-local-replay-20261104/`, including its sealed
+ten-group plan, source projections, original versions, fsynced create intents and
+acknowledgements, shadow/API acceptance, `complete.json` and `retired.json`.
+The final receipt SHA is
+`e417addf0e14b7633b2c9cca470263a8b0612a262e519759255d348b518fa141`.
+The exact owned shadow was retired after full live readback. Offline projection
+took 55.75 seconds and the bulk continuation 7.38 seconds; these local timings
+are not the outstanding sustained-operation acceptance. Missing full details
+and text are not certified complete, and original failed hydration jobs remain
+historical failures rather than being relabeled by metadata replay.
+
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
 off-host disaster recovery. Keep these limitations visible rather than converting

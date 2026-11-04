@@ -4,6 +4,15 @@
 
 ### Added
 
+- Completed local-only replay of all 26,694 missing captured bill identities:
+  16,979 from Congress 94 and 9,715 from Congress 95. All were atomically created
+  from retained list metadata without upstream requests. Exact sources/versions
+  passed readback, all 37,732 pre-existing versions stayed unchanged, and all
+  64,426 captured identities are now present. A real API canary preceded bulk
+  continuation; twenty final API cases passed. The owned shadow was retired.
+  Detail evidence remains unknown rather than being falsely certified complete;
+  original failed acquisition jobs, mappings/aliases and protected analysis
+  state are unchanged. Twenty-nine writer/controller regressions pass.
 - Added a typed, atomic create-only bill writer for controlled local replay.
   It pins the cluster, physical index UUID and alias bindings; validates source
   identities; disables transport retries; verifies exact created sources and

@@ -414,7 +414,8 @@ Work proceeds in this order:
    The previously derived 61,267 proof/recovery total is **not a re-ingest
    backlog**.
 
-   Next: prepare a bounded **local-only replay of genuinely missing identities**.
+   The approved execution contract was a bounded
+   **local-only replay of genuinely missing identities**.
    Resolve the intended metadata-versus-detail output, validate cached candidates
    and rehearse normal projection/API behavior before serving admission.
    Use create-only writes with current-presence checks so existing or concurrently
@@ -431,8 +432,50 @@ Work proceeds in this order:
    The approved execution groups are Congress 94/95 crossed with `hr`, `s`,
    `sconres`, `sjres` and `sres`; exact missing-ID manifests, not date-only jobs,
    determine membership. Normal ingestion and worker routing are unchanged.
-   Projection/shadow rehearsal, API canary and live identity closure remain
-   required before claiming that any of the 26,694 gaps is recovered.
+   Projection/shadow rehearsal, API canary and live identity closure are the
+   required gates; their completed execution follows.
+
+   **2026-11-04 local metadata identity gaps closed:** all **26,694** candidates
+   passed real projection, an owned unaliased shadow and exact readback.
+   A deliberately richer shadow record survived repeated create conflicts
+   unchanged. A live API canary for `bill:94:hr:2655` passed before the remaining
+   26,693 creates. All 26,694 live creates are acknowledged, with exact
+   projected sources and returned versions verified. No record was upserted or
+   replaced; all **37,732** original sequence/primary terms remain unchanged.
+
+   | Congress | Captured source identities now present | Newly created |
+   |---|---:|---:|
+   | 94 | 24,285 | 16,979 |
+   | 95 | 22,313 | 9,715 |
+   | 117 | 17,828 | 0 |
+   | Total | 64,426 | 26,694 |
+
+   A fresh identity comparison has **zero missing captured identities**.
+   Twenty real API checks cover the first/last replayed identity in every
+   Congress/type group, with unknown hydration evidence retained honestly.
+   No Congress.gov/GovInfo request, new worker, expanded allocation or source
+   requeue was needed. Offline projection took 55.75 seconds, shadow rehearsal
+   10.44 seconds, bulk continuation 7.38 seconds and final verification
+   8.41 seconds on this host; these are bounded execution timings, not sustained
+   throughput or release acceptance. Twenty-three writer and six controller
+   regressions, focused API-import/documentation tests, Ruff and Pyright pass.
+
+   Sealed inputs, projections, groups, before-versions, intents/acknowledgements
+   and API/retirement receipts remain under
+   `data/local-readiness-local-replay-20261104/`. Plan SHA is
+   `46f4a2d83c9f3a1e95f175b8d41fdac246594541a80ba4b85aced64f98ac43b1`;
+   final receipt SHA is
+   `e417addf0e14b7633b2c9cca470263a8b0612a262e519759255d348b518fa141`.
+   Only the exact owned shadow was retired after final readback.
+   Serving mappings/aliases, existing richer content, protected analysis and
+   the three original failed acquisition-job outcomes remain unchanged.
+
+   This closes **identity presence in the three captured scopes**, not full
+   detail/text retrieval, freshness, all-history/resource coverage or the
+   sustained-operation gates. Retained metadata is not evidence that missing
+   relationships/summaries/text were downloaded. Further acquisition must target
+   specifically required fields absent from usable local/indexed data, not all
+   existing records lacking modern completeness proof.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus
    identities, source versions, model/configuration and content checksums before
    rebuilding collaboration/topics. Current topic publication is absent; the
