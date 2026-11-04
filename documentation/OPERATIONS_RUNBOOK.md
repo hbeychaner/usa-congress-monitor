@@ -298,10 +298,21 @@ consumer was restored automatically and responded through the broker; the app
 remained available. `execution-smoke-20261104.json`, `acquisition-smoke-20261104.log`
 and `smoke-verification.json` retain the actual outcome. Five supervisor tests
 also cover failure/interruption restoration, false-success rejection and log
-transport failure. Resume the remaining acquisition in the same exclusive window,
-not beside the restored consumer. Acquisition alone cannot authorize promotion:
-rich GovInfo sources require preservation/conflict review and conditional version
-checks before any serving write.
+transport failure.
+
+The full exclusive run subsequently completed **500/500** candidates, retrieving
+the remaining 499 with 5,036 request tokens and no extra item-level network retries.
+It exited without OOM and restored the original consumer automatically, with a
+verified broker response. Independent archive integrity, exact-identity,
+stored-name model and all nine collection-count checks passed for every record.
+All 500 serving sources/versions remain unchanged; the app is responsive.
+Keep `execution-acquisition-20261104.json`, `audit-receipt.json`,
+`audit-manifest.jsonl` and `acquisition-preservation.json` beside the sealed
+archive. None of these candidates has nonblank full text; never erase retained
+GovInfo text because the staged Congress API representation lacks it.
+Next, review production projection/merge preservation and conflicts in an owned
+shadow target before conditional repair. Acquisition alone cannot authorize
+promotion or close an original failed scope.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove

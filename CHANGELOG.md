@@ -4,6 +4,14 @@
 
 ### Added
 
+- Completed and independently audited the first 500-record Congress 94 recovery
+  chunk: exact identities, archive integrity, model validation and all nine
+  collection counts passed. All serving originals/versions remain unchanged.
+  The exclusive acquisition process exited without OOM and automatically
+  restored the operations consumer. No serving promotion or failed-scope closure
+  is implied; preservation-aware shadow validation remains next. Candidates
+  contain no nonblank full text, which does not authorize removal of retained
+  GovInfo content.
 - Validated an explicitly approved exclusive acquisition window within the
   existing 1 GiB operations allocation: pause the idle consumer, run sealed
   staging alone, then restore and verify the original consumer. One live bill

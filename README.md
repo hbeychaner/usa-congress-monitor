@@ -71,6 +71,7 @@ Begin with a bounded scope rather than a full-history backfill.
 Data availability varies by source and scope. Bill pages distinguish unknown,
 partial and complete detail-retrieval evidence; missing text or analysis does
 not necessarily mean the bill itself is missing.
+Complete detail retrieval does not guarantee full-text availability.
 
 ## Everyday commands
 

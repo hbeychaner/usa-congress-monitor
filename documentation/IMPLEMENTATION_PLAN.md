@@ -201,12 +201,26 @@ Work proceeds in this order:
    Retained execution receipts, acquisition log and `smoke-verification.json`
    accompany the sealed batch. API/frontend remain available.
 
-   Next, resume the bounded 500-record acquisition using the same exclusive
-   execution and checkpoint; the consumer remains paused only during acquisition.
-   A completed acquisition still requires an independent archive audit and
-   preservation/conflict checks before any conditional serving repair. Additive
-   merges are not assumed safe for these rich existing sources. This isolated
-   staging experiment is not the sustained ingest/index acceptance run.
+   **2026-11-04 first scope chunk completed and audited:** all **500/500**
+   Congress 94 candidates are staged. The final process retrieved the remaining
+   499 with 5,036 request tokens and zero extra item-level network retries,
+   exiting successfully without OOM. The original consumer was automatically
+   restored and broker-verified. Archive SHA is
+   `63c4ce4faa260c4e4e0c1c71a5868d2835264d9ec1a1759d46327d8757f52fb2`;
+   independent integrity, exact-identity, stored-name model and nine-collection
+   count checks passed for all 500. The audit manifest SHA is
+   `9c378ab2f3951bbd55fc3b07704a50db46e0a978153193add1914c114dad00a6`.
+   All 500 serving sources/versions were independently read back unchanged.
+   No candidate contains nonblank full text; complete detail evidence does not
+   certify text availability or authorize removal of existing GovInfo content.
+
+   Retain `execution-acquisition-20261104.json`, `audit-receipt.json`,
+   `audit-manifest.jsonl` and `acquisition-preservation.json` beside the sealed
+   archive. Next: preservation-aware production projection/merge comparison and
+   owned-shadow conflict/rollback validation before conditional serving repair.
+   Additive merges are not assumed safe for these rich existing sources.
+   This staged acquisition is not live repair, complete failed-scope recovery
+   or the sustained ingest/index acceptance run.
 
    Next: recover the three original job scopes and certify
    discovery/hydration/indexing identities/counts for every
