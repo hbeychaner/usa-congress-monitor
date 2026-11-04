@@ -25,7 +25,10 @@ Historical gap filling starts with indexed identity presence, not the age or
 absence of a newer hydration assessment. An existing bill can contain useful
 data without certified collection completeness. Do not re-download or replay
 that bill merely to replace an unknown assessment with a complete one.
-Explicit field enrichment and freshness work are separate, bounded operations.
+Full detail and full text wherever available remain required. Identity presence
+is only the first gate, not permission to skip missing content in an existing
+document. Field enrichment and freshness are separate, bounded phases of the same
+coverage goal.
 
 1. Establish the intended cluster, physical indices and read/write aliases.
    Compare canonical bill identities across serving and relevant legacy
@@ -77,6 +80,51 @@ separate, explicitly approved operation; existing workers need not be expanded
 or source acquisition enabled.
 See [manual serving repair safety](../OPERATIONS_RUNBOOK.md#manual-serving-repair-safety)
 for a separately approved repair of existing fields.
+
+### Full-detail and full-text coverage
+
+Compare actual indexed fields with retained item/detail/text payloads before
+planning additional acquisition. An archived identity already being indexed does
+not prove that every archived field was incorporated. Conversely, an absent
+modern assessment does not prove that the content is missing.
+
+For each bill and required collection/text version:
+
+1. Reuse content already indexed. Inspect nonblank stored `full_text`, actual
+   expanded records and text-version formats/URLs, not only lemma existence,
+   nested-row totals or legacy `hydration_status` labels.
+2. Compare retained central archives, record-library variants and staged recovery
+   archives against those fields. Preserve richer indexed values and flag
+   conflicting variants for semantic reconciliation; exact-value differences
+   alone are not authorization to overwrite.
+3. Acquire only available content absent from both indexed and usable local
+   inputs. Prefer supported official bulk sources before per-item API calls.
+   Scope work by exact missing fields/versions rather than re-fetching all nine
+   collections for every existing identity.
+4. Track indexed, locally reusable, available upstream, explicitly unavailable,
+   unassessed and failed acquisition/validation separately. An empty array,
+   unresolved count/URL descriptor, reserved bill number or unsupported download
+   format is not interchangeable with a verified successful empty collection.
+5. Rehearse preservation-aware enrichment and use frozen-version conditional
+   writes with exact source/API readback. The create-only writer cannot enrich
+   existing records. Retain the original failed-job history.
+
+Availability is source- and format-specific.
+[GovInfo's published bill-text collection](https://www.govinfo.gov/help/bills)
+covers the 103rd Congress onward, but the currently listed
+[BILLS bulk XML](https://www.govinfo.gov/bulkdata/json/BILLS/) starts at the 113th,
+[BILLSTATUS bulk XML](https://www.govinfo.gov/bulkdata/json/BILLSTATUS/) at the 108th,
+and [BILLSUM bulk XML](https://www.govinfo.gov/bulkdata/json/BILLSUM/) at the 113th.
+Recheck discovery rather than extrapolating one collection's range to another.
+
+Older bill records can still link to Public Law or Private Law PDFs in the
+Statutes at Large. Those are available enacted-law references, not proof that
+earlier bill drafts exist online. The current Congress API
+[`Bill.add_full_text`](../../cdm/models/bills.py) path only retrieves
+`Formatted Text`; PDF-only references are not extracted by that method.
+Keep the law/bill-version distinction and source provenance when assessing or
+adding another retrieval path. Neither a collection start date nor an unsupported
+format establishes that text is unavailable everywhere.
 
 ## Congress API: entry points and planning
 

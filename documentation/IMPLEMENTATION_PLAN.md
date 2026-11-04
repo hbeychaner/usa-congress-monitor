@@ -36,11 +36,13 @@ Work proceeds in this order:
    passes; adding acquisition or analytics fails without starting services.
    This is a point-in-time safety check, not working-set/load certification.
    Additional analytics capacity still needs a measured local execution plan.
-2. **Existence-first, bounded historical recovery.** The user's clarified
-   criterion is actual Elasticsearch presence: do not re-ingest existing
-   datapoints merely because newer completeness proof is missing. Inventory
-   indexed identities and retained local payloads first; use local data for
-   genuine gaps before acquiring anything upstream. The proof-driven
+2. **Content-aware, bounded historical recovery.** The required outcome is full
+   detail and full text wherever available, not only Elasticsearch identity
+   presence. Do not re-ingest content already indexed merely because newer
+   completeness proof is missing; do enrich existing records when specific
+   available content is absent. Inventory actual indexed fields and retained
+   local payloads first; reuse local content before acquiring anything upstream.
+   Keep unavailable, unassessed and failed content distinct. The proof-driven
    existing-record acquisition history below is retained as provenance, not
    authorization to continue that strategy. The latest reconciliation and
    replacement next step follow the third-chunk history.
@@ -476,6 +478,52 @@ Work proceeds in this order:
    relationships/summaries/text were downloaded. Further acquisition must target
    specifically required fields absent from usable local/indexed data, not all
    existing records lacking modern completeness proof.
+
+   **2026-11-04 full-content acceptance clarified; still open:** a read-only
+   actual-source audit, rather than a lemma-field proxy, found nonblank
+   `full_text` on **0/24,285** Congress 94 bills, **0/22,313** Congress 95 bills
+   and **17,817/17,828** Congress 117 bills. The eleven textless Congress 117
+   records are titled as numbers reserved for the Speaker or Minority Leader,
+   with empty stored text-version arrays; this is not eleven proven failed text
+   downloads. This check does not certify every published text version.
+
+   Actual collection-shape inspection found **5,058**, **11,432** and **14,241**
+   unresolved committee count/URL objects in Congresses 94, 95 and 117
+   respectively, even where legacy root labels say complete. All newly replayed
+   metadata records still lack the expanded actions/summaries/titles being
+   audited. Nonempty lists are content indicators, not independent collection
+   completeness proof.
+
+   The older scopes contain **223** and **422** records with nonempty
+   text-version arrays. All **645** were inspected: their references are
+   Public/Private Law Statutes at Large PDFs, not earlier bill drafts.
+   The current Congress API full-text method
+   supports `Formatted Text`, not PDF extraction. Official discovery confirms
+   BILLSTATUS bulk XML starts at Congress 108 and BILLS/BILLSUM bulk XML at
+   Congress 113; the published bill-text collection separately covers Congress
+   103 onward. These ranges cannot justify declaring all older text unavailable.
+   New read-only coverage evidence is kept separately under
+   `data/local-readiness-content-coverage-20261104/`, without modifying the
+   sealed identity replay or acquiring Congress API data.
+
+   A point-in-time comparison of all **64,426** serving bills against **180**
+   read-only central/staged archives inspected **68,374** scoped archive rows,
+   **35,996** distinct selected-field payloads and **34,537** archived identities.
+   It found **459** locally expanded committee collections where serving still
+   contains only a count/URL pointer, reusing the deliberately interrupted third
+   acquisition. It found **no additional nonblank local full text** absent from
+   serving. Exact-value/list-item comparisons also flag subjects, summaries and
+   amendments for semantic review; model/index discriminators and source
+   variants are not automatically missing content or safe overwrite candidates.
+   Nine focused comparison assertions pass without UserWarnings.
+
+   Next validate and rehearse those **459** local committee expansions before
+   conditional serving promotion, reconcile the other local variants, and
+   acquire only supported content still missing afterward. Existing-field
+   enrichment requires preservation-aware shadow/CAS validation, source/version
+   provenance and real readback, not another create-only replay.
+   Full content, broader history/resources, freshness and sustained-operation
+   acceptance remain open.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus
    identities, source versions, model/configuration and content checksums before
    rebuilding collaboration/topics. Current topic publication is absent; the

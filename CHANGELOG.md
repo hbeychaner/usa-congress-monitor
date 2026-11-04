@@ -4,6 +4,17 @@
 
 ### Added
 
+- Clarified that historical identity recovery is a baseline, not completion:
+  full detail and full text wherever available remain required. Recovery now
+  distinguishes indexed content, reusable local content, upstream availability,
+  unassessed fields and failures; missing modern evidence alone is not a
+  download backlog. The ingestion guide separates published bill versions from
+  enacted-law PDFs and records the different official bulk coverage ranges.
+  A read-only field audit compared 64,426 serving bills with 180 local archives:
+  459 committee expansions from the interrupted acquisition are locally
+  recoverable, while no additional nonblank local full text is missing from
+  serving. All 645 older indexed text references are enacted-law PDFs.
+  No new acquisition or serving enrichment was performed by this audit.
 - Completed local-only replay of all 26,694 missing captured bill identities:
   16,979 from Congress 94 and 9,715 from Congress 95. All were atomically created
   from retained list metadata without upstream requests. Exact sources/versions

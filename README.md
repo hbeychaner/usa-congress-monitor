@@ -79,6 +79,8 @@ Controlled local replay uses create-only writes; ordinary ingestion still uses
 the merge behavior described in the ingestion guide.
 Replayed list metadata makes records available for browsing; it does not fetch
 missing summaries, relationships or full text.
+The coverage goal remains full detail and full text wherever available, including
+enrichment of existing records when specific content is missing.
 Complete detail retrieval does not guarantee full-text availability.
 Collection counts or links alone do not prove detail completeness.
 Completeness describes an individual bill, not whether a whole Congress has
