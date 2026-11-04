@@ -4,6 +4,13 @@
 
 ### Added
 
+- Validated an explicitly approved exclusive acquisition window within the
+  existing 1 GiB operations allocation: pause the idle consumer, run sealed
+  staging alone, then restore and verify the original consumer. One live bill
+  passed complete collection-count checks with all 500 serving originals and
+  versions unchanged. Five supervisor regressions cover failure/interruption,
+  false-success rejection and restoration despite log transport failure.
+  No new worker profile, extra memory, relaxed guard or serving repair is implied.
 - Reworked the root README as a newcomer guide: prerequisites, fresh-checkout
   setup, first use, data-loading expectations, safe everyday commands and
   focused documentation links. Technical details and recovery history stay in
@@ -14,8 +21,8 @@
   rows lack valid versioned completeness proof. Sealed the next 500 existing
   Congress 94 originals and separate upstream acquisition metadata without
   serving writes or failed-job relabeling. Five focused recovery-helper cases
-  passed; acquisition remains blocked by the required container memory reserve,
-  not silently admitted or described as a completed backfill.
+  passed; initial admission refused acquisition at the required container memory
+  reserve, without silently relaxing guards or claiming a completed backfill.
 - Completed the frozen 3,047-row local bill repair: archive identity/count/proof
   audit, isolated real-index merge validation, stale-version rejection and
   conditional rollback rehearsal, refreshed consumers, a one-record API canary

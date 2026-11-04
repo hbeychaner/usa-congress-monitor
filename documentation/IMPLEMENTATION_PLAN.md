@@ -184,12 +184,29 @@ Work proceeds in this order:
    Five focused helper regressions verify metadata routing, preservation,
    transient/permanent retry behavior, checksum rejection and resume-loss
    refusal. Production completeness/retry guards are reused unchanged, with a
-   tighter 10,000-request-token budget. Preflight found less than the required
-   256 MiB operations-container memory headroom; acquisition has not started.
-   Do not weaken the reserve or silently expand roles. After safe capacity
-   admission, acquisition, audit and preservation/conflict checks must precede
-   any conditional serving repair; additive merges are not assumed safe for
-   these rich existing sources.
+   tighter 10,000-request-token budget. Initial preflight found less than the
+   required 256 MiB operations-container memory headroom. The user explicitly
+   approved an exclusive execution window: pause only the idle index/maintenance
+   consumer and run acquisition alone in its existing 1 GiB allocation, then
+   restore that consumer. No roles, memory limits or safety guards are expanded.
+
+   **2026-11-04 exclusive execution smoke passed:** the exact existing image
+   retrieved `bill:94:hconres:1`, using ten shared-limit request tokens and no
+   network retries, then restored the original consumer and verified its broker
+   response. The process exited successfully without OOM. Independent readback
+   verified all 500 original serving sources and sequence/primary terms unchanged,
+   plus stored-name model validation and all nine collection counts for the staged
+   candidate. Five supervisor regressions cover successful/failing execution,
+   interruption cleanup, false-success rejection and log-failure restoration.
+   Retained execution receipts, acquisition log and `smoke-verification.json`
+   accompany the sealed batch. API/frontend remain available.
+
+   Next, resume the bounded 500-record acquisition using the same exclusive
+   execution and checkpoint; the consumer remains paused only during acquisition.
+   A completed acquisition still requires an independent archive audit and
+   preservation/conflict checks before any conditional serving repair. Additive
+   merges are not assumed safe for these rich existing sources. This isolated
+   staging experiment is not the sustained ingest/index acceptance run.
 
    Next: recover the three original job scopes and certify
    discovery/hydration/indexing identities/counts for every

@@ -286,12 +286,22 @@ full before-images/sequence terms and authoritative upstream acquisition
 metadata in `data/local-readiness-scope-recovery/congress-94-existing-0001/`.
 The original sources lack acquisition URLs; do not overwrite or invent fields
 to make them usable as metadata. The helper reuses the bounded serial staging
-runner and tightens its token cap to 10,000. Current memory preflight does not
-meet the 256 MiB container reserve, so acquisition has not started. Preserve
-the prepared batch and obtain measured safe capacity before running it; do not
-lower guards, add workers or requeue the original failures. Acquisition alone
-cannot authorize promotion: rich GovInfo sources require preservation/conflict
-review and conditional version checks before any serving write.
+runner and tightens its token cap to 10,000. Initial memory preflight could not
+retain the 256 MiB container reserve alongside the running consumer. The user
+approved temporarily exchanging only the idle operations consumer for acquisition
+in the same 1 GiB allocation, without adding roles or lowering guards.
+
+The one-record exclusive smoke passed with ten request tokens and no retries:
+`bill:94:hconres:1` has valid complete proof and independently reconciled collection
+counts. All 500 original serving sources/versions remain unchanged. The original
+consumer was restored automatically and responded through the broker; the app
+remained available. `execution-smoke-20261104.json`, `acquisition-smoke-20261104.log`
+and `smoke-verification.json` retain the actual outcome. Five supervisor tests
+also cover failure/interruption restoration, false-success rejection and log
+transport failure. Resume the remaining acquisition in the same exclusive window,
+not beside the restored consumer. Acquisition alone cannot authorize promotion:
+rich GovInfo sources require preservation/conflict review and conditional version
+checks before any serving write.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
@@ -299,6 +309,38 @@ off-host disaster recovery. Keep these limitations visible rather than convertin
 a smoke test or local restart into a production acceptance result.
 
 <!-- wiki:repository-only:end -->
+
+### Exclusive staging within existing capacity
+
+Declared stack capacity does not establish spare memory inside a running worker.
+For an explicitly approved external, staging-only recovery experiment, an idle
+operations consumer can temporarily yield its allocation to a bounded acquisition
+process. This is an operator procedure, not an additional default profile or a
+packaged application job.
+
+- Verify the exact consumer is responsive and has no active, reserved or scheduled
+  tasks. Obtain approval for the index/maintenance consumption gap; queued work
+  waits while existing-data reads remain available.
+- Seal acquisition identities, metadata, originals and implementation hashes
+  first. Pin the existing image and retain its original command, queues and
+  memory allocation. Check host capacity and disk before pausing the consumer.
+- Stop that consumer before starting the isolated process. Never overlap both
+  allocations, start dependencies implicitly or bypass request, memory, disk,
+  archive, completeness or identity guards.
+- Keep acquisition checkpoints separate from the durable application ledger.
+  Staged data must not change serving sources, failed jobs, aliases or analytics
+  pointers. Archive audit and preservation-aware conditional repair remain
+  separate gates.
+- On completion, failure or a handled interruption, stop the owned acquisition
+  container before restoring the original consumer. Retain logs and exit/OOM
+  evidence, and verify the restored consumer responds through the broker.
+- A host outage or unhandled process kill can prevent automatic cleanup. Inspect
+  both containers before manual recovery; confirm acquisition is stopped before
+  starting the operations consumer. Do not run normal stack startup concurrently
+  with an exclusive recovery window.
+
+This pause-and-stage procedure is not a continuous ingestion/indexing or
+high-availability acceptance result.
 
 Before requeueing exhausted jobs, create a timestamped ledger backup:
 
