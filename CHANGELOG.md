@@ -4,6 +4,15 @@
 
 ### Added
 
+- Completed the frozen 3,047-row local bill repair: archive identity/count/proof
+  audit, isolated real-index merge validation, stale-version rejection and
+  conditional rollback rehearsal, refreshed consumers, a one-record API canary
+  and version-conditional writes with fsynced intent/acknowledgement journals.
+  Every repaired source/version was read back; seventeen API cases across eleven
+  Congresses passed. Serving mappings/aliases and analysis state are unchanged.
+  Original failed jobs, broader history/freshness and soak/recovery gates remain
+  open. Daily-payload tests strictly validate serialized resource lists, resolving
+  three type diagnostics without casts or suppressions.
 - Typed bill/amendment full-text download failures retain their original network
   cause for shared retry classification and isolated backfill recovery.
   Connection/timeouts and HTTP429/5xx remain transient; permanent HTTP failures,

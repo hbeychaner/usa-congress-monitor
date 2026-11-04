@@ -2,6 +2,7 @@ from datetime import date
 
 import pytest
 import requests
+from pydantic import TypeAdapter
 
 from cdm.contracts.hydration import FullTextDownloadError
 from cdm.workers.failures import FailureClassifier
@@ -43,13 +44,16 @@ def test_recovery_only_targets_transient_error_messages():
     assert not _is_retryable_error("invalid model field")
 
 
-def test_daily_payload_uses_overlapping_incremental_resources():
+def test_daily_payload_uses_overlapping_incremental_resources() -> None:
     payload = DailyIngestPlanner().payload(date(2025, 6, 15)).to_json()
+    resources = TypeAdapter(list[str]).validate_python(
+        payload["resources"], strict=True
+    )
 
     assert payload["mode"] == "daily_incremental"
-    assert payload["resources"] == sorted(payload["resources"])
-    assert "bill" in payload["resources"]
-    assert "amendment" not in payload["resources"]
+    assert resources == sorted(resources)
+    assert "bill" in resources
+    assert "amendment" not in resources
     assert payload["from_date"] == "2025-06-13T00:00:00Z"
     assert payload["to_date"] == "2025-06-15T23:59:59Z"
     assert payload["congress"] == 119

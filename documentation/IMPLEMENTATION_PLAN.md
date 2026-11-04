@@ -1,6 +1,6 @@
 # Engineering improvement plan
 
-**Reviewed:** 2026-11-03
+**Reviewed:** 2026-11-04
 
 **Status:** core reliability/consolidation work and bounded R03 repair/voting
 publication are implemented; approved controlled Compose cutover and scoped
@@ -127,11 +127,36 @@ Work proceeds in this order:
    failures remain terminal. Existing attempt/cooldown/process budgets are
    unchanged. The 2,068-candidate archive is snapshotted before resumption.
 
-   Next: finish and verify this acquisition stage, account explicitly for every
-   unresolved identity, compare complete projections in a bounded shadow target,
-   verify retained/richer fields and conflicts, then apply receipted,
-   version-conditional changes. Only afterward recover the three original job
-   scopes and certify discovery/hydration/indexing identities/counts for every
+   **2026-11-04 completed frozen-set repair:** all **3,047/3,047** candidates
+   passed an independent archive hash/integrity/identity audit, stored-name model
+   validation and reconciliation of all nine collection counts. The sealed
+   archive SHA is
+   `90c27156e4fb49d8e002a9111d751dfca0a8dcbf908b90cca75340e7a4fb10ef`;
+   the audit manifest SHA is
+   `7de3cf2245aa609bc6d4e195fff34cc08eb13cf72d1118ba24ab9365c69e15ea`.
+   Only 780 records contain nonblank full text; detail completeness does not
+   imply universal text availability.
+
+   Every projection passed the real indexer's transformation and additive merge
+   in an owned unaliased shadow target, with exact source and collection-count
+   comparison. Its mapping matched serving without expansion. Stale conditional
+   writes were rejected; conditional rollback restored an exact before-image,
+   followed by verified reapplication. All original live source versions and
+   analysis-index tokens remained unchanged during rehearsal. API/operations
+   consumers were drained, refreshed and verified on their approved queues.
+
+   A one-record live API canary passed before the remaining 3,046 writes.
+   **3,047 writes are now acknowledged and read back with exact planned content
+   and returned versions.** Each write used the frozen sequence/primary term,
+   a fsynced intent before submission and a fsynced acknowledgement afterward;
+   ambiguous intents and concurrent changes block resumption. Originals,
+   projections and receipts remain under
+   `data/local-readiness-hydration-v3/repair-20261104/`. Seventeen real API cases
+   across eleven Congresses verified complete proof and collection/text output.
+   Serving aliases/mappings and protected analysis indices are unchanged.
+
+   Next: recover the three original job scopes and certify
+   discovery/hydration/indexing identities/counts for every
    required history/resource scope. No bulk requeue or legacy relabel substitutes
    for that evidence; the 3,047-row stage alone cannot close all history gaps.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus

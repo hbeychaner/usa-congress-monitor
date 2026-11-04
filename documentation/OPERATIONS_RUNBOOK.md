@@ -207,9 +207,9 @@ to bypass this result.
 An exact, checksummed before-image census covers all 3,047 unproven legislation
 rows. Bounded live retrieval exposed and fixed a shared member-name alias
 round-trip failure; all eleven representative identities then retrieved valid
-complete detail assessments. Twelve candidates have passed isolated acquisition
-staging under the actual operations-container limit. No serving rows or failed
-job statuses have changed. The stage is not a full-history/freshness certificate,
+complete detail assessments. Initially twelve candidates passed isolated
+acquisition staging under the actual operations-container limit, without serving
+writes or failed-job status changes. The stage is not a full-history/freshness certificate,
 and must pass projection comparison, preservation/conflict checks and conditional
 write/rollback gates before serving repair.
 The expanded stage stopped at 27 candidates on legitimate withdrawn/rejoined
@@ -248,6 +248,31 @@ network boundary; 404/permanent failures, missing causes and unrelated runtime
 errors do not gain retries. Staging retains the same three-attempt/six-extra-
 retry caps, cooldowns and resource checks. Preserve the 2,068-candidate snapshot
 and failed checkpoint before resuming the exact bill.
+
+**2026-11-04 frozen-set completion:** acquisition and the independent archive
+audit passed for all **3,047 identities**. All nine collection counts reconcile;
+780 records contain nonblank full text. Preserve `audit-receipt.json` and
+`audit-manifest.jsonl` beside the sealed archive. Detail proof is not a
+certificate of full text or all historical/current source coverage.
+
+The complete set then passed exact projection/merge and collection-count checks
+in an owned unaliased shadow index, including stale-CAS rejection and conditional
+rollback/reapplication. No implicit mapping expansion was needed. Drained
+API/operations consumers loaded the current evidence schema before promotion.
+A single-record API canary preceded the remaining repairs. All **3,047 serving
+writes** now have fsynced intents/acknowledgements and exact content/version
+readback. Seventeen real API cases across eleven Congresses passed. Original
+source images, sealed projections, topology, rehearsal, canary and final receipts
+are retained under `data/local-readiness-hydration-v3/repair-20261104/`.
+Serving aliases/mappings and analysis-index state are unchanged. The acquisition
+checkpoint still correctly reports zero serving writes: it records a separate
+phase; `apply-complete.json` records the later live repair.
+
+The three original Congress 94/95/117 failures remain failed, not requeued or
+relabeled by this repair. Their recorded errors are connection refusal, with
+10/10/9 attempts respectively. New three-request source probes reached every
+scope and reported 24,285/22,313/17,828 list rows. Those observations are not
+canonical identity reconciliation or complete scope coverage.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
@@ -734,6 +759,31 @@ caller uses the same boundary, so graph publication, Voteview counts, archive
 completion and reconciliation reporting cannot accidentally ignore rejection.
 This does not make a multi-item bulk atomic: successful items remain written,
 and replay converges without treating that partial success as batch completion.
+
+### Manual Serving Repair Safety
+
+Ordinary bill `bulk_upsert` uses additive merging with conflict retries; it is
+not a version-conditional repair boundary. Never replay a staged candidate over
+serving data with unconditional replacement.
+
+For an explicitly approved bounded repair, retain checksummed original sources
+and their sequence/primary terms, audit archive identities and versioned proof,
+then compare real projections in an owned unaliased shadow index. Confirm
+mapping compatibility, field preservation, stale-version rejection and
+conditional rollback before changing serving rows. Refresh drained consumers
+when the evidence schema has changed, then verify a live API canary.
+
+Apply only the accepted merged sources, conditional on their original versions.
+Persist and fsync an intent before submission and the exact returned
+acknowledgement afterward, including durable journal directory entries. Do not
+blindly retry an uncertain write. An intent without acknowledgement requires
+explicit reconciliation; any unexpected content/version or topology change
+stops repair. Before resumption, verify acknowledged rows against their recorded
+versions and untouched rows against their originals. Finish with exact readback
+and API checks, without changing unrelated aliases or publication state.
+Repair evidence is distinct from acquisition progress and job-ledger outcomes;
+neither repaired documents nor legacy hydration labels prove an entire upstream
+scope complete.
 
 ### Failure Boundaries Covered
 

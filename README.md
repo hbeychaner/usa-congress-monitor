@@ -68,7 +68,13 @@ Action retrieval reconciles source-row counts separately from distinct action
 bodies and retains anonymous duplicate multiplicities in source-only proof.
 Duplicates do not invent event identities or waive pagination/count checks.
 The [local readiness gates](documentation/IMPLEMENTATION_PLAN.md#local-readiness-follow-through)
-remain in progress; isolated retrieval candidates are not repaired serving rows.
+remain in progress. The frozen 3,047-row bill recovery is now audited and
+conditionally applied: exact shadow projection, stale-version rejection,
+rollback rehearsal and durable per-write receipts preceded full readback.
+Seventeen real API checks passed across eleven Congresses; richer existing
+fields, serving aliases and analysis state were preserved. This closes only the
+frozen repair set, not the three original failed scopes, full-history/current
+freshness, analytics publication or sustained-operation acceptance.
 The isolated backfill's checkpoint distinguishes `retrying` from `failed`;
 bounded network recovery preserves candidates without weakening count checks.
 This staging experiment does not increase application job/client retry limits.
