@@ -13,7 +13,7 @@ from pydantic import AnyHttpUrl, BaseModel, TypeAdapter
 
 from cdm.config.source_policy import SourceName
 from cdm.config.statute_text import StatuteTextSettings
-from cdm.ingest.statutes import StatuteLaw, StatuteLawKind
+from cdm.ingest.statutes import StatuteIdentity, StatuteLaw, StatuteLawKind
 from cdm.store.create_only import BillId, BillSourceIdentity
 from cdm.utils.json_types import JsonObject
 
@@ -45,14 +45,13 @@ class VerifiedStatuteText(BaseModel):
     bill_reference_verified: Literal[True]
 
 
-class StatuteProvenance(BaseModel):
+class LawTextProvenance(BaseModel):
     source: Literal[SourceName.STATUTE] = SourceName.STATUTE
     collection: Literal["STATUTE"] = "STATUTE"
     package_id: str
     url: str
     reference_url: str
     sha256: str
-    volume_sha256: str
     parser_version: str
     law_kind: StatuteLawKind
     congress: int
@@ -61,6 +60,17 @@ class StatuteProvenance(BaseModel):
     first_page: str
     source_volume: int
     approved_date: date
+
+
+class StatuteProvenance(LawTextProvenance):
+    volume_sha256: str
+
+
+class LawTextPayload(BaseModel):
+    bill_id: BillId
+    identity: StatuteIdentity
+    text: str
+    provenance: LawTextProvenance
 
 
 class StatuteTextEnricher:
@@ -72,6 +82,7 @@ class StatuteTextEnricher:
         self.settings = settings
         self.lemmatizer = lemmatizer
         self.pdf_pattern = re.compile(settings.pdf_pattern)
+        self.projector = LawTextProjector(lemmatizer)
 
     def build(self, before: JsonObject, text: VerifiedStatuteText) -> JsonObject:
         identity = BillSourceIdentity.model_validate(before)
@@ -115,22 +126,6 @@ class StatuteTextEnricher:
             for version in versions
         ):
             raise ValueError("Indexed law or PDF evidence changed")
-        old_text = before.get("full_text")
-        if old_text is not None and (not isinstance(old_text, str) or old_text.strip()):
-            raise ValueError("Existing nonblank or invalid full text must be preserved")
-        if before.get("full_text_lemma") not in (None, ""):
-            raise ValueError("Existing text lemma requires independent reconciliation")
-        code = (
-            f"{law.identity.kind.value}-law-"
-            f"{law.identity.congress}-{law.identity.number}"
-        )
-        if before.get("full_text_version_code") not in (None, "", code):
-            raise ValueError("Existing text-version evidence must be preserved")
-        if not law.text.strip():
-            raise ValueError("Verified law text is blank")
-        lemmas = self.lemmatizer([law.text])
-        if len(lemmas) != 1 or not lemmas[0].strip():
-            raise ValueError("Expected one nonblank indexed text lemma")
         provenance = StatuteProvenance(
             package_id=match["package_id"],
             url=str(law.source_url),
@@ -146,6 +141,50 @@ class StatuteTextEnricher:
             source_volume=law.source_volume,
             approved_date=law.approved_date,
         )
+        return self.projector.build(
+            before,
+            LawTextPayload(
+                bill_id=text.bill_id,
+                identity=law.identity,
+                text=law.text,
+                provenance=provenance,
+            ),
+        )
+
+
+class LawTextProjector:
+    def __init__(self, lemmatizer: Callable[[Sequence[str]], list[str]]) -> None:
+        self.lemmatizer = lemmatizer
+
+    def build(self, before: JsonObject, payload: LawTextPayload) -> JsonObject:
+        identity = BillSourceIdentity.model_validate(before)
+        law = payload.identity
+        provenance = payload.provenance
+        if (
+            identity.id != payload.bill_id
+            or identity.congress != law.congress
+            or provenance.law_kind is not law.kind
+            or provenance.congress != law.congress
+            or provenance.law_number != law.number
+        ):
+            raise ValueError(
+                "Publication payload and source identity/provenance differ"
+            )
+        old_text = before.get("full_text")
+        if old_text is not None and (not isinstance(old_text, str) or old_text.strip()):
+            raise ValueError("Existing nonblank or invalid full text must be preserved")
+        if before.get("full_text_lemma") not in (None, ""):
+            raise ValueError("Existing text lemma requires independent reconciliation")
+        code = f"{law.kind.value}-law-{law.congress}-{law.number}"
+        if before.get("full_text_version_code") not in (None, "", code):
+            raise ValueError("Existing text-version evidence must be preserved")
+        if before.get("full_text_version_rank") is not None:
+            raise ValueError("Existing ranked text evidence requires reconciliation")
+        if not payload.text.strip():
+            raise ValueError("Verified law text is blank")
+        lemmas = self.lemmatizer([payload.text])
+        if len(lemmas) != 1 or not lemmas[0].strip():
+            raise ValueError("Expected one nonblank indexed text lemma")
         after = deepcopy(before)
         raw_metadata = before.get("source_metadata")
         metadata = (
@@ -174,7 +213,7 @@ class StatuteTextEnricher:
             if value not in values:
                 values.append(value)
             after[field] = values
-        after["full_text"] = law.text
+        after["full_text"] = payload.text
         after["full_text_lemma"] = lemmas[0]
         after["full_text_version_code"] = code
         return after

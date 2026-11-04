@@ -237,6 +237,21 @@ GovInfo parent-text replacement above. Publication uses frozen-version condition
 writes and exact source/version/API checks, not additive upsert. Existing mapping
 fields suffice; extra component/volume hashes remain in stored source metadata.
 
+[`StatuteRecoveryEnricher`](../../cdm/ingest/statutes_recovery.py) uses the same
+[`LawTextProjector`](../../cdm/ingest/statute_text.py) for independently
+corroborated MODS/XML/PDF/OCR evidence. It may also add missing `laws` and
+`text_versions` entries after matching the official primary bill, preserving
+existing entries and rejecting contradictory law evidence. It does not set a
+draft rank, fabricate completeness evidence or recompute analysis. A partial
+facsimile is represented by `coverage: "partial"` on its PDF format; the
+bill-detail API preserves this attribute and the UI labels the link accordingly.
+Additional recovery fields in `source_metadata` retain source-only proof:
+metadata hashes, XML differences, text extraction method, independent citation
+witness and OCR image/program hashes. They do not require new searchable fields
+or a mapping change (`source_metadata` is `dynamic: false`). The text and its
+lemma use the existing indexed parent fields, so ordinary search can use the
+recovered content without separate law documents or child-text indexing.
+
 ## Validation and index lifecycle
 
 [`audit_document()`](../../cdm/store/mapping_validation.py) reports top-level

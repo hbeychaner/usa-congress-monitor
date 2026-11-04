@@ -9,3 +9,8 @@ export function billTextHeading(version: string | null | undefined): string {
     if (law) return `Enacted ${law[1]} law text (${law[2]}-${law[3]})`;
     return `Full text${version ? ` (version ${version.toUpperCase()})` : ''}`;
 }
+
+export function billTextFormatLabel(format: Readonly<Record<string, unknown>>): string {
+    const label = String(format.type ?? 'Link');
+    return format.coverage === 'partial' ? `${label} (partial facsimile)` : label;
+}

@@ -84,6 +84,9 @@ enrichment of existing records when specific content is missing.
 On a bill's Text tab, "Enacted public law text" or "Enacted private law text"
 identifies verified law text, not an earlier bill draft. PDF source links remain
 available separately; a source link alone does not mean text has been indexed.
+Publisher transcriptions can contain OCR errors; consult the linked facsimile.
+A PDF marked "partial facsimile" contains only part of the law, even when the
+indexed text is complete.
 Complete detail retrieval does not guarantee full-text availability.
 Collection counts or links alone do not prove detail completeness.
 Completeness describes an individual bill, not whether a whole Congress has

@@ -59,6 +59,11 @@ UV_PROJECT_ENVIRONMENT=tmp/api-env uv run --frozen --no-default-groups \
 This still installs spaCy/its model and NumPy for existing search behavior.
 Worker execution requires the `analysis` group; the normal developer/test
 environment includes it. Submission CLIs do not construct training jobs.
+Historical PDF evidence readers require the `historical` group, included by
+`dev`; minimal API environments do not need it. For isolated historical
+tooling, use a separate environment with `--no-default-groups --group historical`.
+The retained macOS OCR controllers are operational evidence, not packaged
+cross-platform application dependencies.
 
 The generated [symbol index](reference/symbols/README.md) covers declarations,
 including private helpers, rather than claiming every declaration is public API.

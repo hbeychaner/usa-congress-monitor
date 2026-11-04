@@ -37,6 +37,10 @@ analysis = [
 dev = [
     "pytest==9.0.2",
     "pytest-asyncio==1.3.0",
+    {include-group = "historical"},
+]
+historical = [
+    "pypdf>=6,<7",
 ]
 release = [
     "pytest==9.0.2",

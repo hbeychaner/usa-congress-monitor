@@ -724,9 +724,9 @@ No declarations in this module.
 - VariableDeclaration: [`BillDetailPage.visibleActions`](../../../frontend/app/src/pages/BillDetailPage.tsx#L134)
 - VariableDeclaration: [`BillDetailPage.timelineActions: TimelineAction[]`](../../../frontend/app/src/pages/BillDetailPage.tsx#L135)
 - VariableDeclaration: [`BillDetailPage.name`](../../../frontend/app/src/pages/BillDetailPage.tsx#L217)
-- VariableDeclaration: [`BillDetailPage.relatedId`](../../../frontend/app/src/pages/BillDetailPage.tsx#L309)
-- VariableDeclaration: [`BillDetailPage.label`](../../../frontend/app/src/pages/BillDetailPage.tsx#L310)
-- VariableDeclaration: [`BillDetailPage.relationship`](../../../frontend/app/src/pages/BillDetailPage.tsx#L311)
+- VariableDeclaration: [`BillDetailPage.relatedId`](../../../frontend/app/src/pages/BillDetailPage.tsx#L310)
+- VariableDeclaration: [`BillDetailPage.label`](../../../frontend/app/src/pages/BillDetailPage.tsx#L311)
+- VariableDeclaration: [`BillDetailPage.relationship`](../../../frontend/app/src/pages/BillDetailPage.tsx#L312)
 
 ## frontend/app/src/pages/BillsPage.tsx
 
@@ -1088,6 +1088,8 @@ No declarations in this module.
 - FunctionDeclaration: [`isEnactedLawText(version: string \| null \| undefined): boolean`](../../../frontend/app/src/shared/billText.ts#L3)
 - FunctionDeclaration: [`billTextHeading(version: string \| null \| undefined): string`](../../../frontend/app/src/shared/billText.ts#L7)
 - VariableDeclaration: [`billTextHeading.law`](../../../frontend/app/src/shared/billText.ts#L8)
+- FunctionDeclaration: [`billTextFormatLabel(format: Readonly<Record<string, unknown>>): string`](../../../frontend/app/src/shared/billText.ts#L13)
+- VariableDeclaration: [`billTextFormatLabel.label`](../../../frontend/app/src/shared/billText.ts#L14)
 
 ## frontend/app/src/shared/contracts/api.ts
 
@@ -1603,7 +1605,7 @@ No declarations in this module.
 - PropertySignature: [`SimilarMembersResponse.member_id: string`](../../../frontend/app/src/shared/contracts/api.ts#L727)
 - PropertySignature: [`SimilarMembersResponse.signal: Signal`](../../../frontend/app/src/shared/contracts/api.ts#L728)
 - PropertySignature: [`SimilarMembersResponse.similar: Array<SimilarMember>`](../../../frontend/app/src/shared/contracts/api.ts#L729)
-- TypeAliasDeclaration: [`SourceName: 'govinfo:billstatus' \| 'govinfo:billsum' \| 'govinfo:bills' \| 'congress.gov_api' \| 'unknown'`](../../../frontend/app/src/shared/contracts/api.ts#L732)
+- TypeAliasDeclaration: [`SourceName: 'govinfo:billstatus' \| 'govinfo:billsum' \| 'govinfo:bills' \| 'govinfo:statute' \| 'congress.gov_api' \| 'unknown'`](../../../frontend/app/src/shared/contracts/api.ts#L732)
 - TypeAliasDeclaration: [`StagingStatus: { connected: boolean; documents: number; exists: boolean; index: string; production_alias_target: string \| null; }`](../../../frontend/app/src/shared/contracts/api.ts#L734)
 - PropertySignature: [`StagingStatus.connected: boolean`](../../../frontend/app/src/shared/contracts/api.ts#L735)
 - PropertySignature: [`StagingStatus.documents: number`](../../../frontend/app/src/shared/contracts/api.ts#L736)

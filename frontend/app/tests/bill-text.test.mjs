@@ -7,9 +7,15 @@ const source = readFileSync(new URL('../src/shared/billText.ts', import.meta.url
 const output = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
 }).outputText;
-const { billTextHeading, isEnactedLawText } = await import(
+const { billTextFormatLabel, billTextHeading, isEnactedLawText } = await import(
     `data:text/javascript;base64,${Buffer.from(output).toString('base64')}`
 );
+
+test('partial source facsimiles are explicit without changing ordinary formats', () => {
+    assert.equal(billTextFormatLabel({type:'PDF',coverage:'partial'}), 'PDF (partial facsimile)');
+    assert.equal(billTextFormatLabel({type:'PDF'}), 'PDF');
+    assert.equal(billTextFormatLabel({}), 'Link');
+});
 
 test('enacted law headings distinguish public and private law from bill drafts', () => {
     assert.equal(billTextHeading('public-law-95-367'), 'Enacted public law text (95-367)');

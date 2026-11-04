@@ -182,6 +182,74 @@ date. Existing source entries/package IDs/URLs are retained. The source enum
 addition does not change general reconciliation authority or certify earlier
 drafts, other versions, all available laws, freshness or complete bill detail.
 
+### Independent metadata, PDF and facsimile recovery
+
+The original indexed PDF links are not an exhaustive catalog. Official
+volume-level [MODS metadata](https://www.govinfo.gov/metadata/pkg/STATUTE-90/mods.xml)
+lists constituent public/private laws and their primary and secondary bills.
+Read this catalog once per retained volume rather than making an API request
+for every bill. Exactly one primary bill is required; secondary associations
+must not be treated as enacted bills. Preserve the containing metadata package
+separately from a reprinted law's original citation.
+
+| Model or collaborator | Responsibility |
+|---|---|
+| [`SealedStatuteFile`](../../cdm/ingest/statutes_evidence.py) | Bind a local source to its official URL and SHA-256; reject changed bytes. |
+| [`StatuteMetadataReader`](../../cdm/ingest/statutes_evidence.py) | Validate MODS law identity, primary bill, citation, date, pages and PDF URL; expose explicit rejection records. |
+| [`StatutePdfReader`](../../cdm/ingest/statutes_evidence.py) | Check page count, citation and law/bill evidence; isolate the selected complete law from neighboring acts on shared pages. |
+| [`StatuteOcrWitness`](../../cdm/ingest/statutes_evidence.py) | Bind on-device OCR to the source PDF and hashed page images. Recovering a damaged opening requires OCR of every PDF page. |
+| [`CongressionalLawEvidence`](../../cdm/ingest/statutes_evidence.py) | Corroborate a primary bill using an exact captured Congress terminal law action when the printed bill header is wrong. |
+| [`StatuteCitationReader`](../../cdm/ingest/statutes_evidence.py) | Find an exact law/start-page citation in a sealed official U.S. Code publication. |
+| [`RecoveredStatuteText`](../../cdm/ingest/statutes_recovery.py) | Select corroborated XML or verified PDF/OCR text without rewriting conflicting XML. |
+| [`StatuteRecoveryEnricher`](../../cdm/ingest/statutes_recovery.py) | Recheck the serving bill/evidence, use the shared text projector, and add verified missing law/PDF metadata without declaring complete detail retrieval. |
+| [`LawTextProjector`](../../cdm/ingest/statute_text.py) | Keep text, lemma, enacted-law version and additive provenance together; refuse pre-existing text/rank conflicts. |
+
+The controlled flow is **sealed catalog + XML + indexed evidence → independent
+matching → bounded PDF/facsimile recovery where needed → sealed text →
+fresh serving projection → owned shadow → live canary → conditional publication
+→ exact source/version/API checks**. Recovery settings are injected through
+[`StatuteRecoverySettings`](../../cdm/config/statute_recovery.py).
+These adapters do not download, schedule jobs or write Elasticsearch themselves.
+The acquisition/OCR/publication controllers used for the local recovery are
+retained operational evidence, not a packaged automatic ingestion command.
+
+PDF recovery requires the `historical` dependency group (`pypdf`), also included
+by the normal `dev` group. A separate minimal environment can install it with
+`uv sync --frozen --no-default-groups --group historical`; API-only environments
+need not install the PDF parser. Native extraction is bounded to 64 MiB per PDF,
+1,000 pages and 16 MiB text. Missing native page text is an explicit failure, not
+silently omitted content. OCR witnesses can corroborate a native header; when
+OCR supplies the text instead, every source page must be represented.
+The retained recovery used local macOS Vision OCR; no document was uploaded to
+an external OCR service.
+
+HTTP 200 alone does not establish a source exists: old STATUTE HTML/PDF paths
+can return a GovInfo "Page Not Found" page. Check content type and PDF parsing,
+not status alone. Never infer availability from an invented neighboring filename
+or use fuzzy title matching to resolve a bill-number conflict.
+
+Recovered provenance records the metadata package/component hashes, text format
+(`uslm_xml`, `publisher_pdf_text_layer`, or `on_device_facsimile_ocr`), original
+XML discrepancies, bill-association proof and any OCR program/page-image hashes.
+Retain the sealed original downloads and OCR sidecars as well as indexed
+provenance. Publisher transcriptions may contain errors; the Text tab directs
+readers to the facsimile. A PDF format with `coverage: "partial"` is labeled
+**PDF (partial facsimile)** rather than being presented as the whole law.
+
+An exceptional citation disagreement needs independent evidence, not an edited
+source: Public Law 94-284's complete XML begins at **90 Stat. 503**, whereas MODS
+and its linked PDF begin at **508**. The official
+[Code's 1976 amendment note](https://www.govinfo.gov/content/pkg/USCODE-2024-title15/html/USCODE-2024-title15-chap47-sec2051.htm)
+independently corroborates page 503. The complete XML text is indexed, both page
+values and the witness are retained, and the original PDF link is marked partial.
+This narrow citation exception does not waive law identity, primary bill,
+approval date or other matching requirements.
+
+The retained volumes 89-92 contain **1,532 scoped Congress 94/95 enacted laws**;
+all now have verified text. Three older reprints are outside that scope.
+This closes that catalog only, not earlier bill drafts, all historical bills,
+full-detail retrieval or current freshness.
+
 ## Congress API: entry points and planning
 
 [`IngestRunner`](../../cdm/ingest/runner.py) fetches one resource.

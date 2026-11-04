@@ -210,6 +210,25 @@ No declarations in this module.
 - field: [`SourcePolicy.billstatus_fields: dict[FieldName, str]`](../../../cdm/config/source_policy.py#L70)
 - function: [`SourcePolicy.rank(self, source: SourceName, field: FieldName) -> int`](../../../cdm/config/source_policy.py#L88)
 
+## cdm/config/statute_recovery.py
+
+[Source](../../../cdm/config/statute_recovery.py)
+
+- class: [`StatuteRecoverySettings(BaseModel)`](../../../cdm/config/statute_recovery.py#L8)
+- field: [`StatuteRecoverySettings.mods_namespace: str`](../../../cdm/config/statute_recovery.py#L11)
+- field: [`StatuteRecoverySettings.xlink_namespace: str`](../../../cdm/config/statute_recovery.py#L12)
+- field: [`StatuteRecoverySettings.metadata_base: str`](../../../cdm/config/statute_recovery.py#L13)
+- field: [`StatuteRecoverySettings.content_base: str`](../../../cdm/config/statute_recovery.py#L14)
+- field: [`StatuteRecoverySettings.citation_pattern: str`](../../../cdm/config/statute_recovery.py#L15)
+- field: [`StatuteRecoverySettings.law_pattern: str`](../../../cdm/config/statute_recovery.py#L16)
+- field: [`StatuteRecoverySettings.maximum_pdf_bytes: int`](../../../cdm/config/statute_recovery.py#L19)
+- field: [`StatuteRecoverySettings.maximum_pdf_pages: int`](../../../cdm/config/statute_recovery.py#L20)
+- field: [`StatuteRecoverySettings.maximum_text_characters: int`](../../../cdm/config/statute_recovery.py#L21)
+- field: [`StatuteRecoverySettings.header_characters: int`](../../../cdm/config/statute_recovery.py#L22)
+- field: [`StatuteRecoverySettings.parser_version: str`](../../../cdm/config/statute_recovery.py#L23)
+- field: [`StatuteRecoverySettings.body_heading_pattern: str`](../../../cdm/config/statute_recovery.py#L24)
+- field: [`StatuteRecoverySettings.bill_patterns: dict[MeasureType, str]`](../../../cdm/config/statute_recovery.py#L28)
+
 ## cdm/config/statute_text.py
 
 [Source](../../../cdm/config/statute_text.py)

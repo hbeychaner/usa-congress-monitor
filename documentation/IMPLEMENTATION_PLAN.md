@@ -584,12 +584,43 @@ Work proceeds in this order:
    is `dcbab36e7b56e0bfac19efa871c5250cc5a4c69d9f405ba6c7b91e2799b5a88a`.
    The production projector refuses existing text/conflicting evidence; this is
    not an automatic ingest resource or proof of complete nine-collection detail.
-   Next resolve the other **72** references independently; do not lower matching
-   requirements to inflate coverage. Also compare the retained bulk law catalog with the newly
-   restored metadata records: the **645** pre-existing PDF references are not an
-   inventory of every available enacted law. Remaining metadata-only detail
-   acquisition and wider history/freshness/analytics/sustained-operation gates
-   are still open.
+   At that checkpoint, the next gate was independent recovery of the other
+   **72** references and comparison with the full retained law catalog, rather
+   than lowering matching requirements or treating the original 645 links as
+   exhaustive.
+
+   **2026-11-04 retained enacted-law catalog closed:** four official volume-level
+   MODS catalogs accept **1,535** components, including three older reprints
+   outside Congress 94/95. All **1,532** scoped primary bill identities already
+   exist; **959** lacked text. Those comprise all **72** unresolved references
+   plus **887** additional laws. Independent recovery supplies **807 XML**,
+   **148 publisher PDF text-layer** and **4 complete on-device facsimile OCR**
+   texts. PDF component boundaries exclude adjacent laws. Exact captured
+   Congress terminal law actions plus MODS independently corroborate three
+   damaged printed bill associations; an official Code citation resolves
+   Public Law 94-284's page-503/page-508 discrepancy without editing the XML.
+   Its linked PDF is explicitly a partial facsimile. Original conflicts,
+   including the seven original XML rejection diagnostics, remain retained.
+
+   Fresh source/version projection, an owned-shadow rehearsal with stale-write
+   and rollback probes, a live browser/API canary and all **959** conditional
+   writes passed. Final exact source/version and actual API checks cover all
+   **1,532** laws, including the original **573** unchanged texts. All **1,061**
+   preserved sentinel source/versions passed; that count includes those 573.
+   Browser/API text equality passed for the canary, all four OCR recoveries
+   and the complete-XML/partial-PDF case. The exact owned shadow was retired.
+   Existing detail/hydration/analysis, mappings/aliases, failed-job history and
+   the original 1 GiB operations worker are unchanged; no Congress API
+   acquisition or added worker was used.
+
+   Retain `data/local-readiness-law-closure-20261104/` and
+   `data/local-readiness-law-closure-publication-20261104/`; publication seal SHA
+   is `aec93a6e8a0b7688d5e5e6d9369354697a31b0c9e3af1bbe95904273fbc9e1f6`.
+   The closed catalog contains **729** Congress 94 and **803** Congress 95 laws,
+   comprising **1,221 public** and **311 private** laws. This does not certify
+   earlier drafts or broader historical bill detail. Remaining metadata-only
+   detail acquisition and wider history/freshness/analytics/sustained-operation
+   gates are still open.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus
    identities, source versions, model/configuration and content checksums before
    rebuilding collaboration/topics. Current topic publication is absent; the

@@ -9,7 +9,7 @@ import { useRead } from '../hooks/useRead';
 import { VotePartyChart } from '../components/VotePartyChart';
 import { SimilarBillsCard } from '../components/SimilarBillsCard';
 import { ActionTimelineChart, type TimelineAction } from '../components/ActionTimelineChart';
-import { billTextHeading, isEnactedLawText } from '../shared/billText';
+import { billTextFormatLabel, billTextHeading, isEnactedLawText } from '../shared/billText';
 
 type RecordValue = Record<string, unknown>;
 
@@ -285,7 +285,7 @@ export function BillDetailPage() {
                                                     <Text size="1" color="gray">{formatDate(String(version.date ?? ''))}</Text>
                                                     {asRecords(version.formats).map((format) => (
                                                         <Text size="1" key={String(format.url ?? format.type)}>
-                                                            <a href={String(format.url ?? '#')} target="_blank" rel="noreferrer">{String(format.type ?? 'Link')}</a>
+                                                            <a href={String(format.url ?? '#')} target="_blank" rel="noreferrer">{billTextFormatLabel(format)}</a>
                                                         </Text>
                                                     ))}
                                                 </Flex>
@@ -295,6 +295,7 @@ export function BillDetailPage() {
                                     {bill.full_text ? (
                                         <details>
                                             <summary><Text weight="medium">{billTextHeading(bill.full_text_version_code)}</Text></summary>
+                                            {isEnactedLawText(bill.full_text_version_code) ? <Text as="span" size="1" color="gray" style={{ display: 'block' }}>Publisher text may contain transcription or OCR errors. Consult the linked facsimile; links marked partial do not contain the whole law.</Text> : null}
                                             <Text as="p" mt="2" style={{ whiteSpace: 'pre-wrap' }}>{isEnactedLawText(bill.full_text_version_code) ? bill.full_text : decodeEntities(bill.full_text)}</Text>
                                         </details>
                                     ) : null}

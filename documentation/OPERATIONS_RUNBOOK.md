@@ -485,8 +485,39 @@ before-images, expected projections, input/controller seals, fsynced intent/ack
 journals, final API verification and retirement receipt. Its run-seal SHA is
 `dcbab36e7b56e0bfac19efa871c5250cc5a4c69d9f405ba6c7b91e2799b5a88a`.
 Do not replay writes when any intent exists: reconcile ambiguous acknowledgements
-and current versions explicitly. The 72 unresolved references remain untouched;
-the original 645 references are not a complete available-law catalog.
+and current versions explicitly. At that checkpoint, the 72 unresolved
+references remained untouched; the original 645 references were not a complete
+available-law catalog.
+
+**Subsequent catalog closure:** all 72 references are now independently
+recovered, together with another 887 enacted laws discovered through four
+volume-level MODS catalogs. The 959 additional texts comprise 807 XML, 148
+publisher PDF text-layer and four complete on-device facsimile OCR recoveries.
+Adjacent laws are excluded from shared-page PDFs. Exact retained Congress law
+actions corroborate damaged printed primary-bill numbers; Public Law 94-284
+uses an independent official Code citation to retain complete XML at page 503
+while marking the conflicting page-508 PDF as partial.
+
+Fresh projection, owned-shadow stale-write/rollback rehearsal, live browser/API
+canary and conditional writes passed. All 959 new and 573 previous laws passed
+exact source/version and actual API checks: **1,532 scoped enacted laws**.
+All **1,061** preserved sentinel source/versions passed, including the previous
+573. Browser/API equality was checked for the canary, every complete OCR
+recovery and the partial-PDF case. The exact owned shadow was retired.
+Details/hydration/analysis, mappings/aliases, failed jobs and the original 1 GiB
+operations worker are unchanged. No Congress API acquisition was used.
+
+Retain `data/local-readiness-law-closure-20261104/` for the catalog, XML/PDF
+inputs, Code witness, OCR sidecars/images and staged text, and
+`data/local-readiness-law-closure-publication-20261104/` for the fresh plan,
+fsynced journals and final/catalog/retirement receipts. Its publication seal SHA
+is `aec93a6e8a0b7688d5e5e6d9369354697a31b0c9e3af1bbe95904273fbc9e1f6`.
+Retain the independent on-device OCR programs in the session evidence; their
+hashes are sealed. These operator controllers are not automatic worker jobs.
+Do not replay acknowledged writes or discard the original XML rejection
+diagnostics: independently recovered text does not repair the publisher's XML.
+Three older catalog reprints are outside scope. This closes the retained
+Congress 94/95 enacted-law catalog, not earlier drafts or full bill details.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove

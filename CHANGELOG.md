@@ -4,6 +4,24 @@
 
 ### Added
 
+- Completed the retained Congress 94/95 enacted-law catalog: 959 additional
+  texts resolve all 72 outstanding references and add 887 other laws, for 1,532
+  verified texts total. Four official volume-level MODS catalogs independently
+  establish primary bills; recovery uses 807 XML texts, 148 publisher PDF text
+  layers and four complete on-device facsimile OCR transcriptions. Adjacent laws
+  on shared PDF pages are excluded. Captured Congress law actions corroborate
+  damaged printed bill numbers; an official Code citation independently resolves
+  Public Law 94-284's conflicting start page while labeling its linked PDF a
+  partial facsimile. Original conflicting evidence remains retained.
+  Owned-shadow stale-write/rollback probes, live browser canary, conditional
+  publication and all 1,532 actual API checks passed. Another 1,061 preserved
+  source/version images include the original 573 texts. The owned shadow is
+  retired; details/hydration/analysis, mappings/aliases, failed-job history and
+  the original worker allocation remain unchanged. No Congress API acquisition
+  was needed. Added typed evidence/recovery adapters, an isolated historical PDF
+  dependency group, regression tests and source-quality/partial-PDF UI labels.
+  This closes the retained catalog, not earlier drafts, wider history, freshness
+  or complete bill-detail coverage.
 - Published all 573 verified historical enacted-law texts: 203 in Congress 94
   and 370 in Congress 95, comprising 307 public and 266 private laws.
   Fresh source/version freezes, owned-shadow stale-write/rollback probes,
@@ -13,8 +31,8 @@
   text cannot be overwritten. Law/version labels, plain-text rendering,
   Statutes provenance and indexed lemmas are wired through the existing API
   fields. No upstream requests, new workers or allocation changes were needed.
-  The owned shadow was retired. The 72 unresolved references and wider content
-  coverage remain open; the publisher does not claim earlier draft coverage or
+  The owned shadow was retired. At that checkpoint, 72 unresolved references and
+  wider content coverage remained open; the publisher does not claim earlier draft coverage or
   complete detail hydration.
 - Reused the interrupted acquisition to enrich 459 Congress 94 bills locally:
   500 expanded committee rows and the archived subject/detail evidence passed
