@@ -270,9 +270,28 @@ phase; `apply-complete.json` records the later live repair.
 
 The three original Congress 94/95/117 failures remain failed, not requeued or
 relabeled by this repair. Their recorded errors are connection refusal, with
-10/10/9 attempts respectively. New three-request source probes reached every
-scope and reported 24,285/22,313/17,828 list rows. Those observations are not
-canonical identity reconciliation or complete scope coverage.
+10/10/9 attempts respectively. A subsequent read-only, fully paginated census
+captured **64,426 canonical source identities** with 260 shared-limit request
+tokens/pages. Independent hash/count checks found no canonical duplicates or
+serving-only identities. There are **26,694 missing identities** and **35,573
+existing rows without valid complete proof**. Congress 94 accounts for
+16,979 missing/6,163 unproven, Congress 95 for 9,715/11,582, and Congress 117
+for 0/17,828. Legacy root completeness labels do not establish versioned proof.
+The sealed receipt and per-scope files are under
+`data/local-readiness-hydration-v3/failed-scope-inventory/`. This is not an atomic
+upstream snapshot or a fresh-detail certificate.
+
+The first 500 sorted existing/unproven Congress 94 IDs have separately sealed
+full before-images/sequence terms and authoritative upstream acquisition
+metadata in `data/local-readiness-scope-recovery/congress-94-existing-0001/`.
+The original sources lack acquisition URLs; do not overwrite or invent fields
+to make them usable as metadata. The helper reuses the bounded serial staging
+runner and tightens its token cap to 10,000. Current memory preflight does not
+meet the 256 MiB container reserve, so acquisition has not started. Preserve
+the prepared batch and obtain measured safe capacity before running it; do not
+lower guards, add workers or requeue the original failures. Acquisition alone
+cannot authorize promotion: rich GovInfo sources require preservation/conflict
+review and conditional version checks before any serving write.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove

@@ -155,6 +155,42 @@ Work proceeds in this order:
    across eleven Congresses verified complete proof and collection/text output.
    Serving aliases/mappings and protected analysis indices are unchanged.
 
+   **2026-11-04 original failed-scope census:** read-only source pagination
+   captured 64,426 canonical bill identities across all three original failed
+   scopes, using 260 shared-rate-limit request tokens/pages. All fifteen output
+   hashes/counts and reconciliation arithmetic were independently verified.
+   No canonical duplicates or serving-only identities were found.
+
+   | Congress | Source identities | Serving identities | Missing | Existing without valid complete proof | Valid complete proof |
+   |---|---:|---:|---:|---:|---:|
+   | 94 | 24,285 | 7,306 | 16,979 | 6,163 | 1,143 |
+   | 95 | 22,313 | 12,598 | 9,715 | 11,582 | 1,016 |
+   | 117 | 17,828 | 17,828 | 0 | 17,828 | 0 |
+   | Total | 64,426 | 37,732 | 26,694 | 35,573 | 2,159 |
+
+   Legacy root `hydration_status="complete"` labels are not versioned
+   completeness proof. Existing unproven rows may still contain rich useful
+   GovInfo data; retain them, rather than treating them as empty. This census
+   is not an atomic upstream snapshot or fresh-detail certification.
+   Sealed evidence lives in
+   `data/local-readiness-hydration-v3/failed-scope-inventory/`.
+
+   The next deterministic batch freezes the first **500 existing, unproven
+   Congress 94 identities**, their full original sources and sequence/primary
+   terms. All lack the acquisition URL in their serving source. A separately
+   sealed roster supplies verified upstream list metadata without inventing
+   URLs or changing the originals. Evidence lives in
+   `data/local-readiness-scope-recovery/congress-94-existing-0001/`.
+   Five focused helper regressions verify metadata routing, preservation,
+   transient/permanent retry behavior, checksum rejection and resume-loss
+   refusal. Production completeness/retry guards are reused unchanged, with a
+   tighter 10,000-request-token budget. Preflight found less than the required
+   256 MiB operations-container memory headroom; acquisition has not started.
+   Do not weaken the reserve or silently expand roles. After safe capacity
+   admission, acquisition, audit and preservation/conflict checks must precede
+   any conditional serving repair; additive merges are not assumed safe for
+   these rich existing sources.
+
    Next: recover the three original job scopes and certify
    discovery/hydration/indexing identities/counts for every
    required history/resource scope. No bulk requeue or legacy relabel substitutes

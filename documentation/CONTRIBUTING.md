@@ -10,12 +10,19 @@ links and its own navigation.
 
 | Content | Edit here |
 |---|---|
+| Newcomer setup, first use and everyday commands | Root `README.md` |
 | Architecture and explanations | Markdown chapters under `documentation` |
 | Diagram geometry and labels | `.mmd` files under `documentation/diagrams` and root `worker-architecture.mmd` |
 | Symbol signatures and field types | Python/TypeScript source, then regenerate |
 | Search field types and analysis | Mapping definitions and owning store code, then update the indexing chapter |
 | Upstream endpoint behavior | Runtime endpoint specs; original snapshots remain provenance |
 | Wiki navigation/link conversion | [Documentation builder](../tools/build_documentation.py) |
+
+Keep the root README focused on helping someone unfamiliar with the system
+start using it. Put implementation details in the owning guide/reference,
+operational procedures in the runbook, completed changes in the changelog and
+dated recovery evidence in the implementation plan. Link those pages instead
+of appending internal progress reports to the README.
 
 ## Regenerate and validate
 

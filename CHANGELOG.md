@@ -4,6 +4,18 @@
 
 ### Added
 
+- Reworked the root README as a newcomer guide: prerequisites, fresh-checkout
+  setup, first use, data-loading expectations, safe everyday commands and
+  focused documentation links. Technical details and recovery history stay in
+  their owning documentation; cloud setup commands now live in the deployment
+  guide rather than the introductory README.
+- Captured and independently reconciled all 64,426 canonical bill identities
+  for the three original failed scopes: 26,694 are missing and 35,573 existing
+  rows lack valid versioned completeness proof. Sealed the next 500 existing
+  Congress 94 originals and separate upstream acquisition metadata without
+  serving writes or failed-job relabeling. Five focused recovery-helper cases
+  passed; acquisition remains blocked by the required container memory reserve,
+  not silently admitted or described as a completed backfill.
 - Completed the frozen 3,047-row local bill repair: archive identity/count/proof
   audit, isolated real-index merge validation, stale-version rejection and
   conditional rollback rehearsal, refreshed consumers, a one-record API canary

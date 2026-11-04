@@ -14,6 +14,7 @@ for the supported topology and resource checks.
 
 | Your question | Read |
 |---|---|
+| How do I install and start using the app? | [Getting started](../README.md#quick-start) |
 | What runs, and why are there several databases? | [Architecture](architecture.md) |
 | Can I see the system rather than just read about it? | [Visual atlas: C4, data flow, relationships, and request sequence](reference/visuals.md) |
 | What are the records, identifiers, fields, and relationships? | [Data structures](reference/data-models.md) |
@@ -28,7 +29,10 @@ for the supported topology and resource checks.
 
 ### Suggested reading paths
 
-- **First-time reader:** architecture -> visual atlas -> data structures ->
+- **First-time user:** [getting started](../README.md#quick-start) ->
+  [using the app](../README.md#using-the-app). Read the ingestion guide when
+  you are ready to collect data.
+- **System reader:** architecture -> visual atlas -> data structures ->
   ingestion -> indexing -> API and frontend.
 - **Data investigator:** data structures -> indexing -> analytics -> source
   symbols for the relevant package. A diagram edge is a logical identifier

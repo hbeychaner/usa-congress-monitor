@@ -258,10 +258,27 @@ do not infer standalone application authentication for a different deployment.
 8. Verify authenticated frontend/API access, workers, ledger, queues, aliases,
    and representative reads and writes before admitting historical traffic.
 
-See the [root deployment instructions](../../README.md#deploying-to-google-cloud)
-and [example variables](../../infra/terraform/terraform.tfvars.example) for the
-actual commands and inputs. Provisioning is not performed by documentation
-generation.
+For a separately approved cloud deployment, the corresponding commands are:
+
+```bash
+# From the repository root; prepare a state bucket first.
+cd infra/terraform
+terraform init -backend-config="bucket=<state-bucket>"
+cp terraform.tfvars.example terraform.tfvars
+# Edit the ignored variables file; supply TF_VAR_congress_api_key privately.
+terraform apply -target=google_artifact_registry_repository.images \
+  -target=google_project_service.apis
+cd ../..
+deploy/gcp/build_push.sh <project_id> [region] [tag]
+cd infra/terraform
+terraform apply
+# Configure the OAuth consent screen, then set deploy_apps=true and apply again.
+```
+
+See the [example variables](../../infra/terraform/terraform.tfvars.example) for
+inputs. Configure `project_id` and `iap_members`, and use the `dns_a_record`
+output for DNS. Provisioning is not performed by documentation generation or
+local startup.
 
 ### Persistence and known deployment boundaries
 
