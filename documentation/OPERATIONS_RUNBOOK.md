@@ -320,14 +320,37 @@ replay. Descriptor and empty cases both reject stale writes and pass conditional
 rollback/reapplication. Eight focused guard tests and six existing repair tests
 pass, with clean lint/types.
 
-All serving sources/versions, aliases/mappings and protected analysis state are
-unchanged. Retain `merge-review-20261104/` and `guarded-shadow-20261104/`, including
+At that rehearsal checkpoint, all serving sources/versions, aliases/mappings and
+protected analysis state were unchanged. Retain `merge-review-20261104/` and
+`guarded-shadow-20261104/`, including
 the sealed guarded receipt, projections and per-record pointer resolutions.
-The owned unaliased shadow remains available for conditional-plan verification.
-Next is a live canary and separately bounded version-conditional repair, not
-ordinary additive replay. Default application merge behavior is unchanged.
-Shadow validation alone cannot authorize promotion or close an original failed
-scope.
+The owned unaliased shadow was retained for conditional-plan verification.
+
+**2026-11-04 live repair completed:** a separate typed acceptance receipt seals
+the guarded policy, implementation and all input evidence. The unchanged proven
+CAS writer applied one canary, verified its actual API response, then applied the
+remaining 499. All **500/500** writes have fsynced intents/acknowledgements and
+exact source/version readback; all 500 distinct API detail responses match the
+accepted identity, content, exposed collections and complete proof.
+
+An initial unversioned API probe returned 404. Injecting the actual
+`http://127.0.0.1:8000/api/v1` base URL corrected only the verifier configuration;
+the acknowledged canary was not rewritten and sealed helper bytes were preserved.
+The browser displays the canary's title, expanded committee and missing-text
+state. The exact owned unaliased shadow was retired only after final API checks
+and another complete serving readback. Keep `apply-complete.json`,
+`api-canary.json`, `api-final.json` and `shadow-retired.json` alongside all original
+evidence. The accepted receipt SHA is
+`cc0bf5a8f3dfbb8902fc3bf25d63d28cf520891a81995d91ad3e1d47f494310d`;
+the final API receipt SHA is
+`790ef5ef75b6900d3f6c02ca76aba01e533a6442ae25540e5302d865ef02e03c`.
+
+Serving aliases/mappings and protected analysis state remain unchanged. Health,
+API/frontend readiness and the original operations consumer pass; existing
+analytics-lineage warnings and three actionable failed jobs remain visible.
+The acquisition checkpoint remains staging-only; separate repair receipts prove
+the 500 serving changes. Default application merging is unchanged, and this
+bounded repair does not close an original failed scope or certify all history.
 
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
@@ -881,6 +904,15 @@ and API checks, without changing unrelated aliases or publication state.
 Repair evidence is distinct from acquisition progress and job-ledger outcomes;
 neither repaired documents nor legacy hydration labels prove an entire upstream
 scope complete.
+
+Use the configured API mount (`/api/v1` by default) for canary and final detail
+checks. A missing route is not a reason to repeat an acknowledged write. Keep
+endpoint configuration separate from sealed repair implementation and bind a
+successful canary to the accepted plan and acknowledged source digest before
+bulk continuation. Verify actual exposed collection content and hydration proof,
+not just HTTP status or counts; source readback covers fields the DTO omits.
+Retire only the exact owned, unaliased shadow after complete source/version and
+API verification, retaining before-images, accepted candidates and journals.
 
 ### Failure Boundaries Covered
 

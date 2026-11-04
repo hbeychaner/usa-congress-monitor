@@ -4,6 +4,13 @@
 
 ### Added
 
+- Completed the first 500-record Congress 94 guarded serving repair: sealed
+  candidates, frozen-version conditional writes, fsynced intent/acknowledgement
+  journals and exact source/version readback. The live canary and all 500
+  versioned API detail checks passed; the owned unaliased shadow was retired.
+  Serving mappings/aliases and protected analysis state are unchanged.
+  Acquisition progress, repair receipts and original failed-job outcomes remain
+  separate; broader history, analytics and sustained-operation gates stay open.
 - Validated all 500 Congress 94 recovery candidates in an owned unaliased shadow.
   Exact ordinary-merge inventory found 484 legacy committee count/URL descriptors
   that would become invalid list entries, plus 16 empty slots. A narrow repair
@@ -11,14 +18,17 @@
   preserves actual records/richer fields, makes empty collections explicit and
   verifies exact readback, idempotent ordinary replay, stale-write rejection and
   conditional rollback/reapplication. Serving sources/versions, mappings and
-  analysis state are unchanged. Ordinary application merging is not changed;
-  live repair remains a separate conditional-write gate.
+  analysis state were unchanged during rehearsal. Ordinary application merging
+  is not changed; live repair followed through a separately sealed
+  conditional-write gate.
 - Completed and independently audited the first 500-record Congress 94 recovery
   chunk: exact identities, archive integrity, model validation and all nine
-  collection counts passed. All serving originals/versions remain unchanged.
+  collection counts passed. Acquisition left all serving originals/versions
+  unchanged.
   The exclusive acquisition process exited without OOM and automatically
   restored the operations consumer. No serving promotion or failed-scope closure
-  is implied; preservation-aware shadow validation remains next. Candidates
+  was implied; preservation-aware shadow validation and live conditional repair
+  followed separately. Candidates
   contain no nonblank full text, which does not authorize removal of retained
   GovInfo content.
 - Validated an explicitly approved exclusive acquisition window within the

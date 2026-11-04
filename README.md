@@ -73,6 +73,8 @@ partial and complete detail-retrieval evidence; missing text or analysis does
 not necessarily mean the bill itself is missing.
 Complete detail retrieval does not guarantee full-text availability.
 Collection counts or links alone do not prove detail completeness.
+Completeness describes an individual bill, not whether a whole Congress has
+been collected.
 
 ## Everyday commands
 

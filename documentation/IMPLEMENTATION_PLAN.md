@@ -244,19 +244,51 @@ Work proceeds in this order:
    Retain `merge-review-20261104/` and `guarded-shadow-20261104/`; the latter's
    `guarded-shadow-receipt.json` seals accepted projections with SHA
    `5d2d9cdae9d16ef1f917bd0a0bd6efac403b33de2ddaf2bef0c62ca210621689`.
-   The unaliased owned shadow is retained for conditional-plan verification.
+   The unaliased owned shadow was retained for conditional-plan verification.
 
-   Next: a live API canary followed by explicitly bounded conditional repair,
-   with the existing intent/acknowledgement and exact readback gates. Do not feed
-   these records back through ordinary additive merging or reuse an earlier
-   sparse-row receipt as authorization. Default application merge behavior has
-   not changed. Shadow success is not live repair, complete failed-scope recovery
-   or the sustained ingest/index acceptance run.
+   **2026-11-04 guarded live repair completed:** a separately typed acceptance
+   receipt seals the explicit committee-expansion policy, implementation,
+   original versions, audit, projections and per-record resolutions. It is not
+   an earlier sparse-row receipt reused as authorization. The unchanged proven
+   repair writer applied one canary, verified it through the real API, then
+   applied the remaining 499 with frozen sequence/primary-term conditions.
+   Every submission has a fsynced intent and acknowledgement; **500/500**
+   sources and returned versions passed exact readback, with zero remaining.
+   The accepted receipt SHA is
+   `cc0bf5a8f3dfbb8902fc3bf25d63d28cf520891a81995d91ad3e1d47f494310d`.
+
+   The first API-only probe exposed an unversioned URL configuration error.
+   Explicit configuration now uses `http://127.0.0.1:8000/api/v1`; the already
+   acknowledged canary was not rewritten and sealed implementation bytes were
+   not changed. All **500 distinct actual API detail responses** passed identity,
+   title/text, exposed collection content and complete hydration-proof checks.
+   API actions are compared independently of their display order; nine source
+   collection counts remain independently audited even though the detail DTO
+   exposes only eight collection surfaces. Browser verification displays the
+   canary's title, expanded committee and expected missing-text state.
+
+   `apply-complete.json`, `api-canary.json`, `api-final.json` and
+   `shadow-retired.json` retain these outcomes in `guarded-shadow-20261104/`.
+   The final API receipt SHA is
+   `790ef5ef75b6900d3f6c02ca76aba01e533a6442ae25540e5302d865ef02e03c`.
+   Only the exact owned, unaliased shadow was retired, after another full serving
+   readback. Serving aliases/mappings and protected analysis state remain
+   unchanged. API/frontend readiness and the original operations consumer remain
+   healthy; the three actionable failed jobs and existing analytics-lineage
+   warnings remain visible. Thirteen adapter/API guards plus eight planner and
+   six existing CAS regressions cover the repair boundary.
+
+   Acquisition `checkpoint.json` still describes staging, not serving writes.
+   Use the separate repair receipts for the 500 acknowledged changes. Default
+   application merge behavior has not changed. This batch does not certify
+   arbitrary rich GovInfo reconciliation, close an original failed scope or
+   satisfy sustained ingest/index acceptance.
 
    Next: recover the three original job scopes and certify
    discovery/hydration/indexing identities/counts for every
    required history/resource scope. No bulk requeue or legacy relabel substitutes
-   for that evidence; the 3,047-row stage alone cannot close all history gaps.
+   for that evidence; neither the earlier 3,047-row repair nor this 500-row
+   repair closes all history gaps.
 3. **Analytics lineage/publication.** Freeze and verify the approved corpus
    identities, source versions, model/configuration and content checksums before
    rebuilding collaboration/topics. Current topic publication is absent; the
