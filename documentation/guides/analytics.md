@@ -25,8 +25,9 @@ Exhaustive declarations are indexed in [utils](../reference/symbols/utils.md),
 Source entry points are [TopicModeler](../../cdm/utils/topic_modeler.py),
 [MetasubjectBuilder](../../cdm/utils/metasubjects.py),
 [PerspectiveRunner](../../cdm/perspectives/runner.py), and
-[GraphBuildJob](../../cdm/graph/job.py). [Container](../../cdm/container.py)
-constructs their stores, clients, config sections, and collaborators.
+[GraphBuildJob](../../cdm/graph/job.py).
+[WorkerContainer](../../cdm/workers/runtime.py) constructs execution collaborators;
+[Container](../../cdm/container.py) owns lightweight reads and durable submission.
 Default model/threshold values live in
 [app_config.py](../../cdm/config/app_config.py); command-line flags can override
 some training values.
@@ -119,25 +120,30 @@ Output vectors are reordered to the original input job sequence.
 A failed run can reuse previously persisted chunks on the next attempt.
 
 Persistence is an Elasticsearch index, not a local NumPy cache:
-[Container.embedding_store](../../cdm/container.py#L94) injects
-`ElasticConfig.embeddings_index` (default `congress-embeddings`) into
-[EmbeddingStore](../../cdm/store/embedding_store.py).
+[Container.embedding_store](../../cdm/container.py) combines
+`ElasticConfig.embeddings_index` (default `congress-embeddings`) with the SHA-256
+of the model name through
+[EmbeddingStore.namespace](../../cdm/store/embedding_store.py).
+The resulting model-owned index has validated model/dimension mapping metadata.
 Document IDs are bill IDs. Records carry model, content hash, embedding timestamp,
 and a cosine-indexed dense vector. The hash includes `model + "\0" + text`.
 
-The same document ID does not retain an independent vector for every model:
-changing the model makes cached hashes stale and writes replacement records.
-Vector dimensions and configured model must remain compatible with the index;
-changing a model is not automatically a dimension migration.
+Separate model namespaces can retain independent vectors for the same bill.
+Within one namespace, changed content makes the cached hash stale; a completed
+write replaces that bill's prior vector. Vector dimensions and configured model
+must remain compatible with the index. Legacy unsuffixed caches are not silently
+relabeled or accepted as model-owned training caches.
 `EmbeddingStore.similar` performs kNN from an existing cached vector, excludes
-the query document, and does not encode missing query bills.
+the query document, and does not encode missing query bills. Similarity reads use
+the published run's cache/model identity when a validated run exists.
 [SimilarBillService.similar](../../cdm/backend/services/similar_bill_service.py)
 adds indexed bill metadata for the API.
 
 ## 2. Topic fitting, assignment, labels, and trends
 
-[scripts/train_topic_model.py](../../scripts/train_topic_model.py) is the
-persistent batch training entry point. `fetch_documents` scans the bill read alias
+[scripts/train_topic_model.py](../../scripts/train_topic_model.py) submits a
+durable training job; the execution worker runs
+[TopicTrainingJob](../../cdm/topics/training.py). Its `_fetch` scans the bill read alias
 for `source_type=bill` with `congress >= --min-congress`; the default is 113.
 This intentionally excludes earlier title-dominated Congresses unless overridden.
 `--max-docs` caps the scanned corpus and is intended for bounded experiments.
@@ -190,9 +196,9 @@ does not recreate that fitted-corpus array.
 
 ### Topic persistence and reads
 
-Training `run` generates a UTC version such as `20261102T080000Z` and saves the
+`TopicTrainingJob.execute` generates a new UTC-based version and saves the
 model below `--model-dir/<version>` (default `models/topics/<version>`).
-`index_results` bulk-writes to `ElasticConfig.analysis_index`, whose default is
+Its `_actions` constructs the versioned bulk writes to `ElasticConfig.analysis_index`, whose default is
 `congress-analysis-topics`. The shared index distinguishes rows with `kind`:
 
 | Kind | Stored information |
@@ -205,11 +211,15 @@ model below `--model-dir/<version>` (default `models/topics/<version>`).
 | `party_topic` | Separate perspective-builder output for a topic and Congress. |
 
 Topic, assignment, and trend IDs include the model version, so versions can
-coexist. Bulk errors fail the run before cleanup. There is no graph-style
-publication pointer for the topic model:
-[TopicService.latest_model_version](../../cdm/backend/services/topic_service.py#L78)
-selects a newest topic document by `trained_at`. Do not assume atomic whole-model
-publication or interpret a status file alone as a consistency check.
+coexist. Bulk errors fail the run before publication.
+[`TopicPublicationStore`](../../cdm/store/topic_publication.py) writes a validated
+complete-run manifest and compare-and-swaps the `topic-model:published` pointer.
+[`TopicService.latest_model_version`](../../cdm/backend/services/topic_service.py)
+reads that pointer, not the newest row by `trained_at`. Partial/capped runs and
+legacy generations without a validated manifest cannot become current simply
+because topic rows exist. Counts, assignments, group coverage and dated trend
+totals are validated before publication. Status/ledger success alone is not a
+source-corpus completeness or freshness certificate.
 
 ### Diagram and data-join keys
 
@@ -562,7 +572,7 @@ See the [commands and artifact contract](../OPERATIONS_RUNBOOK.md#sealed-graph-r
 Run commands from the repository root with the project's configured dependencies:
 
 ```bash
-# Bounded experiment: still computes/caches embeddings and can contact Ollama.
+# Bounded experiment: computes embeddings without model/result/cache writes or LLM calls.
 uv run python scripts/train_topic_model.py --max-docs 5000 --dry-run --no-llm-labels
 
 # Persist a full default-corpus topic model, assignments, and metasubjects.
@@ -582,8 +592,21 @@ uv run python scripts/build_perspectives.py --congress 119 --top-topics 5 --dry-
 The perspective CLI defaults to Congress 119 and the top five topics.
 API and CLI submissions use typed durable analytics requests rather than
 independent subprocess launchers.
-Topic training `--dry-run` skips model saving and analytical-result indexing,
-but the embedding cache is still written during `fit`: it is not a read-only run.
+Topic training `--dry-run` and every `--max-docs` run skip model saving,
+analytical-result indexing, embedding-cache writes and LLM calls. The durable
+job ledger and third-party model-download cache may still change. Submission
+alone does not start an analytics consumer; respect the managed stack's capacity
+checks rather than enabling an oversized profile.
+
+For the approved local release closeout, a separate operator-owned host process
+uses the existing durable runner and heartbeat, with a monitored 4 GiB RSS stop
+threshold and no additional Celery worker. The full existing Congress 113+
+corpus is frozen with source versions and code/configuration seals; exact
+model/content-hash-matched legacy vectors can be reused in the model-isolated
+cache without modifying the legacy cache. Publication rechecks the frozen scope
+and original pointer before the ordinary validated compare-and-swap boundary.
+These controllers and their receipts are retained operational evidence, not
+another packaged worker or an automatically enabled scheduling path.
 
 [AnalyticsJobs](../../cdm/jobs/analytics.py) submits durable jobs and
 [AnalyticsJobRunner](../../cdm/workers/analytics_runner.py) owns worker execution.

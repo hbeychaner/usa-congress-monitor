@@ -14,6 +14,75 @@ below. This is not a production health or data-completeness certification.
 [Data/indexing behavior](reference/indexing.md) |
 [Original frontend requirements](../frontend/WEB_APP_IMPLEMENTATION_PLAN.md)
 
+## Fixed local release closeout
+
+**Agreed 2026-11-04:** finish the remaining release obligations without adding
+features, speculative cleanup or another open-ended batch sequence. The five
+gates below are the closeout checklist; the older findings and dated execution
+history remain provenance, not additional parallel work queues. All-supported
+history and available detail/text remain requirements; unknown availability is
+not silently reclassified as unavailable.
+
+| Gate | Required exit evidence | Current disposition |
+|---|---|---|
+| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | In progress. Central/staged comparison and all 49,207 nested GovInfo archives are audited; no retained identity is missing from search. Independently reproduced 3,084 committee expansions and 44 texts pass owned-shadow rehearsal; serving publication waits for the frozen topic run. Text variants, bill-identity law read-path visibility, broader source support and freshness remain open. |
+| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | In progress. All 109,691 usable indexed bills from the existing Congress 113+ analytics scope are frozen; no inputs were dropped. All 109,691 exact model/content-matching vectors were copied to the model-owned namespace, with zero misses and no legacy-cache writes. The monitored full run is computing trends; no completed topic publication is claimed. Collaboration/topic graph lineage remains open. |
+| C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
+| C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
+| C5. Final disposition | Every gate has evidence or an explicit blocker; validation passes; source/docs/changelog and source-pinned wiki are published. | Pending. Separate-host failover and off-host restoration remain blocked by the single-Mac topology, not implicitly passed or waived. |
+
+Analytics keeps its existing Congress 113+ input contract; this does not narrow
+the historical data requirement. A current indexed corpus is not an authoritative
+upstream inventory. Frozen analytics inputs must remain source/version-exact
+through publication, and incomplete or sampled training cannot become production.
+
+The user approved **one monitored host analytics process**, with a **4 GiB RSS
+stop threshold**, offline cached model access and deterministic labels.
+Docker allocations and the original operations worker remain unchanged.
+Stop the owned process on excess RSS, host memory pressure, insufficient disk
+or the execution deadline; preserve failed attempts and publication intent rather
+than blindly rerunning them. This is a bounded execution exception, not approval
+for an additional Celery worker or a Docker resize.
+
+Current closeout evidence is retained under `data/release-closeout-20261104/`.
+The original all-history census counted **371,230 bill** and **136 law**
+projections. A bill-identity law, such as Congress 119 H.R.227, exists in search
+even though a `source_type=bill` filter excludes it. Inventory must distinguish
+that classification from a missing identity. The replacement comparison streams
+archive batches instead of retaining the entire full-detail corpus in memory.
+
+The completed central/staged comparison covers **180 archives**, **407,458 raw
+bill rows** and **212,411 distinct selected-field payloads**, with no absent
+serving identity or blank-field candidate. The separate nested GovInfo comparison
+covers **26,053 bill parents** and **23,154 text versions**: **49,207 archives and
+payloads**, not a deduplicated identity count. It finds **3,128 distinct local
+repair candidates**, comprising 3,084 unexpanded committee collections and
+44 blank parent texts. A count/URL envelope is not expanded committee content.
+Official retained XML was independently reparsed: every archived committee
+identity/attribute is preserved, with newly extracted official activities added.
+Text is projected through the production version/rank/lemma path.
+
+All 3,128 projections pass exact owned-shadow readback; two owned rows also pass
+stale-write rejection and conditional rollback/reapply probes.
+The 1,532 previously published historical law texts are
+freshly frozen as preservation sentinels. No serving repair has been applied:
+changing a frozen source's sequence number before topic publication would
+correctly invalidate that training run. Eighteen controller safeguards pass,
+including CountUrl expansion, strict nonblank-content preservation and actual
+API collection-shape handling.
+
+The **9,156 nested full-text variants** and **198 central full-text variants**
+are retained review evidence, not automatically missing or newer text. Version
+selection must be established before replacing existing content. Also, all
+136 law projections have valid canonical bill identity fields, but a direct
+Bill API canary for Congress 119 H.R.227 returns 404 because that read path
+requires `source_type=bill`. Search existence therefore does not certify
+Bill API visibility. These findings do not authorize redundant acquisition,
+discriminator rewriting or an unverified declaration of global coverage.
+
+No optional taxonomy, new provider, transport replacement, index expansion or
+general code reduction is part of this closeout.
+
 ## Local readiness follow-through
 
 **2026-11-03, in progress; not release acceptance:** the user selected local-only

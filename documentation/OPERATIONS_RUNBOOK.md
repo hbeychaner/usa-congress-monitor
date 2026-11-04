@@ -5,6 +5,11 @@ for the Congress Tracker workers and durable job ledger.
 
 ## Health Check
 
+The finite [local release closeout](IMPLEMENTATION_PLAN.md#fixed-local-release-closeout)
+tracks content/freshness, analytics, the real 24-hour observation, recovery and
+final disposition. A ready API or passing isolated fixture does not close those
+gates.
+
 Run the read-only health check before and after maintenance:
 
 ```sh
@@ -1122,6 +1127,15 @@ SQLite-backed unit tests in the same workflow. Production alias cutover/rollback
 image/resource/queue-routing release smoke (below), full restore, and
 sustained-operation acceptance remain separate checks. No deployment is
 authorized by passing this suite alone.
+
+The opt-in pipeline fixture accepts `PIPELINE_TEST_SEARCH_URL`,
+`PIPELINE_TEST_SEARCH_API_KEY` (optional for an authenticated search endpoint)
+and `PIPELINE_TEST_REDIS_URL`. Supply credentials through the process environment,
+never a committed command or file. The fixture creates UUID-owned
+`pipeline-acceptance-*` indices/pipelines and scoped stream keys, and removes only
+its own resources. Use a separate Redis database for the drill; never point a
+test that flushes a database at application Redis. This fixture does not restart
+the shared broker or search service.
 
 <!-- wiki:repository-only:start -->
 The bounded handoff comparison uses the same 100 synthetic bills, 25-document

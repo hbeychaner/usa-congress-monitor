@@ -241,7 +241,11 @@ def pipeline(tmp_path: Path) -> Iterator[PipelineFixture]:
             "to isolated synthetic test services"
         )
     with ExitStack() as cleanup:
-        client = Elasticsearch(search_url, request_timeout=30)
+        client = Elasticsearch(
+            search_url,
+            api_key=os.environ.get("PIPELINE_TEST_SEARCH_API_KEY"),
+            request_timeout=30,
+        )
         cleanup.callback(client.close)
         redis = Redis.from_url(redis_url, decode_responses=True)
         cleanup.callback(redis.close)

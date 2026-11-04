@@ -109,6 +109,8 @@ If startup is refused, run `make stack-capacity` and consult the
 [configuration guide](documentation/guides/configuration-and-deployment.md).
 Do not start extra workers manually to bypass a capacity refusal.
 If the app reports API Not Ready, check service status and health first.
+Keep the Mac awake while running long collection or validation jobs; elapsed
+time across sleep is not evidence of continuous operation.
 For failed jobs, restarts or backups, use the
 [operations runbook](documentation/OPERATIONS_RUNBOOK.md).
 Health warnings about failed jobs describe ingestion history, not automated

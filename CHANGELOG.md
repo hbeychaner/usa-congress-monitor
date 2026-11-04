@@ -4,6 +4,27 @@
 
 ### Added
 
+- Established one fixed local release-closeout checklist for content/freshness,
+  analytics, actual 24-hour operation, recovery and final publication, without
+  silently reducing historical detail/text requirements. Froze the complete
+  109,691-bill existing analytics corpus and approved one monitored host job
+  with a 4 GiB RSS stop threshold, unchanged Docker/worker allocations and
+  exact retained-vector reuse. All 109,691 vectors match and are copied into
+  the model-owned cache, with zero misses and no legacy-cache writes; the full
+  run remains under observation rather than being called published.
+  Audited all 180 central/staged archives and 49,207 nested GovInfo archives:
+  no retained identity is absent from search. Independently reproduced 3,084
+  unexpanded committee collections and 44 missing texts; all 3,128 projections
+  pass owned-shadow stale-write/rollback rehearsal. Serving repairs wait for
+  topic publication so they cannot invalidate frozen source versions.
+  Existing text variants and bill-identity law read visibility remain explicit
+  open findings, not authorization to overwrite or re-ingest.
+  Eighteen controller safeguards and ten actual
+  isolated pipeline failure/replay/WAL-restore checks pass; full-system restore
+  and sustained-load acceptance remain separate. The pipeline fixture now
+  accepts an optional environment-supplied search API key. Corrected stale
+  analytics documentation about publication pointers, execution ownership and
+  read-only training previews.
 - Completed the retained Congress 94/95 enacted-law catalog: 959 additional
   texts resolve all 72 outstanding references and add 887 other laws, for 1,532
   verified texts total. Four official volume-level MODS catalogs independently
