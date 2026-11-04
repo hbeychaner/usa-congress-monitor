@@ -9,6 +9,7 @@ import { useRead } from '../hooks/useRead';
 import { VotePartyChart } from '../components/VotePartyChart';
 import { SimilarBillsCard } from '../components/SimilarBillsCard';
 import { ActionTimelineChart, type TimelineAction } from '../components/ActionTimelineChart';
+import { billTextHeading, isEnactedLawText } from '../shared/billText';
 
 type RecordValue = Record<string, unknown>;
 
@@ -293,8 +294,8 @@ export function BillDetailPage() {
                                     ) : <Empty>No text versions are indexed for this bill.</Empty>}
                                     {bill.full_text ? (
                                         <details>
-                                            <summary><Text weight="medium">Full text{bill.full_text_version_code ? ` (version ${bill.full_text_version_code.toUpperCase()})` : ''}</Text></summary>
-                                            <Text as="p" mt="2" style={{ whiteSpace: 'pre-wrap' }}>{decodeEntities(bill.full_text)}</Text>
+                                            <summary><Text weight="medium">{billTextHeading(bill.full_text_version_code)}</Text></summary>
+                                            <Text as="p" mt="2" style={{ whiteSpace: 'pre-wrap' }}>{isEnactedLawText(bill.full_text_version_code) ? bill.full_text : decodeEntities(bill.full_text)}</Text>
                                         </details>
                                     ) : null}
                                 </Flex>

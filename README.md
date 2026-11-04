@@ -81,8 +81,9 @@ Replayed list metadata makes records available for browsing; it does not fetch
 missing summaries, relationships or full text.
 The coverage goal remains full detail and full text wherever available, including
 enrichment of existing records when specific content is missing.
-Historical enacted-law text is distinct from earlier bill drafts; source links
-and text availability should not be treated as interchangeable.
+On a bill's Text tab, "Enacted public law text" or "Enacted private law text"
+identifies verified law text, not an earlier bill draft. PDF source links remain
+available separately; a source link alone does not mean text has been indexed.
 Complete detail retrieval does not guarantee full-text availability.
 Collection counts or links alone do not prove detail completeness.
 Completeness describes an individual bill, not whether a whole Congress has

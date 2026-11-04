@@ -161,6 +161,27 @@ preserve existing details/text, retain source/version provenance, and identify
 the result as enacted-law text rather than an earlier bill draft. Staged text
 alone does not make it available through the application.
 
+[`StatuteTextEnricher`](../../cdm/ingest/statute_text.py) builds a controlled
+projection using injected [`StatuteTextSettings`](../../cdm/config/statute_text.py)
+and a lemmatizer. It rechecks the serving identity, indexed law and PDF evidence,
+refuses nonblank text, unassessed lemmas or conflicting version codes, and changes
+only text, text lemma, version code and additive source provenance. It does not
+recompute hydration or touch relationships/analysis. Publication remains an
+operator-controlled frozen-version write, not ordinary upsert or a worker job.
+
+Published text uses `full_text_version_code` values such as
+`public-law-95-367` or `private-law-95-138`. The existing bill-detail API exposes
+both text and code; the Text tab labels these **Enacted public/private law text**.
+USLM plain text is rendered literally, without HTML/entity reinterpretation.
+Ordinary bill-version labels and legacy text presentation are unchanged.
+
+Provenance uses `govinfo:statute` in `source_metadata`, with the original PDF
+package/reference, official volume XML URL, XML component and volume SHA-256,
+parser version, original citation, containing volume, law identity and approval
+date. Existing source entries/package IDs/URLs are retained. The source enum
+addition does not change general reconciliation authority or certify earlier
+drafts, other versions, all available laws, freshness or complete bill detail.
+
 ## Congress API: entry points and planning
 
 [`IngestRunner`](../../cdm/ingest/runner.py) fetches one resource.

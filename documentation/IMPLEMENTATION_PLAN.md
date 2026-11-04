@@ -566,11 +566,26 @@ Work proceeds in this order:
    Retain `data/local-readiness-statutes-20261104/`, especially the stronger final
    `verified/` manifest/text/quarantine evidence; the earlier preliminary match
    report is not promotion authority. Eighteen reader regressions and focused
-   preservation/import-boundary checks pass. Next freeze provenance-aware
-   projections for only the **573** verified enacted-law texts, rehearse and
-   conditionally promote them with explicit law/version labeling. Resolve the
-   other **72** references independently; do not lower matching requirements to
-   inflate coverage. Also compare the retained bulk law catalog with the newly
+   preservation/import-boundary checks pass.
+
+   **2026-11-04 verified historical law text published:** all **573** candidates
+   are now served, with fresh before-images, a sealed preservation-aware
+   projection, owned-shadow stale-write/rollback probes and conditional writes
+   preceded by a real API/browser canary. All **573** exact sources/acknowledged
+   versions and actual API texts/version codes passed; **560** noncandidate
+   sentinel source/versions stayed exact, including the unresolved references.
+   The result comprises **307 public** and **266 private** laws, with explicit
+   enacted-law labels, indexed text lemmas and truthful Statutes XML/citation
+   provenance. Existing details, hydration, analysis and failed acquisition
+   history are unchanged. No upstream requests, additional workers or allocation
+   changes occurred. The exact owned shadow was retired.
+
+   Retain `data/local-readiness-statute-publication-20261104/`; sealed run SHA
+   is `dcbab36e7b56e0bfac19efa871c5250cc5a4c69d9f405ba6c7b91e2799b5a88a`.
+   The production projector refuses existing text/conflicting evidence; this is
+   not an automatic ingest resource or proof of complete nine-collection detail.
+   Next resolve the other **72** references independently; do not lower matching
+   requirements to inflate coverage. Also compare the retained bulk law catalog with the newly
    restored metadata records: the **645** pre-existing PDF references are not an
    inventory of every available enacted law. Remaining metadata-only detail
    acquisition and wider history/freshness/analytics/sustained-operation gates

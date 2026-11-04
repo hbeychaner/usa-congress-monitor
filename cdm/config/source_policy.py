@@ -12,6 +12,7 @@ class SourceName(StrEnum):
     BILLSTATUS = "govinfo:billstatus"
     BILLSUM = "govinfo:billsum"
     BILLS = "govinfo:bills"
+    STATUTE = "govinfo:statute"
     CONGRESS = "congress.gov_api"
     UNKNOWN = "unknown"
 

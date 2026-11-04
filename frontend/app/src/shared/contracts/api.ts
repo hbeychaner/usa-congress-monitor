@@ -729,7 +729,7 @@ export type SimilarMembersResponse = {
     similar: Array<SimilarMember>;
 };
 
-export type SourceName = 'govinfo:billstatus' | 'govinfo:billsum' | 'govinfo:bills' | 'congress.gov_api' | 'unknown';
+export type SourceName = 'govinfo:billstatus' | 'govinfo:billsum' | 'govinfo:bills' | 'govinfo:statute' | 'congress.gov_api' | 'unknown';
 
 export type StagingStatus = {
     connected: boolean;

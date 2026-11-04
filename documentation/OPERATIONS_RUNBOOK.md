@@ -470,6 +470,24 @@ are explicitly quarantined. No Congress API requests or serving text writes
 were performed. These are enacted-law texts, not proof of available earlier bill
 drafts. The next serving gate must retain this distinction and source provenance.
 
+**Subsequent verified law-text publication:** all 573 final candidates are now
+indexed and available through the real API, with explicit enacted-law version
+codes and UI labels. An owned-shadow rehearsal included stale-write and exact
+rollback probes; the live API/browser canary preceded 572 remaining conditional
+writes. Final exact source/version and API checks passed for all 573; 560
+noncandidate source/version sentinels remained exact. Detail/hydration/analysis,
+serving mappings/aliases and original failed-job history were preserved. No
+upstream requests, extra workers or expanded allocation were used. Only the exact
+owned unaliased shadow was retired after final verification.
+
+Retain `data/local-readiness-statute-publication-20261104/` for the fresh
+before-images, expected projections, input/controller seals, fsynced intent/ack
+journals, final API verification and retirement receipt. Its run-seal SHA is
+`dcbab36e7b56e0bfac19efa871c5250cc5a4c69d9f405ba6c7b91e2799b5a88a`.
+Do not replay writes when any intent exists: reconcile ambiguous acknowledgements
+and current versions explicitly. The 72 unresolved references remain untouched;
+the original 645 references are not a complete available-law catalog.
+
 The requested 24-hour/5-requests-per-second acceptance has **not** run. A single
 Mac cannot provide independent-host failover; its on-host backups do not prove
 off-host disaster recovery. Keep these limitations visible rather than converting

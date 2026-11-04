@@ -227,6 +227,16 @@ records. It therefore stores `bill-text:...` child documents, rather than
 running this parent-text selection step. Those are different storage modes,
 not interchangeable ways of replaying published text.
 
+Controlled historical law-text publication is a separate parent-only operation.
+[`StatuteTextEnricher`](../../cdm/ingest/statute_text.py) fills blank text and its
+lemma while preserving existing details, hydration, analysis and law/PDF evidence.
+It adds `govinfo:statute` provenance and `public-law-<congress>-<number>` or
+`private-law-<congress>-<number>` version codes, not a bill-draft rank or synthetic
+`bill-text:` child. These unranked full texts retain the existing protection from
+GovInfo parent-text replacement above. Publication uses frozen-version conditional
+writes and exact source/version/API checks, not additive upsert. Existing mapping
+fields suffice; extra component/volume hashes remain in stored source metadata.
+
 ## Validation and index lifecycle
 
 [`audit_document()`](../../cdm/store/mapping_validation.py) reports top-level

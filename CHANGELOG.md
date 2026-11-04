@@ -4,6 +4,18 @@
 
 ### Added
 
+- Published all 573 verified historical enacted-law texts: 203 in Congress 94
+  and 370 in Congress 95, comprising 307 public and 266 private laws.
+  Fresh source/version freezes, owned-shadow stale-write/rollback probes,
+  a live API/browser canary and all 573 final API checks passed. Another 560
+  noncandidate records stayed source/version-exact; mappings/aliases, detail
+  evidence, analysis and failed-job history are unchanged. Existing nonblank
+  text cannot be overwritten. Law/version labels, plain-text rendering,
+  Statutes provenance and indexed lemmas are wired through the existing API
+  fields. No upstream requests, new workers or allocation changes were needed.
+  The owned shadow was retired. The 72 unresolved references and wider content
+  coverage remain open; the publisher does not claim earlier draft coverage or
+  complete detail hydration.
 - Reused the interrupted acquisition to enrich 459 Congress 94 bills locally:
   500 expanded committee rows and the archived subject/detail evidence passed
   independent collection audits, owned-shadow rehearsal, conditional serving
@@ -17,8 +29,8 @@
   Four retained bulk volumes supplied verified enacted-law text for 573 of
   645 indexed historical references, without Congress API calls or PDF OCR.
   The remaining 72 references did not pass matching; seven XML components were
-  quarantined. Text is staged, not yet promoted to serving documents or
-  represented as earlier bill drafts.
+  quarantined. The independently verified staging was subsequently published
+  through the guarded serving gate above, not represented as earlier bill drafts.
 - Clarified that historical identity recovery is a baseline, not completion:
   full detail and full text wherever available remain required. Recovery now
   distinguishes indexed content, reusable local content, upstream availability,

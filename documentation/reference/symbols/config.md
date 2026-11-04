@@ -200,15 +200,24 @@ No declarations in this module.
 [Source](../../../cdm/config/source_policy.py)
 
 - class: [`SourceName(StrEnum)`](../../../cdm/config/source_policy.py#L11)
-- class: [`SourcePolicy(BaseModel)`](../../../cdm/config/source_policy.py#L19)
-- field: [`SourcePolicy.authority: tuple[SourceName, ...]`](../../../cdm/config/source_policy.py#L21)
-- field: [`SourcePolicy.list_fields: frozenset[FieldName]`](../../../cdm/config/source_policy.py#L26)
-- field: [`SourcePolicy.identity_fields: frozenset[FieldName]`](../../../cdm/config/source_policy.py#L43)
-- field: [`SourcePolicy.bill_id_pattern: str`](../../../cdm/config/source_policy.py#L61)
-- field: [`SourcePolicy.freshness_hours: int`](../../../cdm/config/source_policy.py#L64)
-- field: [`SourcePolicy.version_fields: tuple[FieldName, ...]`](../../../cdm/config/source_policy.py#L65)
-- field: [`SourcePolicy.billstatus_fields: dict[FieldName, str]`](../../../cdm/config/source_policy.py#L69)
-- function: [`SourcePolicy.rank(self, source: SourceName, field: FieldName) -> int`](../../../cdm/config/source_policy.py#L87)
+- class: [`SourcePolicy(BaseModel)`](../../../cdm/config/source_policy.py#L20)
+- field: [`SourcePolicy.authority: tuple[SourceName, ...]`](../../../cdm/config/source_policy.py#L22)
+- field: [`SourcePolicy.list_fields: frozenset[FieldName]`](../../../cdm/config/source_policy.py#L27)
+- field: [`SourcePolicy.identity_fields: frozenset[FieldName]`](../../../cdm/config/source_policy.py#L44)
+- field: [`SourcePolicy.bill_id_pattern: str`](../../../cdm/config/source_policy.py#L62)
+- field: [`SourcePolicy.freshness_hours: int`](../../../cdm/config/source_policy.py#L65)
+- field: [`SourcePolicy.version_fields: tuple[FieldName, ...]`](../../../cdm/config/source_policy.py#L66)
+- field: [`SourcePolicy.billstatus_fields: dict[FieldName, str]`](../../../cdm/config/source_policy.py#L70)
+- function: [`SourcePolicy.rank(self, source: SourceName, field: FieldName) -> int`](../../../cdm/config/source_policy.py#L88)
+
+## cdm/config/statute_text.py
+
+[Source](../../../cdm/config/statute_text.py)
+
+- class: [`StatuteTextSettings(BaseModel)`](../../../cdm/config/statute_text.py#L6)
+- field: [`StatuteTextSettings.parser_version: str`](../../../cdm/config/statute_text.py#L9)
+- field: [`StatuteTextSettings.volume_base_url: str`](../../../cdm/config/statute_text.py#L10)
+- field: [`StatuteTextSettings.pdf_pattern: str`](../../../cdm/config/statute_text.py#L11)
 
 ## cdm/config/statutes.py
 
