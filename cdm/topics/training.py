@@ -363,6 +363,8 @@ class TopicTrainingJob:
             cache is None or cache.model != self._embedding_model
         ):
             raise ValueError("Full training requires a cache for its embedding model")
+        if not self._options.preview:
+            self._publications.ensure_index()
         self._stage("fetching documents", self._progress.fetch)
         documents = self._fetch()
         if not documents:

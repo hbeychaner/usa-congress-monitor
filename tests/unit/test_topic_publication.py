@@ -6,7 +6,7 @@ from elasticsearch import Elasticsearch, NotFoundError
 
 from cdm.backend.services.subject_service import SubjectService
 from cdm.backend.services.topic_service import TopicService
-from cdm.config.topic_analysis import TopicPublicationId
+from cdm.config.topic_analysis import TopicAnalysisSchema, TopicPublicationId
 from cdm.graph.topics import TopicModelReader
 from cdm.store.metasubject_repository import MetasubjectRepository
 from cdm.store.topic_publication import (
@@ -61,6 +61,10 @@ def missing() -> NotFoundError:
 def client(completed: CompletedTopicRun) -> Mock:
     client = Mock(spec=Elasticsearch, indices=Mock())
     client.indices.exists.return_value = True
+    client.indices.put_mapping.return_value = {"acknowledged": True}
+    client.indices.get_mapping.return_value = {
+        "analysis": {"mappings": {"properties": TopicAnalysisSchema.properties()}}
+    }
     client.get.return_value = {
         "_source": TopicPublicationPointer(run=completed).model_dump(mode="json"),
         "_seq_no": 3,
@@ -110,6 +114,57 @@ class TestPublishedReaders:
 
 
 class TestCompleteRunWrites:
+    def test_unacknowledged_schema_creation_fails(self, client: Mock) -> None:
+        client.indices.exists.return_value = False
+        client.indices.create.return_value = {"acknowledged": False}
+        with pytest.raises(RuntimeError, match="not acknowledged"):
+            TopicPublicationStore(client, "analysis").ensure_index()
+
+    def test_existing_legacy_label_is_preserved_and_only_missing_fields_are_added(
+        self, client: Mock
+    ) -> None:
+        properties = TopicAnalysisSchema.properties()
+        properties["label"] = {
+            "type": "text",
+            "fields": {"keyword": {"type": "keyword", "ignore_above": 256}},
+        }
+        del properties["label_source"]
+        client.indices.get_mapping.return_value = {
+            "analysis": {"mappings": {"properties": properties}}
+        }
+        TopicPublicationStore(client, "analysis").ensure_index()
+        client.indices.put_mapping.assert_called_once_with(
+            index="analysis", properties={"label_source": {"type": "keyword"}}
+        )
+
+    def test_compatible_existing_schema_requires_no_mapping_write(
+        self, client: Mock
+    ) -> None:
+        TopicPublicationStore(client, "analysis").ensure_index()
+        client.indices.put_mapping.assert_not_called()
+
+    @pytest.mark.parametrize(
+        ("name", "mapping"),
+        [
+            ("label", {"type": "integer"}),
+            ("label", {"type": "text"}),
+            ("kind", {"type": "text"}),
+            ("run", {"type": "object", "enabled": True}),
+            ("centroid", {"type": "float"}),
+        ],
+    )
+    def test_incompatible_existing_fields_fail_before_any_mapping_write(
+        self, client: Mock, name: str, mapping: JsonObject
+    ) -> None:
+        properties = TopicAnalysisSchema.properties()
+        properties[name] = mapping
+        client.indices.get_mapping.return_value = {
+            "analysis": {"mappings": {"properties": properties}}
+        }
+        with pytest.raises(ValueError, match=name):
+            TopicPublicationStore(client, "analysis").ensure_index()
+        client.indices.put_mapping.assert_not_called()
+
     @pytest.mark.parametrize(
         ("corpus_size", "dated_documents", "message"),
         [(2, 1, "Assignment count"), (1, 2, "Dated documents")],

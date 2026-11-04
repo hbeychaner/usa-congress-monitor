@@ -221,6 +221,13 @@ because topic rows exist. Counts, assignments, group coverage and dated trend
 totals are validated before publication. Status/ledger success alone is not a
 source-corpus completeness or freshness certificate.
 
+Full runs preflight the destination schema before fetching or fitting the corpus.
+Existing compatible mappings are preserved; only missing fields are added.
+In particular, legacy `label` text fields with a keyword subfield remain intact
+instead of being changed to keyword fields. Incompatible required field mappings
+or unacknowledged schema changes fail explicitly. Previews never initialize or
+modify the publication schema.
+
 ### Diagram and data-join keys
 
 | Document/entity | Identity and join |

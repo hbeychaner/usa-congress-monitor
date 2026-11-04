@@ -1,9 +1,11 @@
 """Topic-analysis schema and typed training options."""
 
+from __future__ import annotations
+
 from datetime import timedelta
 from enum import IntEnum, StrEnum
 from pathlib import Path
-from typing import Self
+from typing import NewType, Self
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 
@@ -204,7 +206,54 @@ class LabelPreviewConfig(BaseModel):
     topic_limit: int = 10000
 
 
+TopicMappingName = NewType("TopicMappingName", str)
+
+
+class TopicMappingField(BaseModel):
+    type: str = "object"
+    index: bool = True
+    enabled: bool = True
+    doc_values: bool | None = None
+    fields: dict[TopicMappingName, TopicMappingField] = Field(default_factory=dict)
+
+    def supports(self, required: TopicMappingField, *, label: bool) -> bool:
+        keyword = self.fields.get(TopicMappingName("keyword"))
+        legacy_label = (
+            label
+            and self.type == "text"
+            and required.type == "keyword"
+            and keyword is not None
+            and keyword.type == "keyword"
+            and keyword.index
+            and keyword.doc_values is not False
+        )
+        return (
+            (self.type == required.type or legacy_label)
+            and self.index == required.index
+            and self.enabled == required.enabled
+            and (required.doc_values is None or self.doc_values == required.doc_values)
+        )
+
+
+class TopicMappingProperties(BaseModel):
+    properties: dict[TopicMappingName, JsonObject] = Field(default_factory=dict)
+
+
 class TopicAnalysisSchema:
+    @classmethod
+    def missing_properties(cls, mapping: JsonObject) -> dict[str, JsonObject]:
+        existing = TopicMappingProperties.model_validate(mapping).properties
+        additions: dict[str, JsonObject] = {}
+        for name, definition in cls.properties().items():
+            prior = existing.get(TopicMappingName(name))
+            if prior is None:
+                additions[name] = definition
+            elif not TopicMappingField.model_validate(prior).supports(
+                TopicMappingField.model_validate(definition), label=name == "label"
+            ):
+                raise ValueError(f"Incompatible topic-analysis mapping: {name}")
+        return additions
+
     @staticmethod
     def properties() -> dict[str, JsonObject]:
         return {

@@ -164,6 +164,23 @@ def corpus(monkeypatch: pytest.MonkeyPatch) -> Mock:
     return scan
 
 
+def test_incompatible_publication_mapping_fails_before_fetch_or_fit(
+    corpus: Mock,
+) -> None:
+    harness = TrainingHarness(TopicTrainingOptions())
+    harness.publications.ensure_index.side_effect = ValueError("Incompatible mapping")
+    with pytest.raises(ValueError, match="Incompatible mapping"):
+        harness.job.execute()
+    corpus.assert_not_called()
+    harness.modeler.fit.assert_not_called()
+
+
+def test_preview_never_initializes_the_publication_mapping(corpus: Mock) -> None:
+    harness = TrainingHarness(TopicTrainingOptions(dry_run=True))
+    harness.job.execute()
+    harness.publications.ensure_index.assert_not_called()
+
+
 @pytest.mark.parametrize(
     "label",
     [

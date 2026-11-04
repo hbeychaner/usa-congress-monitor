@@ -11,7 +11,7 @@ from elasticsearch.helpers import bulk as real_bulk
 
 from cdm.backend.services.subject_service import SubjectService
 from cdm.backend.services.topic_service import TopicService
-from cdm.config.topic_analysis import TopicKind
+from cdm.config.topic_analysis import TopicAnalysisSchema, TopicKind
 from cdm.graph.topics import TopicModelReader
 from cdm.store.metasubject_repository import MetasubjectRepository
 from cdm.store.topic_publication import (
@@ -65,18 +65,38 @@ def actions(
         }
 
 
-@pytest.fixture
-def store() -> Iterator[TopicPublicationStore]:
+@pytest.fixture(params=[False, True], ids=["fresh", "legacy-label"])
+def store(request: pytest.FixtureRequest) -> Iterator[TopicPublicationStore]:
     url = os.environ.get("TOPIC_PUBLICATION_TEST_URL")
     if not url:
         pytest.skip(
             "Set TOPIC_PUBLICATION_TEST_URL to an isolated Elasticsearch server"
         )
-    client = Elasticsearch(url, request_timeout=30)
+    client = Elasticsearch(
+        url,
+        api_key=os.environ.get("TOPIC_PUBLICATION_TEST_API_KEY"),
+        request_timeout=30,
+    )
     index = f"topic-publication-test-{uuid4().hex}"
     store = TopicPublicationStore(client, index)
-    store.ensure_index()
     try:
+        if request.param:
+            properties = TopicAnalysisSchema.properties()
+            properties["label"] = {
+                "type": "text",
+                "fields": {"keyword": {"type": "keyword", "ignore_above": 256}},
+            }
+            for name in ("label_source", "fallback_reason", "run"):
+                del properties[name]
+            client.indices.create(index=index, mappings={"properties": properties})
+        store.ensure_index()
+        mapping = client.indices.get_mapping(index=index)[index]["mappings"][
+            "properties"
+        ]
+        assert mapping["label"]["type"] == ("text" if request.param else "keyword")
+        assert all(
+            name in mapping for name in ("label_source", "fallback_reason", "run")
+        )
         yield store
     finally:
         client.indices.delete(index=index, ignore_unavailable=True)

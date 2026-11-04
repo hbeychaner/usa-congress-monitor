@@ -4,6 +4,16 @@
 
 ### Added
 
+- Fixed full topic publication against the retained legacy analysis index:
+  compatible text/keyword label mappings remain unchanged and only missing
+  fields are added. Incompatible mappings and unacknowledged changes fail
+  explicitly, with full-run schema preflight before costly corpus fitting;
+  previews still make no schema writes. Fresh and legacy real-store cases
+  verify immutable writes, interruption, compare-and-swap publication and
+  rollback. The first monitored full build stayed below its resource cap but
+  failed before publication on the old mapping conflict; its failed job and
+  model remain retained. A guarded repeat keeps the original complete corpus
+  and cached vectors and checkpoints exact fitted result rows before indexing.
 - Established one fixed local release-closeout checklist for content/freshness,
   analytics, actual 24-hour operation, recovery and final publication, without
   silently reducing historical detail/text requirements. Froze the complete

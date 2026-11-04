@@ -113,6 +113,8 @@ Keep the Mac awake while running long collection or validation jobs; elapsed
 time across sleep is not evidence of continuous operation.
 For failed jobs, restarts or backups, use the
 [operations runbook](documentation/OPERATIONS_RUNBOOK.md).
+Inspect a failed analysis job before resubmitting it; an analysis failure does
+not mean the underlying legislation needs downloading again.
 Health warnings about failed jobs describe ingestion history, not automated
 test failures. Repairing some bills does not clear a job for an entire scope.
 

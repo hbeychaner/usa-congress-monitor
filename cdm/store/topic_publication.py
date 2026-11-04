@@ -105,11 +105,21 @@ class TopicPublicationStore:
     def ensure_index(self) -> None:
         properties = TopicAnalysisSchema.properties()
         if not self.client.indices.exists(index=self.index):
-            self.client.indices.create(
+            result = self.client.indices.create(
                 index=self.index, mappings={"properties": properties}
             )
         else:
-            self.client.indices.put_mapping(index=self.index, properties=properties)
+            mapping = self.client.indices.get_mapping(index=self.index)[self.index][
+                "mappings"
+            ]
+            additions = TopicAnalysisSchema.missing_properties(mapping)
+            if not additions:
+                return
+            result = self.client.indices.put_mapping(
+                index=self.index, properties=additions
+            )
+        if not result["acknowledged"]:
+            raise RuntimeError("Topic-analysis mapping change was not acknowledged")
 
     def snapshot(self) -> TopicPublicationSnapshot | None:
         try:
