@@ -4,6 +4,16 @@
 
 ### Added
 
+- Added strict support in bounded recovery for legacy Congress.gov draft-text
+  URLs whose filenames omit the Congress number. Path and filename must agree
+  with the selected Congress, measure and number; nonblank formatted bodies and
+  actual version codes/ranks are retained. All three failing Congress 102
+  canaries now capture text. The resumed stage preserves all 3,852 prior records
+  by exact logical archive comparison and reuses 35,763 validated API caches
+  without duplicating their bodies; a complete nine-collection cache replay
+  proves zero network attempts. Nine separate unresolved source/detail cases
+  remain explicit blockers, not completed coverage. No serving enrichment writes
+  or request/deadline/resource-limit relaxation occurred.
 - Corrected enacted-law PDF headings to recognize historical `102d`/`103d`
   Congress spellings while requiring the heading's Congress to agree with the
   law identity. Regression tests preserve adjacent-law boundaries and reject

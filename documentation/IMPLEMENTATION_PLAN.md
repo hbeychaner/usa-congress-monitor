@@ -244,6 +244,28 @@ produce a complete-content certificate and exits nonzero while these blockers
 remain. The original 150,000-request cap, 48-hour start time, resource guards and
 three-consecutive-new-failure stop remain unchanged.
 
+The next finite run advanced to **3,852 staged records** and **47,603 cumulative
+request attempts** before the consecutive-failure guard stopped it at three
+Congress 102 draft links. Those valid legacy filenames omit the Congress number,
+which is supplied by the URL path. Strict legacy-layout support now verifies the
+host, path and filename identities and captures nonblank formatted bill bodies.
+All three actual canaries pass: H.R.1383 (**726 characters**), H.R.1386
+(**6,155**) and H.R.1387 (**3,722**), all introduced-version text.
+An exact logical SQLite backup preserves every predecessor archive row without
+loading the entire staged corpus into memory. **35,763 validated API cache
+entries** are reused; an actual cached nine-collection replay has **zero network
+attempts**. The original deadline and complete cumulative attempt history remain
+unchanged.
+
+The continuing queue separately retains **nine unresolved identities**: the
+previous three plus `bill:103:hr:4379`, `bill:103:hr:5110`,
+`bill:103:s:171`, `bill:103:s:1406`, `bill:103:s:1487` and
+`bill:103:s:2182`. These include unverified/oversized law representations,
+conflicting XML primary-bill evidence and incomplete nine-collection evidence.
+Their original sources and partial content remain retained for resolution;
+none is declared globally unavailable, successfully hydrated or release-complete.
+No staged content has yet been conditionally published into the serving index.
+
 Recovery includes **35 Congress 113+ identities**, so the previously accepted
 analytics artifacts remain verified only for their recorded old input contract.
 Enrich those inputs, reconcile fingerprints and rebuild affected analytics

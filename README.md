@@ -102,6 +102,8 @@ The reconciled Congress 93-119 roster's 10,452 missing identities have now been
 created from retained catalog metadata without changing existing records.
 Their full-detail and available-text recovery is separate and still in progress;
 staged downloads are not indexed content or proof of current analytics coverage.
+Older Congress.gov text links can encode the Congress in the URL path rather
+than the filename; recovery validates the complete identity before downloading.
 
 ## Everyday commands
 

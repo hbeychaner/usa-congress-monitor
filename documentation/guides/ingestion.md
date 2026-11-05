@@ -479,6 +479,15 @@ If a whole-volume XML exceeds the response bound, keep that bound and use a
 bounded independently verified law source instead; the large representation
 does not establish that the law's text is unavailable.
 
+Historical draft links can instead use
+`/{congress}/bills/{measure}{number}/BILLS-{measure}{number}{version}.htm`.
+The filename alone does not establish the Congress. Controlled recovery validates
+the official HTTPS host, Congress path, both measure/number occurrences and
+version code, then requires a nonblank preformatted bill body. Do not rewrite
+these links into a guessed modern package URL or treat nonblank error-page text
+as a successful bill download. Retained successful API responses can be reused
+after payload-digest validation; cache replay must consume no network attempts.
+
 The runner and indexer derive `hydration_status` from the versioned
 `HydrationAssessment`, never from successful return alone. The assessment records
 source, assessment time, per-detail counts/state/reasons and the scoped status.
