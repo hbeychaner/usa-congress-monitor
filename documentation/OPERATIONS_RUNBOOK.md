@@ -10,6 +10,14 @@ tracks content/freshness, analytics, the real 24-hour observation, recovery and
 final disposition. A ready API or passing isolated fixture does not close those
 gates.
 
+Index presence and Bill API visibility are separate checks. Existing law
+projections can carry valid canonical bill identities, but bill detail/listing
+currently require `source_type=bill`. A 404 for such an indexed identity is an
+unresolved read-path failure, not a missing-document diagnosis or permission to
+download it again. Keep conditional-write acknowledgements and preservation
+evidence; do not reapply acknowledged content repairs or retire their owned
+shadow while strict API acceptance is blocked.
+
 Run the read-only health check before and after maintenance:
 
 ```sh

@@ -1,6 +1,6 @@
 # Engineering improvement plan
 
-**Reviewed:** 2026-11-04
+**Reviewed:** 2026-11-05
 
 **Status:** core reliability/consolidation work and bounded R03 repair/voting
 publication are implemented; approved controlled Compose cutover and scoped
@@ -25,8 +25,8 @@ not silently reclassified as unavailable.
 
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
-| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | In progress. Central/staged comparison and all 49,207 nested GovInfo archives are audited; no retained identity is missing from search. Independently reproduced 3,084 committee expansions and 44 texts pass owned-shadow rehearsal; serving publication waits for the frozen topic run. Text variants, bill-identity law read-path visibility, broader source support and freshness remain open. |
-| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | In progress after restored capacity. The mapping fix is verified; the disk-stopped second attempt remains retained and unpublished. After user cleanup, approximately 22 GiB free disk and 53% host free memory were measured. A separate `analytics-v3` repeat retains the original complete 109,691-bill scope/cache and unchanged safety limits. No completed publication is claimed; collaboration/topic graph lineage remains open. |
+| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | In progress. All retained archives are audited; no retained identity is missing from search. All 3,084 committee expansions and 44 texts are conditionally applied and source/version verified. Actual API checks pass for 3,000 repaired records, including all 44 texts; 128 repaired law projections return 404. Full acceptance and shadow retirement remain blocked. Text variants, all 136 bill-identity law read paths, broader source support and freshness remain open. |
+| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Topic publication verified: the complete 109,691-bill model, 137,230 fitted rows and saved-model seals match the durable succeeded job/current pointer. Actual topic/group/trend/detail/assignment/similarity APIs expose the published model; browser topic results are verified. Earlier failed attempts remain retained. Collaboration/topic graph rebuilds and perspectives lineage remain open, so C2 is not closed. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
 | C5. Final disposition | Every gate has evidence or an explicit blocker; validation passes; source/docs/changelog and source-pinned wiki are published. | Pending. Separate-host failover and off-host restoration remain blocked by the single-Mac topology, not implicitly passed or waived. |
@@ -70,12 +70,25 @@ is unchanged.
 
 After the user freed disk space, the capacity recheck measured
 **23,768,313,856 free bytes** (about 22 GiB) and **53% host free memory**.
-The next attempt uses separate `analytics-v3` evidence, revalidates the original
-corpus/configuration, and retains the 4 GiB RSS stop, 8 GiB disk floor and other
-monitoring limits. A bounded macOS `caffeinate -i` wrapper inhibits idle sleep
-only while that job runs; it does not change persistent system settings or
-certify uninterrupted operation through manual/lid sleep. No qualifying
-24-hour observation has begun.
+The successful repeat used separate `analytics-v3` evidence, revalidated the
+original corpus/configuration, and retained the 4 GiB RSS stop, 8 GiB disk floor
+and other monitoring limits. The job-lifetime macOS `caffeinate -i` wrapper
+ended with the job; no persistent system sleep settings changed.
+
+Durable job `topic_training:677404c485484bdb92314f53d1e9cd31` succeeded and
+published model `20261105T081214Z-a18ff414bbb94e6089ec5eb08eda3cab` with a
+create-only compare-and-swap pointer. The monitor recorded **3,264 seconds**,
+peak parent RSS **1,930,690,560 bytes**, exit zero and no stop reason.
+The completed manifest contains **109,691 assignments**, **878 topic rows**
+(877 non-outlier topics exposed in the browser), **25,249 topic trend rows**,
+**30 metasubjects** and **1,382 metasubject trend rows**. All **137,230 fitted
+actions**, the capture seal and all five saved-model file seals were verified.
+The durable ledger and live publication pointer agree. Actual topic, group,
+trend, detail, bill-assignment and similarity responses validate against their
+API models and expose the exact published-model lineage. The browser renders
+the new model and topic results. This proves topic publication, not graph or
+perspective freshness, all-history analytics or sustained-load acceptance.
+**No qualifying 24-hour observation has begun.**
 
 Current closeout evidence is retained under `data/release-closeout-20261104/`.
 The original all-history census counted **371,230 bill** and **136 law**
@@ -97,12 +110,25 @@ Text is projected through the production version/rank/lemma path.
 
 All 3,128 projections pass exact owned-shadow readback; two owned rows also pass
 stale-write rejection and conditional rollback/reapply probes.
-The 1,532 previously published historical law texts are
-freshly frozen as preservation sentinels. No serving repair has been applied:
-changing a frozen source's sequence number before topic publication would
-correctly invalidate that training run. Eighteen controller safeguards pass,
-including CountUrl expansion, strict nonblank-content preservation and actual
-API collection-shape handling.
+The 1,532 previously published historical law texts were freshly frozen as
+preservation sentinels. After successful topic publication, all **3,128 local
+repairs were conditionally applied**, without changing their sealed projections.
+Every acknowledged after-image and source version matches; all **1,533 sentinels**
+(including those 1,532 law texts) remain unchanged. All 44 restored texts retain
+their paired lemma, version code and rank: 37 `ih`, six `is` and one `ats`.
+The original committee canary also renders correctly in the browser.
+Eighteen controller safeguards pass, including CountUrl expansion, strict
+nonblank-content preservation and actual API collection-shape handling.
+
+The strict final API check stopped on a real 404 for Congress 119 H.R.187.
+A separate complete read-only disposition then checked every repaired record:
+**3,000 actual API responses match the sealed projections**, including all
+44 restored texts; **128 repaired law projections return 404**. These failures
+are recorded as blockers, not successful reads. The sealed plan, original
+verification supplement and failed final attempt remain intact; no completed
+final-acceptance receipt or shadow-retirement receipt exists. Retain the owned
+shadow until canonical bill-identity law reads are resolved and strict final
+verification passes. Do not reapply already acknowledged writes.
 
 The **9,156 nested full-text variants** and **198 central full-text variants**
 are retained review evidence, not automatically missing or newer text. Version

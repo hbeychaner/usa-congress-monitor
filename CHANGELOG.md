@@ -4,6 +4,20 @@
 
 ### Added
 
+- Verified complete local topic publication: the durable succeeded job and live
+  pointer agree on the 109,691-bill model, with 878 topic rows, 30 metasubjects
+  and 137,230 sealed fitted actions. Saved-model seals and actual topic, group,
+  trend, detail, assignment and similarity API lineage pass; browser results
+  expose the new model. The monitored run completed in 3,264 seconds with peak
+  parent RSS 1,930,690,560 bytes, within unchanged resource limits. Graph and
+  perspective lineage and actual 24-hour acceptance remain separate.
+- Conditionally applied all 3,128 independently reproduced local content
+  repairs after topic publication. Exact source/version checks and all 1,533
+  preservation sentinels pass, retaining all 1,532 historical law texts.
+  Complete API disposition verifies 3,000 repaired records, including all
+  44 restored texts; 128 canonical bill-identity law projections return 404.
+  Strict final acceptance remains blocked and the owned shadow is retained;
+  no redundant ingest or discriminator rewriting was performed.
 - Recorded the second monitored analytics stop as a capacity blocker: the
   8 GiB free-disk floor was crossed during trend computation, and the owned
   process was terminated before publication. No completed fitted-row checkpoint
@@ -12,6 +26,7 @@
   After the user freed space, approximately 22 GiB free and 53% host free memory
   were verified. A separate guarded retry retains both failed attempts and uses
   a job-lifetime idle-sleep inhibitor, without changing system sleep settings.
+  That repeat subsequently completed as recorded above.
 - Fixed full topic publication against the retained legacy analysis index:
   compatible text/keyword label mappings remain unchanged and only missing
   fields are added. Incompatible mappings and unacknowledged changes fail
@@ -28,13 +43,12 @@
   109,691-bill existing analytics corpus and approved one monitored host job
   with a 4 GiB RSS stop threshold, unchanged Docker/worker allocations and
   exact retained-vector reuse. All 109,691 vectors match and are copied into
-  the model-owned cache, with zero misses and no legacy-cache writes; the full
-  run remains under observation rather than being called published.
+  the model-owned cache, with zero misses and no legacy-cache writes.
   Audited all 180 central/staged archives and 49,207 nested GovInfo archives:
   no retained identity is absent from search. Independently reproduced 3,084
   unexpanded committee collections and 44 missing texts; all 3,128 projections
-  pass owned-shadow stale-write/rollback rehearsal. Serving repairs wait for
-  topic publication so they cannot invalidate frozen source versions.
+  pass owned-shadow stale-write/rollback rehearsal. Serving repairs were held
+  until topic publication so they could not invalidate frozen source versions.
   Existing text variants and bill-identity law read visibility remain explicit
   open findings, not authorization to overwrite or re-ingest.
   Eighteen controller safeguards and ten actual
