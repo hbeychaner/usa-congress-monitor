@@ -217,6 +217,33 @@ preservation-aware conditional publication and actual read acceptance remain
 required. The ten initial item/detail requests per identity alone impose about
 **22 hours** at the shared rate limit, before pagination/text overhead.
 
+The first full queue stopped safely at **544 staged records**, **23 explicit
+failures** and **6,994 request attempts**, with no serving enrichment writes.
+Twenty-two failures were enacted-law references incorrectly expected to use
+bill-draft URLs; the other record returns an upstream HTTP 500. Controlled
+source-selection probes retained all successes and exposed official historical
+`103d Congress` headings rejected by the PDF parser. The parser now accepts
+historical `102d`/`103d` spellings, requires Congress agreement and preserves
+adjacent-law boundaries. Recovery uses independently matched law XML or
+MODS/PDF evidence; oversized optional whole-volume XML is explicitly recorded
+and replaced by a bounded verified representation, not downloaded over the
+32 MiB limit or mislabeled globally unavailable. Restart intents preserve the
+original deadline and cumulative attempt count across every retained execution.
+The source HTTP 500 remains unresolved, not an empty or successful retrieval.
+
+The verified restart preserves **570 staged records**, including all **35 new
+Congress 113+ inputs**, and resumes the remainder of the same sealed roster.
+Three identities are explicitly held for source resolution:
+`bill:106:sres:218` (repeated upstream HTTP 500), `bill:103:hr:3840` (no verified
+complete enacted-law opening in the supplied PDF), and `bill:103:hr:4066`
+(unconfirmed first-page Statutes citation). Their captured metadata, partial
+content and failure evidence remain retained. They are **not** marked complete
+or unavailable, and are not repeatedly retried ahead of healthy pending work.
+Checkpoints report `known_blocked` separately; draining the eligible queue cannot
+produce a complete-content certificate and exits nonzero while these blockers
+remain. The original 150,000-request cap, 48-hour start time, resource guards and
+three-consecutive-new-failure stop remain unchanged.
+
 Recovery includes **35 Congress 113+ identities**, so the previously accepted
 analytics artifacts remain verified only for their recorded old input contract.
 Enrich those inputs, reconcile fingerprints and rebuild affected analytics

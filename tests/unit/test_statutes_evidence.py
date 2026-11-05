@@ -7,6 +7,7 @@ from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
 from cdm.config.statute_recovery import StatuteRecoverySettings
+from cdm.ingest.statutes import StatuteIdentity, StatuteLawKind
 from cdm.ingest.statutes_evidence import (
     CongressionalLawEvidence,
     SealedStatuteFile,
@@ -179,6 +180,38 @@ def test_pdf_corroborates_law_primary_bill_and_page_and_preserves_text(
     )
     assert pdf.text == "PUBLIC LAW 94-1 94th Congress H.R. 1 An Act."
     assert pdf.pages == 1
+
+
+@pytest.mark.parametrize(
+    ("congress", "ordinal"),
+    [(101, "101st"), (102, "102nd"), (102, "102d"), (103, "103rd"),
+     (103, "103d"), (104, "104th")],
+)
+def test_historical_congress_headings_preserve_law_boundaries(
+    congress: int, ordinal: str,
+) -> None:
+    identity = StatuteIdentity(
+        kind=StatuteLawKind.PUBLIC, congress=congress, number=1
+    )
+    text = (
+        f"Public Law {congress}-1 {ordinal} Congress Selected law. "
+        f"Public Law {congress}-2 {ordinal} Congress Adjacent law."
+    )
+    headings, selected = StatutePdfReader(
+        StatuteRecoverySettings()
+    ).selected_heading(text, identity)
+    assert len(headings) == 2 and len(selected) == 1
+    assert text[selected[0].start():headings[1].start()].strip().endswith(
+        "Selected law."
+    )
+
+
+def test_law_heading_rejects_mismatched_congress() -> None:
+    identity = StatuteIdentity(kind=StatuteLawKind.PUBLIC, congress=103, number=1)
+    headings, selected = StatutePdfReader(
+        StatuteRecoverySettings()
+    ).selected_heading("Public Law 103-1 102nd Congress An Act.", identity)
+    assert not headings and not selected
 
 
 @pytest.mark.parametrize(

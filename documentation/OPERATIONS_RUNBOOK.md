@@ -52,6 +52,12 @@ For a sealed acquisition queue:
    Publish only the owned identity scope using fresh source/version checks,
    conditional writes, exact readback and actual API acceptance. Keep original
    records unchanged and reconcile changed analytics inputs before certification.
+6. Preserve known source blockers in a sealed explicit inventory rather than
+   retrying them indefinitely ahead of healthy pending work. Report them
+   separately in checkpoints and retain their partial content and failure
+   evidence. They remain unresolved coverage obligations: draining the other
+   records must not produce a complete-content certificate or a successful final
+   exit. New unexpected consecutive failures still trigger investigation.
 
 Run the read-only health check before and after maintenance:
 

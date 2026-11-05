@@ -4,6 +4,17 @@
 
 ### Added
 
+- Corrected enacted-law PDF headings to recognize historical `102d`/`103d`
+  Congress spellings while requiring the heading's Congress to agree with the
+  law identity. Regression tests preserve adjacent-law boundaries and reject
+  mismatched Congresses. Missing-content recovery now distinguishes bill drafts
+  from enacted-law references: official law XML or independently matched
+  MODS/PDF evidence is required, without inventing draft ranks or relaxing
+  response-size/resource limits. Prior staged successes and failed executions
+  remain retained. The verified restart preserves 570 staged records and resumes
+  the same roster, separately retaining one upstream HTTP 500 and two unverified
+  law PDFs as explicit blockers. Eligible-queue completion cannot certify full
+  coverage or silently erase these unresolved records.
 - Recovered all 10,452 independently verified missing Congress 93-119 identities
   from retained official metadata using create-only writes. Exact readback and
   64 actual API canaries pass; all 371,366 original document versions remain

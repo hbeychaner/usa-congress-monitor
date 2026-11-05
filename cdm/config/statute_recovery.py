@@ -23,7 +23,7 @@ class StatuteRecoverySettings(BaseModel):
     parser_version: str = "statute-metadata-pdf-v1"
     body_heading_pattern: str = (
         r"\b(?P<kind>Public|Private)\s+Law\s*(?P<congress>\d+)\s*[-\u2013\u2014]\s*"
-        r"(?P<number>\d+)\W{0,80}\d+(?:st|nd|rd|th)\s*Congress\b"
+        r"(?P<number>\d+)\W{0,80}(?P=congress)(?:st|nd|rd|th|d)\s*Congress\b"
     )
     bill_patterns: dict[MeasureType, str] = {
         MeasureType.HR: r"H\.?\s*R\.?",

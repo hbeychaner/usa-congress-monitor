@@ -468,6 +468,17 @@ and missing network causes are not. Generic `RuntimeError` wrappers do not gain
 network retry classification. This preserves existing retry limits and
 full-text validation rather than treating failed downloads as empty success.
 
+Enacted-law entries in a bill's text-version list use `PLAW` or `STATUTE` URLs,
+not necessarily a `BILLS` draft URL. Do not assign a draft version/rank by
+guessing from those links. Match the acquired bill-law relationship against
+official XML primary-bill references or independently validated MODS/PDF
+evidence. Historical PDF headings can use `102d` or `103d` as well as modern
+ordinal spellings; the heading Congress must agree with the law identity.
+Preserve adjacent-law boundaries and explicit partial-facsimile/OCR failures.
+If a whole-volume XML exceeds the response bound, keep that bound and use a
+bounded independently verified law source instead; the large representation
+does not establish that the law's text is unavailable.
+
 The runner and indexer derive `hydration_status` from the versioned
 `HydrationAssessment`, never from successful return alone. The assessment records
 source, assessment time, per-detail counts/state/reasons and the scoped status.
