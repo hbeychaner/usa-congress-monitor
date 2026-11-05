@@ -25,8 +25,8 @@ not silently reclassified as unavailable.
 
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
-| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | In progress. All retained archives are audited; no retained identity is missing from search. All 3,084 committee expansions and 44 texts are conditionally applied and source/version verified. Actual API checks pass for 3,000 repaired records, including all 44 texts; 128 repaired law projections return 404. Full acceptance and shadow retirement remain blocked. Text variants, all 136 bill-identity law read paths, broader source support and freshness remain open. |
-| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Topic publication verified: the complete 109,691-bill model, 137,230 fitted rows and saved-model seals match the durable succeeded job/current pointer. Actual topic/group/trend/detail/assignment/similarity APIs expose the published model; browser topic results are verified. Earlier failed attempts remain retained. Collaboration/topic graph rebuilds and perspectives lineage remain open, so C2 is not closed. |
+| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. Official Congress 93-119 count comparison finds 10,452 count differences, not yet reconciled identities; bounded complete catalog-ID capture is running. Current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
+| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Verified for the existing frozen Congress 113+ contracts. Complete topic model and both rebuilt collaboration/topic graphs are published; accepted voting generation and historical graph counts are preserved. All seven Congress 113-119 perspective snapshots now use the same model: 727 eligible topic/Congress results, with 32 passing stability-gated splits. Exact actual API checks and browser canaries pass. This does not certify inputs not yet discovered/ingested by C1 or daily source freshness. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
 | C5. Final disposition | Every gate has evidence or an explicit blocker; validation passes; source/docs/changelog and source-pinned wiki are published. | Pending. Separate-host failover and off-host restoration remain blocked by the single-Mac topology, not implicitly passed or waived. |
@@ -120,24 +120,65 @@ The original committee canary also renders correctly in the browser.
 Eighteen controller safeguards pass, including CountUrl expansion, strict
 nonblank-content preservation and actual API collection-shape handling.
 
-The strict final API check stopped on a real 404 for Congress 119 H.R.187.
+The initial strict final API check stopped on a real 404 for Congress 119 H.R.187.
 A separate complete read-only disposition then checked every repaired record:
 **3,000 actual API responses match the sealed projections**, including all
 44 restored texts; **128 repaired law projections return 404**. These failures
 are recorded as blockers, not successful reads. The sealed plan, original
-verification supplement and failed final attempt remain intact; no completed
-final-acceptance receipt or shadow-retirement receipt exists. Retain the owned
-shadow until canonical bill-identity law reads are resolved and strict final
-verification passes. Do not reapply already acknowledged writes.
+verification supplement and failed final attempt remain intact. Those failures
+were not bypassed or reclassified as successful reads.
+The corrected shared canonical read scope now accepts valid bill-identity law
+projections without changing `source_type`. A separate immutable current-code
+verification passes all **3,128 source/version/API projections** and **1,533
+sentinels**. All **136 laws** additionally pass actual detail, exact-ID browse
+and cross-entity bill-search checks (**408 responses**), with unchanged source
+images/versions. The browser renders the former H.R.187 blocker. The recorded
+owned shadow was retired only after strict acceptance and UUID/owner/no-alias
+checks. No acknowledged repairs were reapplied.
 
 The **9,156 nested full-text variants** and **198 central full-text variants**
-are retained review evidence, not automatically missing or newer text. Version
-selection must be established before replacing existing content. Also, all
-136 law projections have valid canonical bill identity fields, but a direct
-Bill API canary for Congress 119 H.R.227 returns 404 because that read path
-requires `source_type=bill`. Search existence therefore does not certify
-Bill API visibility. These findings do not authorize redundant acquisition,
-discriminator rewriting or an unverified declaration of global coverage.
+are retained review evidence, not automatically missing or newer text.
+All **9,354** differences were reproduced from **9,169 archives** and classified:
+2,950 protected existing-unranked texts, 352 unversioned incoming texts,
+4,445 same-version different bodies, 1,602 older-ranked texts and five
+same-rank distinct versions. No candidate is provably rank-newer; no serving
+text was overwritten. Ambiguous bodies remain preserved for source/version
+review, not falsely declared missing, equivalent or safe to replace.
+
+The completed graph job freezes **109,827 canonical bill/law signatures** and
+the published topic model. It validates and CAS-publishes **114,539 collaboration
+edges** and **125,009 topic edges**. Topic lineage is exactly
+`20261105T081214Z-a18ff414bbb94e6089ec5eb08eda3cab`; the accepted voting generation
+and historical edge counts are unchanged. Actual neighborhood APIs pass for all
+seven Congresses and the browser renders the graph.
+The monitor completed in **99 seconds**, peak parent RSS **1,017,511,936 bytes**.
+
+Durable perspective job `perspectives:8c6659f9a46c4ca59a43c9213799f873` succeeded:
+all eligible topics, no five-topic cap, no LLM labels, Congress **113-119**.
+The recorded policy corpus contains **91,782 bills** under the existing
+bill-only/filtering contract. **727 topic/Congress results** were staged and
+validated before any publication; only **32 splits** pass the unchanged
+stability/quality thresholds. Failed splits retain other evidence but are not
+served as reliable perspective clusters. All seven snapshots, seven actual
+overview responses and all **727 actual topic responses** match exact current
+model lineage/content/gating. Graph pointers remain unchanged.
+The monitor completed in **391 seconds**, peak parent RSS **1,022,984,192 bytes**.
+Real owned-scratch tests prove stale create/update rejection and rollback for
+graphs and perspective snapshots.
+
+The official catalog count inventory uses exactly **27 bounded requests**,
+Congress **93-119**: **381,749 upstream** versus **371,297 indexed canonical
+identities** in those scopes, a **10,452 count difference**. The largest
+differences are Congress 93 (1,204), 100 (159), 101 (3,955), 102 (1,264) and
+103 (3,780). Counts do not establish set equality or exact missing identities.
+A separate read-only capture is reconciling every official catalog ID, retaining
+all pages; its fixed plan is **1,543 requests**, with a 1,800-request budget,
+two-hour deadline and 8 GiB disk floor. It performs no ingest or serving writes.
+Congress 119 has **19,827 indexed canonical identities** but **zero indexed
+`source_checked_at` values**: freshness is unknown, not proved current or stale.
+The catalog comparison does not certify full detail/text or pre-93 coverage.
+Any newly ingested Congress 113+ records must be reconciled against the frozen
+analytics contract before claiming the published model covers the new corpus.
 
 No optional taxonomy, new provider, transport replacement, index expansion or
 general code reduction is part of this closeout.

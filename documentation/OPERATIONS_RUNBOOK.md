@@ -10,13 +10,21 @@ tracks content/freshness, analytics, the real 24-hour observation, recovery and
 final disposition. A ready API or passing isolated fixture does not close those
 gates.
 
-Index presence and Bill API visibility are separate checks. Existing law
-projections can carry valid canonical bill identities, but bill detail/listing
-currently require `source_type=bill`. A 404 for such an indexed identity is an
-unresolved read-path failure, not a missing-document diagnosis or permission to
-download it again. Keep conditional-write acknowledgements and preservation
-evidence; do not reapply acknowledged content repairs or retire their owned
-shadow while strict API acceptance is blocked.
+Index presence and Bill API visibility are separate checks. Shared bill reads
+include bill/law projections with canonical bill identities; law detail reads
+validate agreement between the identity fields. Do not change `source_type` or
+download an existing law projection to repair read visibility. Exact canonical
+IDs bypass NLP, but this does not certify the memory use of general text queries.
+Keep conditional-write acknowledgements and preservation evidence; do not reapply
+acknowledged content repairs. Retire only the recorded owned, unaliased scratch
+shadow after current-code strict source/version/sentinel/API verification.
+
+Upstream catalog counts are not identity-set reconciliation or full-detail/text
+freshness evidence. Compare official IDs against the physical index, including
+law projections, before proposing create-only ingest. A missing
+`source_checked_at` is unknown freshness, not proof that a document is absent or
+stale. Preserve captured catalog pages and their provenance; do not stamp
+individual records as source-checked merely because a collection count matches.
 
 Run the read-only health check before and after maintenance:
 

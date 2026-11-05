@@ -5,14 +5,17 @@ from __future__ import annotations
 from typing import Any
 
 from elasticsearch import Elasticsearch, NotFoundError
+from pydantic import TypeAdapter
 
 from cdm.backend.errors import EntityNotFoundError
 from cdm.backend.services.bill_vote_index import BillVoteIndex
 from cdm.config.query_reads import QueryReadConfig
 from cdm.contracts.api import BillDetail, BillDetailResponse, BillsResponse, BillSummary
 from cdm.contracts.hydration import HydrationAssessment
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.client import SearchCompletion
 from cdm.store.opensearch import read_alias
+from cdm.utils.json_types import JsonObject
 from cdm.utils.lemmatize import try_lemmatize_query
 
 
@@ -44,7 +47,7 @@ class BillService:
         offset = self._reads.offset(page, limit)
         if query:
             self._reads.text(query, "query")
-        filters: list[dict[str, Any]] = [{"term": {"source_type": "bill"}}]
+        filters: list[dict[str, Any]] = [BillReadScope.query()]
         if congress is not None:
             filters.append({"term": {"congress": congress}})
         if bill_type:
@@ -103,8 +106,8 @@ class BillService:
             if isinstance(exc.body, dict) and exc.body.get("found") is False:
                 raise EntityNotFoundError(f"Bill not found: {normalized_id}") from exc
             raise
-        source: dict[str, Any] = response.get("_source", {})
-        if source.get("source_type") != "bill":
+        source = TypeAdapter(JsonObject).validate_python(response.get("_source", {}))
+        if not BillReadScope.contains(source, normalized_id):
             raise EntityNotFoundError(f"Bill not found: {normalized_id}")
 
         policy_area = source.get("policy_area")
@@ -172,6 +175,9 @@ class BillService:
 
     @staticmethod
     def _text_query(text: str) -> dict[str, Any]:
+        identity = BillReadScope.identity_query(text)
+        if identity is not None:
+            return identity
         should: list[dict[str, Any]] = [
             {
                 "multi_match": {

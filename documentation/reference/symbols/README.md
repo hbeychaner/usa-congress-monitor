@@ -14,23 +14,23 @@ remain authoritative in source. Follow the narrative chapters for intent.
 
 | Area | Files | Declarations |
 |---|---:|---:|
-| [backend](backend.md) | 40 | 410 |
+| [backend](backend.md) | 40 | 409 |
 | [composition](composition.md) | 2 | 30 |
-| [config](config.md) | 10 | 280 |
+| [config](config.md) | 10 | 283 |
 | [contracts](contracts.md) | 7 | 582 |
 | [data_collection](data_collection.md) | 23 | 63 |
 | [deployment](deployment.md) | 2 | 49 |
 | [frontend](frontend.md) | 51 | 2105 |
-| [graph](graph.md) | 11 | 423 |
+| [graph](graph.md) | 11 | 430 |
 | [ingest](ingest.md) | 19 | 740 |
 | [jobs](jobs.md) | 4 | 161 |
 | [models](models.md) | 15 | 870 |
 | [perspectives](perspectives.md) | 13 | 190 |
 | [scripts](scripts.md) | 27 | 123 |
-| [store](store.md) | 13 | 242 |
+| [store](store.md) | 14 | 254 |
 | [tools](tools.md) | 4 | 105 |
 | [topics](topics.md) | 3 | 55 |
 | [utils](utils.md) | 15 | 206 |
 | [workers](workers.md) | 14 | 205 |
 
-Total: 273 source files; 6839 declarations.
+Total: 274 source files; 6860 declarations.

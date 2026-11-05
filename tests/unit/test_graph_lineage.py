@@ -3,7 +3,8 @@ from datetime import UTC, datetime
 from unittest.mock import Mock, patch
 
 import pytest
-from elasticsearch import Elasticsearch
+from elastic_transport import ApiResponseMeta, HttpHeaders, NodeConfig
+from elasticsearch import Elasticsearch, NotFoundError
 
 from cdm.config.topic_analysis import GraphStoreConfig
 from cdm.graph.job import GraphBuildJob
@@ -29,6 +30,11 @@ def graph_client() -> Mock:
     client.indices.get_mapping.return_value.body = {
         GraphStore(client).index: load_definitions()["analysis_graph"]
     }
+    client.get.side_effect = NotFoundError(
+        "missing",
+        ApiResponseMeta(404, "1.1", HttpHeaders(), 0, NodeConfig("http", "localhost", 9200)),
+        {"found": False},
+    )
     return client
 
 
@@ -104,10 +110,13 @@ def test_build_records_actual_scope_and_pins_topic_reads() -> None:
     assert all(edge.graph_version == versions[edge.signal] for edge in graph.edges)
     assert [call[0] for call in graph.store.method_calls] == [
         "ensure_index",
+        "pointer_snapshot",
         "write_edges",
         "publish",
+        "pointer_snapshot",
         "write_edges",
         "publish",
+        "pointer_snapshot",
         "write_edges",
         "publish",
     ]
@@ -157,12 +166,14 @@ def test_publish_refreshes_staged_edges_before_pointer_write(
     assert [call[0] for call in client.method_calls] == [
         "indices.get_mapping",
         "indices.refresh",
+        "get",
         "index",
     ]
     assert client.index.call_args.kwargs == {
         "index": store.index,
         "id": pointer.id,
         "document": pointer.model_dump(mode="json"),
+        "op_type": "create",
         "refresh": True,
     }
 

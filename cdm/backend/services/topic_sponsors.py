@@ -12,7 +12,9 @@ from pydantic import BaseModel
 
 from cdm.backend.services.member_subject_overlay import SUBJECT_FIELD, SUBJECTS_PATH
 from cdm.backend.services.sponsored_bills import SPONSOR_FIELD
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.opensearch import read_alias
+from cdm.utils.json_types import JsonObject
 
 ID_CHUNK = 1024
 SPONSOR_BUCKETS = 600
@@ -81,7 +83,7 @@ class TopicSponsorReader:
     def __init__(self, client: Elasticsearch) -> None:
         self.client = client
 
-    def _count(self, query: dict[str, object]) -> Counter[str]:
+    def _count(self, query: JsonObject) -> Counter[str]:
         try:
             response = self.client.search(
                 index=read_alias("bill"),
@@ -97,8 +99,8 @@ class TopicSponsorReader:
         return Counter({bucket.key: bucket.doc_count for bucket in parsed.aggregations.sponsors.buckets})
 
     @staticmethod
-    def _filters(congress: int | None) -> list[dict[str, object]]:
-        filters: list[dict[str, object]] = [{"term": {"source_type": "bill"}}]
+    def _filters(congress: int | None) -> list[JsonObject]:
+        filters: list[JsonObject] = [BillReadScope.query()]
         if congress:
             filters.append({"term": {"congress": congress}})
         return filters

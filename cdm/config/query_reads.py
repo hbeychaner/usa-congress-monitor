@@ -18,6 +18,20 @@ class SearchKind(StrEnum):
     BILL = "bill"
 
 
+class BillProjectionKind(StrEnum):
+    BILL = "bill"
+    LAW = "law"
+
+
+class BillReadField(StrEnum):
+    ID = "id"
+    SOURCE_TYPE = "source_type"
+
+
+class BillIdentityPrefix(StrEnum):
+    BILL = "bill:"
+
+
 class QueryReadConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
 

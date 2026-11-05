@@ -37,12 +37,11 @@ class MeasureType(StrEnum):
     SCONRES = "sconres"
 
 
-class BillSourceIdentity(BaseModel):
+class CanonicalBillIdentity(BaseModel):
     id: BillId
     congress: int = Field(gt=0)
     type: MeasureType
     number: int = Field(gt=0)
-    source_type: Literal["bill"]
 
     @field_validator("type", mode="before")
     @classmethod
@@ -54,6 +53,10 @@ class BillSourceIdentity(BaseModel):
         if self.id != f"bill:{self.congress}:{self.type.value}:{self.number}":
             raise ValueError("Bill source identity disagrees with its fields")
         return self
+
+
+class BillSourceIdentity(CanonicalBillIdentity):
+    source_type: Literal["bill"]
 
 
 class BillCreation(BaseModel):

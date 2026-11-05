@@ -5,7 +5,9 @@ from __future__ import annotations
 from elasticsearch import Elasticsearch, NotFoundError
 from elasticsearch.helpers import scan
 
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.opensearch import read_alias
+from cdm.utils.json_types import JsonObject
 
 SPONSOR_FIELD = "sponsor_bioguide_ids"
 
@@ -15,8 +17,8 @@ class SponsoredBillReader:
         self.client = client
 
     def by_member(self, member_ids: list[str], congress: int | None) -> dict[str, list[str]]:
-        filters: list[dict[str, object]] = [
-            {"term": {"source_type": "bill"}},
+        filters: list[JsonObject] = [
+            BillReadScope.query(),
             {"terms": {SPONSOR_FIELD: member_ids}},
         ]
         if congress:

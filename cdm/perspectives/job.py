@@ -24,6 +24,7 @@ class PerspectiveBuildJob:
         written = 0
         for congress in request.congresses:
             self._report(AnalysisProgress(stage=f"Congress {congress}"))
+            before = self._repository.snapshot(congress)
             results = self._runner.run(
                 congress,
                 model_version=version,
@@ -50,6 +51,7 @@ class PerspectiveBuildJob:
                     version,
                     datetime.now(UTC),
                     results,
+                    expected=before,
                 )
         self._report(
             AnalysisProgress(

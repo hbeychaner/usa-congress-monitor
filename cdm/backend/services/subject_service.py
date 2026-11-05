@@ -19,6 +19,7 @@ from cdm.contracts.api import (
     SubjectsResponse,
     TopicItem,
 )
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.opensearch import read_alias
 
 _SUBJECTS_PATH = "subjects.legislative_subjects"
@@ -34,7 +35,7 @@ class SubjectService:
         self, congress: int | None = None, size: int = 100
     ) -> SubjectsResponse:
         """Most common legislative subjects and policy areas across bills."""
-        filters: list[dict[str, Any]] = [{"term": {"source_type": "bill"}}]
+        filters: list[dict[str, Any]] = [BillReadScope.query()]
         if congress is not None:
             filters.append({"term": {"congress": congress}})
         response = self._aggregate(filters, size)
@@ -60,7 +61,7 @@ class SubjectService:
         year range, zero-filled, so line charts get a uniform time grid.
         """
         filters: list[dict[str, Any]] = [
-            {"term": {"source_type": "bill"}},
+            BillReadScope.query(),
             {"exists": {"field": "introduced_date"}},
         ]
         if start_year is not None:
@@ -127,7 +128,7 @@ class SubjectService:
     ) -> tuple[list[TopicItem], list[TopicItem]]:
         """(legislative subjects, policy areas) as weighted items for one member."""
         filters: list[dict[str, Any]] = [
-            {"term": {"source_type": "bill"}},
+            BillReadScope.query(),
             {
                 "bool": {
                     "should": [

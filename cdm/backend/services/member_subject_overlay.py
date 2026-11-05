@@ -8,7 +8,9 @@ from pydantic import BaseModel
 from cdm.backend.services.member_topic_overlay import MIN_BILLS
 from cdm.backend.services.sponsored_bills import SPONSOR_FIELD
 from cdm.contracts.api import GraphSubjectLink, GraphSubjectNode
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.opensearch import read_alias
+from cdm.utils.json_types import JsonObject
 
 SUBJECTS_PATH = "subjects.legislative_subjects"
 SUBJECT_FIELD = f"{SUBJECTS_PATH}.name"
@@ -56,8 +58,8 @@ class MemberSubjectOverlayBuilder:
         self.client = client
 
     def _search(self, member_ids: list[str], congress: int | None) -> OverlayResponse:
-        filters: list[dict[str, object]] = [
-            {"term": {"source_type": "bill"}},
+        filters: list[JsonObject] = [
+            BillReadScope.query(),
             {"terms": {SPONSOR_FIELD: member_ids}},
         ]
         if congress:

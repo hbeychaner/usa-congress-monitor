@@ -12,6 +12,7 @@ from pydantic import (
     Field,
     computed_field,
     field_validator,
+    model_validator,
 )
 
 from cdm.contracts.base import ResponseModel
@@ -213,3 +214,23 @@ class GraphVersionPointer(BaseModel):
 class StagedGraph(BaseModel):
     pointer: GraphVersionPointer
     written: int = Field(ge=0)
+
+
+class GraphPointerSnapshot(BaseModel):
+    signal: Signal
+    pointer: GraphVersionPointer | None = None
+    sequence_number: int | None = Field(default=None, ge=0)
+    primary_term: int | None = Field(default=None, gt=0)
+
+    @model_validator(mode="after")
+    def require_complete_version(self) -> GraphPointerSnapshot:
+        if self.pointer is None:
+            if self.sequence_number is not None or self.primary_term is not None:
+                raise ValueError("Absent graph pointers cannot have source versions")
+        elif (
+            self.pointer.signal != self.signal
+            or self.sequence_number is None
+            or self.primary_term is None
+        ):
+            raise ValueError("Graph pointer snapshots require matching signal and version")
+        return self

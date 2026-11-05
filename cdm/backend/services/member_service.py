@@ -17,6 +17,7 @@ from cdm.contracts.api import (
     MemberSummary,
     MemberTerm,
 )
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.client import IncompleteSearchError, SearchCompletion
 from cdm.store.opensearch import read_alias
 
@@ -363,7 +364,7 @@ class MemberService:
                         {
                             "bool": {
                                 "should": [
-                                    {"term": {"source_type": "bill"}},
+                                    BillReadScope.query(),
                                     {"term": {"_index": read_alias("amendment")}},
                                 ],
                                 "minimum_should_match": 1,
@@ -458,7 +459,7 @@ class MemberService:
                 "track_total_hits": False,
                 "_source": list(self._reads.activity_fields),
                 "query": _member_link_query(
-                    bioguide_id, [{"term": {"source_type": "bill"}}]
+                    bioguide_id, [BillReadScope.query()]
                 ),
                 "sort": [
                     {"update_date": {"order": "desc", "missing": "_last"}},

@@ -76,9 +76,9 @@ Data availability varies by source and scope. Bill pages distinguish unknown,
 partial and complete detail-retrieval evidence; missing text or analysis does
 not necessarily mean the bill itself is missing.
 Missing completeness evidence alone is not a reason to re-ingest a record.
-Check the Bill API as well as index presence: legacy law projections with
-canonical bill identities can exist in search while bill reads return 404.
-That is a read-path limitation, not evidence that they need downloading again.
+Bill reads include legacy law projections with valid canonical bill identities,
+without changing their stored classification or downloading them again.
+Exact canonical bill-ID searches use direct identity lookup rather than NLP.
 Controlled local replay uses create-only writes; ordinary ingestion still uses
 the merge behavior described in the ingestion guide.
 Replayed list metadata makes records available for browsing; it does not fetch

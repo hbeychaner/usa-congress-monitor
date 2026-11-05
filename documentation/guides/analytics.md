@@ -62,6 +62,12 @@ These states compare known publication lineage, not daily source updates.
 Matching model IDs do not prove that newly ingested bills have been analyzed.
 Operational graph-age warnings remain separate in graph health.
 
+Bill-facing reads and graph signatures share canonical bill/law eligibility.
+Topic training and the perspective policy corpus retain their existing
+`source_type=bill` contract; widening bill visibility does not silently change a
+published model's fitted corpus. Reconcile source additions against the recorded
+input contract before claiming that an existing model includes new records.
+
 ### Label origin is separate from availability
 
 Topic summaries, metasubject summaries, and perspective clusters record
@@ -378,18 +384,26 @@ The API shows at most 25 ranked topics per party by default.
 
 ### Perspective persistence
 
-[scripts/build_perspectives.py](../../scripts/build_perspectives.py) calls
-`PerspectiveRepository.replace` for each selected Congress, writing `party_topic`
-documents into the shared analysis index. IDs include model version, Congress,
-and topic. Replacement deletes existing `party_topic` rows for that Congress
-before bulk-writing; it is not an atomic version-pointer switch.
+[scripts/build_perspectives.py](../../scripts/build_perspectives.py) submits a
+durable request. `--all-topics` removes the default five-topic limit; normal
+minimum-corpus and stability gates still apply.
+[PerspectiveBuildJob](../../cdm/perspectives/job.py) captures each Congress's
+publication snapshot before fitting.
+[`PerspectiveRepository.replace`](../../cdm/store/perspective_repository.py)
+publishes one validated, refreshable document per Congress in the shared
+analysis index, containing the model version, build time and entire result set.
+An absent snapshot uses a create-only write; an existing snapshot requires the
+captured sequence number and primary term. Stale publication fails explicitly.
+Readers cannot observe a deleted/partially rewritten topic set. Publication is
+atomic per Congress, not a transaction spanning multiple Congresses.
 
-[PerspectiveRepository.read](../../cdm/store/perspective_repository.py) selects
-the newest returned version by `built_at` within a Congress.
-Rebuilding with only selected topics replaces the Congress's prior set, not just
-those individual topics. A topic retrain does not itself rebuild perspectives.
-Because these documents share the analysis index and `model_version`, general
-topic-version cleanup can also remove older-version party analyses.
+[`PerspectiveRepository.read`](../../cdm/store/perspective_repository.py)
+prefers that canonical snapshot and falls back to untouched legacy `party_topic`
+records only when no snapshot exists. Legacy selection uses the newest returned
+`built_at` version. Rebuilding with selected topics still replaces the Congress's
+entire published set, not just those individual topics. A topic retrain does not
+itself rebuild perspectives. Old legacy rows are not deleted by publication;
+analysis retention must account separately for current snapshot model lineage.
 
 ## 5. Three separate member-graph signals
 
@@ -507,9 +521,10 @@ including 984/310 party-split votes, without requests or live writes.
 
 The source reader refuses records with no linked positions, but accepts valid
 present/not-voting-only records; the scorer still uses only yea/nay.
-Topic source scans reject partial search results. The live topic graph has no
-versioned source-model lineage and the configured topic store has no current
-publication, so its lineage cannot be inferred from timestamps or labels.
+Topic source scans reject partial search results. New topic graph generations
+record their exact source-model version; legacy generations without that
+metadata remain unknown, not retrospectively assigned a model from timestamps
+or labels.
 
 <!-- wiki:repository-only:start -->
 Approved gate two added all eight mapping paths, including `shared_topics`, and
@@ -544,8 +559,12 @@ See the [promotion procedure](../OPERATIONS_RUNBOOK.md#sealed-voting-only-graph-
 
 [GraphBuildJob.stage](../../cdm/graph/job.py) returns a typed `StagedGraph`
 containing the candidate `GraphVersionPointer` and written count, without
-publishing. The normal `run()` calls that same stage boundary and then publishes,
-preserving existing worker behavior. Staging alone is not a read-only operation:
+publishing. Candidate edge writes are create-only and require complete
+acknowledgements. The normal `run()` captures a typed pointer snapshot before
+building, calls the same stage boundary, then conditionally publishes against
+that snapshot. An absent pointer uses create-only publication; an existing
+pointer uses its sequence number and primary term. Concurrent publication is an
+explicit conflict, not a last-writer-wins overwrite. Staging alone is not a read-only operation:
 use the repair CLI's isolated rehearsal, not a serving `GraphStore`.
 
 [GraphRepairCapture](../../cdm/graph/repair.py) freezes all configured voting

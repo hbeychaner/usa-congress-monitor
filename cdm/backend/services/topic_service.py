@@ -38,6 +38,7 @@ from cdm.contracts.api import (
     TopicTrendsResponse,
 )
 from cdm.contracts.labels import LabelProvenance
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.client import IncompleteSearchError, SearchCompletion
 from cdm.store.opensearch import read_alias
 from cdm.store.topic_publication import TopicPublicationStore
@@ -707,7 +708,7 @@ class TopicService:
                 "query": {
                     "bool": {
                         "filter": [
-                            {"term": {"source_type": "bill"}},
+                            BillReadScope.query(),
                             {
                                 "bool": {
                                     "should": [

@@ -6,7 +6,7 @@ from collections.abc import Iterable, Iterator
 from itertools import batched
 
 from elasticsearch import Elasticsearch, NotFoundError
-from elasticsearch.helpers import scan
+from elasticsearch.helpers import BulkIndexError, bulk, scan
 from pydantic import TypeAdapter
 
 from cdm.config.topic_analysis import GraphStoreConfig
@@ -16,13 +16,15 @@ from cdm.graph.models import (
     GraphField,
     GraphIndexDefinition,
     GraphMapping,
+    GraphPointerSnapshot,
     GraphVersionPointer,
     MemberEdge,
     RollCallVotes,
     Signal,
 )
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.index_manager import IndexManager, load_definitions
-from cdm.store.opensearch import bulk_upsert, index_name, read_alias
+from cdm.store.opensearch import index_name, read_alias
 
 
 class BillSignatureReader:
@@ -46,7 +48,7 @@ class BillSignatureReader:
                 "query": {
                     "bool": {
                         "filter": [
-                            {"term": {"source_type": "bill"}},
+                            BillReadScope.query(),
                             {"range": {"congress": {"gte": self.first_congress}}},
                         ]
                     }
@@ -140,27 +142,73 @@ class GraphStore:
         self.require_schema()
         written = 0
         for batch in batched(edges, self._settings.write_batch):
-            result = bulk_upsert(
-                self.client,
-                self._settings.index,
-                (edge.model_dump(mode="json") for edge in batch),
-                replace=True,
-                target_index=self.index,
-            )
-            written += int(result["updated"])
+            try:
+                count, _ = bulk(
+                    self.client,
+                    (
+                        {
+                            "_op_type": "create",
+                            "_index": self.index,
+                            "_id": edge.id,
+                            "_source": edge.model_dump(mode="json"),
+                        }
+                        for edge in batch
+                    ),
+                    raise_on_error=True,
+                )
+            except BulkIndexError as exc:
+                raise RuntimeError("Bulk indexing failed for graph candidate") from exc
+            if count != len(batch):
+                raise RuntimeError("Graph candidate acknowledgements are incomplete")
+            written += count
         return written
 
-    def publish(self, pointer: GraphVersionPointer) -> None:
+    def pointer_snapshot(self, signal: Signal) -> GraphPointerSnapshot:
+        try:
+            response = self.client.get(
+                index=self.index, id=GraphVersionPointer.pointer_id(signal)
+            )
+        except NotFoundError as exc:
+            if isinstance(exc.body, dict) and exc.body.get("found") is False:
+                return GraphPointerSnapshot(signal=signal)
+            raise
+        return GraphPointerSnapshot(
+            signal=signal,
+            pointer=GraphVersionPointer.model_validate(response["_source"]),
+            sequence_number=response["_seq_no"],
+            primary_term=response["_primary_term"],
+        )
+
+    def publish(
+        self,
+        pointer: GraphVersionPointer,
+        *,
+        expected: GraphPointerSnapshot | None = None,
+    ) -> None:
         self.require_schema()
         refreshed = self.client.indices.refresh(index=self.index)
         if refreshed["_shards"]["failed"]:
             raise RuntimeError(f"Graph refresh failed: {refreshed['_shards']}")
-        self.client.index(
-            index=self.index,
-            id=pointer.id,
-            document=pointer.model_dump(mode="json"),
-            refresh=True,
-        )
+        before = expected if expected is not None else self.pointer_snapshot(pointer.signal)
+        if before.signal != pointer.signal:
+            raise ValueError("Cannot publish against another graph signal's snapshot")
+        if before.pointer is None:
+            self.client.index(
+                index=self.index,
+                id=pointer.id,
+                document=pointer.model_dump(mode="json"),
+                op_type="create",
+                refresh=True,
+            )
+        else:
+            self.client.index(
+                index=self.index,
+                id=pointer.id,
+                document=pointer.model_dump(mode="json"),
+                if_seq_no=before.sequence_number,
+                if_primary_term=before.primary_term,
+                refresh=True,
+            )
 
     def active_pointer(self, signal: Signal) -> GraphVersionPointer | None:
         try:

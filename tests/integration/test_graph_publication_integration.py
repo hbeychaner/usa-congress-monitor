@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import pytest
-from elasticsearch import ApiError, Elasticsearch
+from elasticsearch import ApiError, ConflictError, Elasticsearch
 
 from cdm.config.topic_analysis import GraphStoreConfig
 from cdm.graph.job import GraphBuildJob
@@ -25,7 +25,11 @@ def store() -> Iterator[GraphStore]:
         pytest.skip(
             "Set GRAPH_PUBLICATION_TEST_URL to an isolated Elasticsearch server"
         )
-    client = Elasticsearch(url, request_timeout=30)
+    client = Elasticsearch(
+        url,
+        request_timeout=30,
+        api_key=os.environ.get("GRAPH_PUBLICATION_TEST_API_KEY") or None,
+    )
     settings = GraphStoreConfig(index=f"graph-lineage-test-{uuid4().hex}")
     store = GraphStore(client, settings)
     client.indices.create(
@@ -73,6 +77,24 @@ def test_published_lineage_round_trips_and_prior_versions_remain(
     assert store.active_version(Signal.TOPIC) == pointers[-1].graph_version
     for pointer in pointers:
         assert store.edge_count(pointer.signal, pointer.graph_version) == 1
+
+
+def test_stale_create_update_and_signal_scoped_rollback(store: GraphStore) -> None:
+    absent = store.pointer_snapshot(Signal.TOPIC)
+    original = publish(store, "cas-original")
+    original_snapshot = store.pointer_snapshot(Signal.TOPIC)
+    newer = publish(store, "cas-newer")
+    with pytest.raises(ConflictError):
+        store.publish(original, expected=absent)
+    with pytest.raises(ConflictError):
+        store.publish(original, expected=original_snapshot)
+    assert store.active_pointer(Signal.TOPIC) == newer
+    current = store.pointer_snapshot(Signal.TOPIC)
+    store.publish(original, expected=current)
+    assert store.active_pointer(Signal.TOPIC) == original
+    store.publish(newer, expected=store.pointer_snapshot(Signal.TOPIC))
+    assert store.active_pointer(Signal.TOPIC) == newer
+    assert store.edge_count(Signal.TOPIC, original.graph_version) == 1
 
 
 def test_staged_edges_are_visible_when_pointer_is_published(store: GraphStore) -> None:
@@ -217,7 +239,6 @@ def test_decimal_csv_ids_recover_voting_graph_through_real_source_index(
     client.indices.create(
         index=source_index,
         **load_definitions()["rollcall"],
-        aliases={read_alias("rollcall"): {}},
     )
     try:
         documents = [
@@ -231,7 +252,7 @@ def test_decimal_csv_ids_recover_voting_graph_through_real_source_index(
         job = GraphBuildJob(
             store,
             Mock(spec=BillSignatureReader),
-            RollCallReader(client),
+            RollCallReader(client, index=source_index),
             Mock(spec=TopicModelReader),
             lambda _progress: None,
         )

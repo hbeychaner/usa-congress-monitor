@@ -67,10 +67,11 @@ class GraphBuildJob:
         self.store.ensure_index()
         for signal in requested:
             self._report(AnalysisProgress(stage=signal.value, versions=versions))
+            before = self.store.pointer_snapshot(signal)
             staged = self.stage(signal)
             pointer = staged.pointer
             self._report(AnalysisProgress(stage="publishing", versions=versions))
-            self.store.publish(pointer)
+            self.store.publish(pointer, expected=before)
             versions[signal] = pointer.graph_version
             print(
                 f"{signal}: wrote {staged.written:,} edges as {pointer.graph_version}"

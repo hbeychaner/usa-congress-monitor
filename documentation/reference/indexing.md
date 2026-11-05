@@ -34,6 +34,18 @@ indices and mandatory discriminators:
 | Other resource names | Same logical name | None |
 | `summaries` | Rejected | Summaries are embedded in legislation; direct indexing raises. |
 
+Storage classification is not the bill-read eligibility rule.
+[`BillReadScope`](../../cdm/store/bill_scope.py) includes `bill` and `law`
+projections with `bill:` identities across bill browsing/search, member activity,
+subjects and graph signature reads. Law detail reads additionally require
+agreement between the canonical ID, Congress, bill type and number; contradictory
+identity fields fail explicitly rather than disappearing as a missing record.
+Standalone text/non-bill records remain excluded. Exact canonical-ID search
+bypasses query lemmatization; ordinary natural-language queries are unchanged.
+[`BillSourceIdentity`](../../cdm/store/create_only.py) remains strictly bill-only
+for controlled create-only ingestion. Broader reads do not authorize rewriting
+law classifications or recreating indexed records.
+
 `index_name()` prefixes `congress-` and converts underscores to hyphens:
 `committee_meeting` becomes `congress-committee-meeting`.
 `read_alias()` and `write_alias()` append `-read` and `-write`.

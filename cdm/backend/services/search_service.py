@@ -7,6 +7,7 @@ from elasticsearch import Elasticsearch
 from cdm.backend.services.state_service import StateService
 from cdm.config.query_reads import QueryReadConfig, SearchKind
 from cdm.contracts.api import SearchResponse, SearchResultItem
+from cdm.store.bill_scope import BillReadScope
 from cdm.store.client import SearchCompletion
 from cdm.store.opensearch import read_alias
 from cdm.utils.json_types import JsonObject
@@ -192,6 +193,13 @@ class SearchService:
 
     @staticmethod
     def _bill_query(query: str, size: int) -> JsonObject:
+        identity = BillReadScope.identity_query(query)
+        if identity is not None:
+            return {
+                "size": size,
+                "query": {"bool": {"filter": [BillReadScope.query(), identity]}},
+                "sort": ["_score", {"id": "asc"}],
+            }
         should: list[JsonObject] = [
             {"term": {"id": {"value": query.lower(), "boost": 6}}},
             {"term": {"number": {"value": query, "boost": 4}}},
@@ -221,6 +229,12 @@ class SearchService:
             )
         return {
             "size": size,
-            "query": {"bool": {"should": should, "minimum_should_match": 1}},
+            "query": {
+                "bool": {
+                    "filter": [BillReadScope.query()],
+                    "should": should,
+                    "minimum_should_match": 1,
+                }
+            },
             "sort": ["_score", {"id": "asc"}],
         }

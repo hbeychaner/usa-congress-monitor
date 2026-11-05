@@ -25,6 +25,7 @@ from cdm.workers.analytics_runner import AnalysisCancelled
 def client() -> Mock:
     client = Mock(spec=Elasticsearch, indices=Mock())
     client.indices.exists.return_value = True
+    client.get.return_value = {"found": False}
     return client
 
 

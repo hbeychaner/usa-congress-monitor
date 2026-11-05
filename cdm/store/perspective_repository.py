@@ -41,6 +41,26 @@ class PerspectivePublication(BaseModel):
         return self
 
 
+class PerspectiveSnapshot(BaseModel):
+    congress: int = Field(gt=0)
+    publication: PerspectivePublication | None = None
+    sequence_number: int | None = Field(default=None, ge=0)
+    primary_term: int | None = Field(default=None, gt=0)
+
+    @model_validator(mode="after")
+    def require_complete_version(self) -> Self:
+        if self.publication is None:
+            if self.sequence_number is not None or self.primary_term is not None:
+                raise ValueError("Absent perspective snapshots cannot have versions")
+        elif (
+            self.publication.congress != self.congress
+            or self.sequence_number is None
+            or self.primary_term is None
+        ):
+            raise ValueError("Perspective snapshot identity/version is incomplete")
+        return self
+
+
 class PerspectiveRepository:
     def __init__(
         self,
@@ -118,12 +138,34 @@ class PerspectiveRepository:
         ]
         return topics, str(newest)
 
+    def snapshot(self, congress: int) -> PerspectiveSnapshot:
+        if not self.client.indices.exists(index=self.index):
+            return PerspectiveSnapshot(congress=congress)
+        try:
+            response = self.client.get(
+                index=self.index, id=PerspectivePublication.document_id(congress)
+            )
+        except NotFoundError as exc:
+            if isinstance(exc.body, dict) and exc.body.get("found") is False:
+                return PerspectiveSnapshot(congress=congress)
+            raise
+        if response.get("found") is False:
+            return PerspectiveSnapshot(congress=congress)
+        return PerspectiveSnapshot(
+            congress=congress,
+            publication=PerspectivePublication.model_validate(response["_source"]),
+            sequence_number=response["_seq_no"],
+            primary_term=response["_primary_term"],
+        )
+
     def replace(
         self,
         congress: int,
         model_version: str,
         built_at: datetime,
         results: Sequence[TopicPerspectives],
+        *,
+        expected: PerspectiveSnapshot | None = None,
     ) -> int:
         """Atomically refresh one Congress; return the number of published topics."""
         publication = PerspectivePublication(
@@ -139,10 +181,24 @@ class PerspectiveRepository:
             )
         else:
             self.client.indices.put_mapping(index=self.index, properties=properties)
-        self.client.index(
-            index=self.index,
-            id=PerspectivePublication.document_id(congress),
-            document=publication.model_dump(mode="json"),
-            refresh="wait_for",
-        )
+        before = expected if expected is not None else self.snapshot(congress)
+        if before.congress != congress:
+            raise ValueError("Cannot publish against another Congress's snapshot")
+        if before.publication is None:
+            self.client.index(
+                index=self.index,
+                id=PerspectivePublication.document_id(congress),
+                document=publication.model_dump(mode="json"),
+                op_type="create",
+                refresh="wait_for",
+            )
+        else:
+            self.client.index(
+                index=self.index,
+                id=PerspectivePublication.document_id(congress),
+                document=publication.model_dump(mode="json"),
+                if_seq_no=before.sequence_number,
+                if_primary_term=before.primary_term,
+                refresh="wait_for",
+            )
         return len(publication.results)
