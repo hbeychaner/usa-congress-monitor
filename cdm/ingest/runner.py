@@ -198,6 +198,7 @@ class IngestRunner:
     api_key: str | None = None
     fetch_items: bool = False
     force_item_fetch: bool = False
+    fetch_bill_text: bool = True
     max_items: int | None = None
     max_pages: int | None = None
     list_page_size: int = 250
@@ -363,7 +364,10 @@ class IngestRunner:
         if self.resource is Resource.BILL:
             hydrate_details = getattr(item, "add_bill_details", None)
             if callable(hydrate_details):
-                hydrate_details(client)
+                if self.fetch_bill_text:
+                    hydrate_details(client)
+                else:
+                    hydrate_details(client, fetch_full_text=False)
         item_data = item.model_dump(mode="json", exclude_none=True)
         if self.resource is Resource.BILL:
             assessment = HydrationAssessment.from_record(item_data)

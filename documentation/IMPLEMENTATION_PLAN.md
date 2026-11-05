@@ -25,8 +25,8 @@ not silently reclassified as unavailable.
 
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
-| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. Complete official Congress 93-119 identity reconciliation now confirms 10,452 absent IDs, with all catalog pages retained and every candidate independently rechecked. Missing-only recovery, available detail/text, current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
-| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Verified for the existing frozen Congress 113+ contracts. Complete topic model and both rebuilt collaboration/topic graphs are published; accepted voting generation and historical graph counts are preserved. All seven Congress 113-119 perspective snapshots now use the same model: 727 eligible topic/Congress results, with 32 passing stability-gated splits. Exact actual API checks and browser canaries pass. This does not certify inputs not yet discovered/ingested by C1 or daily source freshness. |
+| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. All 10,452 independently verified missing official IDs are now created from retained metadata; all 371,366 original versions are preserved and the captured roster has zero remaining missing IDs. Finite full-detail/text acquisition is running after a successful complete-detail/text canary; no staged enrichment is published yet. Available content, current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
+| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Verified for the previous frozen Congress 113+ contracts. Complete topic model and collaboration/topic graphs are published; accepted voting generation and historical graphs are preserved. All seven Congress 113-119 perspective snapshots use that model: 727 eligible topic/Congress results and 32 stability-passing splits, with exact API/browser acceptance. Recovery has now added 35 Congress 113+ identities: their available content and actual input fingerprints require reconciliation and, where inputs change, rebuilding before current-corpus certification. Daily source freshness remains separate. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
 | C5. Final disposition | Every gate has evidence or an explicit blocker; validation passes; source/docs/changelog and source-pinned wiki are published. | Pending. Separate-host failover and off-host restoration remain blocked by the single-Mac topology, not implicitly passed or waived. |
@@ -192,6 +192,35 @@ Congress 119 has **19,827 indexed canonical identities** but **zero indexed
 The catalog comparison does not certify full detail/text or pre-93 coverage.
 Any newly ingested Congress 113+ records must be reconciled against the frozen
 analytics contract before claiming the published model covers the new corpus.
+
+**Missing-only recovery, 2026-11-05:** all **10,452 identities** have now been
+created from those retained catalog pages, with no metadata re-download.
+Owned-shadow rehearsal, richer-document conflict preservation, exact live
+source/version readback and **64 actual API canaries** pass. All **371,366 original
+document versions** are unchanged; the physical index now has **381,818 documents**
+and **zero missing IDs** from the captured official roster. The owned shadow is
+retired. These new records are metadata projections with unknown hydration,
+not a full-detail/full-text certificate.
+
+The separate fixed-roster acquisition queue is running, newest Congress first,
+with **three HTTP threads**, the existing shared **4,800 requests/hour** budget,
+**150,000 maximum request attempts**, a **48-hour deadline**, an **8 GiB disk
+floor**, a **4 GiB RSS stop** and a **32 MiB response bound**. No application
+worker or Docker allocation was added. Cached successful API responses are
+reused. The successful Congress 119 H.J.Res.221 canary verifies all nine detail
+collections and captures **3,956 characters** of introduced-version text using
+a separate unauthenticated public-download session. Earlier canary failures and
+their caches remain retained. Acquisition archives every listed version or an
+explicit unresolved disposition; no listed versions does not establish global
+historical unavailability. Staging makes **no serving enrichment writes**:
+preservation-aware conditional publication and actual read acceptance remain
+required. The ten initial item/detail requests per identity alone impose about
+**22 hours** at the shared rate limit, before pagination/text overhead.
+
+Recovery includes **35 Congress 113+ identities**, so the previously accepted
+analytics artifacts remain verified only for their recorded old input contract.
+Enrich those inputs, reconcile fingerprints and rebuild affected analytics
+before declaring the expanded current corpus covered.
 
 No optional taxonomy, new provider, transport replacement, index expansion or
 general code reduction is part of this closeout.

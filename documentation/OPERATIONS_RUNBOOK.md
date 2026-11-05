@@ -26,6 +26,33 @@ law projections, before proposing create-only ingest. A missing
 stale. Preserve captured catalog pages and their provenance; do not stamp
 individual records as source-checked merely because a collection count matches.
 
+### Resuming bounded missing-only content recovery
+
+Keep identity creation, content acquisition and serving publication separate.
+Create-only replay must finish with exact readback and proof that original
+document versions are unchanged; metadata presence is not detail/text recovery.
+Never restart acknowledged replay to enrich those records.
+
+For a sealed acquisition queue:
+
+1. Retain the immutable candidate roster, code/config seals, request journal,
+   successful-response cache, archived records and failure dispositions. Resume
+   the same execution only with matching seals; preserve failed executions.
+2. Verify there is no second producer. Reuse the shared upstream rate limiter;
+   extra HTTP threads cannot increase the allowed request budget. Resume cached
+   responses and staged IDs without redownloading successful work.
+3. Check persisted request/deadline limits, disk reserve and RSS before dispatch.
+   Keep the host awake, monitor checkpoint progress and stop on safety guards.
+   Do not reset counters or extend deadlines silently to force completion.
+4. Defer hydration's automatic text fetch when using a separate public downloader.
+   Never forward API credentials to public text hosts. Retain each available
+   version and explicit unsupported, extraction or download failures; an empty
+   version listing alone does not prove historical text is unavailable.
+5. Treat archive checkpoints as staged acquisition, not indexed coverage.
+   Publish only the owned identity scope using fresh source/version checks,
+   conditional writes, exact readback and actual API acceptance. Keep original
+   records unchanged and reconcile changed analytics inputs before certification.
+
 Run the read-only health check before and after maintenance:
 
 ```sh

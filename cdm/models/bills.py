@@ -1197,7 +1197,9 @@ class Bill(EntityBase):
                     return full_text
         return ""
 
-    def add_bill_details(self, client: CDGClient, max_pages: int = 100) -> None:
+    def add_bill_details(
+        self, client: CDGClient, max_pages: int = 100, *, fetch_full_text: bool = True
+    ) -> None:
         """Populate the bill with related actions, summaries, and linked entities."""
         fetcher = BillDetailFetcher(client, max_pages)
         payload: JsonObject = self.model_dump(mode="json", by_alias=True)
@@ -1233,7 +1235,7 @@ class Bill(EntityBase):
             elif result.evidence.complete or previous is None:
                 payload[kind] = result.data
         updated = Bill.model_validate(payload)
-        full_text = updated.add_full_text(client)
+        full_text = updated.add_full_text(client) if fetch_full_text else ""
         for kind in BillDetailKind:
             setattr(self, kind.attribute, getattr(updated, kind.attribute))
         if full_text:

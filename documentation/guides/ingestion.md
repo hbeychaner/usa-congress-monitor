@@ -448,7 +448,17 @@ count rules.
 
 All nine relationship updates, including committees, validate before the original
 bill mutates. Partial responses preserve existing richer arrays.
-`add_full_text()` separately retrieves formatted text, rejects unsuccessful HTTP
+By default, `add_bill_details()` then calls `add_full_text()` automatically.
+For explicitly separate acquisition, call
+`add_bill_details(client, fetch_full_text=False)` or construct
+`IngestRunner(..., fetch_bill_text=False)`. This opt-in path still validates all
+nine detail collections, including text-version listings, and preserves existing
+text and version metadata without making the public text request. It does not
+certify text-body coverage or change ordinary CLI/worker defaults. A separate
+downloader must fetch available bodies, preserve version evidence and surface
+failures; use an unauthenticated public-download session rather than forwarding
+the Congress API session's credential to a text host.
+`add_full_text()` retrieves formatted text, rejects unsuccessful HTTP
 responses and empty bodies, and cannot establish historical/text completeness.
 Bill and amendment network failures raise `FullTextDownloadError` (a
 `RuntimeError` subtype) with the original request exception as their explicit

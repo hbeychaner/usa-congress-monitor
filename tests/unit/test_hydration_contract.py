@@ -70,6 +70,44 @@ class HydrationFixture:
 
 
 class TestFullTextNetworkBoundary:
+    @pytest.mark.parametrize("via_runner", [False, True])
+    def test_details_can_defer_text_without_losing_versions_or_existing_text(
+        self, via_runner: bool, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        bill = HydrationFixture.bill()
+        bill.full_text = "Preserved indexed text"
+        versions: JsonObject = {
+            "textVersions": [{
+                "type": "Introduced",
+                "formats": [{
+                    "type": "Formatted Text",
+                    "url": "https://www.congress.gov/119/bills/hr1/BILLS-119hr1ih.htm",
+                }],
+            }],
+            "pagination": {"count": 1},
+        }
+        client = HydrationFixture.client({BillDetailKind.TEXT_VERSIONS: versions})
+        client.session = Mock()
+        client.session.get.side_effect = AssertionError("Text must be acquired separately")
+        if via_runner:
+            client.fetch_one.return_value = bill
+            client.resolve_runtime_params_from_record.return_value = {}
+            runner = IngestRunner(
+                outdir=tmp_path, resource=Resource.BILL, fetch_bill_text=False
+            )
+            monkeypatch.setattr(runner, "_client", lambda: client)
+            metadata = BillMetadata.model_validate({
+                "congress": 119, "type": "HR", "number": "1", "title": "Title",
+                "url": "https://api.congress.gov/v3/bill/119/hr/1",
+            })
+            runner._fetch_single_item(metadata, BILL_ITEM_SPEC, tmp_path)
+        else:
+            bill.add_bill_details(client, fetch_full_text=False)
+        assert bill.hydration_assessment.status is HydrationStatus.COMPLETE
+        assert bill.full_text == "Preserved indexed text"
+        assert isinstance(bill.text_versions, list) and len(bill.text_versions) == 1
+        client.session.get.assert_not_called()
+
     @pytest.mark.parametrize("model", [Bill, Amendment])
     @pytest.mark.parametrize(
         "network_error",

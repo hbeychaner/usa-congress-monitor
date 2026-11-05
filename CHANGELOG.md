@@ -4,6 +4,22 @@
 
 ### Added
 
+- Recovered all 10,452 independently verified missing Congress 93-119 identities
+  from retained official metadata using create-only writes. Exact readback and
+  64 actual API canaries pass; all 371,366 original document versions remain
+  unchanged. The index now contains 381,818 documents, with zero missing IDs
+  from the captured official roster. Metadata is not full-detail/text coverage.
+  A finite, resumable acquisition queue is running for those same identities,
+  sharing the existing 4,800-request/hour budget, with explicit request, deadline,
+  disk and RSS limits and no serving enrichment writes yet. Its successful canary
+  verifies all nine detail collections and captures nonblank versioned text.
+  Thirty-five newly created Congress 113+ records require analytics input
+  reconciliation; prior model acceptance remains scoped to its frozen corpus.
+- Added opt-in full-text deferral to bill hydration and `IngestRunner`, preserving
+  ordinary hydration's automatic text retrieval by default. Separate acquisition
+  can validate all nine detail collections and retain text-version metadata and
+  existing text without using the authenticated API session for public downloads.
+  Direct-model and runner-path regressions verify no text request when deferred.
 - Published verified collaboration/topic graphs with 114,539/125,009 edges,
   exact current topic-model lineage and complete Congress 113-119 HTTP/browser
   acceptance. Historical edge generations and the accepted voting pointer are

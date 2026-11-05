@@ -97,6 +97,10 @@ Completeness describes an individual bill, not whether a whole Congress has
 been collected.
 Reconcile official catalog identities against search before missing-only
 recovery; matching collection totals alone do not establish identity coverage.
+The reconciled Congress 93-119 roster's 10,452 missing identities have now been
+created from retained catalog metadata without changing existing records.
+Their full-detail and available-text recovery is separate and still in progress;
+staged downloads are not indexed content or proof of current analytics coverage.
 
 ## Everyday commands
 
