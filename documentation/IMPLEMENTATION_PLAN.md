@@ -25,7 +25,7 @@ not silently reclassified as unavailable.
 
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
-| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. Official Congress 93-119 count comparison finds 10,452 count differences, not yet reconciled identities; bounded complete catalog-ID capture is running. Current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
+| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. Complete official Congress 93-119 identity reconciliation now confirms 10,452 absent IDs, with all catalog pages retained and every candidate independently rechecked. Missing-only recovery, available detail/text, current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
 | C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Verified for the existing frozen Congress 113+ contracts. Complete topic model and both rebuilt collaboration/topic graphs are published; accepted voting generation and historical graph counts are preserved. All seven Congress 113-119 perspective snapshots now use the same model: 727 eligible topic/Congress results, with 32 passing stability-gated splits. Exact actual API checks and browser canaries pass. This does not certify inputs not yet discovered/ingested by C1 or daily source freshness. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
@@ -170,10 +170,23 @@ The official catalog count inventory uses exactly **27 bounded requests**,
 Congress **93-119**: **381,749 upstream** versus **371,297 indexed canonical
 identities** in those scopes, a **10,452 count difference**. The largest
 differences are Congress 93 (1,204), 100 (159), 101 (3,955), 102 (1,264) and
-103 (3,780). Counts do not establish set equality or exact missing identities.
-A separate read-only capture is reconciling every official catalog ID, retaining
-all pages; its fixed plan is **1,543 requests**, with a 1,800-request budget,
-two-hour deadline and 8 GiB disk floor. It performs no ingest or serving writes.
+103 (3,780). Counts alone did not establish exact missing identities.
+The separate read-only capture has now completed all **1,543 requests** within
+its 1,800-request budget, two-hour deadline and 8 GiB disk floor. All pages are
+retained. It confirms **381,749 unique official IDs** and exactly **10,452 absent
+IDs**. Independent verification reproduces every page's identity cardinality,
+every candidate's source-page seal/row/payload digest and every candidate's
+current physical-index absence. The physical index UUID and **371,366 total
+documents** remain unchanged; no ingest or serving writes occurred.
+
+The five largest scopes contain **10,362 of the 10,452 gaps** (99.1%).
+Missing measure types are 5,850 House bills, 3,724 Senate bills, 570 Senate
+simple resolutions, 208 Senate concurrent resolutions, 97 Senate joint
+resolutions, two House simple resolutions and one House joint resolution.
+Exactly **35 missing identities are Congress 113+**, including five in 119.
+This is now an exact missing-only recovery inventory, not an instruction to
+download the other 371,297 indexed identities again. Captured list metadata
+alone does not satisfy available full-detail/full-text requirements.
 Congress 119 has **19,827 indexed canonical identities** but **zero indexed
 `source_checked_at` values**: freshness is unknown, not proved current or stale.
 The catalog comparison does not certify full detail/text or pre-93 coverage.

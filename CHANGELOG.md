@@ -18,10 +18,13 @@
   extra workers or Docker resizing were introduced.
 - Completed non-overwriting disposition of all 9,354 retained text variants:
   older/unversioned/unranked/equal-rank ambiguity is preserved, with no provably
-  rank-newer candidate. Official Congress 93-119 count reconciliation finds a
-  10,452 count difference, not yet an exact missing-ID set; a bounded retained
-  catalog-ID capture is running without ingest. Missing current source-check
-  metadata remains an explicit freshness gap.
+  rank-newer candidate. Complete official Congress 93-119 identity reconciliation
+  now confirms exactly 10,452 absent IDs among 381,749 unique official IDs,
+  retaining all 1,543 catalog pages without ingest. Of those gaps, 10,362 are in
+  Congress 93/100/101/102/103; 35 are Congress 113+. Every candidate payload seal
+  and live physical-index absence is independently verified. Missing-record
+  recovery and current source-check metadata remain explicit content/freshness
+  gaps; no existing record was re-ingested or rewritten.
 - Verified complete local topic publication: the durable succeeded job and live
   pointer agree on the 109,691-bill model, with 878 topic rows, 30 metasubjects
   and 137,230 sealed fitted actions. Saved-model seals and actual topic, group,

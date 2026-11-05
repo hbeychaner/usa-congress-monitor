@@ -95,6 +95,8 @@ Complete detail retrieval does not guarantee full-text availability.
 Collection counts or links alone do not prove detail completeness.
 Completeness describes an individual bill, not whether a whole Congress has
 been collected.
+Reconcile official catalog identities against search before missing-only
+recovery; matching collection totals alone do not establish identity coverage.
 
 ## Everyday commands
 
