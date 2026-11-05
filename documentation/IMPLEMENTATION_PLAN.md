@@ -26,7 +26,7 @@ not silently reclassified as unavailable.
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
 | C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | In progress. Central/staged comparison and all 49,207 nested GovInfo archives are audited; no retained identity is missing from search. Independently reproduced 3,084 committee expansions and 44 texts pass owned-shadow rehearsal; serving publication waits for the frozen topic run. Text variants, bill-identity law read-path visibility, broader source support and freshness remain open. |
-| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | In progress. All 109,691 usable indexed bills from the existing Congress 113+ analytics scope are frozen, with all exact vectors reused and no dropped inputs. The initial monitored fit/trends completed but publication failed on an incompatible legacy label mapping, not resource exhaustion. The compatibility fix and early preflight pass focused fresh/legacy tests. A guarded repeat preserves the original scope/cache and stages exact fitted rows before indexing; no completed publication is claimed. Collaboration/topic graph lineage remains open. |
+| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Blocked on disk capacity. The initial full run's mapping conflict is fixed and verified. The second monitored run was deliberately terminated during trend computation when free disk fell below 8 GiB; no completed fitted-row checkpoint or publication exists. Restore working headroom before another attempt. The original complete 109,691-bill scope and exact cache remain retained; collaboration/topic graph lineage remains open. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
 | C5. Final disposition | Every gate has evidence or an explicit blocker; validation passes; source/docs/changelog and source-pinned wiki are published. | Pending. Separate-host failover and off-host restoration remain blocked by the single-Mac topology, not implicitly passed or waived. |
@@ -54,6 +54,19 @@ not contain the original assignment probabilities or completed trend rows, so
 it cannot be promoted as the exact completed run by guessing those values.
 The repeat uses separate `analytics-v2` evidence and checkpoints every fitted
 result row before indexing, preserving the original failed attempt.
+
+The second monitored attempt was terminated at **1,307 active elapsed seconds**
+when the **8 GiB free-disk floor** was crossed. Peak observed parent RSS was
+**2,079,129,600 bytes**, below its 4 GiB threshold. A subsequent check found
+about **5.7 GiB free**. This is a resource-safety stop, not another mapping
+failure or a completed build. No `staged.json`, publication intent or published
+receipt exists for that attempt: complete-result checkpointing happens after
+fitting, trend computation and grouping, not partway through those operations.
+The exact job-owned temporary paths named during shutdown are already absent;
+retained project data has not been pruned. Do not retry until free capacity is
+restored. Do not lower the safety floor or count sleep-interrupted elapsed time
+as continuous acceptance evidence. The API remains ready and the original worker
+is unchanged.
 
 Current closeout evidence is retained under `data/release-closeout-20261104/`.
 The original all-history census counted **371,230 bill** and **136 law**

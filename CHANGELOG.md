@@ -4,6 +4,11 @@
 
 ### Added
 
+- Recorded the second monitored analytics stop as a capacity blocker: the
+  8 GiB free-disk floor was crossed during trend computation, and the owned
+  process was terminated before publication. No completed fitted-row checkpoint
+  exists for that attempt. Retained evidence and existing data remain intact;
+  another retry requires restored disk headroom, not a lower safety threshold.
 - Fixed full topic publication against the retained legacy analysis index:
   compatible text/keyword label mappings remain unchanged and only missing
   fields are added. Incompatible mappings and unacknowledged changes fail
