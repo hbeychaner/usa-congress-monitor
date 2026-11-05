@@ -9,6 +9,9 @@
   process was terminated before publication. No completed fitted-row checkpoint
   exists for that attempt. Retained evidence and existing data remain intact;
   another retry requires restored disk headroom, not a lower safety threshold.
+  After the user freed space, approximately 22 GiB free and 53% host free memory
+  were verified. A separate guarded retry retains both failed attempts and uses
+  a job-lifetime idle-sleep inhibitor, without changing system sleep settings.
 - Fixed full topic publication against the retained legacy analysis index:
   compatible text/keyword label mappings remain unchanged and only missing
   fields are added. Incompatible mappings and unacknowledged changes fail

@@ -26,7 +26,7 @@ not silently reclassified as unavailable.
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
 | C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | In progress. Central/staged comparison and all 49,207 nested GovInfo archives are audited; no retained identity is missing from search. Independently reproduced 3,084 committee expansions and 44 texts pass owned-shadow rehearsal; serving publication waits for the frozen topic run. Text variants, bill-identity law read-path visibility, broader source support and freshness remain open. |
-| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Blocked on disk capacity. The initial full run's mapping conflict is fixed and verified. The second monitored run was deliberately terminated during trend computation when free disk fell below 8 GiB; no completed fitted-row checkpoint or publication exists. Restore working headroom before another attempt. The original complete 109,691-bill scope and exact cache remain retained; collaboration/topic graph lineage remains open. |
+| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | In progress after restored capacity. The mapping fix is verified; the disk-stopped second attempt remains retained and unpublished. After user cleanup, approximately 22 GiB free disk and 53% host free memory were measured. A separate `analytics-v3` repeat retains the original complete 109,691-bill scope/cache and unchanged safety limits. No completed publication is claimed; collaboration/topic graph lineage remains open. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
 | C5. Final disposition | Every gate has evidence or an explicit blocker; validation passes; source/docs/changelog and source-pinned wiki are published. | Pending. Separate-host failover and off-host restoration remain blocked by the single-Mac topology, not implicitly passed or waived. |
@@ -67,6 +67,15 @@ retained project data has not been pruned. Do not retry until free capacity is
 restored. Do not lower the safety floor or count sleep-interrupted elapsed time
 as continuous acceptance evidence. The API remains ready and the original worker
 is unchanged.
+
+After the user freed disk space, the capacity recheck measured
+**23,768,313,856 free bytes** (about 22 GiB) and **53% host free memory**.
+The next attempt uses separate `analytics-v3` evidence, revalidates the original
+corpus/configuration, and retains the 4 GiB RSS stop, 8 GiB disk floor and other
+monitoring limits. A bounded macOS `caffeinate -i` wrapper inhibits idle sleep
+only while that job runs; it does not change persistent system settings or
+certify uninterrupted operation through manual/lid sleep. No qualifying
+24-hour observation has begun.
 
 Current closeout evidence is retained under `data/release-closeout-20261104/`.
 The original all-history census counted **371,230 bill** and **136 law**
