@@ -511,6 +511,32 @@ these links into a guessed modern package URL or treat nonblank error-page text
 as a successful bill download. Retained successful API responses can be reused
 after payload-digest validation; cache replay must consume no network attempts.
 
+### Retained versions, primary text and source freshness
+
+Controlled missing-record enrichment keeps the complete captured version set in
+sealed acquisition archives. `text_versions` in the serving document contains
+version metadata and source links; `full_text` contains one selected primary
+body, not an array of every captured body. The text tab exposes those links and
+labels the primary version without asserting that it is always the latest.
+
+Selection prefers independently verified enacted law, then a single distinct
+body. Complete source publication dates can establish a unique latest body;
+otherwise a unique highest rank is used only when every candidate has a known
+rank. Ties, missing dates and incomparable versions remain explicit. A retained
+source-listed representative may be published with an unresolved-order
+disposition; no rank is invented and no other captured body is discarded.
+These selection dispositions remain in the sealed publication evidence.
+An empty version listing means only that the source listed no versions.
+
+Acquisition, hydration assessment and upstream source-check times are different.
+Cached response replay can finish a new acquisition without contacting upstream.
+Controlled enrichment retains its acquisition-supplied time in
+`source_metadata[].acquisition_completed_at`, including timestamps preserved
+on resume, and records the lack of freshness evidence separately. It does not
+derive `source_checked_at` or a whole-document snapshot version from that time.
+Do not use file age, successful replay or an assessment timestamp to certify
+current document freshness.
+
 The runner and indexer derive `hydration_status` from the versioned
 `HydrationAssessment`, never from successful return alone. The assessment records
 source, assessment time, per-detail counts/state/reasons and the scoped status.

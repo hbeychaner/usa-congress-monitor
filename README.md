@@ -101,11 +101,17 @@ recovery; matching collection totals alone do not establish identity coverage.
 The reconciled Congress 93-119 roster's 10,452 missing identities have now been
 created from retained catalog metadata without changing existing records.
 The full acquisition queue has finished: 10,449 records now have complete detail
-and all listed text staged, with three explicitly unresolved source/detail cases.
+conditionally published, including 9,026 primary full texts. All 12,956 captured
+versions remain retained; the serving record contains one selected primary body.
+Exact source/version/API checks pass for every published record, and all 371,366
+original document versions are preserved. Three source/detail cases remain unresolved.
 Those are two law PDFs above the unchanged download bound and one repeatedly
-failing API record. Staged downloads are
-not indexed enrichment or proof of current analytics coverage; conditional
-publication and analytics reconciliation remain pending.
+failing API record. For 487 records, revision ordering is unresolved: a retained
+source-listed representative is published without claiming it is the latest.
+Acquisition timestamps, including cache replays, do not certify source freshness.
+Congress 119 has 19,832 records without document-level source-check timestamps.
+Broader historical coverage, analytics reconciliation, full recovery acceptance
+and the genuine 24-hour observation remain open; this is not release completion.
 Older Congress.gov text links can encode the Congress in the URL path rather
 than the filename; recovery validates the complete identity before downloading.
 Historical law recovery also verifies older act headings and page-header

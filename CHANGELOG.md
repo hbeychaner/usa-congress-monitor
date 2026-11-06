@@ -4,11 +4,24 @@
 
 ### Added
 
+- Conditionally published all 10,449 acquired missing-record enrichments, with
+  9,026 primary full texts and all 12,956 captured versions retained. Exact
+  source/version/API acceptance passes every record; all 371,366 original
+  versions and the three blocked metadata records are preserved. The owned
+  full-scope shadow passed stale-write rejection and conditional rollback and
+  was retired. Actual browser checks render detail and S.171's expanded text.
+  Selection evidence explicitly identifies 487 source-listed representatives
+  whose revision ordering is unresolved, rather than inventing ranks/latest text.
+  Cached acquisition completion is retained as provenance, not minted into
+  document source freshness. All 19,832 Congress 119 records still lack that
+  check evidence; wider history, refreshed analytics, full recovery and the
+  real 24-hour acceptance remain open.
 - Finished the long missing-content queue and recovered its format/transient
   exceptions: 10,449 of the fixed 10,452 records have complete detail and all
   listed text staged. Three remain explicit blockers: two oversized law PDFs
   and the repeated S.Res.218 API failure.
-  Staged enrichment is not yet published. Independent verification preserves
+  Acquisition itself performed no serving writes; subsequent publication is
+  recorded above. Independent verification preserves
   original detail timestamps and captured versions, checks all 25 exception
   recoveries and their source/PDF/OCR evidence, and confirms no serving writes.
 - Corrected text-version completeness to count all retrieved anonymous source
@@ -51,9 +64,9 @@
   64 actual API canaries pass; all 371,366 original document versions remain
   unchanged. The index now contains 381,818 documents, with zero missing IDs
   from the captured official roster. Metadata is not full-detail/text coverage.
-  A finite, resumable acquisition queue is running for those same identities,
-  sharing the existing 4,800-request/hour budget, with explicit request, deadline,
-  disk and RSS limits and no serving enrichment writes yet. Its successful canary
+  The subsequent finite, resumable acquisition queue for those same identities
+  shared the existing 4,800-request/hour budget, with explicit request, deadline,
+  disk and RSS limits and no acquisition-phase serving writes. Its successful canary
   verifies all nine detail collections and captures nonblank versioned text.
   Thirty-five newly created Congress 113+ records require analytics input
   reconciliation; prior model acceptance remains scoped to its frozen corpus.

@@ -1,6 +1,6 @@
 # Engineering improvement plan
 
-**Reviewed:** 2026-11-05
+**Reviewed:** 2026-11-06
 
 **Status:** core reliability/consolidation work and bounded R03 repair/voting
 publication are implemented; approved controlled Compose cutover and scoped
@@ -25,7 +25,7 @@ not silently reclassified as unavailable.
 
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
-| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. All 10,452 missing official IDs are created from retained metadata; all 371,366 original versions are preserved and the captured roster has zero missing IDs. The full acquisition queue has finished: 10,449 records have complete detail/all-listed-text staged, with three explicit source/detail blockers. No staged enrichment is published yet. Conditional publication, current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
+| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | All 10,452 missing official IDs exist; 10,449 now have conditionally published complete detail, including 9,026 primary full texts and 12,956 retained captures. Every source/version/API check passes; all 371,366 original versions and three blocked metadata records are preserved. The owned full-scope shadow passed stale-write/rollback checks and was retired. Primary ordering remains explicitly unresolved for 487 source-listed representatives. Two oversized PDFs and one API failure remain blockers. All 19,832 Congress 119 records lack document source-check evidence; 69 Congress 91/92 records do not establish wider historical completeness. Cached acquisition completion is not freshness. C1 is not closed. |
 | C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Verified for the previous frozen Congress 113+ contracts. Complete topic model and collaboration/topic graphs are published; accepted voting generation and historical graphs are preserved. All seven Congress 113-119 perspective snapshots use that model: 727 eligible topic/Congress results and 32 stability-passing splits, with exact API/browser acceptance. Recovery has now added 35 Congress 113+ identities: their available content and actual input fingerprints require reconciliation and, where inputs change, rebuilding before current-corpus certification. Daily source freshness remains separate. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
@@ -297,8 +297,41 @@ The exact remaining set is **`bill:103:hr:5110`**, **`bill:103:s:2182`**
 and **`bill:106:sres:218`**
 (repeated upstream HTTP 500). These are explicit unresolved sources, not
 certified unavailability or silently waived content. No acquisition process is
-left running. Preservation-aware conditional publication of staged enrichment,
-actual API acceptance and the affected analytics rebuild remain pending.
+left running. Acquisition was followed by the independently verified conditional
+publication below; the affected analytics rebuild remains pending.
+
+**Enrichment publication accepted, 2026-11-06:** all **10,449** complete
+acquisitions now have exact serving-source/version readback and actual detail
+API acceptance. There are **9,026 primary full texts**, with all **12,956**
+captured versions retained in the sealed archives. All **371,366** original
+document versions and the three blocked metadata records are unchanged. The
+owned 10,449-record shadow passed full projection, stale-write rejection and
+conditional rollback/reapplication; it was retired after acceptance. The browser
+renders the canary's sponsors/actions without a hydration warning and expands
+S.171's 67,889-character body with four distinct text-version links.
+
+Primary selection records 321 independently verified laws, 7,545 single-body
+cases, 452 unique source-date decisions, 221 fully ranked decisions and 487
+explicitly unresolved source-listed representatives. Another 1,423 records list
+no versions; that does not prove global text unavailability. Unknown or tied
+revision ordering is never converted into a fabricated rank/latest claim.
+
+A preparation-time inspection found that cached acquisition can set
+`Acquired.checked_at` after replay without an upstream request. The no-write
+attempt and 6,820 completed production projections were sealed and retained;
+independent comparison proved that reuse changed no content or lemma fields.
+The accepted publication retains the acquisition-supplied time in
+`source_metadata[].acquisition_completed_at`, including preserved timestamps on
+resume, but deliberately does not mint `source_checked_at` or a comparable
+snapshot version. Current freshness therefore remains unknown, not newly checked.
+
+The read-only inventory finds **19,832 Congress 119 records**, with **zero**
+document source-check timestamps, and **69** earlier records (68 from Congress
+92 and one from Congress 91). GovInfo documents available Statutes back to 1789;
+the Congress 93-119 roster is not a reconciliation of that broader history.
+Retain `closeout-inventory-v1.json` and the complete
+`missing-enrichment-v2/` evidence under the release-closeout directory.
+Analytics, recovery/restore and the real-day observation remain open.
 
 Recovery includes **35 Congress 113+ identities**, so the previously accepted
 analytics artifacts remain verified only for their recorded old input contract.
