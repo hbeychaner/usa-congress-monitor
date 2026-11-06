@@ -4,6 +4,10 @@
 
 ### Added
 
+- Regenerated the complete source-symbol references for the new configuration
+  and NLP service. Started the replacement continuous observation on November 6
+  at 21:03 UTC after real warm acceptance, with unchanged rates, safety floors
+  and Docker allocations; no passing day is claimed before actual completion.
 - Bounded search-normalization memory with an injected, typed spaCy service:
   serialized memory zones, one-text inference microbatches and excluded unused
   parser/NER components. Kept the model, 200,000-character cap, raw text,

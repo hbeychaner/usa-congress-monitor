@@ -122,6 +122,8 @@ was OOM-killed; no failed interval counts toward the required day.
 Search normalization now serializes spaCy memory zones and uses one text per
 inference microbatch without changing the model or existing text cap.
 See [lemmatization and cache ownership](documentation/reference/indexing.md#lemmatization).
+The replacement continuous observation began November 6 at 21:03 UTC; it
+cannot qualify before the same time on November 7.
 Actual existing-service interruption recovered queued indexing in 77 seconds
 without changing the original worker allocation or protected records. The
 25-index/vector/ledger backup is retained, but full restoration stopped at its

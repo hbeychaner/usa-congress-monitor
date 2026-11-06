@@ -171,6 +171,9 @@ plus two exact 20-record batches, including the longest-text group, with no
 worker OOM. These checks are not a day or a new 15-minute recovery certificate.
 A replacement observation must restart from zero, sealing the NLP source and
 configuration as well as the exact API memory/reload command and watch bound.
+That observation began **2026-11-06 21:03:41.112 UTC**; its earliest qualifying
+finish is the same time on November 7. Initial read/resource journals and exact
+index readback demonstrate actual progress, not merely a started process.
 Completed owned test streams are retired only after terminal indexing,
 exact readback, a retained exact archive and zero pending/lag proof. Every
 archive remains at its original path; native compression is used only when

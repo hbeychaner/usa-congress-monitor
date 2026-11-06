@@ -49,12 +49,17 @@ No declarations in this module.
 
 [Source](../../../cdm/utils/lemmatize.py)
 
-- field: [`_nlp: Any`](../../../cdm/utils/lemmatize.py#L18)
-- function: [`_get_nlp() -> Any`](../../../cdm/utils/lemmatize.py#L22)
-- function: [`lemmatize_texts(texts: Sequence[str]) -> list[str]`](../../../cdm/utils/lemmatize.py#L40)
-- field: [`lemmatize_texts.results: list[str]`](../../../cdm/utils/lemmatize.py#L48)
-- function: [`lemmatize_text(text: str) -> str`](../../../cdm/utils/lemmatize.py#L61)
-- function: [`try_lemmatize_query(text: str) -> str`](../../../cdm/utils/lemmatize.py#L65)
+- class: [`LanguageLoader(Protocol)`](../../../cdm/utils/lemmatize.py#L16)
+- function: [`LanguageLoader.__call__(self, name: str, *, exclude: Iterable[str]) -> Language`](../../../cdm/utils/lemmatize.py#L17)
+- class: [`SpacyLemmatizer()`](../../../cdm/utils/lemmatize.py#L20)
+- function: [`SpacyLemmatizer.__init__(self, settings: LemmatizationConfig, loader: LanguageLoader, logger: logging.Logger) -> None`](../../../cdm/utils/lemmatize.py#L21)
+- function: [`SpacyLemmatizer._model(self) -> Language`](../../../cdm/utils/lemmatize.py#L31)
+- function: [`SpacyLemmatizer.lemmatize(self, texts: Sequence[str]) -> list[str]`](../../../cdm/utils/lemmatize.py#L46)
+- function: [`SpacyLemmatizer.try_query(self, text: str) -> str`](../../../cdm/utils/lemmatize.py#L67)
+- field: [`_default_lemmatizer: SpacyLemmatizer`](../../../cdm/utils/lemmatize.py#L77)
+- function: [`lemmatize_texts(texts: Sequence[str]) -> list[str]`](../../../cdm/utils/lemmatize.py#L82)
+- function: [`lemmatize_text(text: str) -> str`](../../../cdm/utils/lemmatize.py#L86)
+- function: [`try_lemmatize_query(text: str) -> str`](../../../cdm/utils/lemmatize.py#L90)
 
 ## cdm/utils/log_trimmer.py
 
