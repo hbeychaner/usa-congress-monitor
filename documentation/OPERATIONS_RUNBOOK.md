@@ -131,10 +131,32 @@ The corrected helper imports only ledger/broker collaborators, not the full
 application container: measured import peak **67,256 KiB**, with a regression
 ceiling of 96 MiB. Warm acceptance passed 75 reads at p95 **0.452 seconds**
 while the original worker indexed 20 exact records; no new API OOM occurred.
-These are preparation checks, not 24-hour evidence. The new observation started
-**2026-11-06 17:46:22.243096 UTC**; earliest qualifying finish is the same time
-on November 7. Original Docker allocations, the 8 GiB disk floor and other
-guards remain unchanged.
+These are preparation checks, not 24-hour evidence. That next observation also
+failed: **3,913.009 seconds**, 19,516 offered/19,515 completed reads, p95
+**0.348 seconds**, zero scheduling gaps and another API OOM kill. Its receipt
+records 65 consumed indexing results; the journal proves 66 completed timed
+batches plus smoke. All 628,082 protected original ledger rows still verify
+unchanged, with full integrity, and the owned failed target is retired.
+
+The supervisor was watching **104,893 directories** under `/workspace`; even
+after its server child died, the cgroup retained about **166 MiB of kernel
+memory**. Bounding hot reload to `/workspace/cdm` reduced the watches to **42**
+and kernel memory to about **4.6 MiB**. Warm HTTP/index smoke now measures
+about **213 MiB/512 MiB** for the API, p95 **0.353 seconds** over 75 reads and
+20 exact indexed records. The original worker's container identity, command
+and 1 GiB allocation are unchanged. These observations support the bounded-watch
+fix; they do not prove a day.
+
+The new observation started **2026-11-06 18:58:06.015273 UTC**; earliest
+qualifying finish is the same time on November 7. Its sealed environment checks
+the exact API memory limit, reload command and a maximum 256 watches before
+starting. Completed owned test streams are retired only after terminal indexing,
+exact readback, a retained exact archive and zero pending/lag proof. Every
+archive remains at its original path; native compression is used only when
+byte-exact and beneficial, with explicit no-saving dispositions otherwise.
+Duplicate failed-run source storage was replaced with independent byte-identical
+APFS clones, not removed. Original Docker allocations, rates, the 8 GiB disk
+floor and other guards remain unchanged.
 
 Maintenance receipts reference explicit recovery dispositions, not a complete
 restore certificate. Preserve failed observations and their zero qualifying
@@ -185,6 +207,11 @@ PY
 
 Schedule full integrity scans around maintenance, not alongside a sustained-load
 acceptance run; even read-only diagnostics consume memory and I/O.
+
+Keep API reload watching scoped to application source, not the entire checkout.
+Large retained-data trees can consume substantial kernel watch/slab memory that
+Python RSS does not show. Monitor the container cgroup as well as process RSS;
+a live reload supervisor does not prove its server child or `/ready` is healthy.
 
 Stop all ledger writers before replacement/restoration, preserve the current
 file and sidecars, and verify a current consistent backup before replacing any

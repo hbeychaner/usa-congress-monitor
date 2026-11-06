@@ -4,6 +4,15 @@
 
 ### Added
 
+- Bounded managed API hot reload to `/workspace/cdm`, preserving code reload
+  and the original 512 MiB allocation without watching retained data or frontend
+  dependencies. The previous supervisor held 104,893 inotify watches; the
+  real-day run failed after 3,913 seconds with another API OOM despite p95
+  0.348 seconds. Its failed receipt remains retained and is not qualifying time.
+  The corrected runtime has 42 watches and a warmed API near 213 MiB, with
+  75 successful reads and actual 20-record indexing. Added a deployment
+  regression for the explicit watch root. The new full-day observation started
+  November 6 at 18:58 UTC and is not yet certified.
 - Accepted the complete expanded analytics corpus: 109,726 usable inputs,
   892 visible topics, 114,537 collaboration/126,412 topic edges and 707
   Congress/topic perspective results with 19 stability-passing splits.

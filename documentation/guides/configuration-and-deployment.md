@@ -22,6 +22,13 @@ make es-api-key
 `make es-api-key` creates the local application search credential.
 Avoid running either against a deployment you do not own.
 
+The managed API retains development hot reload, scoped to `/workspace/cdm`.
+Do not watch the entire bind-mounted checkout: retained acquisition directories,
+archives and frontend dependencies can otherwise create an unbounded inotify
+watch set and consume the API container's memory outside Python RSS. Changes to
+application Python still reload; Compose/environment changes require restarting
+the affected service. Frontend hot reload is independent.
+
 ## Settings ownership
 
 [AppConfig and section definitions](../../cdm/config/app_config.py) are the

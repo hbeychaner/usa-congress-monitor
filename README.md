@@ -19,6 +19,8 @@ The default services need roughly 8 GiB of Docker memory. Keep at least 8 GiB of
 host disk free for the runtime, with additional space for images, dependencies
 and data. Startup checks capacity and refuses an undersized configuration.
 Maintain the free-disk reserve while long jobs run, not only at startup.
+The API watches only application Python for hot reload, not the retained-data
+tree or the entire checkout.
 
 ### 2. Set up a fresh checkout
 

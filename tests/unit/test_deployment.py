@@ -205,6 +205,25 @@ class TestJobRouting:
 class TestComposeOperations:
     root = Path(__file__).resolve().parents[2]
 
+    def test_api_reload_watches_only_application_source(self) -> None:
+        compose = ComposeFile.model_validate(
+            yaml.safe_load((self.root / "docker-compose.fullstack.yml").read_text())
+        )
+        backend = compose.services[ServiceName("backend")]
+        command = (
+            shlex.split(backend.command)
+            if isinstance(backend.command, str)
+            else backend.command
+        )
+        assert "--reload" in command
+        roots = [
+            Path(command[number + 1])
+            for number, argument in enumerate(command)
+            if argument == "--reload-dir"
+        ]
+        assert roots == [Path("/workspace/cdm")]
+        assert backend.mem_limit == "512m"
+
     def test_controlled_profile_excludes_acquisition_publication_and_scheduling(
         self,
     ) -> None:
