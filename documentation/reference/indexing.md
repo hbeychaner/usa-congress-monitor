@@ -191,6 +191,22 @@ objects/lists and calls
 The raw field remains intact. A failed/missing enrichment should not be
 mistaken for a server analyzer generating the sibling automatically.
 
+[`SpacyLemmatizer`](../../cdm/utils/lemmatize.py) receives its typed
+[`LemmatizationConfig`](../../cdm/config/app_config.py), model loader and logger.
+The existing public helpers share one process-local service; the model loads
+only on first nonempty use. A lock serializes loading and inference because
+spaCy memory zones cannot overlap on a shared model.
+The `en_core_web_md` model excludes the unused parser and NER components.
+Each inference microbatch contains one text, retaining the existing
+200,000-character head-only cap (or the model's smaller limit).
+This microbatch is not a Congress.gov request or an indexing-job batch.
+Each call runs inside `Language.memory_zone()`; only materialized lemma strings
+escape, never spaCy Docs or Tokens. Temporary vocabulary, tokenizer and
+participating component caches are released afterward. Index-time failures
+remain explicit; query-time failures retain the logged best-effort behavior.
+Raw text, model identity, stop-word/punctuation filtering and public helper
+signatures are unchanged.
+
 ## Upsert and replacement semantics
 
 [`bulk_upsert()`](../../cdm/store/opensearch.py) materializes input documents,

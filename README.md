@@ -117,6 +117,11 @@ Expanded-corpus analytics are accepted: 109,726 inputs, 892 visible topics and
 with current graph/model lineage and actual API/browser checks.
 Broader historical coverage, full recovery acceptance and the genuine 24-hour
 observation remain open; this is not release completion.
+The latest observation failed after 5,882 seconds when the original worker
+was OOM-killed; no failed interval counts toward the required day.
+Search normalization now serializes spaCy memory zones and uses one text per
+inference microbatch without changing the model or existing text cap.
+See [lemmatization and cache ownership](documentation/reference/indexing.md#lemmatization).
 Actual existing-service interruption recovered queued indexing in 77 seconds
 without changing the original worker allocation or protected records. The
 25-index/vector/ledger backup is retained, but full restoration stopped at its

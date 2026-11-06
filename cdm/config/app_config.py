@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
 
@@ -128,6 +129,21 @@ class EmbeddingConfig(_Section):
     embedding_batch_docs: int = 500
 
 
+class LemmaExcludedComponent(StrEnum):
+    PARSER = "parser"
+    NER = "ner"
+
+
+class LemmatizationConfig(_Section):
+    spacy_model: str = "en_core_web_md"
+    lemma_max_chars: int = Field(default=200_000, gt=0)
+    lemma_batch_size: int = Field(default=1, gt=0)
+    lemma_excluded_components: tuple[LemmaExcludedComponent, ...] = (
+        LemmaExcludedComponent.PARSER,
+        LemmaExcludedComponent.NER,
+    )
+
+
 class MetasubjectConfig(_Section):
     # Topics are clustered into this many broad metasubjects.
     metasubject_target_groups: int = 30
@@ -229,6 +245,7 @@ class AppConfig(BaseModel):
     govinfo: GovInfoConfig = Field(default_factory=GovInfoConfig)
     indexing: IndexingConfig = Field(default_factory=IndexingConfig)
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
+    lemmatization: LemmatizationConfig = Field(default_factory=LemmatizationConfig)
     metasubject: MetasubjectConfig = Field(default_factory=MetasubjectConfig)
     perspective: PerspectiveConfig = Field(default_factory=PerspectiveConfig)
     api: ApiConfig = Field(default_factory=ApiConfig)

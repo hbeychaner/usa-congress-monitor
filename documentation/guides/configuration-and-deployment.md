@@ -58,6 +58,7 @@ and `ApiConfig.cors_origins_csv` uses `CORS_ORIGINS`.
 | `ledger` | `JOB_DB_PATH`, `RETENTION_DAYS`, `COVERAGE_LOOKBACK_DAYS`, `RECORD_LIBRARY_ROOT` | Durable ledger, retention and latest-record library |
 | `govinfo` | `GOVINFO_RATE_LIMIT_PER_HOUR`, `GOVINFO_ARCHIVE_ROOT` | Local bulk-download pacing and archive location |
 | `indexing` | `INDEX_BATCH_JOBS`, `INDEX_BATCH_DOCS`, `INGEST_PARTIAL_INDEX_EVERY` | Bounded indexing batches and incremental dispatch |
+| `lemmatization` | `SPACY_MODEL`, `LEMMA_MAX_CHARS`, `LEMMA_BATCH_SIZE`, `LEMMA_EXCLUDED_COMPONENTS` | Defaults: `en_core_web_md`, 200,000 characters, one text per inference microbatch, excluded `parser`/`ner`; serialized memory zones bound transient caches |
 | `embedding` | `EMBEDDING_MODEL`, `EMBEDDING_BATCH_DOCS` | Vector model identity and batching |
 | `metasubject` | `METASUBJECT_TARGET_GROUPS`, matching/confidence settings | Group construction and identity carry-over |
 | `perspective` | `PERSPECTIVE_*` | Evidence thresholds, exclusions, stability and display rules |

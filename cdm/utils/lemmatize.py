@@ -1,61 +1,86 @@
-"""spaCy-backed lemmatization for OpenSearch ``*_lemma`` search fields."""
+"""Memory-bounded spaCy lemmatization for search fields and query text."""
 
 from __future__ import annotations
 
 import logging
 import threading
-from collections.abc import Sequence
-from typing import Any
+from collections.abc import Iterable, Sequence
+from typing import Protocol
 
 import spacy
+from spacy.language import Language
 
-logger = logging.getLogger(__name__)
-
-SPACY_MODEL = "en_core_web_md"
-# Cap spaCy input; lemma fields only need the head and huge texts starve workers.
-MAX_LEMMA_CHARS = 200_000
-
-_nlp: Any = None
-_lock = threading.Lock()
+from cdm.config import LemmatizationConfig, get_config
 
 
-def _get_nlp() -> Any:
-    global _nlp
-    if _nlp is None:
-        with _lock:
-            if _nlp is None:
-                try:
-                    # parser/ner are not needed for lemmas; md lemmatizer
-                    # requires tok2vec + tagger + attribute_ruler.
-                    _nlp = spacy.load(SPACY_MODEL, disable=["parser", "ner"])
-                except OSError as exc:
-                    raise RuntimeError(
-                        f"spaCy model {SPACY_MODEL!r} is not installed; "
-                        "run `uv sync` (the model wheel is pinned in "
-                        "pyproject.toml/requirements.txt)"
-                    ) from exc
-    return _nlp
+class LanguageLoader(Protocol):
+    def __call__(self, name: str, *, exclude: Iterable[str]) -> Language: ...
+
+
+class SpacyLemmatizer:
+    def __init__(
+        self, settings: LemmatizationConfig, loader: LanguageLoader,
+        logger: logging.Logger,
+    ) -> None:
+        self._settings = settings
+        self._loader = loader
+        self._logger = logger
+        self._language: Language | None = None
+        self._lock = threading.Lock()
+
+    def _model(self) -> Language:
+        if self._language is None:
+            try:
+                self._language = self._loader(
+                    self._settings.spacy_model,
+                    exclude=self._settings.lemma_excluded_components,
+                )
+            except OSError as exc:
+                raise RuntimeError(
+                    f"spaCy model {self._settings.spacy_model!r} is not installed; "
+                    "run `uv sync` (the model wheel is pinned in "
+                    "pyproject.toml/requirements.txt)"
+                ) from exc
+        return self._language
+
+    def lemmatize(self, texts: Sequence[str]) -> list[str]:
+        if not texts:
+            return []
+        with self._lock:
+            model = self._model()
+            maximum = min(model.max_length, self._settings.lemma_max_chars)
+            # Only strings escape the zone; Docs and Tokens must not outlive it.
+            with model.memory_zone():
+                return [
+                    " ".join(
+                        token.lemma_.lower()
+                        for token in doc
+                        if token.lemma_
+                        and not (token.is_punct or token.is_space or token.is_stop)
+                    )
+                    for doc in model.pipe(
+                        ((text or "")[:maximum] for text in texts),
+                        batch_size=self._settings.lemma_batch_size,
+                    )
+                ]
+
+    def try_query(self, text: str) -> str:
+        if not text or not text.strip():
+            return ""
+        try:
+            return self.lemmatize([text])[0]
+        except (RuntimeError, ImportError, ValueError):
+            self._logger.warning("Query lemmatization unavailable; skipping lemma clauses")
+            return ""
+
+
+_default_lemmatizer: SpacyLemmatizer = SpacyLemmatizer(
+    get_config().lemmatization, spacy.load, logging.getLogger(__name__),
+)
 
 
 def lemmatize_texts(texts: Sequence[str]) -> list[str]:
-    """Return whitespace-joined lowercase lemmas for each text."""
-    if not texts:
-        return []
-    nlp = _get_nlp()
-    # Very large bill texts can exceed spaCy's max_length; truncate rather
-    # than fail — the head of the document still carries the topical signal.
-    max_chars = min(int(nlp.max_length), MAX_LEMMA_CHARS)
-    results: list[str] = []
-    for doc in nlp.pipe([(text or "")[:max_chars] for text in texts]):
-        results.append(
-            " ".join(
-                token.lemma_.lower()
-                for token in doc
-                if token.lemma_
-                and not (token.is_punct or token.is_space or token.is_stop)
-            )
-        )
-    return results
+    return _default_lemmatizer.lemmatize(texts)
 
 
 def lemmatize_text(text: str) -> str:
@@ -63,11 +88,4 @@ def lemmatize_text(text: str) -> str:
 
 
 def try_lemmatize_query(text: str) -> str:
-    """Best-effort query lemmatization; returns "" when unavailable."""
-    if not text or not text.strip():
-        return ""
-    try:
-        return lemmatize_text(text)
-    except (RuntimeError, ImportError, ValueError):
-        logger.warning("Query lemmatization unavailable; skipping lemma clauses")
-        return ""
+    return _default_lemmatizer.try_query(text)

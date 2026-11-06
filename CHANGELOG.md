@@ -4,6 +4,19 @@
 
 ### Added
 
+- Bounded search-normalization memory with an injected, typed spaCy service:
+  serialized memory zones, one-text inference microbatches and excluded unused
+  parser/NER components. Kept the model, 200,000-character cap, raw text,
+  filtering and public helpers unchanged. Added concurrency, cleanup, failure
+  and real transient-vocabulary regressions; 60 captured pre-change projections
+  and all 9,120 complete frozen workload projections match exactly. Offline
+  peak RSS is 673.1 MiB with an unchanged string store. Actual warm acceptance
+  passes 75 reads and two 20-record batches, including the longest text, through
+  the original worker without an OOM. The last observation failed after 5,881.866 seconds
+  with a worker OOM, despite a healthy API, p95 0.342 seconds and zero scheduling
+  gaps. Recovered only its exact interrupted 20-record job using the original
+  payload and unchanged 1 GiB worker; all 628,082 original jobs verify unchanged.
+  The failed observation remains retained with zero qualifying time.
 - Bounded managed API hot reload to `/workspace/cdm`, preserving code reload
   and the original 512 MiB allocation without watching retained data or frontend
   dependencies. The previous supervisor held 104,893 inotify watches; the
@@ -11,8 +24,8 @@
   0.348 seconds. Its failed receipt remains retained and is not qualifying time.
   The corrected runtime has 42 watches and a warmed API near 213 MiB, with
   75 successful reads and actual 20-record indexing. Added a deployment
-  regression for the explicit watch root. The new full-day observation started
-  November 6 at 18:58 UTC and is not yet certified.
+  regression for the explicit watch root. The subsequent observation started
+  November 6 at 18:58 UTC and later failed on worker memory, not API readiness.
 - Accepted the complete expanded analytics corpus: 109,726 usable inputs,
   892 visible topics, 114,537 collaboration/126,412 topic edges and 707
   Congress/topic perspective results with 19 stability-passing splits.
@@ -28,7 +41,7 @@
   Documented Docker-only live ledger access and unsafe legacy native checks.
   Retained both failed sustained-operation attempts, including an API OOM.
   A lightweight ledger helper passed 23 regression checks and warm HTTP/index
-  smoke; the new genuine 24-hour observation is running, not certified.
+  smoke; these preparation checks do not certify a genuine 24-hour observation.
 - Verified actual RabbitMQ/Redis/API interruption and recovery through the
   original 1 GiB operations worker in 77.4035 seconds, including exact queued
   indexing and preservation of all 628,082 prior job rows. Post-maintenance

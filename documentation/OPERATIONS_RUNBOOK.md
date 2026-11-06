@@ -147,10 +147,31 @@ about **213 MiB/512 MiB** for the API, p95 **0.353 seconds** over 75 reads and
 and 1 GiB allocation are unchanged. These observations support the bounded-watch
 fix; they do not prove a day.
 
-The new observation started **2026-11-06 18:58:06.015273 UTC**; earliest
-qualifying finish is the same time on November 7. Its sealed environment checks
-the exact API memory limit, reload command and a maximum 256 watches before
-starting. Completed owned test streams are retired only after terminal indexing,
+The observation that started **2026-11-06 18:58:06.015273 UTC** failed after
+**5,881.866 seconds**: 28,200 offered/28,199 completed reads, p95 **0.342 seconds**
+and zero scheduling gaps. The API remained ready with no new OOM; the original
+1 GiB worker OOM-killed its child during batch 94. Broker redelivery skipped
+the still-running durable job; it did not automatically recover that claim.
+After proving the executor dead and the worker idle, the same worker was
+restarted without changing its identity, command or allocation. Only the exact
+owned interrupted job was deliberately requeued, preserving its original wire
+payload. Recovery verifies all 20 exact sources, zero pending/lag, full ledger
+integrity and all 628,082 protected original rows unchanged. Its owned scratch
+target is retired; archives and failed receipts remain retained.
+
+The bounded NLP implementation now serializes spaCy memory zones, excludes
+unused parser/NER components and uses one text per inference microbatch with
+the same model, cap and filtering. Sixty captured pre-change projections and
+all **9,120 complete frozen workload projections** match exactly. Offline peak
+RSS is **673.1 MiB**, with the string store unchanged at 709,118 entries.
+The vocabulary's cumulative `len()` counter is not a live-retention measure in
+this spaCy version; real transient-lexeme membership and string cleanup are
+tested directly. Actual warm acceptance passes 75 reads at p95 **0.433 seconds**
+plus two exact 20-record batches, including the longest-text group, with no
+worker OOM. These checks are not a day or a new 15-minute recovery certificate.
+A replacement observation must restart from zero, sealing the NLP source and
+configuration as well as the exact API memory/reload command and watch bound.
+Completed owned test streams are retired only after terminal indexing,
 exact readback, a retained exact archive and zero pending/lag proof. Every
 archive remains at its original path; native compression is used only when
 byte-exact and beneficial, with explicit no-saving dispositions otherwise.
