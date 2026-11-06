@@ -4,6 +4,16 @@
 
 ### Added
 
+- Corrected sustained-observation clock selection after macOS successfully
+  stepped UTC backward by 89.289665 milliseconds. The old observer stopped
+  after 6,491.686 seconds despite 32,459 successful reads, p95 0.346 seconds
+  and no API/worker OOM. Its journal accounts for 109 completed timed indexing
+  batches plus two preflight batches; all 628,082 original jobs remain unchanged.
+  The replacement compares nonadjustable monotonic and suspend-inclusive Darwin
+  clocks, preserving the original two-second gap and 86,400-second requirements.
+  UTC remains an event timestamp, not a continuity clock. Added clock-step,
+  actual-gap and exact-loop-equivalence regressions; retained the failed receipt
+  with zero qualifying time and retired only its completed owned scratch.
 - Regenerated the complete source-symbol references for the new configuration
   and NLP service. Started the replacement continuous observation on November 6
   at 21:03 UTC after real warm acceptance, with unchanged rates, safety floors

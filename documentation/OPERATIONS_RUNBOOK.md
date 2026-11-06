@@ -171,9 +171,23 @@ plus two exact 20-record batches, including the longest-text group, with no
 worker OOM. These checks are not a day or a new 15-minute recovery certificate.
 A replacement observation must restart from zero, sealing the NLP source and
 configuration as well as the exact API memory/reload command and watch bound.
-That observation began **2026-11-06 21:03:41.112 UTC**; its earliest qualifying
-finish is the same time on November 7. Initial read/resource journals and exact
-index readback demonstrate actual progress, not merely a started process.
+That observation began **2026-11-06 21:03:41.112 UTC** and stopped after
+**6,491.686 seconds**. All 32,459 offered reads completed successfully at p95
+**0.346 seconds**; neither the API nor worker recorded an OOM. The receipt
+consumed 108 indexing results, while the journal independently accounts for
+109 completed timed batches plus two preflight batches. All original job rows
+verify unchanged, with full ledger integrity; its owned target is retired.
+
+The macOS time-service log proves a successful **89.289665-millisecond backward
+UTC adjustment** at the failure instant. The old observer rejected any negative
+wall-clock increment; the maximum actual request-offer interval was only
+**0.509 seconds**. The failed receipt remains false and receives no qualifying
+time. The replacement uses Python's nonadjustable monotonic clock and Darwin's
+nonadjustable, suspend-inclusive `CLOCK_MONOTONIC_RAW`, retaining the same
+two-second scheduling/suspend limits and all other original gates. UTC remains
+an event timestamp. Tests reproduce the old NTP false alarm, still reject real
+sleep/pauses, and compare the entire load/resource/journal/acceptance loop
+against the sealed original after normalizing only the continuity clock call.
 Completed owned test streams are retired only after terminal indexing,
 exact readback, a retained exact archive and zero pending/lag proof. Every
 archive remains at its original path; native compression is used only when
