@@ -4,6 +4,31 @@
 
 ### Added
 
+- Accepted the complete expanded analytics corpus: 109,726 usable inputs,
+  892 visible topics, 114,537 collaboration/126,412 topic edges and 707
+  Congress/topic perspective results with 19 stability-passing splits.
+  Reconciliation preserves every original training projection and adds exactly
+  35; actual HTTP/browser checks validate current lineage and results.
+  Preserved a disk-guarded graph attempt and revalidated its complete stages
+  after lossless storage recovery; no data pruning or threshold changes.
+- Actually restored and hash-verified all five files/27,890,390 bytes of the
+  current published model. Recovered a divergent host/container SQLite ledger
+  view using a verified current snapshot, preserving all 628,082 protected
+  original rows and resuming the exact queued 20-record job. The later incident
+  exceeded 15 minutes; the earlier 77-second restart is not its recovery time.
+  Documented Docker-only live ledger access and unsafe legacy native checks.
+  Retained both failed sustained-operation attempts, including an API OOM.
+  A lightweight ledger helper passed 23 regression checks and warm HTTP/index
+  smoke; the new genuine 24-hour observation is running, not certified.
+- Verified actual RabbitMQ/Redis/API interruption and recovery through the
+  original 1 GiB operations worker in 77.4035 seconds, including exact queued
+  indexing and preservation of all 628,082 prior job rows. Post-maintenance
+  source/version checks preserve 371,366 originals, 10,449 enrichments and the
+  three blocked metadata records. Retained a complete 25-index/vector/ledger
+  backup; actual full restoration stopped at the combined resource guard after
+  two complete indices and 116,500 legislation records. Documented that full
+  restoration, its 15-minute objective and off-host recovery remain unproved;
+  maintenance completion is not a full-restore certificate.
 - Conditionally published all 10,449 acquired missing-record enrichments, with
   9,026 primary full texts and all 12,956 captured versions retained. Exact
   source/version/API acceptance passes every record; all 371,366 original

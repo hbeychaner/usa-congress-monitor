@@ -68,6 +68,16 @@ Topic training and the perspective policy corpus retain their existing
 published model's fitted corpus. Reconcile source additions against the recorded
 input contract before claiming that an existing model includes new records.
 
+For an expanded corpus, compare the actual training projection for every original
+input, not only its document version: a metadata-only version advance need not
+change the fitted text. Record additions, removals and changed projections
+against the protected baseline. Graph signature eligibility can include law
+projections that topic training excludes, so their input counts need not match.
+Rebuild dependent graphs/perspectives on the accepted model, preserve voting and
+historical generations, and verify the actual HTTP/browser lineage and stability
+gating before declaring current-corpus acceptance. A cache-read log alone does
+not prove exact reused/new embedding counts.
+
 ### Label origin is separate from availability
 
 Topic summaries, metasubject summaries, and perspective clusters record

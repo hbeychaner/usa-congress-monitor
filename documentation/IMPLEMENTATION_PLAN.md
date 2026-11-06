@@ -26,15 +26,36 @@ not silently reclassified as unavailable.
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
 | C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | All 10,452 missing official IDs exist; 10,449 now have conditionally published complete detail, including 9,026 primary full texts and 12,956 retained captures. Every source/version/API check passes; all 371,366 original versions and three blocked metadata records are preserved. The owned full-scope shadow passed stale-write/rollback checks and was retired. Primary ordering remains explicitly unresolved for 487 source-listed representatives. Two oversized PDFs and one API failure remain blockers. All 19,832 Congress 119 records lack document source-check evidence; 69 Congress 91/92 records do not establish wider historical completeness. Cached acquisition completion is not freshness. C1 is not closed. |
-| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Verified for the previous frozen Congress 113+ contracts. Complete topic model and collaboration/topic graphs are published; accepted voting generation and historical graphs are preserved. All seven Congress 113-119 perspective snapshots use that model: 727 eligible topic/Congress results and 32 stability-passing splits, with exact API/browser acceptance. Recovery has now added 35 Congress 113+ identities: their available content and actual input fingerprints require reconciliation and, where inputs change, rebuilding before current-corpus certification. Daily source freshness remains separate. |
-| C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
-| C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
+| C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Accepted for the expanded frozen corpus. Model `20261106T165556Z-a4db27dfa2624216b7c60c1e4caf12f3` fits all 109,726 usable inputs: all 109,691 original projections are unchanged, exactly 35 are added and none removed. Published 893 topic rows (892 visible), 109,726 assignments, 25,229 topic trends, 30 metasubjects and 1,477 metasubject trends. Graphs validate 109,862 canonical bill/law signatures and publish 114,537 collaboration/126,412 topic edges; voting/history remain unchanged. All 707 eligible Congress 113-119 perspective results and 19 stability-passing splits pass exact HTTP contracts and actual browser checks. No exact cache-transfer count is certified. Daily source freshness remains separate. |
+| C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | In progress, not passed. The current observation began 2026-11-06 17:46:22.243096 UTC; earliest qualifying finish is 2026-11-07 17:46:22.243096 UTC. Failed SQLite-view and API-OOM attempts are retained and count as zero qualifying time. The corrected observer keeps live ledger access in Docker and avoids loading the full application container into its helper; original service allocations and safety floors are unchanged. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
+| C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | The original interruption recovered in 77.4035 seconds through the unchanged 1 GiB worker. A later divergent host/container SQLite view was recovered from a verified current snapshot: all-table logical digests match, all 628,082 protected original job rows remain unchanged, and the exact queued 20-record job resumed. That later incident exceeded 15 minutes. The current published model's five files/27,890,390 bytes were actually restored and hash-verified. The complete 25-index/3,244,277-document/vector/ledger backup is retained; actual restoration verified 1,504,221 graph, 413,506 topic and 116,500 legislation records before the resource guard stopped it. All owned restore targets are retired. Full restoration and its 15-minute objective did not pass. All 371,366 original versions, 10,449 enrichments and three blockers are preserved; full-library/volume and off-host restoration remain unproved. |
 | C5. Final disposition | Every gate has evidence or an explicit blocker; validation passes; source/docs/changelog and source-pinned wiki are published. | Pending. Separate-host failover and off-host restoration remain blocked by the single-Mac topology, not implicitly passed or waived. |
 
 Analytics keeps its existing Congress 113+ input contract; this does not narrow
 the historical data requirement. A current indexed corpus is not an authoritative
 upstream inventory. Frozen analytics inputs must remain source/version-exact
 through publication, and incomplete or sampled training cannot become production.
+
+The finite source disposition independently reconciles **381,818 physical
+documents**, including all captured missing identities, and **124,681**
+contiguous cumulative acquisition requests against the original 150,000-request
+budget and unchanged 48-hour deadline. Public Law 103-465 (245 pages) and
+Public Law 103-337 (451 pages) exceed the unchanged 32 MiB download bound;
+verified official metadata exposes no accepted smaller text alternative.
+The valid full-page XML cosponsor request for Congress 106 S.Res.218 still
+returns HTTP 500. Partial XML and HTTP-200 "Page Not Found" bodies are not
+publishable complete content. These three source blockers, unknown current
+freshness and wider historical coverage remain explicit; equivalent retries
+are not another open-ended implementation queue.
+
+The expanded analytics run completed in **1,783.225 seconds**, with peak RSS
+**2,063,482,880 bytes**, below the unchanged 4 GiB bound. An earlier graph
+attempt staged complete results but stopped at the 8 GiB disk floor before
+publication. Lossless APFS compression/copy-on-write storage recovery preserved
+every retained path, logical byte and seal; the accepted graph execution
+revalidated those complete stages and all source versions before conditional
+publication. No dataset was pruned and no resource limit relaxed. The 707
+perspective results use deterministic labels and unchanged stability thresholds.
 
 The user approved **one monitored host analytics process**, with a **4 GiB RSS
 stop threshold**, offline cached model access and deterministic labels.

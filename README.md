@@ -110,8 +110,20 @@ failing API record. For 487 records, revision ordering is unresolved: a retained
 source-listed representative is published without claiming it is the latest.
 Acquisition timestamps, including cache replays, do not certify source freshness.
 Congress 119 has 19,832 records without document-level source-check timestamps.
-Broader historical coverage, analytics reconciliation, full recovery acceptance
-and the genuine 24-hour observation remain open; this is not release completion.
+Expanded-corpus analytics are accepted: 109,726 inputs, 892 visible topics and
+707 Congress/topic perspective results, including 19 stability-passing splits,
+with current graph/model lineage and actual API/browser checks.
+Broader historical coverage, full recovery acceptance and the genuine 24-hour
+observation remain open; this is not release completion.
+Actual existing-service interruption recovered queued indexing in 77 seconds
+without changing the original worker allocation or protected records. The
+25-index/vector/ledger backup is retained, but full restoration stopped at its
+resource guard after two complete indices and part of legislation; it did not
+pass. See the [recovery boundaries](documentation/OPERATIONS_RUNBOOK.md#backup-and-actual-recovery-boundaries).
+The current model's five files were actually restored and hash-verified.
+A later host/container SQLite-view incident was recovered without losing any
+protected original jobs, but exceeded 15 minutes. Keep live ledger operations
+inside Docker; see the [SQLite operating boundary](documentation/OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary).
 Older Congress.gov text links can encode the Congress in the URL path rather
 than the filename; recovery validates the complete identity before downloading.
 Historical law recovery also verifies older act headings and page-header
@@ -123,12 +135,16 @@ Run these from the repository root:
 
 ```bash
 make stack-status   # Check running services
-make health-check   # Check application dependencies and outstanding failures
-make status         # Inspect durable jobs and ingestion coverage
+curl --fail http://127.0.0.1:8000/ready  # Check API dependency readiness
 make stack-logs     # Follow application logs; Ctrl+C stops following
 make down           # Stop the stack while preserving stored data
 make up             # Start it again
 ```
+
+Do not run the legacy native `make status` or `make health-check` against the
+live Docker-mounted SQLite ledger. Native and container access diverged during
+actual operation; full diagnostic scripts also have unqualified memory use for
+large ledgers. Use the runbook's Docker-side checks instead.
 
 If startup is refused, run `make stack-capacity` and consult the
 [configuration guide](documentation/guides/configuration-and-deployment.md).

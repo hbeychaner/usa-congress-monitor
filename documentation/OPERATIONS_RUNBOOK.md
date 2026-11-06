@@ -59,23 +59,141 @@ For a sealed acquisition queue:
    records must not produce a complete-content certificate or a successful final
    exit. New unexpected consecutive failures still trigger investigation.
 
-Run the read-only health check before and after maintenance:
+### Backup and actual recovery boundaries
+
+Back up indices, alias inventory, ledger, record archives and published model
+artifacts separately. A consistent backup is not proof of restoration, and an
+API restart is not broker-volume or independent-host disaster recovery.
+Measure the full recovery interval, including diagnosis; a shorter, separate
+restart exercise cannot certify a later incident's recovery time.
+
+Elasticsearch 9 can omit dense vectors from ordinary `_source` retrieval.
+Export with `source_exclude_vectors=False`; verify the resulting source rather
+than assuming a default scan contains embeddings. For exact vector readback,
+owned restore targets use `index.mapping.exclude_source_vectors=False`.
+Preserve index mappings/settings and alias inventory separately. Never restore
+over serving indices or attach serving aliases to a test target.
+
+Restore model artifacts into an owned scratch directory, preserving relative
+paths, then verify every file's size/hash against the published manifest.
+Retain the archive after retiring only that verified scratch directory.
+Keep source/version and protected-ledger-row preservation checks separate from
+restore success. Resource-guarded partial restoration is a failure, even when
+every acknowledged record in the partial target verifies exactly.
+
+<!-- wiki:repository-only:start -->
+### Local closeout recovery evidence
+
+The local closeout backup contains **25 business indices and 3,244,277
+documents**, including dense vectors, plus a **448,028,672-byte** consistent
+online SQLite ledger backup. These are frozen backup counts, not a claim that
+later analytics publications are included.
+
+Actual restoration exactly verified **1,504,221 graph documents** and
+**413,506 topic documents**, then acknowledged and verified **116,500
+legislation documents** before the combined disk-or-RSS guard stopped it.
+The failure did not record individual resource values, so neither the specific
+bound nor a full-restoration success can be inferred. All three owned restore
+targets were retired after UUID/owner/no-alias checks. **The complete restore
+and its 15-minute recovery objective did not pass.** Retain the complete
+backup and partial-attempt receipts; do not lower safety floors or prune data
+to force a passing result.
+
+A separate actual interruption stopped the original operations worker, durably
+queued an owned 20-document archive/Redis/index job, restarted the existing
+RabbitMQ, Redis and API containers, then restarted the same worker. Recovery
+took **77.4035 seconds**, with exact indexed sources, no pending stream entries,
+API readiness and scratch retirement. All **628,082 pre-existing job rows**,
+including five failed rows, were unchanged; the worker retained its **1 GiB**
+allocation. Subsequent readback also preserved all **371,366 original document
+versions**, **10,449 accepted enrichments** and **three blocked metadata records**.
+
+The current model `20261106T165556Z-a4db27dfa2624216b7c60c1e4caf12f3`
+was subsequently backed up and actually restored: **five files, 27,890,390
+bytes**, with exact hashes and owned restored scratch retirement. The archive
+remains retained. Full archive/broker-volume restoration, independent-host
+failover and off-host disaster recovery remain unproved.
+
+During the first sustained-operation attempt, the host live ledger passed
+integrity checks while the container view was malformed and differed in size.
+Both writers were stopped; the healthy current online backup matched the host
+ledger's all-table logical dump digests. The old host inode and malformed
+container-visible file were retained, and the live inode was atomically replaced
+with the verified current snapshot. The exact queued job resumed from its
+original serialized payload, indexed all 20 exact records and left no pending
+entries. All **628,082 original job rows** remain unchanged. The precise
+filesystem/cache mechanism is not proved; the divergent views are observed
+facts. **This incident exceeded 15 minutes.**
+
+The next observation failed after **215.814 seconds**, with 970 offered/920
+completed reads and an API cgroup OOM kill. It is not a qualifying day.
+The corrected helper imports only ledger/broker collaborators, not the full
+application container: measured import peak **67,256 KiB**, with a regression
+ceiling of 96 MiB. Warm acceptance passed 75 reads at p95 **0.452 seconds**
+while the original worker indexed 20 exact records; no new API OOM occurred.
+These are preparation checks, not 24-hour evidence. The new observation started
+**2026-11-06 17:46:22.243096 UTC**; earliest qualifying finish is the same time
+on November 7. Original Docker allocations, the 8 GiB disk floor and other
+guards remain unchanged.
+
+Maintenance receipts reference explicit recovery dispositions, not a complete
+restore certificate. Preserve failed observations and their zero qualifying
+time; never add elapsed intervals across incidents or sleep.
+<!-- wiki:repository-only:end -->
+
+### Live SQLite operating boundary
+
+Keep all live ledger operations inside Docker while the managed stack is
+running. Do not mix host-native SQLite connections with container writers on the
+same bind-mounted WAL ledger, including read-only diagnostics and backups.
+Readiness/stack checks do not require a second ledger runtime:
 
 ```sh
-make health-check
-uv run python scripts/health_check.py --json
+make stack-status
+curl --fail http://127.0.0.1:8000/ready
 ```
 
-A healthy report requires `jobs`, `celery`, `redis`, and `opensearch` to be
-`ok`. Warnings may remain for historical audit rows, but every category must
-have an explicit disposition. `actionable_failure_count` is the count to use
-for the maintenance decision; expected denormalized-summary rows are excluded.
+The legacy `make status`, `make health-check`, and direct
+`scripts/job_status.py`/`scripts/health_check.py` commands open the native
+ledger. **Do not run them against a Docker-managed live ledger.** They also
+materialize job rows and are not qualified within the small API container's
+memory budget; do not merely wrap the full scripts in `docker exec`.
+Use bounded Docker-side ledger queries and independently check the existing
+worker/broker and serving API. Readiness alone is not a queue, source freshness,
+restore or sustained-operation certificate. Keep historical failed job rows and
+their explicit dispositions rather than clearing them for a green report.
 
-Verify the ledger independently when investigating corruption:
+For an independent live integrity check, use a lightweight Docker-side reader:
 
 ```sh
-uv run python -c 'from sqlalchemy import text; from cdm.config import get_config; from cdm.jobs.store import JobStore; s=JobStore(get_config().ledger.job_db_path); print(s.engine.connect().execute(text("PRAGMA integrity_check")).scalar_one())'
+docker compose -f docker-compose.fullstack.yml exec -T backend \
+  python - <<'PY'
+import sqlite3
+from contextlib import closing
+from pathlib import Path
+
+from cdm.config import get_config
+
+path = Path(get_config().ledger.job_db_path).resolve()
+with closing(sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)) as connection:
+    result = connection.execute("PRAGMA integrity_check").fetchall()
+if result != [("ok",)]:
+    raise RuntimeError(f"Ledger integrity check failed: {result}")
+print("ok")
+PY
 ```
+
+Schedule full integrity scans around maintenance, not alongside a sustained-load
+acceptance run; even read-only diagnostics consume memory and I/O.
+
+Stop all ledger writers before replacement/restoration, preserve the current
+file and sidecars, and verify a current consistent backup before replacing any
+inode. Never overwrite the ledger from an older backup to hide corruption.
+After recovery, check full integrity, protected original rows, exact interrupted
+job identity/payload, terminal status, indexed sources and pending stream entries.
+Native access to a closed offline snapshot is different from native access to
+the shared live WAL file. Keep full scans and heavyweight diagnostic imports out
+of tightly allocated serving containers.
 
 ## Restart
 
@@ -85,7 +203,7 @@ Compose is the sole supported managed local stack:
 ```sh
 make up
 make stack-status
-make health-check
+curl --fail http://127.0.0.1:8000/ready
 ```
 
 `make services`/`make start`/`make stack-up` are aliases for that path.
@@ -174,7 +292,7 @@ time/ownership and absence; a completed bootout is not proof that all children
 are gone. Suspended old-code processes must not be blindly resumed with
 `SIGCONT`. Stop and investigate unexpected live identities rather than running
 process-name kills or retrying teardown without checking its effects.
-Use `make up`, `make stack-status`, and `make health-check` afterward. The old
+Use `make up`, `make stack-status`, and the Docker-side checks above afterward. The old
 native targets now fail with this migration guidance; no agent is uninstalled
 or service switched by an ordinary startup/test run.
 
@@ -616,7 +734,8 @@ Before requeueing exhausted jobs, create a timestamped ledger backup:
 
 ```sh
 backup="data/jobs.sqlite3.pre-recovery-$(date -u +%Y%m%dT%H%M%SZ)"
-uv run python - data/jobs.sqlite3 "$backup" <<'PY'
+docker compose -f docker-compose.fullstack.yml exec -T backend \
+  python - data/jobs.sqlite3 "$backup" <<'PY'
 import sqlite3
 import sys
 from contextlib import closing
@@ -642,14 +761,16 @@ files are not automatically an atomic cross-store snapshot. Preserve each
 archive's `records.sqlite3` with the same backup API. This is not a replacement
 for Elasticsearch index/alias/model-artifact backups.
 
+Run the online backup in the existing container, not through a native connection
+to its live WAL file. The resulting closed snapshot may be inspected offline.
+
 Use the recovery task for stale worker messages and transient failures. It is
 single-flight and rate-limited; do not bulk requeue vendor 4xx, malformed XML,
 validation, disk-I/O, or expected non-indexed failures.
 
-```sh
-uv run python scripts/job_status.py
-uv run python scripts/health_check.py --json
-```
+Check only the relevant job identities through bounded Docker-side reads.
+Do not invoke the native full-ledger status/health scripts while Docker writers
+are active.
 
 For acknowledged Redis streams, replay from the durable `records.sqlite3`
 archive or re-ingest the source package. Do not blindly redispatch an index job
