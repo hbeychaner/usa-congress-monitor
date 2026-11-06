@@ -25,7 +25,7 @@ not silently reclassified as unavailable.
 
 | Gate | Required exit evidence | Current disposition |
 |---|---|---|
-| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. All 10,452 independently verified missing official IDs are now created from retained metadata; all 371,366 original versions are preserved and the captured roster has zero remaining missing IDs. Finite full-detail/text acquisition is running after a successful complete-detail/text canary; no staged enrichment is published yet. Available content, current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
+| C1. Content and freshness | One explicit inventory of indexed identities/content, retained recoverable content, independently supported upstream gaps and actual source-check age; resolve required available gaps or record an explicit blocker. | Retained repair/read acceptance complete: all 3,128 repairs, 1,533 sentinels and 136 canonical law detail/browse/search paths pass; owned shadow retired. All 9,354 text variants have explicit non-overwrite dispositions. All 10,452 missing official IDs are created from retained metadata; all 371,366 original versions are preserved and the captured roster has zero missing IDs. The full acquisition queue has finished: 10,449 records have complete detail/all-listed-text staged, with three explicit source/detail blockers. No staged enrichment is published yet. Conditional publication, current-Congress source-check evidence and broader historical source coverage remain unresolved. C1 is not closed. |
 | C2. Analytics | Complete frozen input scope, source versions/configuration, verified cache/model identity, validated results, publication/rollback evidence and actual API/browser checks. | Verified for the previous frozen Congress 113+ contracts. Complete topic model and collaboration/topic graphs are published; accepted voting generation and historical graphs are preserved. All seven Congress 113-119 perspective snapshots use that model: 727 eligible topic/Congress results and 32 stability-passing splits, with exact API/browser acceptance. Recovery has now added 35 Congress 113+ identities: their available content and actual input fingerprints require reconciliation and, where inputs change, rebuilding before current-corpus certification. Daily source freshness remains separate. |
 | C3. Sustained operation | Actual uninterrupted 24 hours at 5 reads/second, p95 at most 2 seconds during bounded ingestion/indexing, with offered load, failures, resource pressure and observation gaps recorded. | Not started. A short test, elapsed wall time across sleep, or an unfinished observer cannot pass this gate. |
 | C4. Recovery and restore | Account for acknowledged jobs/documents after controlled interruption, verify backups by restoration, and measure recovery within 15 minutes. | Partial evidence only: ten isolated real-store pipeline checks pass, including killed-writer/WAL restore and duplicate terminal delivery. Full-system restoration and broker interruption are not established by those fixtures. |
@@ -202,7 +202,7 @@ and **zero missing IDs** from the captured official roster. The owned shadow is
 retired. These new records are metadata projections with unknown hydration,
 not a full-detail/full-text certificate.
 
-The separate fixed-roster acquisition queue is running, newest Congress first,
+The separate fixed-roster acquisition queue ran newest Congress first,
 with **three HTTP threads**, the existing shared **4,800 requests/hour** budget,
 **150,000 maximum request attempts**, a **48-hour deadline**, an **8 GiB disk
 floor**, a **4 GiB RSS stop** and a **32 MiB response bound**. No application
@@ -257,7 +257,7 @@ entries** are reused; an actual cached nine-collection replay has **zero network
 attempts**. The original deadline and complete cumulative attempt history remain
 unchanged.
 
-The continuing queue separately retains **nine unresolved identities**: the
+At that restart, the continuing queue separately retained **nine unresolved identities**: the
 previous three plus `bill:103:hr:4379`, `bill:103:hr:5110`,
 `bill:103:s:171`, `bill:103:s:1406`, `bill:103:s:1487` and
 `bill:103:s:2182`. These include unverified/oversized law representations,
@@ -265,6 +265,40 @@ conflicting XML primary-bill evidence and incomplete nine-collection evidence.
 Their original sources and partial content remain retained for resolution;
 none is declared globally unavailable, successfully hydrated or release-complete.
 No staged content has yet been conditionally published into the serving index.
+
+**Acquisition queue finished, 2026-11-06:** the full run staged **10,420**
+records. Four transient public-download failures then recovered from cached
+detail with four requests, reaching **10,424**. A bounded exception pass
+independently recovered another **25**, for **10,449 staged / three unresolved**.
+All four rich-HTML cases preserve their complete extracted bodies and matched
+bill/Congress identity. Enacted-law cases require independently matched MODS,
+law identity, primary bill, citation and text boundaries; granule suffixes are
+not citation pages. Five damaged PDF text layers have complete source-sealed
+on-device OCR witnesses. Historical act openings and both older page-header
+layouts now pass without accepting running headers or mid-act fragments.
+
+Independent verification covers all 25 exception identities, disjointness from
+the 10,424-record base, complete nine-collection evidence, nonblank captured
+versions, unchanged previously captured versions and original detail-check
+timestamps, and all retained PDF/OCR source/image digests. Logical SQLite
+backups preserve every predecessor record and failed execution. The cumulative
+request journal ends at **124,648**; the original request/deadline/resource limits
+remain unchanged. Acquisition made **zero serving enrichment writes**.
+
+The S.171 detail case exposed a counting bug, not a missing upstream version:
+the retained response contains five rows including one identical duplicate.
+The corrected contract retains five source rows, four distinct versions and
+typed duplicate multiplicity. All nine collections and all four text captures
+now pass; the original cached source-check timestamp remains unchanged.
+Raw count mismatches and explicit-ID repetition still cannot certify completeness.
+
+The exact remaining set is **`bill:103:hr:5110`**, **`bill:103:s:2182`**
+(245- and 451-page enacted-law PDFs above the 32 MiB response bound),
+and **`bill:106:sres:218`**
+(repeated upstream HTTP 500). These are explicit unresolved sources, not
+certified unavailability or silently waived content. No acquisition process is
+left running. Preservation-aware conditional publication of staged enrichment,
+actual API acceptance and the affected analytics rebuild remain pending.
 
 Recovery includes **35 Congress 113+ identities**, so the previously accepted
 analytics artifacts remain verified only for their recorded old input contract.

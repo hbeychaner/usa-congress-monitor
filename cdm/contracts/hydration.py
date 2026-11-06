@@ -66,11 +66,15 @@ class DetailState(StrEnum):
     ENVELOPE = "envelope"
 
 
-class RepeatedAction(BaseModel):
+class RepeatedDetailRecord(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     record: JsonObject
     occurrences: int = Field(ge=2)
+
+
+class RepeatedAction(RepeatedDetailRecord):
+    """Source multiplicity of an anonymous action body."""
 
 
 class DetailEvidence(BaseModel):
@@ -84,7 +88,7 @@ class DetailEvidence(BaseModel):
     )
     fetched_count: int = Field(
         ge=0,
-        description="Retrieved source-counted entries; action and nested relationship rows retain anonymous duplicates, while top-level records remain distinct.",
+        description="Retrieved source-counted entries; action, text-version and nested relationship rows retain anonymous duplicates, while top-level records remain distinct.",
     )
     fetched_record_count: int | None = Field(
         default=None,
@@ -99,6 +103,10 @@ class DetailEvidence(BaseModel):
     repeated_actions: list[RepeatedAction] = Field(
         default_factory=list,
         description="Repeated anonymous action bodies and their source-row multiplicities, not a count of separate real-world events.",
+    )
+    repeated_text_versions: list[RepeatedDetailRecord] = Field(
+        default_factory=list,
+        description="Repeated anonymous text-version rows and their exact source multiplicities; download each distinct version only once.",
     )
     expected_active_count: int | None = Field(
         default=None,
@@ -121,19 +129,20 @@ class DetailEvidence(BaseModel):
             and self.fetched_relationship_count > self.fetched_count
         ):
             raise ValueError("Distinct relationships cannot exceed source rows")
-        if self.repeated_actions and (
-            self.fetched_record_count is None
-            or (
-                self.fetched_record_count
-                + sum(action.occurrences - 1 for action in self.repeated_actions)
-                > self.fetched_count
-            )
-            or self.complete
-            and self.fetched_record_count
-            + sum(action.occurrences - 1 for action in self.repeated_actions)
-            != self.fetched_count
-        ):
-            raise ValueError("Repeated action evidence must reconcile row counts")
+        for repeated in (self.repeated_actions, self.repeated_text_versions):
+            if repeated and (
+                self.fetched_record_count is None
+                or (
+                    self.fetched_record_count
+                    + sum(record.occurrences - 1 for record in repeated)
+                    > self.fetched_count
+                )
+                or self.complete
+                and self.fetched_record_count
+                + sum(record.occurrences - 1 for record in repeated)
+                != self.fetched_count
+            ):
+                raise ValueError("Repeated detail evidence must reconcile row counts")
         if (
             self.fetched_active_count is not None
             and self.fetched_active_count > self.fetched_count
@@ -471,8 +480,8 @@ class BillDetailFetcher:
                     ]
                     if len(identified) != len(self.distinct(identified)):
                         object_complete = False
-        repeated_actions: list[RepeatedAction] = []
-        if kind is BillDetailKind.ACTIONS:
+        repeated_records: list[RepeatedDetailRecord] = []
+        if kind in (BillDetailKind.ACTIONS, BillDetailKind.TEXT_VERSIONS):
             frequencies = Counter(
                 DetailIdentity(
                     json.dumps(record, sort_keys=True, separators=(",", ":"))
@@ -480,8 +489,8 @@ class BillDetailFetcher:
                 for record in records
                 if record.get("id") is None and record.get("url") is None
             )
-            repeated_actions = [
-                RepeatedAction(
+            repeated_records = [
+                RepeatedDetailRecord(
                     record=TypeAdapter(JsonObject).validate_json(body),
                     occurrences=count,
                 )
@@ -490,7 +499,7 @@ class BillDetailFetcher:
             ]
             fetched = len(records)
             object_complete = fetched == len(distinct) + sum(
-                action.occurrences - 1 for action in repeated_actions
+                record.occurrences - 1 for record in repeated_records
             )
         complete = (
             object_complete
@@ -511,7 +520,12 @@ class BillDetailFetcher:
                 fetched_count=fetched,
                 fetched_record_count=len(distinct),
                 fetched_relationship_count=fetched_relationship_count,
-                repeated_actions=repeated_actions,
+                repeated_actions=[
+                    RepeatedAction.model_validate(record.model_dump())
+                    for record in repeated_records
+                ] if kind is BillDetailKind.ACTIONS else [],
+                repeated_text_versions=repeated_records
+                if kind is BillDetailKind.TEXT_VERSIONS else [],
                 expected_active_count=expected_active,
                 fetched_active_count=active,
                 state=DetailState.OBJECT

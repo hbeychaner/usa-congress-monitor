@@ -711,8 +711,9 @@ No declarations in this module.
 - class: [`StatutePdfReader()`](../../../cdm/ingest/statutes_evidence.py#L348)
 - function: [`StatutePdfReader.__init__(self, settings: StatuteRecoverySettings) -> None`](../../../cdm/ingest/statutes_evidence.py#L349)
 - function: [`StatutePdfReader.selected_heading(self, text: str, identity: StatuteIdentity) -> tuple[list[re.Match[str]], list[re.Match[str]]]`](../../../cdm/ingest/statutes_evidence.py#L353)
-- function: [`StatutePdfReader.read(self, source: SealedStatuteFile, metadata: StatuteMetadataLaw, witness: StatuteOcrWitness \| None=None, indexed_source: JsonObject \| None=None) -> VerifiedStatutePdf`](../../../cdm/ingest/statutes_evidence.py#L366)
-- field: [`StatutePdfReader.read.texts: list[str]`](../../../cdm/ingest/statutes_evidence.py#L384)
+- function: [`StatutePdfReader.citation_confirmed(self, header: str, metadata: StatuteMetadataLaw) -> bool`](../../../cdm/ingest/statutes_evidence.py#L366)
+- function: [`StatutePdfReader.read(self, source: SealedStatuteFile, metadata: StatuteMetadataLaw, witness: StatuteOcrWitness \| None=None, indexed_source: JsonObject \| None=None) -> VerifiedStatutePdf`](../../../cdm/ingest/statutes_evidence.py#L391)
+- field: [`StatutePdfReader.read.texts: list[str]`](../../../cdm/ingest/statutes_evidence.py#L409)
 
 ## cdm/ingest/statutes_recovery.py
 

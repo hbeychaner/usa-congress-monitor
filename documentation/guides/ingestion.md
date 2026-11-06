@@ -436,6 +436,11 @@ Missing relationship lists remain incomplete; conflicting bill metadata still
 fails. `fetched_record_count` separately reports distinct top-level records
 (legislative subjects for the object-shaped subjects response), while
 `fetched_count` reports the endpoint's source-counted entries.
+Text-version pagination also counts source rows, including exact anonymous
+duplicates. The normalized version list remains distinct so a repeated version
+is downloaded only once. `repeated_text_versions` preserves each repeated body
+and its occurrence count; raw counts, distinct counts and multiplicities must
+reconcile before completeness. This does not waive missing or conflicting rows.
 For actions, the source count measures returned rows, including identical
 anonymous bodies. `fetched_count` retains that row count, while normalized
 `actions` and `fetched_record_count` remain distinct. `repeated_actions` stores
@@ -474,7 +479,21 @@ guessing from those links. Match the acquired bill-law relationship against
 official XML primary-bill references or independently validated MODS/PDF
 evidence. Historical PDF headings can use `102d` or `103d` as well as modern
 ordinal spellings; the heading Congress must agree with the law identity.
+Older facsimiles instead use an `AN ACT` or `JOINT RESOLUTION` opening,
+sometimes preceded by an enactment date, without repeating the Congress.
+Require that complete legislative opening, not a running page header or a
+fragment starting mid-act. Older page headers can print the page before the
+volume or place the volume at the left and page at the right of a law/date
+banner. Match the exact page, volume and Congress against independent MODS
+metadata; a date's day/year is not a page number. A running header can name an
+adjacent law sharing that page, so identify and bound the selected act separately.
 Preserve adjacent-law boundaries and explicit partial-facsimile/OCR failures.
+When the text layer is damaged, retain source-sealed local OCR witnesses and
+page-image digests; reconstructing a missing opening requires every PDF page.
+The `-2`/`-3` suffix in a granule filename distinguishes granules sharing a
+page; it is not part of the numeric Statutes citation. Independently match
+the primary bill and law identity before selecting the canonical MODS PDF;
+retain discrepancies with the originally listed source URL.
 If a whole-volume XML exceeds the response bound, keep that bound and use a
 bounded independently verified law source instead; the large representation
 does not establish that the law's text is unavailable.
@@ -483,7 +502,11 @@ Historical draft links can instead use
 `/{congress}/bills/{measure}{number}/BILLS-{measure}{number}{version}.htm`.
 The filename alone does not establish the Congress. Controlled recovery validates
 the official HTTPS host, Congress path, both measure/number occurrences and
-version code, then requires a nonblank preformatted bill body. Do not rewrite
+version code, then requires a nonblank preformatted bill body. Some official
+historical bodies use rich HTML rather than `<pre>`; controlled recovery
+accepts those only after independently matching Congress and bill headings,
+removing script/style content and retaining the complete extracted body.
+Do not rewrite
 these links into a guessed modern package URL or treat nonblank error-page text
 as a successful bill download. Retained successful API responses can be reused
 after payload-digest validation; cache replay must consume no network attempts.

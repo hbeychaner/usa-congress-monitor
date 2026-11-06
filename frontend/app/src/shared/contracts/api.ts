@@ -226,6 +226,7 @@ export type DetailEvidence = {
     page_count: number;
     reason: string;
     repeated_actions?: Array<RepeatedAction>;
+    repeated_text_versions?: Array<RepeatedDetailRecord>;
     state: DetailState;
 };
 
@@ -673,6 +674,11 @@ export type RelatedTopic = {
 };
 
 export type RepeatedAction = {
+    occurrences: number;
+    record: JsonObject;
+};
+
+export type RepeatedDetailRecord = {
     occurrences: number;
     record: JsonObject;
 };

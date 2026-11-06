@@ -214,6 +214,62 @@ def test_law_heading_rejects_mismatched_congress() -> None:
     assert not headings and not selected
 
 
+@pytest.mark.parametrize("opening", [
+    "AN ACT", "JOINT RESOLUTION", "December 29, 1973 AN ACT",
+])
+def test_legacy_act_openings_exclude_running_headers_and_adjacent_laws(
+    opening: str,
+) -> None:
+    identity = StatuteIdentity(kind=StatuteLawKind.PUBLIC, congress=93, number=225)
+    text = (
+        "942 PUBLIC LAW 93-225-DEC. 29, 1973 [87 STAT. Section 17. Previous law.\n"
+        f"Public Law 93-225\n{opening}\nSelected law.\n"
+        "Public Law 93-226\nAN ACT\nAdjacent law."
+    )
+    headings, selected = StatutePdfReader(
+        StatuteRecoverySettings()
+    ).selected_heading(text, identity)
+    assert len(headings) == 2 and len(selected) == 1
+    content = text[selected[0].start():headings[1].start()]
+    assert "Selected law." in content
+    assert "Previous law." not in content and "Adjacent law." not in content
+
+
+@pytest.mark.parametrize("text", [
+    "PUBLIC LAW 93-225-DEC. 29, 1973 [87 STAT. Section 17.",
+    "Public Law 93-225 December 29, 1973 Section 17.",
+    "Public Law 93-225 A report mentions this act.",
+])
+def test_legacy_act_opening_requires_a_complete_legislative_title(text: str) -> None:
+    headings, _ = StatutePdfReader(StatuteRecoverySettings()).selected_heading(
+        text, StatuteIdentity(kind=StatuteLawKind.PUBLIC, congress=93, number=225),
+    )
+    assert not headings
+
+
+@pytest.mark.parametrize(("header", "expected"), [
+    ("90 STAT. 3 PUBLIC LAW 94-1", True),
+    ("3 PUBLIC LAW 94-1-JAN. 28, 1976 [90 STAT.", True),
+    ("3 PUBLIC LAW 94-2-JAN. 28, 1976 [90 STAT.", True),
+    ("90 STAT.] PUBLIC LAW 94-2-JAN. 28, 1976 3 Public Law 94-1", True),
+    ("90 STAT. PUBLIC LAW 94-1-JAN. 28, 1976 3 Public Law 94-1", True),
+    ("4 PUBLIC LAW 94-1-JAN. 28, 1976 [90 STAT.", False),
+    ("3 PUBLIC LAW 94-1-JAN. 28, 1976 [91 STAT.", False),
+    ("3 PUBLIC LAW 93-1-JAN. 28, 1976 [90 STAT.", False),
+    ("Section 3 PUBLIC LAW 94-1 [90 STAT.", False),
+    ("3 PUBLIC LAW 94-1 [H.R. 1] unrelated body [90 STAT.", False),
+    ("90 STAT.] PUBLIC LAW 94-1-JAN. 3, 1976 4 Public Law 94-1", False),
+    ("91 STAT.] PUBLIC LAW 94-1-JAN. 28, 1976 3 Public Law 94-1", False),
+    ("90 STAT.] PUBLIC LAW 93-1-JAN. 28, 1976 3 Public Law 94-1", False),
+])
+def test_pdf_citation_requires_exact_modern_or_legacy_page_header(
+    tmp_path: Path, header: str, expected: bool,
+) -> None:
+    assert StatutePdfReader(StatuteRecoverySettings()).citation_confirmed(
+        header, Fixture.law(tmp_path),
+    ) is expected
+
+
 @pytest.mark.parametrize(
     ("text", "message"),
     [

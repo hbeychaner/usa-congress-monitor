@@ -23,7 +23,10 @@ class StatuteRecoverySettings(BaseModel):
     parser_version: str = "statute-metadata-pdf-v1"
     body_heading_pattern: str = (
         r"\b(?P<kind>Public|Private)\s+Law\s*(?P<congress>\d+)\s*[-\u2013\u2014]\s*"
-        r"(?P<number>\d+)\W{0,80}(?P=congress)(?:st|nd|rd|th|d)\s*Congress\b"
+        r"(?P<number>\d+)(?:\W{0,80}(?P=congress)(?:st|nd|rd|th|d)\s*Congress\b"
+        r"|\s+(?:(?:January|February|March|April|May|June|July|August|September|"
+        r"October|November|December)\s+\d{1,2},?\s+\d{4}\s+)?"
+        r"(?:AN\s+ACT|JOINT\s+RESOLUTION)\b)"
     )
     bill_patterns: dict[MeasureType, str] = {
         MeasureType.HR: r"H\.?\s*R\.?",

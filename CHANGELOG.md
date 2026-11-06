@@ -4,6 +4,27 @@
 
 ### Added
 
+- Finished the long missing-content queue and recovered its format/transient
+  exceptions: 10,449 of the fixed 10,452 records have complete detail and all
+  listed text staged. Three remain explicit blockers: two oversized law PDFs
+  and the repeated S.Res.218 API failure.
+  Staged enrichment is not yet published. Independent verification preserves
+  original detail timestamps and captured versions, checks all 25 exception
+  recoveries and their source/PDF/OCR evidence, and confirms no serving writes.
+- Corrected text-version completeness to count all retrieved anonymous source
+  rows while keeping normalized/downloaded versions distinct. Typed
+  `repeated_text_versions` evidence retains exact multiplicities; missing rows,
+  explicit-ID repetition and contradictory source counts remain incomplete.
+  S.171 now verifies five source rows/four distinct versions and captures all
+  four texts, preserving the original cached source-check time. Regenerated
+  frontend contracts expose the new evidence.
+- Added verified historical act/joint-resolution openings and both older
+  Statutes page-header layouts to PDF recovery. Running headers and partial
+  acts remain rejected; page, volume and Congress must agree with official
+  metadata, and adjacent laws remain excluded. Source-sealed on-device OCR
+  recovered five damaged text layers without changing resource/download bounds.
+  Rich historical HTML is accepted only with independently matching bill and
+  Congress headings; granule suffixes are not mistaken for citation pages.
 - Added strict support in bounded recovery for legacy Congress.gov draft-text
   URLs whose filenames omit the Congress number. Path and filename must agree
   with the selected Congress, measure and number; nonblank formatted bodies and

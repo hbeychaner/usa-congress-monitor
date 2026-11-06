@@ -230,7 +230,7 @@ No declarations in this module.
 - field: [`StatuteRecoverySettings.header_characters: int`](../../../cdm/config/statute_recovery.py#L22)
 - field: [`StatuteRecoverySettings.parser_version: str`](../../../cdm/config/statute_recovery.py#L23)
 - field: [`StatuteRecoverySettings.body_heading_pattern: str`](../../../cdm/config/statute_recovery.py#L24)
-- field: [`StatuteRecoverySettings.bill_patterns: dict[MeasureType, str]`](../../../cdm/config/statute_recovery.py#L28)
+- field: [`StatuteRecoverySettings.bill_patterns: dict[MeasureType, str]`](../../../cdm/config/statute_recovery.py#L31)
 
 ## cdm/config/statute_text.py
 

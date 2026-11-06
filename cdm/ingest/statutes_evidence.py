@@ -363,6 +363,31 @@ class StatutePdfReader:
         ]
         return headings, selected
 
+    def citation_confirmed(self, header: str, metadata: StatuteMetadataLaw) -> bool:
+        page = re.escape(metadata.first_page.split("-")[0])
+        return bool(
+            re.search(
+                rf"\b{metadata.citation_volume}\s+STAT\.\s*{page}\b",
+                header,
+                re.IGNORECASE,
+            )
+            or re.search(
+                rf"^\s*{page}\s+(?:PUBLIC|PRIVATE)\s+LAW\s*"
+                rf"{metadata.identity.congress}\s*[-\u2013\u2014]\s*\d+"
+                rf"[^\[\]]{{0,100}}\[\s*{metadata.citation_volume}\s+STAT\.",
+                header,
+                re.IGNORECASE,
+            )
+            or re.search(
+                rf"^\s*{metadata.citation_volume}\s+STAT\.\s*\]?\s+"
+                rf"(?:PUBLIC|PRIVATE)\s+LAW\s*{metadata.identity.congress}"
+                rf"\s*[-\u2013\u2014]\s*\d+[^\[\]]{{0,100}}\s+{page}"
+                rf"(?=\s+(?:PUBLIC|PRIVATE)\s+LAW\b)",
+                header,
+                re.IGNORECASE,
+            )
+        )
+
     def read(
         self,
         source: SealedStatuteFile,
@@ -452,12 +477,7 @@ class StatutePdfReader:
                 )
             primary_verified_by = PdfBillVerification.CONGRESS
             evidence_sha256 = SourceDigest.of(indexed_source)
-        if not re.search(
-            rf"\b{metadata.citation_volume}\s+STAT\.\s*"
-            rf"{re.escape(metadata.first_page.split('-')[0])}\b",
-            citation_header,
-            re.IGNORECASE,
-        ):
+        if not self.citation_confirmed(citation_header, metadata):
             raise ValueError("PDF first-page Statutes citation is not confirmed")
         source.verify()
         return VerifiedStatutePdf(

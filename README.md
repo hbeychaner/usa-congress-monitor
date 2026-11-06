@@ -100,10 +100,16 @@ Reconcile official catalog identities against search before missing-only
 recovery; matching collection totals alone do not establish identity coverage.
 The reconciled Congress 93-119 roster's 10,452 missing identities have now been
 created from retained catalog metadata without changing existing records.
-Their full-detail and available-text recovery is separate and still in progress;
-staged downloads are not indexed content or proof of current analytics coverage.
+The full acquisition queue has finished: 10,449 records now have complete detail
+and all listed text staged, with three explicitly unresolved source/detail cases.
+Those are two law PDFs above the unchanged download bound and one repeatedly
+failing API record. Staged downloads are
+not indexed enrichment or proof of current analytics coverage; conditional
+publication and analytics reconciliation remain pending.
 Older Congress.gov text links can encode the Congress in the URL path rather
 than the filename; recovery validates the complete identity before downloading.
+Historical law recovery also verifies older act headings and page-header
+citations, using source-sealed local OCR when a PDF's text layer is damaged.
 
 ## Everyday commands
 

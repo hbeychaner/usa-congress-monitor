@@ -150,6 +150,53 @@ class TestFullTextNetworkBoundary:
 
 
 class TestDetailRetrieval:
+    def test_text_version_source_rows_preserve_exact_duplicate_evidence(self) -> None:
+        reported: JsonObject = {
+            "type": "Reported to Senate", "date": "1993-04-15T04:00:00Z",
+            "formats": [{"type": "Formatted Text", "url": "https://www.congress.gov/103/bills/s171/BILLS-103s171rs2.htm"}],
+        }
+        versions: list[JsonObject] = [
+            {"type": "Engrossed in Senate"}, reported, reported,
+            {"type": "Reference Change Senate"}, {"type": "Introduced in Senate"},
+        ]
+        result = HydrationFixture.fetch(
+            {"textVersions": versions, "pagination": {"count": 5}},
+            BillDetailKind.TEXT_VERSIONS,
+        )
+        assert result.evidence.complete
+        assert result.evidence.fetched_count == 5
+        assert result.evidence.fetched_record_count == len(result.data) == 4
+        assert len(result.evidence.repeated_text_versions) == 1
+        assert result.evidence.repeated_text_versions[0].record == reported
+        assert result.evidence.repeated_text_versions[0].occurrences == 2
+        assert DetailEvidence.model_validate_json(
+            result.evidence.model_dump_json()
+        ) == result.evidence
+        malformed = result.evidence.model_dump()
+        malformed["fetched_record_count"] = 5
+        with pytest.raises(ValidationError, match="reconcile"):
+            DetailEvidence.model_validate(malformed)
+
+    @pytest.mark.parametrize("expected", [1, 3])
+    def test_text_version_duplicates_never_waive_source_count_mismatch(
+        self, expected: int,
+    ) -> None:
+        version: JsonObject = {"type": "Reported to Senate"}
+        result = HydrationFixture.fetch(
+            {"textVersions": [version, version], "pagination": {"count": expected}},
+            BillDetailKind.TEXT_VERSIONS,
+        )
+        assert not result.evidence.complete
+        assert result.evidence.fetched_count == 2
+
+    def test_explicit_text_version_id_repetition_remains_incomplete(self) -> None:
+        version: JsonObject = {"id": "version", "type": "Reported to Senate"}
+        result = HydrationFixture.fetch(
+            {"textVersions": [version, version], "pagination": {"count": 2}},
+            BillDetailKind.TEXT_VERSIONS,
+        )
+        assert not result.evidence.complete
+
     def test_anonymous_action_rows_retain_duplicate_evidence(self) -> None:
         action: JsonObject = {"actionDate": "1990-09-27", "text": "Passed"}
         other: JsonObject = {"actionDate": "1990-09-28", "text": "Signed"}
