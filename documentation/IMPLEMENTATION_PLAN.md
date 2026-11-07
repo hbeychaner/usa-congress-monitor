@@ -16,6 +16,11 @@ below. This is not a production health or data-completeness certification.
 
 ## Fixed local release closeout
 
+The new genuine C3 observation began **2026-11-07 01:54:45 UTC** after the
+complete 480-job/two-rotation startup proof and source/wiki publication.
+Earliest qualifying completion is **2026-11-08 01:54:45 UTC**; no passing day is
+claimed before its full receipt and preservation reconciliation.
+
 **Agreed 2026-11-04:** finish the remaining release obligations without adding
 features, speculative cleanup or another open-ended batch sequence. The five
 gates below are the closeout checklist; the older findings and dated execution

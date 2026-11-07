@@ -244,6 +244,13 @@ are independently verified. The closed backup ledger was byte-exact
 native-compressed (448,028,672 logical bytes; 93,687,808 currently allocated);
 the no-saving analytical-source attempt was refused and its bytes retained.
 Neither stress nor previous failures count toward the required new genuine day.
+The fresh genuine observation started **2026-11-07 01:54:45 UTC** after source
+and source-pinned wiki publication. Actual five-read offered load, completed
+timed indexing and retained acknowledgements are observed. Its earliest
+qualifying completion is **2026-11-08 01:54:45 UTC**; the full 86,400-second,
+432,000-read/1,440-timed-batch contract remains unpassed until final receipt
+and preservation reconciliation. The 480 stress and two warm jobs remain
+separate and do not count toward the 1,440 timed jobs or qualifying duration.
 Completed owned test streams are retired only after terminal indexing,
 exact readback, a retained exact archive and zero pending/lag proof. Every
 archive remains at its original path; native compression is used only when

@@ -135,7 +135,8 @@ tasks retain their original routing/name/limits and are registered at startup
 only for analytics-consuming workers.
 The complete 480-job stress now passes: 9,600 exact projections, all 9,120
 inputs and two original child rotations, with no worker restart/OOM and
-unchanged 1 GiB allocation. The required new uninterrupted day is still pending.
+unchanged 1 GiB allocation. The new genuine day started **2026-11-07 01:54:45 UTC**;
+earliest qualifying completion is **2026-11-08 01:54:45 UTC**, not yet passed.
 Actual existing-service interruption recovered queued indexing in 77 seconds
 without changing the original worker allocation or protected records. The
 25-index/vector/ledger backup is retained, but full restoration stopped at its

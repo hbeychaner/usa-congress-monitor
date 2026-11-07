@@ -27,6 +27,11 @@
   rotations, zero restart/OOM and unchanged 1 GiB allocation. Every one of the
   482 preflight jobs/archives and 24 resource samples is verified; all 628,082
   original ledger rows and integrity remain intact. This is not a qualifying day.
+- Start a fresh genuine 86,400-second observation at **2026-11-07 01:54:45 UTC**
+  after full stress and source-pinned publication, retaining five reads/second,
+  1,440 timed indexing batches, original floors/allocations and sleep guards.
+  Actual reads and completed/retained timed jobs are verified. Earliest
+  qualifying completion is **2026-11-08 01:54:45 UTC**; no passing day is claimed.
   Gate warmup on the selected indexing queue; ingestion-only and sender-free
   initialization retain their previous behavior. Added warm-only/queue-gating
   regressions, with 48 focused normalization/task/retry tests passing.
