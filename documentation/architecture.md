@@ -85,9 +85,15 @@ between configured mapping families and actively populated indices.
 [Container](../cdm/container.py) receives the configuration, constructs
 collaborators and caches shared clients/services. FastAPI dependency providers
 expose those services to routes. The existing
-[WorkerContainer](../cdm/workers/runtime.py) extends that root with ingestion,
-topic training, graph building and perspective construction. Analysis factories
-are not imported by the API or submission CLIs. Four single-use metasubject
+[OperationsContainer](../cdm/workers/operations.py) extends that root with
+ingestion, indexing and maintenance. [WorkerContainer](../cdm/workers/runtime.py)
+extends the operational root with topic training, graph building and perspective
+construction. Operations workers do not import the analysis implementations.
+Celery registers [analytics tasks](../cdm/workers/analytics_tasks.py) at startup,
+before forking, only for workers consuming the configured analytics queue;
+the serialized task name and routing remain unchanged. Python imports stay at
+module level rather than being deferred inside execution functions.
+Analysis factories are not imported by the API or submission CLIs. Four single-use metasubject
 factory wrappers were removed; training collaborators are wired directly at
 their one construction boundary. Graph/perspective builds share a stateless
 topic-model reader.

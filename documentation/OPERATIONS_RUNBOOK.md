@@ -188,6 +188,62 @@ two-second scheduling/suspend limits and all other original gates. UTC remains
 an event timestamp. Tests reproduce the old NTP false alarm, still reject real
 sleep/pauses, and compare the entire load/resource/journal/acceptance loop
 against the sealed original after normalizing only the continuity clock call.
+
+The next attempt retained zero clock/scheduling gaps but stopped when the worker
+OOM-killed its child during batch 65, before its existing 200-task rotation.
+Its false receipt records 4,142.229 seconds including the bounded drain wait,
+19,500 offered/19,499 completed reads, p95 **0.345 seconds** and 64 consumed
+indexing results. The API remained ready. The exact interrupted job was
+recovered with its original wire payload and 20 exact sources, zero pending/lag,
+all 628,082 original job rows unchanged and owned scratch retirement.
+
+The existing worker parent retains heavy imports. Index-consuming workers now
+warm the CPU NLP model before forking, sharing model-weight pages rather than
+allocating another model in a child. Commands, concurrency, 200-task rotation
+and the 1 GiB allocation remain unchanged; ingestion-only workers are not warmed.
+Before another genuine day, require **480 real indexing jobs/9,600 exact
+projections**, every one of the **9,120 frozen inputs**, and **two actual child
+rotations** with zero worker OOM. All stress archives remain retained.
+An initial preflight's additional peak check rejected a transient kernel peak
+just above `memory.max`, despite the exact unchanged limit and zero OOM.
+That failed preflight is retained and its 22 completed owned jobs are accounted
+for. The corrected check verifies the actual effective `memory.max == 1 GiB`,
+retains raw peak/current measurements, and preserves the original observer RSS,
+disk, host-memory and other guards. It does not resize or hide an OOM.
+The subsequent full preflight stopped after 160 successful jobs when the
+original worker unexpectedly restarted, stranding the next exact job's RUNNING
+claim. A new cgroup showed zero OOM kills; that reset counter does not establish
+an uninterrupted worker. All 163 owned jobs are now exactly terminal, every
+archived source is verified, and its failed unstarted scratch is retired.
+A controlled warm-worker fork measured 42,782 minor faults from a full child GC
+without a frozen heap versus 17 with one. The indexing parent now collects
+unreachable objects and freezes the remaining long-lived import/model graph
+before forking; future task objects still undergo normal GC. Require the
+observed warm/freeze markers, stable original worker start/restart state, and
+the full two-rotation stress proof before another day. Failed stress contributes
+no qualifying observation time. Retention resumes both four-digit warm/timed
+and five-digit stress receipts without revisiting an already deleted stream.
+Frozen-only stress completed 328 jobs and one original child rotation but
+stopped on another unexpected worker restart. Its exact interruption is
+recovered, all 331 owned jobs/6,620 archived records are terminal and verified,
+and its failed scratch is retired. The core remaining footprint was unrelated
+analytics imports in the operational task composition root. Operational task
+discovery now uses `OperationsContainer`; analytics implementations are
+registered through Celery's loader at startup only for analytics-consuming
+workers, before forking, with module-level Python imports and unchanged
+serialized task name/route/time limits. Fresh operations import/model warmup
+measured 305,201,152/595,853,312 bytes with no unrelated analysis modules loaded.
+Require the same complete stress, rotations, runtime, allocation and original
+resource floors; no previous failed time is credited.
+The complete queue-scoped preflight now passes: **480 jobs/9,600 exact
+projections/all 9,120 inputs**, **three child PIDs/two original rotations**,
+zero restart/OOM and unchanged 1 GiB allocation, in 1,233.788 seconds.
+All 482 warm/stress jobs and retained archive/zero-pending receipts, all
+24 resource samples, and all 628,082 protected original ledger rows/integrity
+are independently verified. The closed backup ledger was byte-exact
+native-compressed (448,028,672 logical bytes; 93,687,808 currently allocated);
+the no-saving analytical-source attempt was refused and its bytes retained.
+Neither stress nor previous failures count toward the required new genuine day.
 Completed owned test streams are retired only after terminal indexing,
 exact readback, a retained exact archive and zero pending/lag proof. Every
 archive remains at its original path; native compression is used only when

@@ -126,6 +126,16 @@ An automatic 89-millisecond UTC correction subsequently tripped the observer's
 wall-clock check while both services remained healthy. The replacement uses
 nonadjustable, suspend-aware timing with the same two-second gap limit;
 the failed interval still does not count toward the required day.
+The next attempt exposed another worker OOM. The indexing worker now warms
+its CPU NLP model and freezes its collected parent heap before forking, so child
+garbage collection cannot undo model/import page sharing; a full-corpus,
+two-child-rotation stress check must pass before restarting the required day.
+Its operational composition root excludes unrelated training imports; analytics
+tasks retain their original routing/name/limits and are registered at startup
+only for analytics-consuming workers.
+The complete 480-job stress now passes: 9,600 exact projections, all 9,120
+inputs and two original child rotations, with no worker restart/OOM and
+unchanged 1 GiB allocation. The required new uninterrupted day is still pending.
 Actual existing-service interruption recovered queued indexing in 77 seconds
 without changing the original worker allocation or protected records. The
 25-index/vector/ledger backup is retained, but full restoration stopped at its

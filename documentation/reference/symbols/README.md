@@ -30,7 +30,7 @@ remain authoritative in source. Follow the narrative chapters for intent.
 | [store](store.md) | 14 | 254 |
 | [tools](tools.md) | 4 | 105 |
 | [topics](topics.md) | 3 | 55 |
-| [utils](utils.md) | 15 | 211 |
-| [workers](workers.md) | 14 | 205 |
+| [utils](utils.md) | 15 | 213 |
+| [workers](workers.md) | 16 | 208 |
 
-Total: 274 source files; 6880 declarations.
+Total: 276 source files; 6885 declarations.

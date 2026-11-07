@@ -76,6 +76,25 @@ and `ApiConfig.cors_origins_csv` uses `CORS_ORIGINS`.
 | `openai` | `OPENAI_API_KEY` | Declared optional credential; not a replacement for the Ollama implementation |
 | `api` | `CORS_ORIGINS`, `LOG_LEVEL` | Browser origins and application logging |
 
+Index-consuming Celery workers warm the existing CPU spaCy model in the parent
+before the prefork pool starts. The selected consumption queues gate warmup;
+ingestion-only workers retain their existing startup behavior. Forked children
+share model weights, while per-call memory zones still own transient NLP state.
+The parent collects unreachable objects and freezes its remaining heap before
+forking, preventing child GC from copying the long-lived import/model graph.
+Future task objects still undergo ordinary GC. Check the observed parent
+warm/freeze markers and stable worker start/restart state, not only an OOM
+counter that resets when Docker restarts the container.
+Operational task discovery uses `OperationsContainer`, without importing
+training/graph/perspective implementations. Analytics-consuming workers register
+their implementation module through Celery's loader during `worker_init`, before
+the pool is created. All Python imports remain at module level; nothing is
+imported lazily inside a job. The serialized analytics task name, routing and
+time limits remain unchanged.
+The worker command, concurrency, child-rotation count and memory allocation
+are unchanged. Do not move this warmup into execution children or increase
+worker limits to hide duplicated model memory.
+
 For **all declared field types**, see the generated
 [config reference](../reference/symbols/config.md). It is a static declaration
 reference, not a dump of effective values or secrets. Older snippets referring

@@ -28,6 +28,13 @@ Source entry points are [TopicModeler](../../cdm/utils/topic_modeler.py),
 [GraphBuildJob](../../cdm/graph/job.py).
 [WorkerContainer](../../cdm/workers/runtime.py) constructs execution collaborators;
 [Container](../../cdm/container.py) owns lightweight reads and durable submission.
+It inherits ingestion/indexing/maintenance construction from
+[OperationsContainer](../../cdm/workers/operations.py). Celery registers
+[analytics_tasks](../../cdm/workers/analytics_tasks.py) before the prefork pool
+starts only when the worker consumes the configured analytics queue. The
+broker-facing `cdm.workers.tasks.run_analytics_job` name, queue, time limits,
+heartbeat and retry behavior are unchanged; operational workers no longer load
+the unrelated training libraries.
 Default model/threshold values live in
 [app_config.py](../../cdm/config/app_config.py); command-line flags can override
 some training values.

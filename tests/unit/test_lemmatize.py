@@ -84,6 +84,18 @@ def test_no_input_does_not_load_model_or_create_zone() -> None:
     assert probe.zones == 0
 
 
+def test_prefork_warmup_loads_only_the_shared_model_without_inference() -> None:
+    probe = PipeProbe()
+    service = probe.service()
+    service.warm()
+    service.warm()
+    assert probe.loader.call_count == 1
+    assert probe.zones == 0
+    probe.language.pipe.assert_not_called()
+    assert service.lemmatize(["House Acts"]) == ["house acts"]
+    assert probe.loader.call_count == 1
+
+
 def test_character_limit_preserves_the_existing_head_only_contract() -> None:
     probe = PipeProbe()
     probe.language.max_length = 5

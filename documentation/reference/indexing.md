@@ -193,8 +193,24 @@ mistaken for a server analyzer generating the sibling automatically.
 
 [`SpacyLemmatizer`](../../cdm/utils/lemmatize.py) receives its typed
 [`LemmatizationConfig`](../../cdm/config/app_config.py), model loader and logger.
-The existing public helpers share one process-local service; the model loads
-only on first nonempty use. A lock serializes loading and inference because
+The existing public helpers share one process-local service. Workers consuming
+the configured indexing queue call
+[`warm_lemmatizer()`](../../cdm/utils/lemmatize.py) during
+[`warm_store()`](../../cdm/workers/tasks.py), before Celery creates its prefork
+pool. CPU model weights can then share copy-on-write pages with execution
+children and their replacements, rather than being loaded separately in a child
+alongside the parent's cached worker imports. Other processes still load the
+model only on first nonempty use; ingestion-only workers do not preload it.
+The indexing parent collects unreachable objects and freezes its remaining heap
+before forking: child GC must not write collection counters throughout the
+long-lived import/model graph and undo page sharing. GC remains enabled for
+new per-task objects; spaCy zones still release transient native NLP state.
+The operational composition root also excludes unrelated analytics
+implementations. Analytics task registration is selected by the consumption
+queue at Celery startup, before fork, with the same broker-facing task name.
+This removes the training import footprint from the indexing worker rather
+than increasing its allocation or weakening the text/projection contract.
+A lock serializes loading and inference because
 spaCy memory zones cannot overlap on a shared model.
 The `en_core_web_md` model excludes the unused parser and NER components.
 Each inference microbatch contains one text, retaining the existing

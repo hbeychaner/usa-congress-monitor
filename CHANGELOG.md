@@ -4,6 +4,36 @@
 
 ### Added
 
+- Warm the existing CPU spaCy model in the parent before indexing workers fork,
+  sharing model-weight pages across execution children and replacements without
+  changing commands, allocations, model identity or inference behavior.
+  Collect and freeze the long-lived parent heap so child garbage collection
+  does not undo copy-on-write sharing; future task objects still undergo GC.
+  A controlled real-fork probe measured 42,782 GC-induced minor faults without
+  freezing versus 17 with it. The first warm-only full stress stopped at 160
+  successful jobs after an unexpected worker restart, with the exact next job
+  recovered and preserved; it did not pass. Runtime guards also detect worker
+  start/restart changes even when the new cgroup's OOM counter has reset.
+  Frozen-only stress reached 328 successful jobs and one child rotation, then
+  another unexpected restart; all 331 owned jobs/6,620 archived sources are
+  terminal and verified, and that failed scratch is retired. Isolate the
+  operational composition root from analytics imports; register analytics
+  implementations at queue-selected Celery startup with all Python imports at
+  module level, preserving the original broker-facing name/routing/time limits.
+  A fresh operations import measured 305,201,152 bytes and model warmup
+  595,853,312 bytes, with no unrelated analysis modules loaded.
+  The full 480-job preflight passed in 1,233.788 seconds: 9,600 exact
+  projections/all 9,120 frozen inputs, three observed child PIDs/two original
+  rotations, zero restart/OOM and unchanged 1 GiB allocation. Every one of the
+  482 preflight jobs/archives and 24 resource samples is verified; all 628,082
+  original ledger rows and integrity remain intact. This is not a qualifying day.
+  Gate warmup on the selected indexing queue; ingestion-only and sender-free
+  initialization retain their previous behavior. Added warm-only/queue-gating
+  regressions, with 48 focused normalization/task/retry tests passing.
+  The last interrupted owned job was explicitly recovered with its exact
+  original payload, 20 exact sources, zero pending/lag and all 628,082 protected
+  job rows unchanged. A full-corpus 480-job stress check requires 9,600 exact
+  projections, all 9,120 inputs and two child rotations before another real day.
 - Corrected sustained-observation clock selection after macOS successfully
   stepped UTC backward by 89.289665 milliseconds. The old observer stopped
   after 6,491.686 seconds despite 32,459 successful reads, p95 0.346 seconds

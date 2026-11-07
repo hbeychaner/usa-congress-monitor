@@ -22,6 +22,10 @@ class TaskName(StrEnum):
     RUN_RECONCILIATION = "cdm.workers.tasks.run_reconciliation_job"
 
 
+class TaskModule(StrEnum):
+    ANALYTICS = "cdm.workers.analytics_tasks"
+
+
 class JobDispatcher:
     """Routes a ledger job to its Celery task and queue."""
 

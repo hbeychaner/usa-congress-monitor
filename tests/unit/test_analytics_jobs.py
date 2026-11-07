@@ -42,7 +42,7 @@ from cdm.perspectives.runner import PerspectiveRunner
 from cdm.store.perspective_repository import PerspectiveRepository
 from cdm.topics.training import TopicTrainingJob
 from cdm.utils.json_types import JsonObject
-from cdm.workers import tasks
+from cdm.workers import analytics_tasks, tasks
 from cdm.workers.analytics_runner import AnalysisCancelled, AnalyticsJobRunner
 from cdm.workers.dispatch import JobDispatcher, TaskName
 from cdm.workers.failures import FailureClassifier
@@ -110,7 +110,7 @@ class RunnerHarness:
             job_heartbeat=JobHeartbeat(self.store, 0.01),
             task_retrier=TaskRetrier(self.store, QueueConfig(), FailureClassifier()),
         )
-        monkeypatch.setattr(tasks, "_container", lambda: container)
+        monkeypatch.setattr(analytics_tasks, "_container", lambda: container)
         task = tasks.celery_app.tasks[TaskName.RUN_ANALYTICS.value]
         return task.apply(args=[job_id], throw=True).get(propagate=True)
 

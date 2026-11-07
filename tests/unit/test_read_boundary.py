@@ -39,3 +39,24 @@ print(json.dumps({"modules": list(sys.modules)}))
                 "cdm.perspectives.job",
             }
         )
+
+    def test_fresh_operations_imports_do_not_load_analysis_implementations(self) -> None:
+        source = """
+import json
+import sys
+from cdm.workers import tasks
+print(json.dumps({"modules": list(sys.modules)}))
+"""
+        result = subprocess.run(
+            [sys.executable, "-W", "error::UserWarning", "-c", source],
+            cwd=Path(__file__).resolve().parents[2],
+            text=True, capture_output=True, check=True, timeout=60,
+        )
+        imported = set(ReadImports.model_validate_json(result.stdout).modules)
+        assert not imported.intersection(
+            {
+                "bertopic", "sentence_transformers", "transformers",
+                "cdm.workers.runtime", "cdm.workers.analytics_tasks",
+                "cdm.topics.training", "cdm.graph.job", "cdm.perspectives.job",
+            }
+        )

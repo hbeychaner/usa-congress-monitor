@@ -64,6 +64,11 @@ class SpacyLemmatizer:
                     )
                 ]
 
+    def warm(self) -> None:
+        with self._lock:
+            self._model()
+            self._logger.info("spaCy model loaded before indexing worker fork")
+
     def try_query(self, text: str) -> str:
         if not text or not text.strip():
             return ""
@@ -89,3 +94,7 @@ def lemmatize_text(text: str) -> str:
 
 def try_lemmatize_query(text: str) -> str:
     return _default_lemmatizer.try_query(text)
+
+
+def warm_lemmatizer() -> None:
+    _default_lemmatizer.warm()

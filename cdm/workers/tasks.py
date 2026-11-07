@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import gc
+import logging
 from collections.abc import Callable
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -9,44 +11,72 @@ from pathlib import Path
 from typing import NoReturn
 
 from celery.signals import worker_init
+from celery.worker.worker import WorkController
 
 from cdm.config import get_config
 from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
 from cdm.jobs.analytics import GraphRequest, PerspectiveRequest, TopicRequest
 from cdm.jobs.store import JobKind
 from cdm.utils.json_types import JsonObject
+from cdm.utils.lemmatize import warm_lemmatizer
 from cdm.utils.log_trimmer import LogTrimmer
 from cdm.workers.celery_app import celery_app
-from cdm.workers.dispatch import TaskName
+from cdm.workers.dispatch import TaskModule, TaskName
+from cdm.workers.operations import OperationsContainer
 from cdm.workers.results import JobResult
-from cdm.workers.runtime import WorkerContainer
 
 VOTEVIEW_DIR = Path("data/voteview")
 
 
 # Worker-wide composition root; shares one set of clients across tasks.
 @lru_cache(maxsize=1)
-def _container() -> WorkerContainer:
-    return WorkerContainer(get_config())
+def _container() -> OperationsContainer:
+    return OperationsContainer(get_config())
 
 
 @worker_init.connect
-def warm_store(**_: object) -> None:
-    """Build the store in the parent so forked children inherit it."""
+def warm_store(sender: WorkController | None = None, **_: object) -> None:
+    """Warm the store/NLP and preserve indexing parent pages before fork."""
+    app = sender.app if sender is not None else None
+    if (
+        app is not None
+        and get_config().queue.celery_analytics_queue in app.amqp.queues.consume_from
+    ):
+        app.loader.import_task_module(TaskModule.ANALYTICS.value)
     _container().job_store.repair_legacy_windows()
+    if (
+        app is not None
+        and get_config().queue.celery_index_queue in app.amqp.queues.consume_from
+    ):
+        warm_lemmatizer()
+        gc.collect()
+        # Child collections must not copy the long-lived parent model/import graph.
+        gc.freeze()
+        logging.getLogger(__name__).info(
+            "Frozen %s parent objects before indexing worker fork",
+            gc.get_freeze_count(),
+        )
 
 
-def _execute(task: object, job_id: str, run: Callable[[str], JobResult]) -> JsonObject:
+def _execute(
+    task: object, job_id: str, run: Callable[[str], JobResult],
+    container: OperationsContainer | None = None,
+) -> JsonObject:
     """Run a job and hand failures to the retry policy."""
     try:
-        with _container().job_heartbeat.watch(job_id):
+        with (container if container is not None else _container()).job_heartbeat.watch(job_id):
             return run(job_id).model_dump(mode="json", exclude_none=True)
     except Exception as exc:  # noqa: BLE001 - Celery must retry all ordinary task failures.
-        _retry(task, job_id, exc)
+        _retry(task, job_id, exc, container)
 
 
-def _retry(task: object, job_id: str, exc: Exception) -> NoReturn:
-    _container().task_retrier.handle(task, job_id, exc)  # type: ignore[arg-type]
+def _retry(
+    task: object, job_id: str, exc: Exception, container: OperationsContainer | None = None,
+) -> NoReturn:
+    (container if container is not None else _container()).task_retrier.handle(
+        task,  # type: ignore[arg-type]
+        job_id, exc,
+    )
 
 
 @celery_app.task(
@@ -80,16 +110,6 @@ def run_index_job(self: object, job_id: str) -> JsonObject:
 def run_reconciliation_job(self: object, job_id: str) -> JsonObject:
     """Replay archived GovInfo records into a validated staging index."""
     return _execute(self, job_id, _container().reconciliation_runner.run)
-
-
-@celery_app.task(
-    bind=True,
-    name=TaskName.RUN_ANALYTICS.value,
-    soft_time_limit=get_config().queue.celery_analytics_soft_time_limit,
-    time_limit=get_config().queue.celery_analytics_time_limit,
-)
-def run_analytics_job(self: object, job_id: str) -> JsonObject:
-    return _execute(self, job_id, _container().analytics_runner.run)
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_daily_ingest")
