@@ -4,6 +4,20 @@
 
 ### Added
 
+- Completed and independently reconciled the genuine uninterrupted local day:
+  **86,400.149 seconds**, from **2026-11-07 01:54:45 UTC** to
+  **2026-11-08 01:54:46 UTC**, **432,000 offered/completed reads**, zero failures,
+  **p95 0.343 seconds** and **1,440 timed indexing jobs/28,800 records**.
+  Verified all 1,922 separate warm/stress/timed jobs, exact retained archives
+  and zero-pending acknowledgements; all 4,319 resource samples preserve the
+  original floors, and the unchanged worker had no restart/OOM.
+  Post-day readback preserves all 371,366 original versions, 10,449 enriched
+  sources and three blocked records, all 628,082 protected job rows, the
+  five published model-file hashes and current topic/graph/707-perspective
+  HTTP contracts. Retired only the accepted owned shadow/streams, retaining
+  every archive and failed attempt. Finished the fixed evidence-or-blocker
+  closeout and current documentation/wiki disposition: content/freshness and
+  full/off-host restoration remain explicitly uncertified, not waived.
 - Warm the existing CPU spaCy model in the parent before indexing workers fork,
   sharing model-weight pages across execution children and replacements without
   changing commands, allocations, model identity or inference behavior.
@@ -31,7 +45,8 @@
   after full stress and source-pinned publication, retaining five reads/second,
   1,440 timed indexing batches, original floors/allocations and sleep guards.
   Actual reads and completed/retained timed jobs are verified. Earliest
-  qualifying completion is **2026-11-08 01:54:45 UTC**; no passing day is claimed.
+  qualifying completion was **2026-11-08 01:54:45 UTC**; no passing day was
+  claimed at startup. The complete passing receipt is recorded above.
   Gate warmup on the selected indexing queue; ingestion-only and sender-free
   initialization retain their previous behavior. Added warm-only/queue-gating
   regressions, with 48 focused normalization/task/retry tests passing.

@@ -10,6 +10,43 @@ tracks content/freshness, analytics, the real 24-hour observation, recovery and
 final disposition. A ready API or passing isolated fixture does not close those
 gates.
 
+### Latest local acceptance disposition
+
+The fixed implementation closeout finished on **2026-11-08** with evidence or
+explicit blockers for every gate. It is not an all-history freshness or full
+disaster-recovery certificate.
+
+- **C2 accepted:** the expanded 109,726-input model and current topic, graph
+  and all 707 perspective HTTP contracts remain exact after the day; all five
+  published model-file hashes are unchanged.
+- **C3 passed:** **86,400.149 uninterrupted seconds**, **432,000 offered and
+  completed reads**, zero failures/gaps, **p95 0.343 seconds** against the
+  2-second objective, and **1,440 timed indexing jobs/28,800 records**.
+  The interval ran from **2026-11-07 01:54:45 UTC** to
+  **2026-11-08 01:54:46 UTC**. The 3.779-second maximum request latency is
+  retained; the objective bounds p95, not maximum latency.
+  All **4,319 resource samples** preserve the original safety floors;
+  the original worker/allocation/command remained stable with no restart/OOM.
+  All **1,922** separately accounted warm/stress/timed jobs, exact retained
+  archives, dispatch identities and zero-pending/zero-lag receipts pass.
+  No warm/stress/failed time is added to the qualifying day.
+- **Preservation:** all **371,366 original document versions**, **10,449
+  accepted enriched sources**, **three blocked metadata records** and
+  **628,082 original ledger rows** remain exact; ledger integrity is `ok`.
+  Only accepted, exactly owned test streams/index were retired. Every archive,
+  source seal and failed observation remains retained.
+- **C1 blocked:** two law PDFs exceed the unchanged 32 MiB response bound and
+  one complete cosponsor collection fails upstream. Ordering remains unresolved
+  for 487 representatives; 19,832 Congress 119 records lack document source-check
+  evidence; the 69 pre-93 records do not prove wider historical coverage.
+- **C4 not passed:** the 77.4035-second controlled interruption and exact
+  five-file model restore passed, but a later SQLite incident exceeded
+  15 minutes and full index restoration stopped at the original resource guard.
+  Full-library/broker-volume/off-host recovery remains unproved.
+  Single-host topology blocks independent-host failover, not a waived objective.
+- **C5 complete:** validation and current source-pinned documentation/wiki
+  publication record these distinctions, without another open-ended retry queue.
+
 Index presence and Bill API visibility are separate checks. Shared bill reads
 include bill/law projections with canonical bill identities; law detail reads
 validate agreement between the identity fields. Do not change `source_type` or
@@ -244,12 +281,12 @@ are independently verified. The closed backup ledger was byte-exact
 native-compressed (448,028,672 logical bytes; 93,687,808 currently allocated);
 the no-saving analytical-source attempt was refused and its bytes retained.
 Neither stress nor previous failures count toward the required new genuine day.
-The fresh genuine observation started **2026-11-07 01:54:45 UTC** after source
-and source-pinned wiki publication. Actual five-read offered load, completed
-timed indexing and retained acknowledgements are observed. Its earliest
-qualifying completion is **2026-11-08 01:54:45 UTC**; the full 86,400-second,
-432,000-read/1,440-timed-batch contract remains unpassed until final receipt
-and preservation reconciliation. The 480 stress and two warm jobs remain
+The fresh genuine observation ran from **2026-11-07 01:54:45 UTC** to
+**2026-11-08 01:54:46 UTC** after source and source-pinned wiki publication.
+The full **86,400.149-second/432,000-read/1,440-timed-batch** contract passed
+and its complete read/resource/job/archive/preservation reconciliation is done.
+All 1,922 warm/stress/timed jobs and archives remain accounted for, and the
+accepted owned target is retired. The 480 stress and two warm jobs remain
 separate and do not count toward the 1,440 timed jobs or qualifying duration.
 Completed owned test streams are retired only after terminal indexing,
 exact readback, a retained exact archive and zero pending/lag proof. Every

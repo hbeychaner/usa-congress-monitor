@@ -115,28 +115,30 @@ Congress 119 has 19,832 records without document-level source-check timestamps.
 Expanded-corpus analytics are accepted: 109,726 inputs, 892 visible topics and
 707 Congress/topic perspective results, including 19 stability-passing splits,
 with current graph/model lineage and actual API/browser checks.
-Broader historical coverage, full recovery acceptance and the genuine 24-hour
-observation remain open; this is not release completion.
-The latest observation failed after 5,882 seconds when the original worker
-was OOM-killed; no failed interval counts toward the required day.
-Search normalization now serializes spaCy memory zones and uses one text per
-inference microbatch without changing the model or existing text cap.
+The fixed [implementation closeout](documentation/IMPLEMENTATION_PLAN.md#fixed-local-release-closeout)
+is finished with explicit content/freshness and full-recovery blockers, not a
+complete historical-data or disaster-recovery certification.
+The genuine uninterrupted observation **passed** from **2026-11-07 01:54:45 UTC**
+to **2026-11-08 01:54:46 UTC**: **86,400.149 seconds**, **432,000 offered and
+completed reads**, **zero read failures**, and **p95 0.343 seconds**, below the
+2-second objective. All **1,440 timed indexing jobs/28,800 records** passed;
+the 480 stress and two warm jobs are separate from the qualifying day.
+All **1,922 jobs, exact retained archives and zero-pending acknowledgements**
+are reconciled, all **628,082 original ledger rows** and **371,366 original
+document versions** are unchanged, and the accepted enrichment/model/graph/
+perspective data still pass exact readback and current HTTP contracts.
+Only the owned test index and acknowledged test streams were retired.
+The original worker had no restart/OOM, and all **4,319 resource samples**
+preserved the original floors and allocations.
+
+The indexing worker shares its warmed CPU NLP model and frozen parent heap
+across prefork children while continuing GC for new task objects.
+Its operational composition excludes unrelated analytics imports; analytics
+implementations register before fork only for analytics-queue consumers,
+preserving their original routing/name/limits. Search normalization uses
+serialized memory zones without changing model identity or the text cap.
 See [lemmatization and cache ownership](documentation/reference/indexing.md#lemmatization).
-An automatic 89-millisecond UTC correction subsequently tripped the observer's
-wall-clock check while both services remained healthy. The replacement uses
-nonadjustable, suspend-aware timing with the same two-second gap limit;
-the failed interval still does not count toward the required day.
-The next attempt exposed another worker OOM. The indexing worker now warms
-its CPU NLP model and freezes its collected parent heap before forking, so child
-garbage collection cannot undo model/import page sharing; a full-corpus,
-two-child-rotation stress check must pass before restarting the required day.
-Its operational composition root excludes unrelated training imports; analytics
-tasks retain their original routing/name/limits and are registered at startup
-only for analytics-consuming workers.
-The complete 480-job stress now passes: 9,600 exact projections, all 9,120
-inputs and two original child rotations, with no worker restart/OOM and
-unchanged 1 GiB allocation. The new genuine day started **2026-11-07 01:54:45 UTC**;
-earliest qualifying completion is **2026-11-08 01:54:45 UTC**, not yet passed.
+Failed attempts remain retained and contribute no qualifying time.
 Actual existing-service interruption recovered queued indexing in 77 seconds
 without changing the original worker allocation or protected records. The
 25-index/vector/ledger backup is retained, but full restoration stopped at its
