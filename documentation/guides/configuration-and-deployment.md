@@ -200,12 +200,30 @@ make stack-down
 frontend and profiled operations/acquisition/indexing/maintenance/analytics/
 Beat services, on top of the local infrastructure stack. Only the controlled
 profile starts by default. A shared YAML anchor owns Python
-environment/mount/restart policy; the API selects the slim `api` build target
-and workers override it with the full `analysis` target. All consumers use the
+environment/mount/restart policy; the API and operational services select the
+`api` build target. Only `worker-analytics` selects the full `analysis` target;
+ingestion, indexing, maintenance and Beat do not need training dependencies.
+All consumers use the
 configured queue names. The API's `/ready` check gates worker startup; normal
 startup waits for infrastructure and application readiness with a bounded timeout.
 Dependencies are installed from the frozen lock at build time, not concurrently
 at process startup into a shared mutable environment.
+
+Image sizes and build-cache usage are separate. PyTorch's default Linux
+analytics dependencies can include multi-gigabyte NVIDIA libraries even on
+an ARM64 host; do not install them in operational workers. Reclaim only
+inspected, unused build-cache records when needed, never data volumes or
+retained archives. Docker Desktop may return freed sparse-disk space to macOS
+after a short delay; verify actual host free disk before resuming guarded jobs.
+Changing a build target does not shrink an existing image or replace a running
+container. Build and verify a replacement separately before a planned cutover.
+An isolated operational-image verification measured **2.03 GB**, versus the
+previous **11.30 GB** analytics-bearing operations image (about **82% smaller**).
+Operational task imports and actual NLP inference passed without Torch, NVIDIA,
+BERTopic or sentence-transformers installed, with networking disabled and a
+1 GiB/1 CPU limit. These are logical image sizes; shared layers are
+not additional disk usage for every container. The verified build did not
+recreate the live worker or remove its in-use image.
 
 All Python services share the checkout at `/workspace` and at its original
 absolute path. This preserves existing absolute archive paths in queued native

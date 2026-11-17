@@ -21,6 +21,7 @@ ServiceName = NewType("ServiceName", str)
 
 
 class ComposeService(BaseModel):
+    build: "ComposeBuild | None" = None
     command: str | list[str] = ""
     cpus: str | float | None = None
     mem_limit: str | int | None = None
@@ -35,6 +36,12 @@ class ComposeService(BaseModel):
 
 class ComposeHealth(BaseModel):
     test: list[str]
+
+
+class ComposeBuild(BaseModel):
+    context: str
+    dockerfile: str
+    target: str | None = None
 
 
 class ComposeVolume(BaseModel):
@@ -66,6 +73,19 @@ class ComposeFile(BaseModel):
 
 class TestDeployment:
     root = Path(__file__).resolve().parents[2]
+
+    def test_only_analytics_worker_installs_analysis_dependencies(self) -> None:
+        compose = ComposeFile.model_validate(
+            yaml.safe_load((self.root / "docker-compose.fullstack.yml").read_text())
+        )
+        for name in (
+            "backend", "worker", "worker-bulk", "worker-index",
+            "worker-maintenance", "worker-operations", "beat", "worker-analytics",
+        ):
+            build = compose.services[ServiceName(name)].build
+            assert build is not None
+            assert build.dockerfile == "Dockerfile.python"
+            assert build.target == ("analysis" if name == "worker-analytics" else "api")
 
     @pytest.mark.parametrize(
         "filename",

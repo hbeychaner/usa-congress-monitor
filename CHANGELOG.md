@@ -4,6 +4,46 @@
 
 ### Added
 
+- Reopened the explicit content/recovery blockers without changing the closed
+  execution or the accepted day. Downloaded and independently validated both
+  complete historical law PDFs with a recorded 96 MiB allowance restricted to
+  their exact official URLs; other downloads retain the 32 MiB bound. Reused
+  successful captures and verified the one transiently failed Senate version
+  against its official GovInfo package metadata. Conditionally published both
+  complete law records and all 12 captured versions.
+- Recovered the resolution's available full text and exact 99 original cosponsors
+  from official GovInfo MODS, which identifies Lincoln Chafee `C001040`; the
+  failing Congress API attempts to resolve `C000269` on the introduction date.
+  Published that evidence with explicit alternate-source provenance and partial
+  API hydration, not fabricated API success or later sponsorship/withdrawal
+  completeness. All three owned repairs pass shadow/stale-write/rollback and
+  real API checks; their shadows are retired.
+  Exact per-shard checkpoints reconcile just three serving writes, preserving
+  all 371,366 original document versions, 10,449 prior enriched sources,
+  628,082 original job rows/integrity and current model/graph/707-perspective
+  HTTP contracts. Complete enrichments total 10,451; one additional resolution
+  remains explicitly partial. Ordering, source-check age and wider historical
+  coverage remain uncertified.
+- Actually restored and source-readback-verified every one of the retained
+  25 indices, all 3,244,277 documents/vectors and the closed ledger.
+  The preserved full attempt verified 20 indices in 1,471.070 seconds before
+  an oversized district-geometry bulk request failed HTTP 413.
+  A five-index/557-record continuation passed in 51.637 seconds with actual
+  serialized requests bounded to 32 MiB; maximum measured request was
+  33,485,998 bytes. All owned targets are retired and serving state is unchanged.
+  These are individually verified backup contents across preserved phases,
+  not a stitched passing 15-minute recovery or off-host/full-system certificate.
+- Corrected full-stack image selection: all operational workers and Beat use
+  the API dependency target; only the analytics worker installs analysis.
+  The isolated replacement is **2,031,682,476 bytes**, versus
+  **11,304,318,664 bytes** for the running operations image (about 82% smaller).
+  Verified task imports and real NLP in a network-disabled, 1 GiB/1 CPU
+  container without Torch, NVIDIA, BERTopic or sentence-transformers.
+  All 45 deployment/read-boundary tests, Ruff and Compose validation pass.
+  Reclaimed only two inspected unused/unshared dependency-build cache records;
+  no retained data, volumes or in-use images were pruned, and the original
+  live worker was not recreated. Documented logical/shared image sizes and
+  Docker Desktop's delayed host-disk reclamation.
 - Completed and independently reconciled the genuine uninterrupted local day:
   **86,400.149 seconds**, from **2026-11-07 01:54:45 UTC** to
   **2026-11-08 01:54:46 UTC**, **432,000 offered/completed reads**, zero failures,

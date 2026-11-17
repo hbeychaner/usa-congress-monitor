@@ -102,13 +102,16 @@ Reconcile official catalog identities against search before missing-only
 recovery; matching collection totals alone do not establish identity coverage.
 The reconciled Congress 93-119 roster's 10,452 missing identities have now been
 created from retained catalog metadata without changing existing records.
-The full acquisition queue has finished: 10,449 records now have complete detail
-conditionally published, including 9,026 primary full texts. All 12,956 captured
-versions remain retained; the serving record contains one selected primary body.
-Exact source/version/API checks pass for every published record, and all 371,366
-original document versions are preserved. Three source/detail cases remain unresolved.
-Those are two law PDFs above the unchanged download bound and one repeatedly
-failing API record. For 487 records, revision ordering is unresolved: a retained
+The full acquisition queue has finished: 10,451 records now have complete detail
+conditionally published, including 9,028 primary full texts. The two previously
+oversized laws are recovered. One additional resolution now serves its available
+full text and all 99 original cosponsors from official GovInfo metadata, including
+the correctly identified Lincoln Chafee. Its failing Congress API collection
+remains honestly marked partial; later sponsorship episodes are not inferred.
+All 12,969 captured versions remain retained; the serving record contains one
+selected primary body. Exact source/version/API checks preserve all 371,366
+original document versions and all 10,449 previously accepted enrichments.
+For 487 records, revision ordering is unresolved: a retained
 source-listed representative is published without claiming it is the latest.
 Acquisition timestamps, including cache replays, do not certify source freshness.
 Congress 119 has 19,832 records without document-level source-check timestamps.
@@ -137,13 +140,20 @@ Its operational composition excludes unrelated analytics imports; analytics
 implementations register before fork only for analytics-queue consumers,
 preserving their original routing/name/limits. Search normalization uses
 serialized memory zones without changing model identity or the text cap.
+Operational Compose services now also use the `api` image target; only the
+analytics worker installs the `analysis` dependency group. An independently
+verified operational image is **2.03 GB instead of 11.30 GB**, about **82% smaller**,
+and runs task imports and NLP without Torch/NVIDIA dependencies. Existing
+containers are not automatically replaced; the original worker remains unchanged.
 See [lemmatization and cache ownership](documentation/reference/indexing.md#lemmatization).
 Failed attempts remain retained and contribute no qualifying time.
 Actual existing-service interruption recovered queued indexing in 77 seconds
 without changing the original worker allocation or protected records. The
-25-index/vector/ledger backup is retained, but full restoration stopped at its
-resource guard after two complete indices and part of legislation; it did not
-pass. See the [recovery boundaries](documentation/OPERATIONS_RUNBOOK.md#backup-and-actual-recovery-boundaries).
+25-index/vector/ledger backup is retained. Every index's contents, all 3,244,277
+documents/vectors and the closed ledger have now been restored and exactly
+verified across preserved 20-index and five-index phases. This does not pass
+the 15-minute recovery objective or certify full-system/off-host restoration.
+See the [recovery boundaries](documentation/OPERATIONS_RUNBOOK.md#backup-and-actual-recovery-boundaries).
 The current model's five files were actually restored and hash-verified.
 A later host/container SQLite-view incident was recovered without losing any
 protected original jobs, but exceeded 15 minutes. Keep live ledger operations

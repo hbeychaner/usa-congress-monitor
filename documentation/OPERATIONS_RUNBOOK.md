@@ -13,8 +13,11 @@ gates.
 ### Latest local acceptance disposition
 
 The fixed implementation closeout finished on **2026-11-08** with evidence or
-explicit blockers for every gate. It is not an all-history freshness or full
-disaster-recovery certificate.
+explicit blockers for every gate. The explicitly reopened **2026-11-17** phase
+resolved the two law gaps, published available alternate-source resolution
+evidence, verified every frozen backup index and corrected operational image
+selection. Neither phase is an all-history freshness or full disaster-recovery
+certificate; the original passing day remains unchanged.
 
 - **C2 accepted:** the expanded 109,726-input model and current topic, graph
   and all 707 perspective HTTP contracts remain exact after the day; all five
@@ -31,18 +34,33 @@ disaster-recovery certificate.
   archives, dispatch identities and zero-pending/zero-lag receipts pass.
   No warm/stress/failed time is added to the qualifying day.
 - **Preservation:** all **371,366 original document versions**, **10,449
-  accepted enriched sources**, **three blocked metadata records** and
-  **628,082 original ledger rows** remain exact; ledger integrity is `ok`.
+  previously accepted enriched sources** and **628,082 original ledger rows**
+  remain exact; ledger integrity is `ok`. Exactly three owned writes replace
+  the former blocker metadata with **two complete law records** and **one
+  explicitly partial resolution**. The resolution serves its available text
+  and all **99 original cosponsors** from official GovInfo MODS; its API-only
+  cosponsor evidence remains incomplete. Current model files, graphs and all
+  707 perspective HTTP contracts remain exact.
   Only accepted, exactly owned test streams/index were retired. Every archive,
   source seal and failed observation remains retained.
-- **C1 blocked:** two law PDFs exceed the unchanged 32 MiB response bound and
-  one complete cosponsor collection fails upstream. Ordering remains unresolved
+- **C1 still bounded:** the two complete law PDFs and all listed versions are
+  now recovered and conditionally published. The resolution's Congress API
+  collection still fails because its member-term lookup uses `C000269`;
+  official GovInfo instead identifies Lincoln Chafee `C001040`. Available
+  original membership is published with that provenance, without claiming
+  API retrieval or later sponsorship/withdrawal completeness. Ordering remains unresolved
   for 487 representatives; 19,832 Congress 119 records lack document source-check
   evidence; the 69 pre-93 records do not prove wider historical coverage.
 - **C4 not passed:** the 77.4035-second controlled interruption and exact
   five-file model restore passed, but a later SQLite incident exceeded
-  15 minutes and full index restoration stopped at the original resource guard.
-  Full-library/broker-volume/off-host recovery remains unproved.
+  15 minutes. All **25** retained index contents/**3,244,277** documents and
+  vectors plus the closed ledger are now actually restored and exactly
+  verified across preserved 20-index and five-index phases. The full attempt
+  took **1,471.070 seconds** before HTTP 413; the final five indices passed
+  in **51.637 seconds** using byte-bounded requests. This does not satisfy the
+  15-minute objective. All owned targets are retired; current serving state
+  was unchanged throughout restoration. Full-library/broker-volume/off-host
+  recovery remains unproved.
   Single-host topology blocks independent-host failover, not a waived objective.
 - **C5 complete:** validation and current source-pinned documentation/wiki
   publication record these distinctions, without another open-ended retry queue.
@@ -96,6 +114,19 @@ For a sealed acquisition queue:
    records must not produce a complete-content certificate or a successful final
    exit. New unexpected consecutive failures still trigger investigation.
 
+The reopened law phase recorded a **96 MiB allowance for only two exact,
+independently identified official PDF URLs**, including the matching parser
+bound. The normal **32 MiB** download limit and original closed execution were
+not changed. Reuse verified PDFs rather than redownloading them after another
+version fails. An alternate rendition must be explicitly linked by its official
+package metadata and verified against the exact bill/version identity.
+
+Alternate-source evidence is not a successful Congress API response. Preserve
+source URLs, package identities and hashes; publish useful verified fields
+without changing incomplete API-only hydration into complete status. An
+introduced-version roster establishes original membership, not unobserved later
+episodes or withdrawals.
+
 ### Backup and actual recovery boundaries
 
 Back up indices, alias inventory, ledger, record archives and published model
@@ -117,6 +148,15 @@ Retain the archive after retiring only that verified scratch directory.
 Keep source/version and protected-ledger-row preservation checks separate from
 restore success. Resource-guarded partial restoration is a failure, even when
 every acknowledged record in the partial target verifies exactly.
+
+Bound restore batches by **actual serialized bytes as well as record count**.
+Large district geometries can exceed the server's HTTP limit even in a small
+row-count batch. The verified continuation uses at most **32 MiB/1,000 records**
+per request, with a hard check of the actual NDJSON body before sending; do not
+raise the server limit to conceal oversized requests. Retain per-batch write
+acknowledgements, exact source/vector readback and target retirement evidence.
+Successful individual-index retries do not erase a failed whole-recovery
+interval or turn separate phases into a passing recovery-time observation.
 
 <!-- wiki:repository-only:start -->
 ### Local closeout recovery evidence
