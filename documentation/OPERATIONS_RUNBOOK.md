@@ -257,6 +257,29 @@ backup below. This verifies independent data storage and bounded restoration
 on the existing host, not complete-index, ledger/broker, separate-host or
 15-minute recovery.
 
+### Portable local operational backup
+
+Keep the operational companion backup separate from the data-only cloud
+payload. Capture a consistent job-ledger backup inside Docker, then copy only
+the closed backup; export broker definitions and record whether work queues
+are empty, because definitions do not contain messages. Complete Redis
+`BGSAVE` before copying its RDB and preserve every logical database. Archive
+closed canonical source libraries and models, retaining checksums and safe
+relative paths. On ExFAT media, keep these as portable backup artifacts rather
+than live database or search-engine storage.
+
+Operational artifacts can contain sensitive state, including broker password
+hashes. Keep them private and do not add them to the allowlisted data-only
+Drive upload. Record component capture times, application revision and
+configuration requirements; copying files alone does not establish a common
+recovery point or prove an actual restore.
+
+Simultaneous full-stack verification is explicitly outside the agreed task
+scope. Backup verification and recovery instructions do not require a second
+running stack or an interruption of the live application. Report component
+restore evidence precisely; do not claim independent-host failover, an
+unperformed whole-system restore or a passing 15-minute recovery objective.
+
 <!-- wiki:repository-only:start -->
 ### Local closeout recovery evidence
 

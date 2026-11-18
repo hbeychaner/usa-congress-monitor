@@ -163,6 +163,8 @@ SHA-256 checks; a bounded restore exactly verified **936 documents**, including
 See the [dated data-only backup procedure](documentation/OPERATIONS_RUNBOOK.md#independent-dated-data-only-backups)
 for the verified scope, exclusions and recovery steps. This is independent
 data storage with a local restore check, not full-system or separate-host failover.
+For a private external-drive backup of operational state, see the
+[portable local backup guidance](documentation/OPERATIONS_RUNBOOK.md#portable-local-operational-backup).
 The current model's five files were actually restored and hash-verified.
 A later host/container SQLite-view incident was recovered without losing any
 protected original jobs, but exceeded 15 minutes. Keep live ledger operations

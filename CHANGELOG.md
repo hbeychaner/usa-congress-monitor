@@ -27,6 +27,10 @@
 
 ### Added
 
+- Documented the private portable operational-backup procedure separately from
+  the data-only cloud payload. Removed simultaneous full-stack verification
+  from the agreed task scope without claiming an unperformed restore or a
+  passing historical recovery-time objective.
 - Completed a private, non-overwriting dated Google Drive data-only backup:
   25 current indices / 3,622,617 documents, published models and retained public
   source archives. All 170 payload files / 5,026,339,543 bytes passed independent

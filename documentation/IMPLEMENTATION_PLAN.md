@@ -18,6 +18,14 @@ gate; content/freshness and full recovery are not certified.
 
 ## Fixed local release closeout
 
+**Recovery scope amended, 2026-11-18:** the user explicitly removed
+simultaneous full-stack verification from the task scope. Do not retain it as
+an open task or require a second running stack, extra compute or a service
+interruption to complete the remaining work. Verify the approved portable SSD
+backup and document its recovery procedure and exclusions. Existing component
+restore evidence remains valid; this scope change does not assert an unperformed
+whole-system restore or turn the historical failed 15-minute objective into a pass.
+
 **Final disposition, 2026-11-08:** the genuine C3 observation and complete
 post-day reconciliation passed. The fixed implementation work is finished:
 C2/C3 are accepted, C1/C4 retain explicit unresolved blockers, and C5 publishes
