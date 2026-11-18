@@ -158,6 +158,105 @@ acknowledgements, exact source/vector readback and target retirement evidence.
 Successful individual-index retries do not erase a failed whole-recovery
 interval or turn separate phases into a passing recovery-time observation.
 
+#### Independent dated data-only backups
+
+A synchronized desktop folder is not proof of an uploaded or recoverable
+backup. Use a private, dedicated Google Drive folder and a new dated snapshot
+directory; never mirror deletions, overwrite an older snapshot, or make a
+public sharing link. Check authenticated free quota against the measured
+payload plus a reserve before transferring. Keep at least 8 GiB free locally.
+Google Drive file revisions are not a substitute for separate dated copies.
+
+The portable payload contains:
+
+| Path | Recovery content |
+|---|---|
+| `manifest.json` | Snapshot time/source commit, cluster/index identities, artifact sizes/SHA-256 hashes, counts and explicit exclusions. |
+| `indices/*.jsonl.gz` | Current physical-index records with `_id`, complete `_source` including available dense vectors, and original sequence/term evidence. |
+| `indices/*.metadata.json` | Corresponding mappings, settings and alias inventory; not permission to attach aliases during a test. |
+| `models/` | The five hash-verified files of the published model, not an arbitrary model/cache directory. |
+| `public-source-records.jsonl.gz` | Audited, deduplicated logical JSON exports of retained source archives; frames preserve relative origin, resource, record identity and payload. |
+| `public-source-files.tar.gz` | Retained public XML/CSV files with relative paths and without host owner metadata. |
+| `official-pdfs/` | Available independently sealed official law PDFs, named by content hash with source URLs in the manifest. |
+
+Export current indices between unchanged metadata/shard-sequence captures;
+stop rather than label an inconsistent export current. Read only closed
+source archives and export their logical records, not raw SQLite/free pages.
+Exclude WAL-active archives, job ledgers, operational journals, credentials,
+private code and private host paths. Report sensitive/unclassified exclusions
+and duplicate counts separately; an excluded record is not silently recovered.
+Canonical raw source roots are `data/full_history`, `data/daily`,
+`data/record_library` and `data/voteview`. Ad-hoc execution evidence and GovInfo
+acquisition-state SQLite trackers are not raw-source recovery content; the
+trackers' downloaded XML is retained separately. This does not preserve every
+local acquisition attempt's in-place resumability.
+Audit decompressed JSONL/tar contents and model bytes before any upload, not
+only compressed containers or filenames.
+
+Upload only this allowlisted payload with non-overwriting semantics, for
+example `rclone copy PAYLOAD REMOTE:DEDICATED_FOLDER/NEW_DATE --immutable --checksum`.
+Do not upload the parent directory containing private execution state.
+Afterward compare the exact remote file set and sizes, then use
+`rclone hashsum sha256 REMOTE:DEDICATED_FOLDER/NEW_DATE --download` and compare
+every downloaded hash against the sealed manifest, including the separately
+sealed manifest itself. This reads through the cloud API, not a local
+Drive Desktop cache. Preserve transfer/download receipts without tokens.
+Publish a small `VERIFIED.json` summary only after successful download and
+actual restore checks, then download-check that summary too. A dated folder
+or an uploaded manifest alone is not a completed verification receipt.
+If the shared client hits a Drive project quota, retain validated per-file
+download hashes bound to the exact manifest and retry only unfinished files
+with a finite retry budget. Preserve errors and partial receipts; a quota
+failure is not a passing verification or permission to replace cloud files.
+
+For an actual recovery check, download artifacts into owned scratch storage,
+verify their hashes again, restore a finite documented index scope into
+UUID/owner-marked unaliased targets, and read back exact sources/vectors.
+Include large geometries to exercise byte bounds and documents with actual
+nonempty embeddings; a vector mapping alone is not a vector restore test.
+Read all model files and logical source frames, and validate tar member paths,
+owner metadata and counts without extracting arbitrary paths. Retire only
+verified owned targets and redundant downloaded scratch files, preserving
+the original local snapshot, cloud copy and receipts.
+
+After host loss, recover the private folder through Drive or an authorized
+client, retrieve the application revision recorded in the manifest, verify
+downloaded hashes, and rebuild owned indices from `_id`/`_source` plus their
+mappings. Original sequence numbers are evidence, not values to assign to new
+indices. Reconcile aliases explicitly only after full destination validation.
+Recovering job/broker state requires a separately approved consistent backup;
+this payload does not contain it.
+
+The first copy is a manual data-safety measure, not scheduled backup automation,
+independent-host failover, full-system restoration or a passing recovery-time
+certificate. The currently authenticated rclone shared Google client reports
+a retirement warning; arrange an own-client migration before relying on
+unattended future runs. Do not broaden Drive access scopes silently. Existing
+uploaded files remain accessible through their owning Drive account.
+
+**Verified first copy, 2026-11-18:** the private `20261117T220143Z` snapshot
+contains 170 payload files / **5,026,339,543 bytes**, covering **25 current
+indices / 3,622,617 documents** with available source vectors, the five
+published model files and retained public source archives. Every remote
+payload file passed SHA-256 comparison after actual independent cloud
+download. The downloaded restore scope exactly verified all **436 district
+geometries**, **250 legislation records** and **250 nonempty vectors** from
+the current published model's cache. All three owned targets were retired.
+All five model files/six tensors, **1,531,866 logical source frames**,
+**49,249 raw XML/CSV members** and **112 official PDFs** were downloaded and
+read; archive paths, owner metadata, counts and PDF signatures passed.
+The source export accounts separately for **3,478,053 logical duplicates**
+and **20 private-path-bearing records excluded before upload**.
+The final cloud inventory contains 171 files including the independently
+download-checked `VERIFIED.json` completion summary. Serving mappings,
+aliases and shard checkpoints remained unchanged; the original worker
+identity, image, start time, resource limits and restart count are preserved.
+Redundant downloaded scratch files were removed, not the original snapshot.
+These current snapshot counts are distinct from the older frozen closeout
+backup below. This verifies independent data storage and bounded restoration
+on the existing host, not complete-index, ledger/broker, separate-host or
+15-minute recovery.
+
 <!-- wiki:repository-only:start -->
 ### Local closeout recovery evidence
 

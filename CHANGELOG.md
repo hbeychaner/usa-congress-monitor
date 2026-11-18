@@ -4,6 +4,18 @@
 
 ### Added
 
+- Completed a private, non-overwriting dated Google Drive data-only backup:
+  25 current indices / 3,622,617 documents, published models and retained public
+  source archives. All 170 payload files / 5,026,339,543 bytes passed independent
+  downloaded SHA-256 checks. Actually restored and exactly read back all 436
+  district geometries, 250 legislation records and 250 nonempty current-model
+  vectors; retired all owned scratch targets. Downloaded and read all five
+  model files, 1,531,866 logical source records, 49,249 raw source files and 112
+  official PDFs. Uploaded and independently checked the completion receipt.
+  Preserved serving state, the original worker and the local snapshot; excluded
+  credentials, private code, sensitive records and operational/ledger/broker
+  state. Documented recovery steps and resumable quota handling without claiming
+  scheduled automation, full-system/separate-host recovery or a passing RTO.
 - Reopened the explicit content/recovery blockers without changing the closed
   execution or the accepted day. Downloaded and independently validated both
   complete historical law PDFs with a recorded 96 MiB allowance restricted to

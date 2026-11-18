@@ -154,6 +154,15 @@ documents/vectors and the closed ledger have now been restored and exactly
 verified across preserved 20-index and five-index phases. This does not pass
 the 15-minute recovery objective or certify full-system/off-host restoration.
 See the [recovery boundaries](documentation/OPERATIONS_RUNBOOK.md#backup-and-actual-recovery-boundaries).
+A private dated Google Drive snapshot now protects **25 current indices /
+3,622,617 documents**, published models and retained public source archives.
+All **170 payload files / 5,026,339,543 bytes** passed actual cloud-download
+SHA-256 checks; a bounded restore exactly verified **936 documents**, including
+250 nonempty vectors. All five model files, 1,531,866 logical source records,
+49,249 raw source files and 112 official PDFs were downloaded and read.
+See the [dated data-only backup procedure](documentation/OPERATIONS_RUNBOOK.md#independent-dated-data-only-backups)
+for the verified scope, exclusions and recovery steps. This is independent
+data storage with a local restore check, not full-system or separate-host failover.
 The current model's five files were actually restored and hash-verified.
 A later host/container SQLite-view incident was recovered without losing any
 protected original jobs, but exceeded 15 minutes. Keep live ledger operations
