@@ -67,8 +67,8 @@ and `ApiConfig.cors_origins_csv` uses `CORS_ORIGINS`.
 | `redis` | `REDIS_URL`, `REDIS_STREAM_MAXLEN`, `REDIS_CONSUMER_GROUP` | Record handoff and consumer coordination |
 | `ledger` | `JOB_DB_PATH`, `RETENTION_DAYS`, `COVERAGE_LOOKBACK_DAYS`, `RECORD_LIBRARY_ROOT` | Durable ledger, retention and latest-record library |
 | `govinfo` | `GOVINFO_RATE_LIMIT_PER_HOUR`, `GOVINFO_ARCHIVE_ROOT` | Local bulk-download pacing and archive location |
-| `indexing` | `INDEX_BATCH_JOBS`, `INDEX_BATCH_DOCS`, `INGEST_PARTIAL_INDEX_EVERY` | Bounded indexing batches and incremental dispatch |
-| `lemmatization` | `SPACY_MODEL`, `LEMMA_MAX_CHARS`, `LEMMA_BATCH_SIZE`, `LEMMA_EXCLUDED_COMPONENTS` | Defaults: `en_core_web_md`, 200,000 characters, one text per inference microbatch, excluded `parser`/`ner`; serialized memory zones bound transient caches |
+| `indexing` | `INDEX_BATCH_JOBS`, `INDEX_BATCH_DOCS`, `INGEST_PARTIAL_INDEX_EVERY` | Bounded indexing batches and incremental dispatch; managed operations overrides the bulk/prefetch bound to 32 documents |
+| `lemmatization` | `SPACY_MODEL`, `LEMMA_MAX_CHARS`, `LEMMA_CHUNK_CHARS`, `LEMMA_BATCH_SIZE`, `LEMMA_EXCLUDED_COMPONENTS` | Defaults: `en_core_web_md`, 200,000-character total allowance, 8,192-character inference chunks, one chunk per microbatch, excluded `parser`/`ner`; each chunk owns a serialized memory zone |
 | `embedding` | `EMBEDDING_MODEL`, `EMBEDDING_BATCH_DOCS` | Vector model identity and batching |
 | `metasubject` | `METASUBJECT_TARGET_GROUPS`, matching/confidence settings | Group construction and identity carry-over |
 | `perspective` | `PERSPECTIVE_*` | Evidence thresholds, exclusions, stability and display rules |
@@ -104,6 +104,17 @@ and composition root when changing a configuration value.
 ## Local runtime choices
 
 ### Managed stack: Compose
+
+All managed Python services share `ledger-data:/var/lib/congress` and
+`JOB_DB_PATH=/var/lib/congress/jobs.sqlite3`. With project name
+`congresstracker`, the volume is `congresstracker_ledger-data`.
+Native tools retain their separate configured path; the old checkout database
+is not the live managed ledger. Do not mix the two.
+Before upgrading an existing deployment, stop writers and migrate a verified,
+consistent Docker-side backup into the volume; otherwise a new empty volume
+would appear to lose the old job history. See the
+[ledger boundary and restoration procedure](../OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary).
+Normal shutdown preserves the volume. Do not remove it with `down --volumes`.
 
 ```bash
 make up

@@ -340,6 +340,16 @@ After queue review and capacity admission, enable this scoped recurrence with
 alone still does not start Beat. Bill updates preserve an existing law
 discriminator and do not erase nonempty full text with an empty fetch.
 
+Accept a catch-up only after comparing the captured list's identities and
+versions with serving state, verifying archived bodies/relationships and
+checking child index jobs plus Redis pending/lag. A succeeded ingest resource
+can still have logged item failures; its status alone is not acceptance.
+The stale/skeleton policy is not an all-field freshness audit. In particular,
+`source_checked_at` is stripped at projection, and a hydrated timestamp is
+not a certificate for every listed text version. Preserve failed attempts and
+source-specific pagination errors rather than stamping success or relaxing
+count/identity checks.
+
 ## Endpoint specs and HTTP boundary
 
 [`cdm/data_collection/specs`](../../cdm/data_collection/specs) registers named

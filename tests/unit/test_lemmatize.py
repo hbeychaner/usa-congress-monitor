@@ -62,15 +62,15 @@ class PipeProbe:
         )
 
 
-def test_lemmatizes_strings_inside_one_memory_zone_with_bounded_batches() -> None:
+def test_lemmatizes_strings_inside_memory_zones_with_bounded_batches() -> None:
     probe = PipeProbe()
     service = probe.service()
     assert service.lemmatize(["Passed House", "", "the Border Acts"]) == [
         "passed house", "", "border acts",
     ]
-    assert probe.zones == 1
+    assert probe.zones == 3
     assert not probe.inside
-    assert probe.batches == [1]
+    assert probe.batches == [1, 1, 1]
     probe.loader.assert_called_once_with(
         "en_core_web_md",
         exclude=(LemmaExcludedComponent.PARSER, LemmaExcludedComponent.NER),
@@ -102,6 +102,32 @@ def test_character_limit_preserves_the_existing_head_only_contract() -> None:
     service = probe.service(LemmatizationConfig(lemma_max_chars=4))
     assert service.lemmatize(["Passed House"]) == ["pass"]
     assert probe.seen == ["Pass"]
+
+
+def test_large_text_chunks_preserve_words_output_shape_and_character_allowance() -> None:
+    probe = PipeProbe()
+    text = "Passed House\nBorder Acts ignored"
+    service = probe.service(
+        LemmatizationConfig(lemma_max_chars=24, lemma_chunk_chars=13)
+    )
+    assert service.lemmatize([text, "", "Senate Votes"]) == [
+        "passed house border acts", "", "senate votes",
+    ]
+    assert "".join(probe.seen[:2]) == text[:24]
+    assert all(len(chunk) <= 13 for chunk in probe.seen)
+    assert probe.zones == 4
+    assert not probe.inside
+
+
+def test_delimiter_free_text_still_has_a_strict_per_chunk_bound() -> None:
+    probe = PipeProbe()
+    service = probe.service(
+        LemmatizationConfig(lemma_max_chars=12, lemma_chunk_chars=5)
+    )
+    assert service.lemmatize(["abcdefghijklmnop"]) == ["abcde fghij kl"]
+    assert "".join(probe.seen) == "abcdefghijkl"
+    assert max(map(len, probe.seen)) == 5
+    assert probe.zones == 3
 
 
 def test_concurrent_calls_do_not_overlap_zones_and_load_model_only_once() -> None:

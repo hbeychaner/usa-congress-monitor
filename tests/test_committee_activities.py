@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import pytest
+
 from cdm.ingest.govinfo import GovInfoBillStatusParser, GovInfoPackage
+from cdm.models.bills import CommitteeMetadata
 
 _XML = """<billStatus><bill>
 <title>Test Act</title>
@@ -42,3 +45,21 @@ def test_committee_activities_and_subcommittees_are_parsed() -> None:
     [subcommittee] = committee["subcommittees"]
     assert subcommittee["system_code"] == "hsba15"
     assert subcommittee["activities"][0]["date"] == "2013-04-02T19:45:43Z"
+
+
+@pytest.mark.parametrize(
+    "activity",
+    [
+        {"name": "Bills of Interest - Exchange of Letters"},
+        {"name": "Bills of Interest - Exchange of Letters", "date": None},
+    ],
+)
+def test_undated_committee_activity_is_preserved(
+    activity: dict[str, str | None],
+) -> None:
+    committee = CommitteeMetadata.model_validate(
+        {"name": "Foreign Affairs", "activities": [activity]}
+    )
+    assert committee.activities is not None
+    assert committee.activities[0].name == activity["name"]
+    assert committee.activities[0].date is None

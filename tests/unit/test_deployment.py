@@ -225,6 +225,17 @@ class TestJobRouting:
 class TestComposeOperations:
     root = Path(__file__).resolve().parents[2]
 
+    def test_live_ledger_uses_one_docker_volume_for_all_python_services(self) -> None:
+        compose = yaml.safe_load(
+            (self.root / "docker-compose.fullstack.yml").read_text()
+        )
+        assert "ledger-data" in compose["volumes"]
+        for name, service in compose["services"].items():
+            if name == "frontend":
+                continue
+            assert service["environment"]["JOB_DB_PATH"] == "/var/lib/congress/jobs.sqlite3"
+            assert "ledger-data:/var/lib/congress" in service["volumes"]
+
     def test_api_reload_watches_only_application_source(self) -> None:
         compose = ComposeFile.model_validate(
             yaml.safe_load((self.root / "docker-compose.fullstack.yml").read_text())

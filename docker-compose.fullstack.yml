@@ -15,15 +15,20 @@ x-python: &python
     RABBITMQ_URL: ${CONTAINER_RABBITMQ_URL:-amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@host.docker.internal:${RABBITMQ_PORT:-5672}/${RABBITMQ_DEFAULT_VHOST:-/}}
     REDIS_URL: redis://host.docker.internal:6379/0
     ES_LOCAL_URL: http://host.docker.internal:${ES_LOCAL_PORT:-9200}
+    JOB_DB_PATH: /var/lib/congress/jobs.sqlite3
     OLLAMA_URL: ${CONTAINER_OLLAMA_URL:-http://host.docker.internal:11434}
     TOKENIZERS_PARALLELISM: "false"
   volumes:
+    - ledger-data:/var/lib/congress
     - ./:/workspace
     - ${PWD:?Run Compose from the repository root}:${PWD}
 
 services:
   backend:
     <<: *python
+    environment:
+      <<: *python_environment
+      PYTHONFAULTHANDLER: "1"
     command: ["uvicorn", "cdm.backend.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/workspace/cdm"]
     ports:
       - "127.0.0.1:8000:8000"
@@ -86,6 +91,9 @@ services:
   worker-operations:
     <<: *worker
     profiles: [operations]
+    environment:
+      <<: *python_environment
+      INDEX_BATCH_DOCS: "32"
     mem_limit: ${OPERATIONS_MEMORY:-1g}
     command: celery -A cdm.workers.celery_app:celery_app worker --hostname=operations@%h --pool=prefork --concurrency=1 --max-tasks-per-child=200 --loglevel=INFO --queues=${CELERY_INDEX_QUEUE:-congress-index},${CELERY_MAINTENANCE_QUEUE:-congress-maintenance}
 
@@ -115,3 +123,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+
+volumes:
+  ledger-data:

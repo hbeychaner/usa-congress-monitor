@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from typing import Protocol
 
 import spacy
@@ -49,20 +49,43 @@ class SpacyLemmatizer:
         with self._lock:
             model = self._model()
             maximum = min(model.max_length, self._settings.lemma_max_chars)
-            # Only strings escape the zone; Docs and Tokens must not outlive it.
-            with model.memory_zone():
-                return [
-                    " ".join(
-                        token.lemma_.lower()
-                        for token in doc
-                        if token.lemma_
-                        and not (token.is_punct or token.is_space or token.is_stop)
-                    )
-                    for doc in model.pipe(
-                        ((text or "")[:maximum] for text in texts),
-                        batch_size=self._settings.lemma_batch_size,
-                    )
-                ]
+            results: list[str] = []
+            for text in texts:
+                parts: list[str] = []
+                for chunk in self._chunks((text or "")[:maximum]):
+                    # Only strings escape a chunk's zone, never Docs or Tokens.
+                    with model.memory_zone():
+                        parts.extend(
+                            " ".join(
+                                token.lemma_.lower()
+                                for token in doc
+                                if token.lemma_
+                                and not (
+                                    token.is_punct or token.is_space or token.is_stop
+                                )
+                            )
+                            for doc in model.pipe(
+                                [chunk], batch_size=self._settings.lemma_batch_size
+                            )
+                        )
+                results.append(" ".join(part for part in parts if part))
+            return results
+
+    def _chunks(self, text: str) -> Iterator[str]:
+        if not text:
+            yield text
+            return
+        start = 0
+        while start < len(text):
+            end = min(start + self._settings.lemma_chunk_chars, len(text))
+            if end < len(text):
+                boundary = end
+                while boundary > start and not text[boundary - 1].isspace():
+                    boundary -= 1
+                if boundary > start:
+                    end = boundary
+            yield text[start:end]
+            start = end
 
     def warm(self) -> None:
         with self._lock:

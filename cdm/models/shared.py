@@ -18,9 +18,11 @@ class Format(BaseModel):
 
 
 class Activity(BaseModel):
-    """Committee activity entry with name and date."""
+    """Committee activity entry with an optional source-provided date."""
 
-    date: datetime = Field(description="When the committee activity occurred")
+    date: datetime | None = Field(
+        default=None, description="When the committee activity occurred, if supplied"
+    )
     name: str = Field(description="What the committee activity name is.")
 
 

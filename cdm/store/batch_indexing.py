@@ -104,14 +104,21 @@ class _IndexRun:
         try:
             while job_id not in self._failed:
                 entries = self._streams[job_id].read_batch(
-                    group, count=payload.batch_size, consumer=consumer, block_ms=None
+                    group,
+                    count=min(
+                        payload.batch_size, self._owner.batch_docs - len(self._buffer)
+                    ),
+                    consumer=consumer,
+                    block_ms=None,
                 )
                 if not entries:
                     break
                 for entry_id, entry in entries:
                     self._buffer.append((job_id, entry_id, self._document(entry)))
-                if len(self._buffer) >= self._owner.batch_docs:
-                    self._flush()
+                    if len(self._buffer) >= self._owner.batch_docs:
+                        self._flush()
+                        if job_id in self._failed:
+                            break
         except Exception as exc:  # noqa: BLE001 - attributed to this job.
             self._failed.setdefault(job_id, exc)
 

@@ -45,6 +45,10 @@ make up
 For an already configured checkout, use `make up`; you do not need to recreate
 credentials each time.
 
+The managed stack keeps job history in a Docker volume. Existing installations
+must follow the [ledger migration and recovery guidance](documentation/OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary)
+before switching from the older checkout-mounted database.
+
 ### 3. Open the app
 
 - **Web app:** <http://localhost:5173>
@@ -114,7 +118,9 @@ original document versions and all 10,449 previously accepted enrichments.
 For 487 records, revision ordering is unresolved: a retained
 source-listed representative is published without claiming it is the latest.
 Acquisition timestamps, including cache replays, do not certify source freshness.
-Congress 119 has 19,832 records without document-level source-check timestamps.
+See the [current coverage and freshness boundaries](documentation/OPERATIONS_RUNBOOK.md#current-operating-posture)
+for the verified current-Congress catch-up; acquisition is not whole-field
+freshness certification.
 Expanded-corpus analytics are accepted: 109,726 inputs, 892 visible topics and
 707 Congress/topic perspective results, including 19 stability-passing splits,
 with current graph/model lineage and actual API/browser checks.
@@ -144,7 +150,7 @@ Operational Compose services now also use the `api` image target; only the
 analytics worker installs the `analysis` dependency group. An independently
 verified operational image is **2.03 GB instead of 11.30 GB**, about **82% smaller**,
 and runs task imports and NLP without Torch/NVIDIA dependencies. Existing
-containers are not automatically replaced; the original worker remains unchanged.
+containers require an explicit rebuild/recreation to pick up image changes.
 See [lemmatization and cache ownership](documentation/reference/indexing.md#lemmatization).
 Failed attempts remain retained and contribute no qualifying time.
 Actual existing-service interruption recovered queued indexing in 77 seconds
@@ -179,7 +185,9 @@ citations, using source-sealed local OCR when a PDF's text layer is damaged.
 Recurring bill refresh reuses the existing ingest pipeline; see the
 [refresh policy](documentation/guides/ingestion.md#scope-and-item-fetch-policy).
 The controlled operations profile does not automatically enable acquisition
-or scheduling.
+or scheduling. To retain the opt-in daily bill refresh on startup, use
+`make up STACK_PROFILES=operations,scheduler`; plain `make up` does not retain
+the scheduler profile.
 
 Run these from the repository root:
 

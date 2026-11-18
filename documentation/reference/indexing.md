@@ -213,15 +213,19 @@ than increasing its allocation or weakening the text/projection contract.
 A lock serializes loading and inference because
 spaCy memory zones cannot overlap on a shared model.
 The `en_core_web_md` model excludes the unused parser and NER components.
-Each inference microbatch contains one text, retaining the existing
-200,000-character head-only cap (or the model's smaller limit).
+Each input retains the existing 200,000-character head-only derived-lemma cap
+(or the model's smaller limit). Within that allowance, inference uses chunks
+of at most `LEMMA_CHUNK_CHARS` (default 8,192), preferring whitespace boundaries
+and hard-splitting delimiter-free runs when necessary.
 This microbatch is not a Congress.gov request or an indexing-job batch.
-Each call runs inside `Language.memory_zone()`; only materialized lemma strings
+Each chunk runs inside its own `Language.memory_zone()`; only materialized lemma strings
 escape, never spaCy Docs or Tokens. Temporary vocabulary, tokenizer and
 participating component caches are released afterward. Index-time failures
 remain explicit; query-time failures retain the logged best-effort behavior.
 Raw text, model identity, stop-word/punctuation filtering and public helper
-signatures are unchanged.
+signatures are unchanged. Linguistic context resets at chunk boundaries;
+derived lemmas may therefore differ near a boundary. This does not truncate
+stored source text or increase the total allowance.
 
 ## Upsert and replacement semantics
 
@@ -339,11 +343,17 @@ million entries); acknowledging does not delete stream entries.
 
 [`StreamIndexer`](../../cdm/store/batch_indexing.py) can share bulk requests
 across compatible jobs. It constructs and validates documents before buffering,
-flushes at the configured shared document threshold, and acknowledges entry
+flushes inside the per-entry loop at the configured shared document threshold,
+and caps each Redis read to the remaining buffer capacity. The managed
+operations worker uses `INDEX_BATCH_DOCS=32`; the general typed default is
+unchanged. A smaller bulk limit must not be bypassed by a larger payload read
+size. The indexer acknowledges entry
 IDs **only after the whole bulk result reports no errors**.
 A partial bulk failure may already have written some documents, but all
 contributors to that buffer are failed and their entries remain pending.
-Re-delivery can repeat already-successful actions.
+Re-delivery can repeat already-successful actions. Processing stops for a stream
+after a failed sub-batch, leaving subsequent entries unacknowledged. Counts of
+processed deliveries need not equal unique canonical identities.
 
 Decode/transform/validation exceptions fail the owning stream job and do not
 acknowledge the offending batch. Earlier buffered valid entries may still be

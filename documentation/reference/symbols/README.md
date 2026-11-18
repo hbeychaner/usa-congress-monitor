@@ -16,7 +16,7 @@ remain authoritative in source. Follow the narrative chapters for intent.
 |---|---:|---:|
 | [backend](backend.md) | 40 | 409 |
 | [composition](composition.md) | 2 | 30 |
-| [config](config.md) | 10 | 291 |
+| [config](config.md) | 10 | 292 |
 | [contracts](contracts.md) | 7 | 584 |
 | [data_collection](data_collection.md) | 23 | 63 |
 | [deployment](deployment.md) | 2 | 49 |
@@ -30,7 +30,7 @@ remain authoritative in source. Follow the narrative chapters for intent.
 | [store](store.md) | 14 | 254 |
 | [tools](tools.md) | 4 | 105 |
 | [topics](topics.md) | 3 | 55 |
-| [utils](utils.md) | 15 | 213 |
+| [utils](utils.md) | 15 | 216 |
 | [workers](workers.md) | 16 | 210 |
 
-Total: 276 source files; 6890 declarations.
+Total: 276 source files; 6894 declarations.

@@ -32,10 +32,10 @@ No declarations in this module.
 - function: [`_IndexRun.__init__(self, owner: StreamIndexer, payloads: dict[str, IndexPayload], resource: str, target_index: str \| None, replace: bool, preserve_raw: bool) -> None`](../../../cdm/store/batch_indexing.py#L71)
 - function: [`_IndexRun.execute(self) -> dict[str, IndexOutcome \| Exception]`](../../../cdm/store/batch_indexing.py#L95)
 - function: [`_IndexRun._drain(self, job_id: str, payload: IndexPayload, consumer: str) -> None`](../../../cdm/store/batch_indexing.py#L102)
-- function: [`_IndexRun._document(self, entry: StreamEntry) -> dict[str, object]`](../../../cdm/store/batch_indexing.py#L118)
-- function: [`_IndexRun._flush(self) -> None`](../../../cdm/store/batch_indexing.py#L128)
-- field: [`_IndexRun._flush.acked: dict[str, list[str]]`](../../../cdm/store/batch_indexing.py#L145)
-- function: [`_IndexRun._outcome(self, job_id: str) -> IndexOutcome \| Exception`](../../../cdm/store/batch_indexing.py#L155)
+- function: [`_IndexRun._document(self, entry: StreamEntry) -> dict[str, object]`](../../../cdm/store/batch_indexing.py#L125)
+- function: [`_IndexRun._flush(self) -> None`](../../../cdm/store/batch_indexing.py#L135)
+- field: [`_IndexRun._flush.acked: dict[str, list[str]]`](../../../cdm/store/batch_indexing.py#L152)
+- function: [`_IndexRun._outcome(self, job_id: str) -> IndexOutcome \| Exception`](../../../cdm/store/batch_indexing.py#L162)
 
 ## cdm/store/bill_scope.py
 

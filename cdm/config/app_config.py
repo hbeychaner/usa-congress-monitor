@@ -138,6 +138,7 @@ class LemmaExcludedComponent(StrEnum):
 class LemmatizationConfig(_Section):
     spacy_model: str = "en_core_web_md"
     lemma_max_chars: int = Field(default=200_000, gt=0)
+    lemma_chunk_chars: int = Field(default=8192, gt=0)
     lemma_batch_size: int = Field(default=1, gt=0)
     lemma_excluded_components: tuple[LemmaExcludedComponent, ...] = (
         LemmaExcludedComponent.PARSER,

@@ -54,6 +54,12 @@ use the routed representation rather than that overlapping layout.
 | React/Vite | Route pages, call typed API wrappers and render results | Server-side indexing or durable jobs |
 | Ollama | Optional locally configured labels and summaries | Source evidence, identifiers, or authoritative votes |
 
+Managed Python services share a Docker-volume SQLite ledger at
+`/var/lib/congress/jobs.sqlite3`, not the macOS checkout-mounted WAL.
+Archives and the record library remain separate replay stores. See the
+[ledger operating boundary](OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary)
+before migration or restoration.
+
 See the [ingestion guide](guides/ingestion.md) for precise retry and acknowledgement
 ordering, and [indexing reference](reference/indexing.md) for the distinction
 between configured mapping families and actively populated indices.
@@ -101,7 +107,8 @@ topic-model reader.
 The `analysis` dependency group is included in normal development installs but
 excluded from the opt-in Docker `api` target. The last/default Docker target,
 `analysis`, keeps the full worker runtime. The approved local Compose deployment
-now selects `api` for FastAPI and `analysis` for workers. spaCy, its pinned model
+selects `api` for FastAPI, operational workers and Beat; only the analytics
+worker selects `analysis`. spaCy, its pinned model
 and NumPy remain serving
 dependencies because search still uses the same lemma fields and normalization.
 When training packages are installed, spaCy's optional integrations can also

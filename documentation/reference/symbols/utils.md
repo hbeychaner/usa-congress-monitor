@@ -55,13 +55,16 @@ No declarations in this module.
 - function: [`SpacyLemmatizer.__init__(self, settings: LemmatizationConfig, loader: LanguageLoader, logger: logging.Logger) -> None`](../../../cdm/utils/lemmatize.py#L21)
 - function: [`SpacyLemmatizer._model(self) -> Language`](../../../cdm/utils/lemmatize.py#L31)
 - function: [`SpacyLemmatizer.lemmatize(self, texts: Sequence[str]) -> list[str]`](../../../cdm/utils/lemmatize.py#L46)
-- function: [`SpacyLemmatizer.warm(self) -> None`](../../../cdm/utils/lemmatize.py#L67)
-- function: [`SpacyLemmatizer.try_query(self, text: str) -> str`](../../../cdm/utils/lemmatize.py#L72)
-- field: [`_default_lemmatizer: SpacyLemmatizer`](../../../cdm/utils/lemmatize.py#L82)
-- function: [`lemmatize_texts(texts: Sequence[str]) -> list[str]`](../../../cdm/utils/lemmatize.py#L87)
-- function: [`lemmatize_text(text: str) -> str`](../../../cdm/utils/lemmatize.py#L91)
-- function: [`try_lemmatize_query(text: str) -> str`](../../../cdm/utils/lemmatize.py#L95)
-- function: [`warm_lemmatizer() -> None`](../../../cdm/utils/lemmatize.py#L99)
+- field: [`SpacyLemmatizer.lemmatize.results: list[str]`](../../../cdm/utils/lemmatize.py#L52)
+- field: [`SpacyLemmatizer.lemmatize.parts: list[str]`](../../../cdm/utils/lemmatize.py#L54)
+- function: [`SpacyLemmatizer._chunks(self, text: str) -> Iterator[str]`](../../../cdm/utils/lemmatize.py#L74)
+- function: [`SpacyLemmatizer.warm(self) -> None`](../../../cdm/utils/lemmatize.py#L90)
+- function: [`SpacyLemmatizer.try_query(self, text: str) -> str`](../../../cdm/utils/lemmatize.py#L95)
+- field: [`_default_lemmatizer: SpacyLemmatizer`](../../../cdm/utils/lemmatize.py#L105)
+- function: [`lemmatize_texts(texts: Sequence[str]) -> list[str]`](../../../cdm/utils/lemmatize.py#L110)
+- function: [`lemmatize_text(text: str) -> str`](../../../cdm/utils/lemmatize.py#L114)
+- function: [`try_lemmatize_query(text: str) -> str`](../../../cdm/utils/lemmatize.py#L118)
+- function: [`warm_lemmatizer() -> None`](../../../cdm/utils/lemmatize.py#L122)
 
 ## cdm/utils/log_trimmer.py
 

@@ -10,7 +10,40 @@ tracks content/freshness, analytics, the real 24-hour observation, recovery and
 final disposition. A ready API or passing isolated fixture does not close those
 gates.
 
-### Latest local acceptance disposition
+### Current operating posture
+
+The managed API and operations worker use one Docker-volume ledger; see the
+[live SQLite boundary](#live-sqlite-operating-boundary). Restricted Beat runs
+only daily current-Congress bill refresh at 02:00 UTC. Retain it with
+`make up STACK_PROFILES=operations,scheduler`; plain startup selects only
+operations and can remove inactive-profile containers. Acquisition uses the
+existing serial worker and shared request budget, not an extra service.
+The operations worker retains its 1 GiB limit and uses 32-document bounded
+bulks/prefetch. NLP uses 8,192-character inference chunks within the unchanged
+200,000-character derived-lemma allowance; full source text remains intact.
+
+The 2026-11-18 captured Congress 119 list reconciles **20,010 identities** with
+serving and **zero remaining stale/skeleton candidates**. **1,909 unique
+complete hydrated records** pass body/relationship readback: **1,867** fetched
+full texts and **42** authoritative empty text inventories. All **22** owned
+index jobs succeeded; all six streams have zero pending/lag. Of **19,832**
+original records, **18,101** exact document versions are unchanged and all
+**1,731** changed identities are accounted for; **178** identities were added.
+All **136** original law discriminators and nonempty text preservation checks
+pass. This is the captured-list selection contract, not all-field/all-history
+freshness or a guarantee of latest-text ordering. The **487** historical
+ordering ambiguities, partial historical resolution API evidence and failed
+original 15-minute RTO remain explicit limitations. The accepted 24-hour
+observation is unchanged and was not repeated.
+
+The verified private SSD package includes consistent ledger snapshots, broker
+definitions, Redis RDB, canonical source/model artifacts and application
+recovery instructions. Relocated local backup paths are symlinks to
+`/Volumes/PortableSSD`; keep it mounted. These captures are not an atomic
+common recovery point, off-host failover or an unperformed whole-stack restore.
+
+<!-- wiki:repository-only:start -->
+### Earlier local acceptance disposition
 
 The fixed implementation closeout finished on **2026-11-08** with evidence or
 explicit blockers for every gate. The explicitly reopened **2026-11-17** phase
@@ -64,6 +97,7 @@ certificate; the original passing day remains unchanged.
   Single-host topology blocks independent-host failover, not a waived objective.
 - **C5 complete:** validation and current source-pinned documentation/wiki
   publication record these distinctions, without another open-ended retry queue.
+<!-- wiki:repository-only:end -->
 
 Index presence and Bill API visibility are separate checks. Shared bill reads
 include bill/law projections with canonical bill identities; law detail reads
@@ -280,6 +314,16 @@ running stack or an interruption of the live application. Report component
 restore evidence precisely; do not claim independent-host failover, an
 unperformed whole-system restore or a passing 15-minute recovery objective.
 
+On the approved PortableSSD, the private dated package lives under
+`CongressTrackerRecovery/20261118-refresh-and-recovery`; its `RECOVERY.md`
+records checksums, application revision, component times, required configuration
+and restoration order. The verified 170-file data snapshot and 62-file frozen
+closeout copy supersede only their independently hash-matched local originals.
+Their original local directories are now symlinks: losing or unmounting the
+SSD makes those paths unavailable. ExFAT AppleDouble companions are metadata,
+not extra payload files; never discard an unverified payload as metadata.
+Keep credentials and host configuration separately: they are not in the package.
+
 <!-- wiki:repository-only:start -->
 ### Local closeout recovery evidence
 
@@ -466,8 +510,26 @@ time; never add elapsed intervals across incidents or sleep.
 ### Live SQLite operating boundary
 
 Keep all live ledger operations inside Docker while the managed stack is
-running. Do not mix host-native SQLite connections with container writers on the
-same bind-mounted WAL ledger, including read-only diagnostics and backups.
+running. All managed Python services share `ledger-data:/var/lib/congress`
+and `JOB_DB_PATH=/var/lib/congress/jobs.sqlite3`; project `congresstracker`
+uses volume `congresstracker_ledger-data`. Do not mix host-native SQLite
+connections with container writers, including read-only diagnostics and backups.
+The older checkout database is an offline retained copy, not the live ledger.
+Do not delete the named volume during ordinary shutdown.
+
+Before upgrading an old bind-mounted deployment, quiesce API/admin writers,
+workers and Beat. Take a consistent backup inside Docker, then restore the
+closed snapshot into the new volume before starting writers. Verify integrity
+and every table's row counts/content against the closed source; merely mounting
+an empty volume does not migrate history. Keep the old copy for rollback.
+The approved migration preserved all 630,879 job rows and every other table.
+
+The old macOS/Docker shared-WAL workload reproduced a native **SIGBUS**, not
+an API OOM: the Uvicorn supervisor survived while its server child died.
+Faulthandler traced SQLite execution during progress/status reads. Moving the
+live WAL into Docker storage passed the same 720-request/1,200-write stress.
+`PYTHONFAULTHANDLER=1` remains enabled for backend native-crash diagnostics;
+a live supervisor alone is not API health.
 Readiness/stack checks do not require a second ledger runtime:
 
 ```sh
@@ -1062,13 +1124,16 @@ Before requeueing exhausted jobs, create a timestamped ledger backup:
 ```sh
 backup="data/jobs.sqlite3.pre-recovery-$(date -u +%Y%m%dT%H%M%SZ)"
 docker compose -f docker-compose.fullstack.yml exec -T backend \
-  python - data/jobs.sqlite3 "$backup" <<'PY'
+  python - "$backup" <<'PY'
 import sqlite3
 import sys
 from contextlib import closing
 from pathlib import Path
 
-source, target = (Path(argument).resolve() for argument in sys.argv[1:])
+from cdm.config import get_config
+
+source = Path(get_config().ledger.job_db_path).resolve()
+target = Path(sys.argv[1]).resolve()
 target.touch(exist_ok=False)
 with (
     closing(sqlite3.connect(source.as_uri() + "?mode=ro", uri=True)) as live,
@@ -1116,18 +1181,38 @@ Rollback is a maintenance operation:
 5. Start services and run the health check.
 6. Confirm queue state and OpenSearch aliases before resuming work.
 
-Example ledger restoration after services are stopped and the backup is verified:
+Example managed-ledger restoration after all application writers are stopped.
+The one-off container mounts the same project volume and starts no dependencies;
+verify its project/configuration and available capacity first. Replace the
+snapshot argument with the intended closed backup:
 
 ```sh
-(
-  set -e
-  before="data/pre-restore-$(date -u +%Y%m%dT%H%M%SZ)"
-  mkdir "$before"
-  for path in data/jobs.sqlite3 data/jobs.sqlite3-wal data/jobs.sqlite3-shm; do
-    if [ -e "$path" ]; then mv "$path" "$before/"; fi
-  done
-  cp -p data/jobs.sqlite3.pre-recovery-TIMESTAMP data/jobs.sqlite3
-)
+docker compose -p congresstracker -f docker-compose.fullstack.yml \
+  run --rm --no-deps -T --entrypoint python backend \
+  - /workspace/data/jobs.sqlite3.pre-recovery-TIMESTAMP <<'PY'
+import shutil
+import sqlite3
+import sys
+from contextlib import closing
+from datetime import UTC, datetime
+from pathlib import Path
+
+from cdm.config import get_config
+
+source = Path(sys.argv[1]).resolve(strict=True)
+target = Path(get_config().ledger.job_db_path).resolve()
+if source == target:
+    raise RuntimeError("Backup must differ from the live ledger path")
+with closing(sqlite3.connect(source.as_uri() + "?mode=ro", uri=True)) as snapshot:
+    if snapshot.execute("PRAGMA integrity_check").fetchall() != [("ok",)]:
+        raise RuntimeError("Backup integrity failed")
+before = target.parent / ("pre-restore-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"))
+before.mkdir()
+for path in (target, Path(str(target) + "-wal"), Path(str(target) + "-shm")):
+    if path.exists():
+        path.rename(before / path.name)
+shutil.copy2(source, target)
+PY
 ```
 
 Do not restore over an open database or leave the previous database's sidecars

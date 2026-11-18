@@ -18,6 +18,45 @@ gate; content/freshness and full recovery are not certified.
 
 ## Fixed local release closeout
 
+**Ordered operational completion, 2026-11-18:** API recovery, restricted
+02:00 UTC recurring refresh and private SSD-package verification preceded the
+current-Congress catch-up; final source/docs/wiki/CI publication follows it.
+The live ledger moved from the macOS bind-mounted WAL into one shared Docker
+volume after a reproduced native SIGBUS, preserving every table. The formerly
+crashing workload passed 720 requests and 1,200 concurrent writes. NLP now
+infers 8,192-character chunks within its unchanged 200,000-character allowance;
+operations bulks and Redis reads are bounded to 32 documents, without increasing
+the 1 GiB allocation. Both oversized source bodies remain intact, including
+HR8800's 3,779,538 characters.
+
+The final captured list has **20,010** identities, all indexed, with **zero**
+remaining stale/skeleton candidates. **1,909** unique complete hydrated records
+pass critical-body/relationship readback; **1,867** fetched bodies and **42**
+authoritative empty text inventories are distinguished. All **22** owned index
+jobs succeeded and all six streams have zero pending/lag. Of **19,832**
+originals, **18,101** exact versions are unchanged; all **1,731** changed
+identities and **178** additions are accounted for. All **136** law
+discriminators and nonempty-text preservation checks pass.
+Missing optional committee activity dates were a local validation bug and are
+fixed with regression coverage. HR8800's default related-bill pages exposed
+inconsistent cached counts (62 then 63); a supported 250-row request recovered
+the complete collection with the existing count/identity/exhaustion guards,
+not fabricated pagination success. Original failed attempts remain recorded.
+One final in-flight HCONRES40 source existed only in its acknowledged stream;
+it is now independently archived and verified. The earlier explanation that
+the 823rd stream entry duplicated one of 822 archive identities was incorrect.
+
+The SSD data snapshot, closed ledger, Redis RDB, broker definitions and
+source/model tar were independently verified. Only hash-matched superseded
+local copies were relocated; their symlinks require PortableSSD mounted.
+Historical ordering remains source-limited for **487** representatives
+(Congress 101: 417, 102: 46, 103: 24): **463** have no publication dates and
+**480** include unranked version codes. Do not infer latestness from acquisition
+time or archive order. The captured-list catch-up does not certify all-field
+freshness, all historical coverage, off-host recovery or the original RTO.
+The already accepted uninterrupted day is unchanged. Earlier dated inventories
+below remain provenance, not current operational counts or reopened budgets.
+
 **Recovery scope amended, 2026-11-18:** the user explicitly removed
 simultaneous full-stack verification from the task scope. Do not retain it as
 an open task or require a second running stack, extra compute or a service

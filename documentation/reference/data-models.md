@@ -33,7 +33,7 @@ while committee-print and committee-meeting detail models allow extra fields.
 |---|---|
 | `EntityBase` | Optional `id` and `build_id()` identity heuristics; used by many, but not all, item/list models. |
 | `Format` | Text representation `type` and HTTP `url`; not the fetched content. |
-| `Activity` | Committee activity `name` and `date`. |
+| `Activity` | Committee activity `name` and optional source-provided `date`; undated exchange-of-letters entries remain valid without an invented timestamp. |
 | `CountUrl` | Deferred relationship: `count`, `url`, optional `count_including_withdrawn_cosponsors`. It does not mean the relationship has been expanded. |
 | `Title` | `title`, `title_type`, `title_type_code`, `update_date`, and bill-text version code/name. |
 | `SourceSystem` | Action source `name` and numeric `code` (default `-1`). |

@@ -4,6 +4,18 @@
 
 ### Fixed
 
+- Moved the managed live job ledger into one shared Docker volume, eliminating
+  reproduced native SQLite SIGBUS crashes on the macOS bind-mounted WAL.
+  Migration preserved every table; the formerly crashing workload then passed
+  720 HTTP requests with 1,200 concurrent ledger writes.
+- Bound spaCy inference to whitespace-preferred 8,192-character chunks with
+  independent memory zones, retaining the existing 200,000-character derived
+  lemma allowance and complete source text. Bound operations bulks and Redis
+  prefetch to 32 documents; stop failed sub-batches without acknowledging
+  remaining entries. Both formerly oversized bills index within the original
+  1 GiB worker allocation.
+- Accept source-provided committee activities without dates, preserving their
+  names rather than rejecting otherwise valid complete bills.
 - Reused the existing daily ingest scheduler and stale-bill filter for a
   current-Congress catch-up pass, rather than introducing another service.
   Compare aware same-day updates in full, preserve newer indexed versions,
@@ -27,6 +39,20 @@
 
 ### Added
 
+- Reconciled the captured 20,010-identity Congress 119 list with serving:
+  no remaining stale/skeleton candidates, 1,909 unique complete hydrated records
+  and critical-field/relationship readbacks, including 1,867 fetched full texts
+  and 42 authoritative empty text inventories. All 22 owned index jobs and
+  zero-pending/zero-lag stream checks pass. Preserve 18,101 exact original
+  versions; all 1,731 changed originals and 178 additions are accounted for,
+  with all 136 law discriminators retained. Recover the final in-flight stream
+  record into a separate archive. A supported larger-page request resolved one
+  source's inconsistent cached pagination without weakening completeness checks.
+  This is not all-history/all-field freshness or a new 24-hour observation.
+- Activated restricted daily refresh and verified the private PortableSSD
+  recovery package. Relocated only independently hash-verified duplicate backup
+  files, preserving local paths as SSD-dependent symlinks. Documented named-volume
+  restoration, bounded runtime behavior and the unchanged historical RTO limits.
 - Documented the private portable operational-backup procedure separately from
   the data-only cloud payload. Removed simultaneous full-stack verification
   from the agreed task scope without claiming an unperformed restore or a

@@ -94,6 +94,55 @@ class TestIndexDestinations:
 
 
 class TestStreamFailures:
+    @pytest.mark.parametrize("fail_first", [False, True])
+    def test_large_stream_read_respects_bulk_bound_and_stops_on_failure(
+        self, fail_first: bool
+    ) -> None:
+        redis = Mock(spec=Redis)
+        redis.xpending.return_value = {"pending": 0}
+        redis.xlen.return_value = 5
+        redis.xack.return_value = 1
+        indexer = StreamIndexer(
+            redis, Mock(spec=Elasticsearch), batch_docs=2, default_group="indexers"
+        )
+        entries = [
+            (
+                f"{number}-0",
+                StreamEntry(resource="bill", record={"id": f"bill:118:hr:{number}"}),
+            )
+            for number in range(1, 6)
+        ]
+        payload = IndexPayload(stream="source-stream", resource="bill", batch_size=500)
+        with (
+            patch(
+                "cdm.store.batch_indexing.RedisRecordStream.read_batch",
+                side_effect=[entries, []],
+            ) as read,
+            patch("cdm.store.batch_indexing.bulk_upsert") as bulk,
+        ):
+            if fail_first:
+                bulk.side_effect = RuntimeError("write rejected")
+            outcomes = indexer.index(
+                {"job": payload}, resource="bill", target_index=None,
+                replace=False, preserve_raw=False,
+            )
+
+        assert [len(call.args[2]) for call in bulk.call_args_list] == (
+            [2] if fail_first else [2, 2, 1]
+        )
+        assert all(call.kwargs["count"] <= 2 for call in read.call_args_list)
+        if fail_first:
+            assert isinstance(outcomes["job"], RuntimeError)
+            redis.xack.assert_not_called()
+        else:
+            outcome = outcomes["job"]
+            assert isinstance(outcome, IndexOutcome)
+            assert outcome.indexed == 5
+            assert outcome.batches == 3
+            assert [
+                call.args[2:] for call in redis.xack.call_args_list
+            ] == [("1-0", "2-0"), ("3-0", "4-0"), ("5-0",)]
+
     @pytest.mark.parametrize("destination_exists", [False, True])
     def test_failed_write_leaves_the_entire_batch_unacknowledged(
         self, destination_exists: bool
