@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Fixed
+
+- Fixed the failing GitHub dependency-audit step without weakening its severity
+  gate or downgrading Vite. Pinned the reviewed `@ryotsu/picomatch@4.0.7-a`
+  replacement for all Vite/fdir/tinyglobby matcher consumers, with lockfile
+  integrity and bounded regression tests for CVE-2026-112366 plus ordinary glob
+  compatibility. The previous matcher exceeded the child-process deadline;
+  the replacement passes and `npm audit --audit-level=low` reports no findings.
+- Removed three stale lint suppressions in the job heartbeat and index CLI.
+  Repository Ruff and focused heartbeat/deployment tests pass; runtime behavior
+  is unchanged. Corrected managed-stack acceptance instructions to avoid
+  opening the live container-managed SQLite ledger from host-native commands.
+
 ### Added
 
 - Completed a private, non-overwriting dated Google Drive data-only backup:

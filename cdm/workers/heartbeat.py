@@ -36,5 +36,5 @@ class JobHeartbeat:
         while not stop.wait(self._interval):
             try:
                 self._store.touch(job_id)
-            except Exception:  # noqa: BLE001 - a failed beat must not kill the job.
+            except Exception:
                 logger.warning("Heartbeat failed for %s", job_id, exc_info=True)

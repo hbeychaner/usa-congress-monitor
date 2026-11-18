@@ -203,6 +203,10 @@ needs downloading again.
 Health warnings about failed jobs describe ingestion history, not automated
 test failures. Repairing some bills does not clear a job for an entire scope.
 
+Frontend dependency audits remain enforced. The pinned glob-matcher remediation
+and bounded regression checks are documented under
+[testing and contracts](documentation/guides/configuration-and-deployment.md#testing-and-contracts).
+
 ## Learn more
 
 - [Documentation home](documentation/README.md) and

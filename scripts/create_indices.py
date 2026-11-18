@@ -56,8 +56,8 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from cdm.config import get_config  # noqa: E402
-from cdm.store.index_manager import IndexManager  # noqa: E402
+from cdm.config import get_config
+from cdm.store.index_manager import IndexManager
 
 
 def _load_env_defaults() -> dict:

@@ -268,7 +268,25 @@ uv run --with ruff ruff check .
 uv run python -m compileall -q cdm scripts tools
 # Frontend type checking and production build:
 npm --prefix frontend/app run build
+# Keep the dependency audit and bounded glob regressions enforced:
+npm --prefix frontend/app run audit
+npm --prefix frontend/app test
 ```
+
+The Vite dependency chain pins `picomatch` to the reviewed npm alias
+`@ryotsu/picomatch@4.0.7-a` in both the manifest and integrity-locked dependency
+graph. Upstream picomatch through 4.0.7 is affected by
+[CVE-2026-112366 / GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf);
+no fixed upstream release was available when this remediation was made.
+The replacement's runtime changes were compared with the upstream archive and
+its [security-fix commit](https://github.com/ryotsu-kankichi/secured-picomatch/commit/3ab5a7627d480259e3d9ca67fbc14c125d374f0e).
+It adds no runtime dependencies or install hooks. A child-process deadline
+regression reproduces the former event-loop stall and verifies the fix, while
+compatibility tests cover Vite's actual matcher consumers, ordinary paths,
+extglobs and punctuation. This is a reviewed fork, not an upstream release;
+remove the override only after a fixed upstream release passes the same tests.
+Keep `npm audit --audit-level=low`; do not suppress the advisory or downgrade
+the bundler just to bypass this check.
 
 Tests explicitly gated on live services require a controlled environment and
 credentials. They are not substitutes for fixture-driven unit tests.
@@ -362,10 +380,12 @@ GCP IAM grants alone do not redirect application LLM calls.
 After any runtime change, check:
 
 ```bash
-make status
-make health-check
 make stack-status
+curl --fail http://127.0.0.1:8000/ready
 ```
+
+Do not run host-native `make status` or `make health-check` against the
+Docker-managed live ledger; use its owning container for ledger inspection.
 
 Inspect source coverage, active worker queues, archive retention, Redis pending
 entries and the exact search aliases. Use the
