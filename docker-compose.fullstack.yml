@@ -77,6 +77,11 @@ services:
     <<: *worker
     profiles: [scheduler]
     command: ["celery", "-A", "cdm.workers.celery_app:celery_app", "beat", "--loglevel=INFO", "--schedule=data/celerybeat-schedule"]
+    cpus: 0.25
+    mem_limit: 96m
+    environment:
+      <<: *python_environment
+      CELERY_BILL_REFRESH_ONLY: "true"
 
   worker-operations:
     <<: *worker
@@ -96,6 +101,9 @@ services:
       - "127.0.0.1:5173:5173"
     environment:
       VITE_API_BASE_URL: http://localhost:8000
+      GOMAXPROCS: "1"
+      GOMEMLIMIT: 64MiB
+      NODE_OPTIONS: --max-old-space-size=96
     volumes:
       - ./frontend/app:/app
       - /app/node_modules

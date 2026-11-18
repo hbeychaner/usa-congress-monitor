@@ -151,6 +151,8 @@ def bulk_upsert(
         "for (entry in params.doc.entrySet()) {"
         " def key = entry.getKey();"
         " def value = entry.getValue();"
+        " if (ctx._source['source_type'] == 'law'"
+        "     && (key == 'source_type' || key == '_resource')) { continue; }"
         " if (value != null) {"
         "  if (value instanceof List) {"
         "   if (!value.isEmpty()) {"

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from cdm.ingest.archive import LatestRecordArchive
 from cdm.ingest.stale_bills import (
     IndexedBillState,
@@ -43,9 +45,43 @@ def test_same_day_update_with_subject_data_is_fresh() -> None:
     assert not _filter(**{"9533": state}).needs_refresh(_meta())
 
 
+@pytest.mark.parametrize(
+    ("upstream", "expected"),
+    [
+        ("2025-01-03T09:00:00Z", True),
+        ("2025-01-03T08:06:15Z", False),
+        ("2025-01-03T08:00:00Z", False),
+        ("2025-01-03T10:00:00+02:00", False),
+        ("2025-01-03", False),
+    ],
+)
+def test_same_day_versions_compare_full_aware_timestamps(
+    upstream: str, expected: bool
+) -> None:
+    state = IndexedBillState(
+        update_date="2025-01-03T08:06:15Z", hydrated=True
+    )
+    assert _filter(**{"9533": state}).needs_refresh(
+        _meta(update_date=upstream)
+    ) is expected
+
+
 def test_unhydrated_skeleton_without_subjects_is_stale() -> None:
     state = IndexedBillState(update_date="2025-01-03")
     assert _filter(**{"9533": state}).needs_refresh(_meta())
+
+
+def test_older_upstream_does_not_replace_newer_unhydrated_record() -> None:
+    state = IndexedBillState(update_date="2025-01-04T08:00:00Z")
+    assert not _filter(**{"9533": state}).needs_refresh(_meta())
+
+
+def test_newer_indexed_text_version_is_not_downgraded() -> None:
+    state = IndexedBillState(
+        update_date="2025-01-02T08:00:00Z",
+        update_date_including_text="2025-01-04T08:00:00Z",
+    )
+    assert not _filter(**{"9533": state}).needs_refresh(_meta())
 
 
 def test_hydrated_bill_without_subjects_is_not_refetched() -> None:

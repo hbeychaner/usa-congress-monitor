@@ -4,6 +4,16 @@
 
 ### Fixed
 
+- Reused the existing daily ingest scheduler and stale-bill filter for a
+  current-Congress catch-up pass, rather than introducing another service.
+  Compare aware same-day updates in full, preserve newer indexed versions,
+  include canonical law projections in the state lookup, and enable actual
+  bill hydration for coverage-gap jobs. Preserve existing law discriminators
+  and nonempty text during normal bill merges. The opt-in Compose scheduler
+  runs only daily bill refresh through the existing serial operations worker,
+  without analytics/retention schedules or another refresh subsystem.
+- Bound cold frontend dependency optimization within its existing 256 MiB
+  allocation, preventing esbuild-triggered restart loops after renewed volumes.
 - Fixed the failing GitHub dependency-audit step without weakening its severity
   gate or downgrading Vite. Pinned the reviewed `@ryotsu/picomatch@4.0.7-a`
   replacement for all Vite/fdir/tinyglobby matcher consumers, with lockfile

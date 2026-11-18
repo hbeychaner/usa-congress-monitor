@@ -60,6 +60,16 @@ class DailyIngestPlanner:
             mode=IngestMode.DAILY_INCREMENTAL,
         )
 
+    def bill_refresh_payload(self, today: date) -> IngestPayload:
+        return self.payload(today).model_copy(update={
+            "resources": ["bill"],
+            "from_date": None,
+            "to_date": None,
+            "refresh_stale": True,
+            "retain_records": True,
+            "concurrency": 1,
+        })
+
 
 class CoverageGapPlanner:
     """Jobs for uncovered spans (interior holes and a stale tail)."""
@@ -141,7 +151,7 @@ class CoverageGapPlanner:
                         # Congress.gov backfills (e.g. 1978 bills with a 2026
                         # updateDate).
                         congress=congress_for_year(current.year),
-                        fetch_items=config.fetch_items_default,
+                        fetch_items=config.fetch_items_default or resource == "bill",
                         # Gap windows are small enough to hydrate full bill detail.
                         item_resources=["bill"],
                         index=True,

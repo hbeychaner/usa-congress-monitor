@@ -267,6 +267,18 @@ class TestComposeOperations:
         assert worker.mem_limit is not None
         assert "STACK_PROFILES ?= operations" in (self.root / "Makefile").read_text()
 
+    def test_scoped_scheduler_and_cold_frontend_remain_bounded(self) -> None:
+        compose = yaml.safe_load(
+            (self.root / "docker-compose.fullstack.yml").read_text()
+        )["services"]
+        beat = compose["beat"]
+        assert beat["environment"]["CELERY_BILL_REFRESH_ONLY"] == "true"
+        assert beat["mem_limit"] == "96m"
+        frontend = compose["frontend"]
+        assert frontend["mem_limit"] == "256m"
+        assert frontend["environment"]["GOMAXPROCS"] == "1"
+        assert frontend["environment"]["GOMEMLIMIT"] == "64MiB"
+
     @pytest.mark.parametrize("custom_queues", [False, True])
     def test_real_compose_render_preserves_supervision_state_and_queue_coverage(
         self, tmp_path: Path, custom_queues: bool

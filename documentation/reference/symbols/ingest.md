@@ -517,20 +517,22 @@ No declarations in this module.
 
 [Source](../../../cdm/ingest/stale_bills.py)
 
-- class: [`ItemFilter(Protocol)`](../../../cdm/ingest/stale_bills.py#L18)
-- function: [`ItemFilter.needs_refresh(self, meta: BaseModel) -> bool`](../../../cdm/ingest/stale_bills.py#L21)
-- class: [`IndexedBillState(BaseModel)`](../../../cdm/ingest/stale_bills.py#L24)
-- field: [`IndexedBillState.update_date: str \| None`](../../../cdm/ingest/stale_bills.py#L27)
+- class: [`ItemFilter(Protocol)`](../../../cdm/ingest/stale_bills.py#L17)
+- function: [`ItemFilter.needs_refresh(self, meta: BaseModel) -> bool`](../../../cdm/ingest/stale_bills.py#L20)
+- class: [`IndexedBillState(BaseModel)`](../../../cdm/ingest/stale_bills.py#L23)
+- field: [`IndexedBillState.update_date: str \| None`](../../../cdm/ingest/stale_bills.py#L26)
+- field: [`IndexedBillState.update_date_including_text: str \| None`](../../../cdm/ingest/stale_bills.py#L27)
 - field: [`IndexedBillState.has_subject_data: bool`](../../../cdm/ingest/stale_bills.py#L28)
 - field: [`IndexedBillState.hydrated: bool`](../../../cdm/ingest/stale_bills.py#L29)
 - function: [`IndexedBillState.from_source(cls, source: JsonObject) -> IndexedBillState`](../../../cdm/ingest/stale_bills.py#L32)
-- class: [`IndexedBillStateReader()`](../../../cdm/ingest/stale_bills.py#L45)
-- function: [`IndexedBillStateReader.__init__(self, client: Elasticsearch, index: str) -> None`](../../../cdm/ingest/stale_bills.py#L55)
-- function: [`IndexedBillStateReader.read(self, congress: int) -> dict[str, IndexedBillState]`](../../../cdm/ingest/stale_bills.py#L59)
-- class: [`StaleBillFilter()`](../../../cdm/ingest/stale_bills.py#L78)
-- function: [`StaleBillFilter.__init__(self, states: Mapping[str, IndexedBillState]) -> None`](../../../cdm/ingest/stale_bills.py#L81)
-- function: [`StaleBillFilter.bill_key(meta: BillMetadata) -> str`](../../../cdm/ingest/stale_bills.py#L85)
-- function: [`StaleBillFilter.needs_refresh(self, meta: BaseModel) -> bool`](../../../cdm/ingest/stale_bills.py#L88)
+- class: [`IndexedBillStateReader()`](../../../cdm/ingest/stale_bills.py#L47)
+- function: [`IndexedBillStateReader.__init__(self, client: Elasticsearch, index: str) -> None`](../../../cdm/ingest/stale_bills.py#L58)
+- function: [`IndexedBillStateReader.read(self, congress: int) -> dict[str, IndexedBillState]`](../../../cdm/ingest/stale_bills.py#L62)
+- class: [`StaleBillFilter()`](../../../cdm/ingest/stale_bills.py#L81)
+- function: [`StaleBillFilter.__init__(self, states: Mapping[str, IndexedBillState]) -> None`](../../../cdm/ingest/stale_bills.py#L84)
+- function: [`StaleBillFilter.bill_key(meta: BillMetadata) -> str`](../../../cdm/ingest/stale_bills.py#L88)
+- function: [`StaleBillFilter.needs_refresh(self, meta: BaseModel) -> bool`](../../../cdm/ingest/stale_bills.py#L91)
+- function: [`StaleBillFilter._newer(upstream: str, indexed: str) -> bool`](../../../cdm/ingest/stale_bills.py#L112)
 
 ## cdm/ingest/statute_text.py
 

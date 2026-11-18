@@ -174,6 +174,11 @@ citations, using source-sealed local OCR when a PDF's text layer is damaged.
 
 ## Everyday commands
 
+Recurring bill refresh reuses the existing ingest pipeline; see the
+[refresh policy](documentation/guides/ingestion.md#scope-and-item-fetch-policy).
+The controlled operations profile does not automatically enable acquisition
+or scheduling.
+
 Run these from the repository root:
 
 ```bash

@@ -311,6 +311,35 @@ Date parameters are sent only for catalog-supported resources.
 When congress is supplied, the runner selects congress-list variants where
 registered, including a dedicated bill list.
 
+The existing daily scheduler also submits a current-Congress bill pass without
+a date window, using `refresh_stale=True`. Discovery scans the current list;
+item hydration is limited to new bills, newer source versions and unhydrated
+skeletons. This catches updates older than the incremental two-day overlap.
+Each day's distinct job retains its fetched records and uses the existing
+shared API limiter, ledger, retry and indexing pipeline. Aware source timestamps
+are compared in full, including same-day changes; date-only timestamps retain
+day-level precision. Bill state includes law projections with canonical bill
+identities. Coverage-gap bill jobs explicitly enable item hydration.
+
+These are configured scheduler capabilities, not proof that acquisition is
+running or that every available detail/text endpoint succeeds. The controlled
+`operations` profile still excludes Beat and acquisition workers. The GovInfo
+package scheduler remains discovery-only for previously unseen package jobs;
+it is not the mechanism used for this recurring Congress API catch-up.
+
+The Compose `scheduler` profile sets `CELERY_BILL_REFRESH_ONLY=true`: Beat
+publishes only the 02:00 UTC bill-refresh task to the existing maintenance
+queue. The operations worker runs that acquisition serially using the existing
+shared API limiter, then drains the resulting index work. It does not consume
+the general ingest queue or enable retention, analytics, static, vote or GovInfo
+schedules. Completed daily refresh jobs are not dispatched again. The restricted
+Beat process does not import worker/NLP implementations.
+
+After queue review and capacity admission, enable this scoped recurrence with
+`make up STACK_PROFILES=operations,scheduler`. The default `operations` profile
+alone still does not start Beat. Bill updates preserve an existing law
+discriminator and do not erase nonempty full text with an empty fetch.
+
 ## Endpoint specs and HTTP boundary
 
 [`cdm/data_collection/specs`](../../cdm/data_collection/specs) registers named

@@ -60,6 +60,19 @@ def test_daily_payload_uses_overlapping_incremental_resources() -> None:
     assert payload["item_resources"] == ["bill"]
 
 
+def test_daily_bill_refresh_finds_updates_outside_incremental_window() -> None:
+    planner = DailyIngestPlanner()
+    payload = planner.bill_refresh_payload(date(2026, 11, 18))
+    assert payload.resources == ["bill"]
+    assert payload.congress == 119
+    assert payload.from_date is None and payload.to_date is None
+    assert payload.fetch_items and payload.item_resources == ["bill"]
+    assert payload.refresh_stale and payload.retain_records and payload.index
+    assert payload.schedule_date == "2026-11-18"
+    assert payload.to_json() != planner.payload(date(2026, 11, 18)).to_json()
+    assert payload.to_json() != planner.bill_refresh_payload(date(2026, 11, 19)).to_json()
+
+
 class TestFullTextFailureClassification:
     @pytest.mark.parametrize(
         ("cause", "expected"),

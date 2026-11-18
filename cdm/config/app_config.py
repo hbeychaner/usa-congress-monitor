@@ -60,6 +60,7 @@ class OllamaConfig(_Section):
 
 
 class QueueConfig(_Section):
+    celery_bill_refresh_only: bool = False
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
     rabbitmq_queue: str = "congress-sync"
     rabbitmq_prefetch: int = 10

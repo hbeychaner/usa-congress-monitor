@@ -123,11 +123,11 @@ The default `STACK_PROFILES=operations` is deliberately controlled:
 | Profile | Services/capability | Default |
 |---|---|---|
 | Always enabled | API (`api` image target), React/Vite; search, broker, Redis | On |
-| `operations` | One full-image prefork worker, concurrency 1; index + maintenance queues | On |
+| `operations` | One `api`-image prefork worker, concurrency 1; index + maintenance queues | On |
 | `acquisition` | Ingest worker and bulk/default-queue worker | Off |
 | `dedicated` | Separate index and maintenance workers, instead of `operations` | Off |
 | `analytics` | Full-image bounded analytics worker | Off |
-| `scheduler` | Beat, including acquisition/retention scheduling | Off |
+| `scheduler` | 96 MiB Beat, restricted to current-Congress bill refresh | Off |
 | `observability` | Infrastructure Kibana/setup | Off |
 
 `STACK_PROFILES` replaces the default, rather than adding to it. Do not combine
@@ -138,8 +138,15 @@ scope change (not commands to run blindly against retained queues):
 ```bash
 make up STACK_PROFILES=                         # API/UI + infrastructure only
 make up STACK_PROFILES=operations,acquisition    # no analytics or scheduler
+make up STACK_PROFILES=operations,scheduler      # scoped daily bill refresh only
 make up STACK_PROFILES=dedicated,acquisition,analytics,scheduler,observability
 ```
+
+The scoped scheduler sends bill-refresh work through the existing maintenance
+queue, not the general acquisition queue. It preserves serial operations-worker
+execution and disables unrelated periodic jobs. Frontend cold dependency
+optimization is bounded by `GOMAXPROCS=1`, `GOMEMLIMIT=64MiB` and a 96 MiB Node
+old-space limit within the unchanged 256 MiB container limit.
 
 Review retained messages, durable jobs, due schedules, source credentials and
 capacity before enabling producers/consumers. Maintenance is allowed under the

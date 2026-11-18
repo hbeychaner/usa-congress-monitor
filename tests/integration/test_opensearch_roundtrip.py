@@ -1,4 +1,5 @@
 import os
+from uuid import uuid4
 
 import pytest
 
@@ -15,6 +16,29 @@ from cdm.store.opensearch import (
 
 pytestmark = pytest.mark.integration
 
+
+def test_bill_refresh_preserves_law_identity_and_existing_full_text():
+    if os.getenv("OPENSEARCH_INTEGRATION") != "1":
+        pytest.skip("Set OPENSEARCH_INTEGRATION=1 for the isolated live merge test")
+    client = get_opensearch_client()
+    target = f"refresh-merge-test-{uuid4().hex}"
+    client.indices.create(index=target, settings={"number_of_replicas": 0})
+    try:
+        identity = "bill:119:hr:1"
+        client.index(index=target, id=identity, document={
+            "id": identity, "source_type": "law", "_resource": "law",
+            "full_text": "Complete existing text", "title": "Old title",
+        })
+        bulk_upsert(client, "bill", [{
+            "id": identity, "source_type": "bill", "_resource": "bill",
+            "full_text": "", "title": "Refreshed title",
+        }], target_index=target)
+        stored = client.get(index=target, id=identity)["_source"]
+        assert stored["source_type"] == stored["_resource"] == "law"
+        assert stored["full_text"] == "Complete existing text"
+        assert stored["title"] == "Refreshed title"
+    finally:
+        client.indices.delete(index=target)
 
 def _delete_from_alias_targets(client, alias, document_id):
     for index in client.indices.get_alias(name=alias):

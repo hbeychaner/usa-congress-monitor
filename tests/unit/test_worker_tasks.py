@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any, cast
+from unittest.mock import Mock
 
 import pytest
 
@@ -57,6 +58,43 @@ def _install(monkeypatch, dispatched=None, probe_depth=None, **overrides):
 def test_denormalized_summaries_are_not_queued_for_direct_indexing():
     assert not IngestJobRunner.should_queue_index_job("summaries")
     assert IngestJobRunner.should_queue_index_job("bill")
+
+
+def test_daily_scheduler_submits_existing_pipeline_bill_catchup(monkeypatch):
+    submitter = Mock()
+    submitter.submit.side_effect = [
+        {"id": "incremental", "status": "queued"},
+        {"id": "bill-refresh", "status": "queued"},
+    ]
+    _install(monkeypatch, job_submitter=submitter)
+    result = tasks.schedule_daily_ingest.run()
+    assert result["job_id"] == "incremental"
+    assert result["bill_refresh_job_id"] == "bill-refresh"
+    call = submitter.submit.call_args_list[1]
+    assert call.args[0] == JobKind.INGEST.value
+    assert call.args[1]["resources"] == ["bill"]
+    assert call.args[1]["from_date"] is None
+    assert call.args[1]["refresh_stale"] is True
+    assert call.kwargs == {"dispatch_existing": False}
+
+
+@pytest.mark.parametrize("status", ["queued", "failed", "running", "succeeded"])
+def test_scoped_bill_scheduler_uses_existing_operations_queue(monkeypatch, status):
+    submitter = Mock()
+    submitter.submit.return_value = {"id": "bill-refresh", "status": status}
+    container = _install(monkeypatch, job_submitter=submitter)
+    send = Mock()
+    monkeypatch.setattr(tasks.celery_app, "send_task", send)
+    result = tasks.schedule_bill_refresh.run()
+    assert result == {"job_id": "bill-refresh", "status": status}
+    assert submitter.submit.call_args.kwargs == {"dispatch": False}
+    if status in ("queued", "failed"):
+        send.assert_called_once_with(
+            "cdm.workers.tasks.run_ingest_job", args=["bill-refresh"],
+            queue=container.config.queue.celery_maintenance_queue,
+        )
+    else:
+        send.assert_not_called()
 
 
 def test_soft_time_limit_failures_are_retryable():

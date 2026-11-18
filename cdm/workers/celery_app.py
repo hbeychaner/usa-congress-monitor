@@ -40,6 +40,9 @@ celery_app.conf.update(
         "cdm.workers.tasks.recover_failed_ingest_jobs": {
             "queue": get_config().queue.celery_maintenance_queue
         },
+        "cdm.workers.tasks.schedule_bill_refresh": {
+            "queue": get_config().queue.celery_maintenance_queue
+        },
     },
     task_queues=None,
     worker_prefetch_multiplier=max(1, get_config().queue.rabbitmq_prefetch // 100),
@@ -97,4 +100,12 @@ celery_app.conf.update(
     },
 )
 
-celery_app.autodiscover_tasks(["cdm.workers"])
+if get_config().queue.celery_bill_refresh_only:
+    celery_app.conf.beat_schedule = {
+        "daily-bill-refresh": {
+            "task": "cdm.workers.tasks.schedule_bill_refresh",
+            "schedule": crontab(hour=2, minute=0),
+        }
+    }
+else:
+    celery_app.autodiscover_tasks(["cdm.workers"])

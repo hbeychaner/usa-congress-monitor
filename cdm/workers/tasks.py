@@ -16,7 +16,7 @@ from celery.worker.worker import WorkController
 from cdm.config import get_config
 from cdm.ingest.voteview import VoteIngestor, VoteviewClient, current_congress
 from cdm.jobs.analytics import GraphRequest, PerspectiveRequest, TopicRequest
-from cdm.jobs.store import JobKind
+from cdm.jobs.store import JobKind, JobStatus
 from cdm.utils.json_types import JsonObject
 from cdm.utils.lemmatize import warm_lemmatizer
 from cdm.utils.log_trimmer import LogTrimmer
@@ -115,9 +115,17 @@ def run_reconciliation_job(self: object, job_id: str) -> JsonObject:
 @celery_app.task(name="cdm.workers.tasks.schedule_daily_ingest")
 def schedule_daily_ingest() -> JsonObject:
     container = _container()
-    payload = container.daily_ingest_planner.payload(datetime.now(UTC).date())
+    today = datetime.now(UTC).date()
+    payload = container.daily_ingest_planner.payload(today)
     job = container.job_submitter.submit(JobKind.INGEST.value, payload.to_json())
-    return {"job_id": job["id"], "status": job["status"]}
+    refresh = container.daily_ingest_planner.bill_refresh_payload(today)
+    refresh_job = container.job_submitter.submit(
+        JobKind.INGEST.value, refresh.to_json(), dispatch_existing=False
+    )
+    return {
+        "job_id": job["id"], "status": job["status"],
+        "bill_refresh_job_id": refresh_job["id"],
+    }
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_coverage_gaps")
@@ -131,6 +139,23 @@ def schedule_coverage_gaps() -> JsonObject:
         for payload in container.coverage_gap_planner.payloads()
     ]
     return {"queued": queued, "count": len(queued)}
+
+
+@celery_app.task(name="cdm.workers.tasks.schedule_bill_refresh")
+def schedule_bill_refresh() -> JsonObject:
+    container = _container()
+    payload = container.daily_ingest_planner.bill_refresh_payload(
+        datetime.now(UTC).date()
+    )
+    job = container.job_submitter.submit(
+        JobKind.INGEST.value, payload.to_json(), dispatch=False
+    )
+    if job["status"] in (JobStatus.QUEUED, JobStatus.FAILED):
+        celery_app.send_task(
+            TaskName.RUN_INGEST.value, args=[job["id"]],
+            queue=container.config.queue.celery_maintenance_queue,
+        )
+    return {"job_id": job["id"], "status": job["status"]}
 
 
 @celery_app.task(name="cdm.workers.tasks.schedule_static_refresh")
