@@ -312,8 +312,10 @@ def test_concurrent_change_blocks_rollback_acceptance(
     before = repair.documents()
     publish = GraphStore.publish
 
-    def publish_then_conflict(store: GraphStore, pointer: GraphVersionPointer) -> None:
-        publish(store, pointer)
+    def publish_then_conflict(
+        store: GraphStore, pointer: GraphVersionPointer
+    ) -> GraphVersionPointer:
+        published = publish(store, pointer)
         if pointer_conflict:
             index = store.index
             identity = pointer.id
@@ -327,6 +329,7 @@ def test_concurrent_change_blocks_rollback_acceptance(
         ).source
         body["concurrent_marker"] = True
         repair.staging.index(index=index, id=identity, document=body, refresh=True)
+        return published
 
     with (
         patch.object(

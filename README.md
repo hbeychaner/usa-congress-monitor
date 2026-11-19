@@ -141,7 +141,8 @@ needs downloading again.
 Successful analytics builds enqueue separate verified cleanup jobs, retaining the served model
 and one predecessor. See the [analytics retention policy](documentation/guides/analytics.md#6-rebuilds-retention-and-operational-checks);
 downloaded base models and source data are not removed.
-Failed training and preview runs do not remove working models.
+Failed training and preview runs do not remove working models; cleanup refuses
+uncertain serving state.
 Health warnings about failed jobs describe ingestion history, not automated
 test failures. Repairing some bills does not clear a job for an entire scope.
 
