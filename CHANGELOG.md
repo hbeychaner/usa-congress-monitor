@@ -4,6 +4,32 @@
 
 ### Fixed
 
+- Retain the live topic model and one predecessor, each graph signal's current
+  and previous generation, and one previous perspective snapshot per Congress.
+  Successful non-preview analytics builds submit a separate durable cleanup
+  job on the maintenance queue. Verify actual HTTP model/graph/perspective
+  readbacks before bounded deletion; serialize analytics and cleanup claims,
+  protect live dependencies and shared caches, reject unknown ownership and
+  unsafe paths, and leave source data, archives and downloaded base models alone.
+- Focused maintained documentation on current architecture, contracts and
+  operating procedures; removed embedded migration/closeout narratives and
+  corrected frontend routes. Incident reports and implementation plans remain
+  as ignored local copies rather than tracked documentation. Release history
+  stays in this changelog.
+- Retired 13 obsolete operational entry points from version control while
+  retaining exact local copies under targeted ignore rules: legacy native
+  diagnostics, one-off migrations/reparsing/redispatch, unused scaffolding and
+  superseded infrastructure wrappers. Retired their legacy health-helper tests.
+  Keep the supported setup, ingestion, analytics, guarded repair, contract,
+  documentation and deployment tools. Route `make status`, `make health-check`
+  and `make worker-monitor` through existing bounded HTTP endpoints, propagate
+  HTTP failures, and stop auto-opening a native SQLite monitor with `make worker`.
+- Include native Ollama readiness in `make up` and its aliases: reuse a running
+  endpoint or start the local service, require the configured label model, and
+  verify application-container access before reporting startup success. Missing
+  models, failed service starts and unreachable endpoints fail explicitly.
+  Do not add a competing Docker model server, implicitly download models,
+  regenerate existing labels or stop a shared Ollama server on `make down`.
 - Moved the managed live job ledger into one shared Docker volume, eliminating
   reproduced native SQLite SIGBUS crashes on the macOS bind-mounted WAL.
   Migration preserved every table; the formerly crashing workload then passed

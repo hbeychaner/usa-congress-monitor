@@ -375,13 +375,12 @@ submit the corrected controls. Free-text validation and supported server depth
 remain API responsibilities. Reapplying the same canonical URL retries the read
 without inserting a duplicate history entry.
 
-[useRead](../../frontend/app/src/hooks/useRead.ts) is the existing analytics read
-hook generalized by name and with an idle (`null`) request. Lists and search now
-share its request-identity guard: new requests immediately hide previous data;
+[useRead](../../frontend/app/src/hooks/useRead.ts) supports analytics, list and
+search reads, including an idle (`null`) request. Its request-identity guard
+immediately hides results when a new request starts;
 late successes/failures cannot overwrite the active state. A query-less search
 is idle, not an empty result or a loading request. Failed reads show an error,
-not zero-result success. Existing optional-analysis callers keep their behavior.
-No query-cache library or global state store was added.
+not zero-result success.
 
 Native forms, labeled inputs, pressed-state type buttons, and Radix selectors
 remain keyboard operable. Navigation wraps on narrow screens rather than
@@ -419,8 +418,7 @@ proof that the main page or the backend has no data. Admin progress polls every
   API origin for actual application reads.
 - Generated response aliases are the shared browser contract. These compile-time
   types do not provide runtime JSON validation. Helpers retain their public alias
-  names and use generated named types (`Contracts.BillsResponse`), not the old
-  generator's `components['schemas']` map. Operation request/response types are
+  names and use generated named types (`Contracts.BillsResponse`). Operation request/response types are
   generated too; compile-time tests verify query enums and numeric parameters.
 - Generation enables only the TypeScript plugin: no SDK, HTTP client, or runtime
   enums. It generates into an owned temporary directory before comparing or
@@ -485,7 +483,7 @@ uploads them for seven days. Inspect a downloaded trace with
 These are browser-contract fixtures, not a live backend, search-index, image,
 queue-recovery, or deployment acceptance test. Those controlled integration and
 release gates are separate checks.
-The same workflow now runs a separate
+The workflow also runs a separate
 [controlled pipeline gate](../OPERATIONS_RUNBOOK.md#controlled-pipeline-acceptance)
 against disposable Redis/Elasticsearch, including the real-index query-budget
 regressions. Browser fixtures do not substitute for those checks or the remaining
@@ -509,14 +507,12 @@ Two explicit overrides bridge upstream dependency ranges:
 - `d3-color` 3.1.0 replaces the vulnerable v2 in the map's D3 dependency chain.
   Its ESM color/interpolation behavior is tested through that actual chain and
   the production map bundle.
-- The new generator's `@hey-api/json-schema-ref-parser` uses patched `js-yaml`
+- The generator's `@hey-api/json-schema-ref-parser` uses patched `js-yaml`
   4.3.2, staying within YAML's existing major API.
 
 Keep the generator pinned to its exact version because its pre-1.0 releases can
 change output. Reassess overrides on upgrades and remove them when upstream
-ranges resolve patched compatible versions without them. The generator migration
-removes the old Redocly/minimatch/brace-expansion chain rather than forcing an
-incompatible minimatch API into it.
+ranges resolve patched compatible versions without them.
 
 When diagnosing a page, trace its feature helper, the concrete route, the
 dependency provider, and service method before interpreting an empty panel.

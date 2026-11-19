@@ -15,7 +15,7 @@ case "${1:-}" in
                 label="com.congress-tracker.$name"
                 if [ -e "$HOME/Library/LaunchAgents/$label.plist" ] ||
                     launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1; then
-                    printf 'Legacy agent %s must be retired before Compose startup. See documentation/OPERATIONS_RUNBOOK.md.\n' "$label" >&2
+                    printf 'Conflicting agent %s blocks Compose startup. Verify service ownership; see documentation/OPERATIONS_RUNBOOK.md.\n' "$label" >&2
                     exit 1
                 fi
             done

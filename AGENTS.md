@@ -3,7 +3,7 @@
 ## Code style
 
 - Professional, strongly typed, object-oriented Python (3.13). Behavior lives in classes with clear single responsibilities; avoid loose module-level functions that pass dicts around.
-- Use Pydantic models for every structured value: CSV rows, API payloads, OpenSearch documents, job payloads, config. Validate at the boundary and keep typed models inside.
+- Use Pydantic models for every structured value: CSV rows, API payloads, Elasticsearch documents, job payloads, config. Validate at the boundary and keep typed models inside.
 - Avoid string-keyed dicts. Model fields as typed attributes, and use `StrEnum` for closed sets of values (chambers, parties, positions, kinds). Dicts are fine only when keyed by an enum or a typed identifier.
 - Keep string literals to a minimum: constants, enum members, and Pydantic field aliases replace magic strings. Serialize at the edge with `model_dump(mode="json")`.
 - Full type annotations on all signatures, including return types; no bare `Any` where a concrete type or Protocol exists.
@@ -20,11 +20,11 @@
 - Application settings live in `cdm/config` (pydantic-settings sections, `get_config()`); do not add new module-level constants to `settings.py`. Constants used by only one or two functions may stay beside them.
 - Classes receive collaborators (clients, stores, config sections) through their constructors and never read config or build clients themselves.
 - `cdm/container.py` (`Container`) is the composition root for scripts and workers; `cdm/backend/dependencies.py` provides FastAPI `Depends` providers. Tests inject fakes directly or override the container.
-- Legacy modules still importing `settings` are migrated when they are otherwise changed.
+- Modified modules use the typed configuration sections and composition roots.
 
 ## Applying this guidance
 
-These rules apply to new and modified code as well as legacy modules. Rewrite legacy modules to conform; migrate them when they are otherwise being changed.
+These rules apply to all new and modified code.
 
 ## Reference implementation
 

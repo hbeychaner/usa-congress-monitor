@@ -50,20 +50,14 @@ Generated from declarations; see the catalogue scope in the index.
 - function: [`DocumentationBuilder.wiki_link(self, origin: Path, href: str, pages: set[Path]) -> str`](../../../tools/build_documentation.py#L270)
 - function: [`DocumentationBuilder.wiki_text(self, path: Path) -> str`](../../../tools/build_documentation.py#L289)
 - field: [`DocumentationBuilder.wiki_text.lines: list[str]`](../../../tools/build_documentation.py#L290)
-- function: [`DocumentationBuilder.build_wiki(self, output: Path, *, check: bool) -> None`](../../../tools/build_documentation.py#L308)
-- field: [`DocumentationBuilder.build_wiki.pages: dict[Path, str]`](../../../tools/build_documentation.py#L327)
-- function: [`DocumentationBuilder.validate_links(self) -> None`](../../../tools/build_documentation.py#L375)
-- field: [`DocumentationBuilder.validate_links.missing: list[str]`](../../../tools/build_documentation.py#L376)
-- function: [`DocumentationBuilder.run(self, *, check: bool, wiki: Path \| None, wiki_only: bool=False) -> None`](../../../tools/build_documentation.py#L408)
-- class: [`DocumentationCommand()`](../../../tools/build_documentation.py#L419)
-- function: [`DocumentationCommand.run(self) -> None`](../../../tools/build_documentation.py#L420)
-
-## tools/find_missing_docstrings.py
-
-[Source](../../../tools/find_missing_docstrings.py)
-
-No declarations in this module.
-
+- function: [`DocumentationBuilder._chapter_paths(self) -> set[Path]`](../../../tools/build_documentation.py#L308)
+- function: [`DocumentationBuilder.build_wiki(self, output: Path, *, check: bool) -> None`](../../../tools/build_documentation.py#L322)
+- field: [`DocumentationBuilder.build_wiki.pages: dict[Path, str]`](../../../tools/build_documentation.py#L333)
+- function: [`DocumentationBuilder.validate_links(self) -> None`](../../../tools/build_documentation.py#L381)
+- field: [`DocumentationBuilder.validate_links.missing: list[str]`](../../../tools/build_documentation.py#L382)
+- function: [`DocumentationBuilder.run(self, *, check: bool, wiki: Path \| None, wiki_only: bool=False) -> None`](../../../tools/build_documentation.py#L409)
+- class: [`DocumentationCommand()`](../../../tools/build_documentation.py#L420)
+- function: [`DocumentationCommand.run(self) -> None`](../../../tools/build_documentation.py#L421)
 
 ## tools/release_smoke_probe.py
 
@@ -122,11 +116,3 @@ No declarations in this module.
 - function: [`ReleaseProbe.http(url: HttpUrl) -> HttpReply \| ProbeUnavailable`](../../../tools/release_smoke_probe.py#L187)
 - function: [`ReleaseProbe.routing(self) -> RoutingReply`](../../../tools/release_smoke_probe.py#L205)
 - field: [`ReleaseProbe.routing.deliveries: list[DeliveredJob]`](../../../tools/release_smoke_probe.py#L208)
-
-## tools/swagger_to_endpoint_specs.py
-
-[Source](../../../tools/swagger_to_endpoint_specs.py)
-
-- function: [`schema_from_param(p: dict[str, Any]) -> dict[str, Any]`](../../../tools/swagger_to_endpoint_specs.py#L27)
-- function: [`convert()`](../../../tools/swagger_to_endpoint_specs.py#L49)
-- field: [`convert.out: list[dict[str, Any]]`](../../../tools/swagger_to_endpoint_specs.py#L59)

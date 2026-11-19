@@ -33,8 +33,8 @@ It inherits ingestion/indexing/maintenance construction from
 [analytics_tasks](../../cdm/workers/analytics_tasks.py) before the prefork pool
 starts only when the worker consumes the configured analytics queue. The
 broker-facing `cdm.workers.tasks.run_analytics_job` name, queue, time limits,
-heartbeat and retry behavior are unchanged; operational workers no longer load
-the unrelated training libraries.
+heartbeat and retry behavior belong to the durable analytics lifecycle.
+Operational workers do not load training libraries.
 Default model/threshold values live in
 [app_config.py](../../cdm/config/app_config.py); command-line flags can override
 some training values.
@@ -52,7 +52,7 @@ topic-based centers are requested.
 | `empty` | Published analysis was read successfully but produced no matching results. |
 | `available` | Results are available; this is not a source-corpus freshness guarantee. |
 | `stale` | A graph or perspective snapshot uses a different topic model from the published model observed for this response. Results remain readable. |
-| `unknown` | Legacy lineage, cache ownership, or requested Congress coverage cannot be verified. |
+| `unknown` | Model lineage, cache ownership, or requested Congress coverage cannot be verified. |
 | `unavailable` | A dependency failed or a required published artifact could not be read; HTTP 503 carries this error state instead of an empty success. |
 
 Unbuilt detail requests return 503 with `analysis_state: not_built`; an unknown
@@ -60,8 +60,7 @@ topic within a published model remains 404. Timed-out and failed-shard analytics
 searches are rejected. A missing query embedding is not a successful empty kNN
 search, and no vectors are generated during a read.
 
-Member profiles no longer embed duplicate topic analysis. Clients fetch the
-existing member-topics endpoint separately, so unavailable optional analysis
+Clients fetch member topics separately from the core profile, so unavailable optional analysis
 does not prevent the core profile from loading. The frontend shows failures and
 availability notices instead of silently hiding those sections.
 
@@ -99,7 +98,7 @@ show it without hiding usable fallback results.
 | `largest_topic` | A metasubject copied its largest topic's title. |
 | `override` | An explicit metasubject name override. |
 | `deterministic` | A system label or a duplicate-name fallback combining existing titles. |
-| `unknown` | A stored legacy label has no verifiable origin. |
+| `unknown` | A stored label has no verifiable origin. |
 
 Safe fallback reasons are `disabled`, `unavailable`, `request_failed`,
 `invalid_response`, and `name_collision`. Raw model replies, exception messages,
@@ -113,7 +112,7 @@ errors still fail the build rather than being hidden as a successful fallback.
 
 ## 1. Corpus construction and cached embeddings
 
-[build_topic_documents](../../cdm/utils/topic_modeler.py#L162) converts search hits
+[build_topic_documents](../../cdm/utils/topic_modeler.py#L157) converts search hits
 to `TopicDocument` objects. For each bill it:
 
 - strips HTML tags, unescapes HTML, and collapses whitespace;
@@ -129,9 +128,9 @@ Consequently, a bill without a usable title/summary can still contribute subject
 terms. These inputs are not the complete operative bill text. Natural-language
 embedding input and lemma-preferred keyword input are intentionally different.
 
-[TopicDocument.embedding_input](../../cdm/utils/topic_modeler.py#L105) returns
+[TopicDocument.embedding_input](../../cdm/utils/topic_modeler.py#L100) returns
 `embed_text` when available, otherwise `text`.
-[TopicModeler._embed](../../cdm/utils/topic_modeler.py#L226) uses `CachedEmbedder`
+[TopicModeler._embed](../../cdm/utils/topic_modeler.py#L221) uses `CachedEmbedder`
 when an embedding store is injected; the configured default transformer is
 `all-mpnet-base-v2`.
 
@@ -154,7 +153,7 @@ and a cosine-indexed dense vector. The hash includes `model + "\0" + text`.
 Separate model namespaces can retain independent vectors for the same bill.
 Within one namespace, changed content makes the cached hash stale; a completed
 write replaces that bill's prior vector. Vector dimensions and configured model
-must remain compatible with the index. Legacy unsuffixed caches are not silently
+must remain compatible with the index. Unsuffixed caches are not silently
 relabeled or accepted as model-owned training caches.
 `EmbeddingStore.similar` performs kNN from an existing cached vector, excludes
 the query document, and does not encode missing query bills. Similarity reads use
@@ -171,7 +170,7 @@ for `source_type=bill` with `congress >= --min-congress`; the default is 113.
 This intentionally excludes earlier title-dominated Congresses unless overridden.
 `--max-docs` caps the scanned corpus and is intended for bounded experiments.
 
-[TopicModeler.fit](../../cdm/utils/topic_modeler.py#L248) creates BERTopic with:
+[TopicModeler.fit](../../cdm/utils/topic_modeler.py#L243) creates BERTopic with:
 
 - supplied sentence embeddings;
 - `CountVectorizer` English plus legislative stopwords;
@@ -186,7 +185,7 @@ The `_assignments` adapter uses zero if the library supplies no probability and
 takes the maximum if a per-document vector is supplied. These values should not
 be described as calibrated policy-classification confidence.
 
-[TopicModeler.transform](../../cdm/utils/topic_modeler.py#L282) assigns new documents
+[TopicModeler.transform](../../cdm/utils/topic_modeler.py#L277) assigns new documents
 without refitting. It exists as a callable utility; the batch training script
 performs a fresh `fit`, not online `partial_fit`.
 The transform method encodes directly rather than using `_embed`'s cache path.
@@ -205,7 +204,7 @@ empty response to callers, which use their naming fallback.
 Default URL/model are `http://localhost:11434` / `llama3.1`; this remains
 configuration, not a guarantee of local execution in every deployment.
 
-[TopicModeler.topics_over_time](../../cdm/utils/topic_modeler.py#L291) analyzes
+[TopicModeler.topics_over_time](../../cdm/utils/topic_modeler.py#L286) analyzes
 dated fitted documents, using `--nr-bins` (default 60).
 Missing timestamps are excluded, and no dated documents is an error.
 These BERTopic time bins are not the fixed calendar-quarter bins used for
@@ -239,14 +238,14 @@ coexist. Bulk errors fail the run before publication.
 complete-run manifest and compare-and-swaps the `topic-model:published` pointer.
 [`TopicService.latest_model_version`](../../cdm/backend/services/topic_service.py)
 reads that pointer, not the newest row by `trained_at`. Partial/capped runs and
-legacy generations without a validated manifest cannot become current simply
+generations without a validated manifest cannot become current simply
 because topic rows exist. Counts, assignments, group coverage and dated trend
 totals are validated before publication. Status/ledger success alone is not a
 source-corpus completeness or freshness certificate.
 
 Full runs preflight the destination schema before fetching or fitting the corpus.
 Existing compatible mappings are preserved; only missing fields are added.
-In particular, legacy `label` text fields with a keyword subfield remain intact
+In particular, `label` text fields with a keyword subfield remain intact
 instead of being changed to keyword fields. Incompatible required field mappings
 or unacknowledged schema changes fail explicitly. Previews never initialize or
 modify the publication schema.
@@ -264,7 +263,7 @@ modify the publication schema.
 | Party-topic analysis | `party_topic:{model_version}:{congress}:{topic_id}`; nested `perspective_id` is local to the topic/Congress split. |
 | Member | Bare bioguide IDs appear in sponsor/cosponsor arrays and graph endpoints; canonical summary `mget` uses `member:{bioguide_id}` in `congress-member-read`. |
 | Graph edge | `edge:{graph_version}:{signal}:{member}:{neighbor}`; member and neighbor are bare bioguide IDs; `by_congress` holds nested per-Congress evidence. |
-| Graph pointer | `pointer:{signal}` selects a graph version and records observed Congress scope; modern topic pointers pin `source_model_version`. Legacy pointers may lack both. |
+| Graph pointer | `pointer:{signal}` selects a graph version and records observed Congress scope; topic builds record `source_model_version`. Missing lineage or scope remains unknown. |
 
 Model versions and graph versions are distinct timestamp identifiers.
 Roll-call `legislation_id` joins the canonical bill ID; Congress.gov House votes
@@ -415,11 +414,11 @@ Readers cannot observe a deleted/partially rewritten topic set. Publication is
 atomic per Congress, not a transaction spanning multiple Congresses.
 
 [`PerspectiveRepository.read`](../../cdm/store/perspective_repository.py)
-prefers that canonical snapshot and falls back to untouched legacy `party_topic`
-records only when no snapshot exists. Legacy selection uses the newest returned
+prefers the Congress snapshot and reads standalone `party_topic`
+records only when no snapshot exists. Standalone selection uses the newest returned
 `built_at` version. Rebuilding with selected topics still replaces the Congress's
 entire published set, not just those individual topics. A topic retrain does not
-itself rebuild perspectives. Old legacy rows are not deleted by publication;
+itself rebuild perspectives. Standalone rows are not deleted by publication;
 analysis retention must account separately for current snapshot model lineage.
 
 ## 5. Three separate member-graph signals
@@ -504,11 +503,11 @@ aliases. Both edges and pointers target the same configured physical index;
 an existing write alias cannot silently redirect only the edges elsewhere.
 Extra fields are allowed; this check does not certify analyzer/query equivalence.
 `shared_topics` is explicitly keyword-mapped, not merely retained in `_source`.
-Adding mappings alone does not retroactively index old stored values: approved
+Adding mappings alone does not index stored values: approved
 rebuild/reindex verification is still necessary.
 
 Health reports incompatible mappings as failed and missing pointer Congress
-scope as unknown coverage. An empty legacy graph response without known scope is
+scope as unknown coverage. An empty graph response without known scope is
 `unknown`, not proof of no relationships, including unfiltered requests.
 Observed Congress lists, active edge counts and top-k output are not global
 source-coverage certificates.
@@ -519,45 +518,18 @@ bridge indices have no implemented population path and are not dependencies of
 these builders; their zero counts must not trigger invented bridge rows.
 Retain them pending an explicit schema-scope decision.
 
-<!-- wiki:repository-only:start -->
-The original read-only live audit found 109,691 scoped bill inputs (11 without sponsor
-IDs), 12,621 roll calls and active collaboration/voting/topic edge counts of
-114,566/110,341/125,086. At that audit, voting omitted Congress 114: all 1,824 source
-roll calls then had no linked member positions.
-<!-- wiki:repository-only:end -->
-
 Voteview vote CSVs represent
 ICPSR IDs as integral decimals while member CSVs use integer strings. Typed
-integer IDs now join these representations exactly and reject fractional or
+integer IDs join these representations exactly and reject fractional or
 invalid values; unknown non-President links and mismatched roll-call sets fail
 before replacement output. Presidents remain explicitly excluded.
-<!-- wiki:repository-only:start -->
-Offline reconstruction recovers all 1,322 House and 502 Senate roll calls,
-including 984/310 party-split votes, without requests or live writes.
-<!-- wiki:repository-only:end -->
 
 The source reader refuses records with no linked positions, but accepts valid
 present/not-voting-only records; the scorer still uses only yea/nay.
-Topic source scans reject partial search results. New topic graph generations
-record their exact source-model version; legacy generations without that
+Topic source scans reject partial search results. Topic graph builds
+record their exact source-model version; generations without that
 metadata remain unknown, not retrospectively assigned a model from timestamps
 or labels.
-
-<!-- wiki:repository-only:start -->
-Approved gate two added all eight mapping paths, including `shared_topics`, and
-repaired exactly those 1,824 sources with CAS and per-write receipts. Complete
-12,621-record source verification and a full 1,148,223-document graph backup/
-isolated restore passed; unrelated source versions and all graph bodies,
-versions, pointers and aliases were unchanged at gate two. Existing graph values are not
-retroactively indexed merely by the mapping additions.
-Approved gate three subsequently published only voting:
-`20261103T091601Z-4b9d26b3167844a790a5f1aded61143f`, with **116,450 edges** and
-explicit Congress **113-119** scope, including **48,655** searchable Congress 114
-edges. All old graph bodies/versions remain; only the voting pointer changed.
-The physical graph now contains 1,264,673 documents, including historical
-versions and pointers. Collaboration/topic remain on their original pointers;
-topic lineage is still unknown. No workers have resumed.
-<!-- wiki:repository-only:end -->
 
 [VotingGraphPromotion](../../cdm/graph/promotion.py) verifies the applied repair
 and sealed candidate, stages create-only edges, captures their exact versions,
@@ -565,11 +537,7 @@ and preserves the complete historical graph. `accept()` validates actual
 desktop/narrow Playwright results and decodes each embedded typed API response
 to prove candidate identity, Congress 114 availability and finite voting links.
 `publish()` revalidates the evidence and CAS-switches only the voting pointer;
-rollback restores the exact old raw pointer without removing either edge set.
-<!-- wiki:repository-only:start -->
-Real API/browser acceptance passed both against the pinned candidate and,
-after publication, the ordinary unpinned serving API.
-<!-- wiki:repository-only:end -->
+rollback restores the captured raw pointer without removing either edge set.
 See the [promotion procedure](../OPERATIONS_RUNBOOK.md#sealed-voting-only-graph-promotion).
 
 ### Sealed staging and rollback evidence
@@ -601,13 +569,6 @@ preconditions. Exact original source bodies and raw pointers must be restored;
 Elasticsearch sequence numbers themselves are not reversible. Owned indices
 are removed before an acceptance marker is written, including on failure.
 
-<!-- wiki:repository-only:start -->
-The 2026-11-03 rehearsal captured 12,621 roll calls and exactly 1,824 repair
-candidates (1,322 House, 502 Senate). The isolated candidate has 116,450 voting
-edges over Congresses 113-119, including 48,655 with searchable Congress 114
-evidence. Full cloned source/pointer rollback passed; this is not live
-publication, corpus freshness or global completeness certification.
-<!-- wiki:repository-only:end -->
 See the [commands and artifact contract](../OPERATIONS_RUNBOOK.md#sealed-graph-repair-rehearsal).
 
 ## 6. Rebuilds, retention, and operational checks
@@ -641,34 +602,61 @@ job ledger and third-party model-download cache may still change. Submission
 alone does not start an analytics consumer; respect the managed stack's capacity
 checks rather than enabling an oversized profile.
 
-For the approved local release closeout, a separate operator-owned host process
-uses the existing durable runner and heartbeat, with a monitored 4 GiB RSS stop
-threshold and no additional Celery worker. The full existing Congress 113+
-corpus is frozen with source versions and code/configuration seals; exact
-model/content-hash-matched legacy vectors can be reused in the model-isolated
-cache without modifying the legacy cache. Publication rechecks the frozen scope
-and original pointer before the ordinary validated compare-and-swap boundary.
-These controllers and their receipts are retained operational evidence, not
-another packaged worker or an automatically enabled scheduling path.
-
 [AnalyticsJobs](../../cdm/jobs/analytics.py) submits durable jobs and
 [AnalyticsJobRunner](../../cdm/workers/analytics_runner.py) owns worker execution.
 The [topic](../../cdm/topics/training.py), [graph](../../cdm/graph/job.py) and
 [perspective](../../cdm/perspectives/job.py) builders share that lifecycle.
-SQLite ledger claims, heartbeats, progress and terminal states are authoritative;
-removed PID/JSON status files are not current coordination mechanisms.
+SQLite ledger claims, heartbeats, progress and terminal states are authoritative.
+Analytics builds and cleanup share one execution slot, so pruning cannot race
+training, graph staging or perspective publication through these durable jobs.
 
 [RetirementReporter](../../cdm/topics/retirement.py) inventories published
-references and retention candidates read-only. Unknown legacy references remain
-explicit; this report does not automatically delete model directories, topic
-versions or embedding entries. Any destructive retention remains separately
-gated.
+references read-only. The default preview command never submits jobs or deletes
+anything. [AnalyticsCleanup](../../cdm/topics/cleanup.py) implements the separate
+retention job, automatically submitted after successful non-preview topic,
+graph or perspective builds. Failed builds and dry runs do not schedule it.
+The cleanup job requires its parent to have succeeded and verifies actual
+topic, graph-neighborhood and per-Congress party API versions before deletion.
+
+The policy retains:
+
+- The published topic generation and its predecessor: saved model files,
+  validated run manifests, topics, assignments, time bins and metasubjects.
+- Each graph signal's published edge generation and predecessor.
+- Each Congress's complete current perspective snapshot and one previous
+  complete snapshot, embedded in its atomic publication document.
+- Additional topic generations still referenced by live consumers or recorded
+  predecessor snapshots, and every cache shared by retained topic models.
+  Refresh dependent analytics to release these pins; safety takes precedence
+  over forcing a two-model cap.
+
+Publication records carry one predecessor, not an accumulating history.
+For publications without predecessor metadata, cleanup conservatively keeps the
+nearest older indexed generation; this does not certify it as a complete
+rollback snapshot. Only future atomic perspective publications can preserve a
+complete predecessor snapshot. Newer unpublished artifacts are left untouched
+until they are older than the retained topic window.
+
+Deletion is scoped to explicit derived kinds/versions and exact owned model
+directories. Unknown live lineage, missing retained artifacts/manifests/caches,
+truncated inventories, unsafe paths and changed publication pointers fail the
+job explicitly. Shared embedding caches remain; unneeded owned cache indices
+are removed only after checking their identity and absence of aliases.
+Source indices, latest-record libraries, archives, backups, downloaded embedding
+base models and Ollama models are outside this policy. Elasticsearch segment
+merging reclaims deleted-document space asynchronously; cleanup does not
+force-merge a live index.
+
+Use the Docker-managed [cleanup procedure](../OPERATIONS_RUNBOOK.md#analytics-retention)
+to preview exact targets or explicitly submit a maintenance job. The cleanup
+task does not require an analytics worker or enable recurring acquisition,
+training or general archive-retention schedules.
 
 [GraphHealthChecker.check](../../cdm/graph/health.py) checks published pointer
 presence, edge count, age (warning after nine days), last-build state, and topic
 model drift. Declared mapping compatibility and known Congress scope are
-separate gates. Current pointers support explicit source-model lineage; legacy
-pointers may still lack it. Age or a successful rebuild is not proof of source
+separate gates. Pointers support explicit source-model lineage;
+absent metadata remains unknown. Age or a successful rebuild is not proof of source
 freshness or complete historical coverage.
 
 Operational interpretation:

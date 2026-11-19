@@ -1,5 +1,4 @@
 import os
-import plistlib
 import re
 import shlex
 import shutil
@@ -73,6 +72,101 @@ class ComposeFile(BaseModel):
 
 class TestDeployment:
     root = Path(__file__).resolve().parents[2]
+
+    @pytest.mark.parametrize(
+        ("target", "endpoint"),
+        [
+            ("status", "/api/v1/admin/system-status"),
+            ("health-check", "/ready"),
+            ("worker-monitor", "/api/v1/admin/ingest-progress"),
+        ],
+    )
+    @pytest.mark.parametrize("http_success", [False, True])
+    def test_operator_reports_use_http_and_propagate_failures(
+        self, tmp_path: Path, target: str, endpoint: str, http_success: bool
+    ) -> None:
+        binaries = tmp_path / "bin"
+        binaries.mkdir()
+        trace = tmp_path / "trace"
+        curl = binaries / "curl"
+        curl.write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" >> "$TRACE"\n'
+            + ("exit 0\n" if http_success else "exit 7\n")
+        )
+        curl.chmod(0o755)
+        result = subprocess.run(
+            ["make", "--no-print-directory", target, "API_URL=http://127.0.0.1:8123"],
+            cwd=self.root,
+            env=os.environ
+            | {"PATH": f"{binaries}:{os.environ['PATH']}", "TRACE": str(trace)},
+            capture_output=True, text=True, timeout=10, check=False,
+        )
+        assert result.returncode == (0 if http_success else 2), result.stderr
+        command = trace.read_text().strip()
+        assert command.endswith("http://127.0.0.1:8123" + endpoint)
+        assert "--fail" in command and "--max-time 30" in command
+
+    def test_foreground_worker_does_not_launch_native_monitor(
+        self, tmp_path: Path
+    ) -> None:
+        binaries = tmp_path / "bin"
+        binaries.mkdir()
+        trace = tmp_path / "trace"
+        for name in ("uv", "osascript"):
+            executable = binaries / name
+            executable.write_text(
+                f'#!/bin/sh\nprintf "{name} %s\\n" "$*" >> "$TRACE"\n'
+            )
+            executable.chmod(0o755)
+        uname = binaries / "uname"
+        uname.write_text("#!/bin/sh\nprintf 'Darwin\\n'\n")
+        uname.chmod(0o755)
+        result = subprocess.run(
+            ["make", "--no-print-directory", "worker"],
+            cwd=self.root,
+            env=os.environ
+            | {
+                "PATH": f"{binaries}:{os.environ['PATH']}",
+                "TRACE": str(trace),
+                "MONITOR": "1",
+            },
+            capture_output=True, text=True, timeout=10, check=False,
+        )
+        assert result.returncode == 0, result.stderr
+        commands = trace.read_text().splitlines()
+        assert len(commands) == 1
+        assert commands[0].startswith("uv run celery ")
+        assert "--queues=congress-ingest" in commands[0]
+
+    @pytest.mark.parametrize("ollama_ready", [False, True])
+    def test_stack_checks_ollama_before_and_after_compose_start(
+        self, tmp_path: Path, ollama_ready: bool
+    ) -> None:
+        runner = tmp_path / "runner"
+        trace = tmp_path / "trace"
+        runner.write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" >> "$TRACE"\n'
+            + ("" if ollama_ready else '[ "$1" != ensure-ollama ] || exit 1\n')
+        )
+        runner.chmod(0o755)
+        result = subprocess.run(
+            [
+                "make", "--no-print-directory", "stack-up",
+                f"MAKE={runner}", f"COMPOSE={runner}",
+            ],
+            cwd=self.root,
+            env=os.environ | {"HOME": str(tmp_path), "TRACE": str(trace)},
+            capture_output=True, text=True, timeout=15, check=False,
+        )
+        commands = trace.read_text().splitlines()
+        assert result.returncode == (0 if ollama_ready else 2), result.stderr
+        if ollama_ready:
+            assert commands.index("ensure-ollama") < commands.index("local")
+            assert commands[-1].endswith(
+                "exec -T backend python scripts/ensure_ollama.py --check-only"
+            )
+        else:
+            assert commands[-1] == "ensure-ollama"
 
     def test_only_analytics_worker_installs_analysis_dependencies(self) -> None:
         compose = ComposeFile.model_validate(
@@ -178,8 +272,12 @@ class TestJobRouting:
             celery_index_queue="release-index",
             celery_bulk_queue="release-bulk",
             celery_analytics_queue="release-analytics",
+            celery_maintenance_queue="release-maintenance",
         )
         expected = {
+            JobKind.ANALYTICS_CLEANUP: (
+                TaskName.RUN_ANALYTICS_CLEANUP, queues.celery_maintenance_queue,
+            ),
             JobKind.INGEST: (TaskName.RUN_INGEST, queues.celery_ingest_queue),
             JobKind.INDEX: (TaskName.RUN_INDEX, queues.celery_index_queue),
             JobKind.GOVINFO_BULK: (
@@ -384,7 +482,7 @@ class TestComposeOperations:
         assert "--schedule=data/celerybeat-schedule" in arguments
 
     @pytest.mark.parametrize("registered", [False, True])
-    def test_legacy_registration_blocks_start_without_stopping_any_process(
+    def test_conflicting_registration_blocks_start_without_stopping_any_process(
         self, tmp_path: Path, registered: bool
     ) -> None:
         binaries = tmp_path / "bin"
@@ -410,13 +508,13 @@ class TestComposeOperations:
         )
         assert result.returncode == (1 if registered else 0)
         if registered:
-            assert "Legacy agent" in result.stderr
+            assert "Conflicting agent" in result.stderr
 
     def test_unloaded_agent_plist_also_blocks_start(self, tmp_path: Path) -> None:
         agents = tmp_path / "Library/LaunchAgents"
         agents.mkdir(parents=True)
         plist = agents / "com.congress-tracker.beat.plist"
-        plist.write_text("retained legacy registration")
+        plist.write_text("conflicting registration")
         binaries = tmp_path / "bin"
         binaries.mkdir()
         uname = binaries / "uname"
@@ -436,7 +534,7 @@ class TestComposeOperations:
         )
         assert result.returncode == 1
         assert "com.congress-tracker.beat" in result.stderr
-        assert plist.read_text() == "retained legacy registration"
+        assert plist.read_text() == "conflicting registration"
 
     def test_managed_entry_points_do_not_spawn_or_kill_native_processes(self) -> None:
         makefile = (self.root / "Makefile").read_text()
@@ -551,56 +649,3 @@ class TestComposeOperations:
             else "Docker is not running."
         )
         assert expected in result.stdout
-
-    @pytest.mark.skipif(
-        not Path("/usr/libexec/PlistBuddy").exists(), reason="macOS migration"
-    )
-    @pytest.mark.parametrize("owned", [True, False])
-    def test_documented_retirement_preserves_plists_and_refuses_other_checkouts(
-        self, tmp_path: Path, owned: bool
-    ) -> None:
-        agents = tmp_path / "Library/LaunchAgents"
-        agents.mkdir(parents=True)
-        plist = agents / "com.congress-tracker.ingest-recovery.plist"
-        contents = plistlib.dumps(
-            {"WorkingDirectory": str(tmp_path if owned else self.root)}
-        )
-        plist.write_bytes(contents)
-        calls = tmp_path / "calls"
-        launchctl = tmp_path / "launchctl"
-        launchctl.write_text(
-            '#!/bin/sh\nprintf \'%s\\n\' "$*" >> "$OPERATIONS_CALLS"\n'
-            'case "$*" in\n'
-            '"print "*"/com.congress-tracker.ingest-recovery") exit 0 ;;\n'
-            '"bootout "*"/com.congress-tracker.ingest-recovery") exit 0 ;;\n'
-            '"print "*) exit 1 ;;\n*) exit 99 ;;\nesac\n'
-        )
-        launchctl.chmod(0o755)
-        runbook = (self.root / "documentation/OPERATIONS_RUNBOOK.md").read_text()
-        match = re.search(
-            r"```sh\n(# Retire legacy agents.*?)\n```", runbook, re.DOTALL
-        )
-        assert match is not None
-        result = subprocess.run(
-            ["sh", "-c", match.group(1)],
-            cwd=tmp_path,
-            env=os.environ
-            | {
-                "HOME": str(tmp_path),
-                "PATH": f"{tmp_path}:{os.environ['PATH']}",
-                "OPERATIONS_CALLS": str(calls),
-            },
-            text=True,
-            capture_output=True,
-            check=False,
-            timeout=10,
-        )
-        assert result.returncode == (0 if owned else 1), result.stderr
-        if owned:
-            assert not plist.exists()
-            backups = list(agents.glob(f"retired-congress-tracker-*/{plist.name}"))
-            assert len(backups) == 1 and backups[0].read_bytes() == contents
-            assert calls.read_text().count("bootout ") == 1
-        else:
-            assert plist.read_bytes() == contents
-            assert not calls.exists()

@@ -94,7 +94,7 @@ class SQLiteRecordArchive:
     @staticmethod
     def _record_id(record: JsonObject) -> str:
         identity = record.get("id") or record.get("url")
-        # Legacy bill lists reuse the same canonical key for distinct entries.
+        # Bill lists can reuse a canonical key for distinct entries.
         if (
             record.get("introduced_date")
             and isinstance(identity, str)

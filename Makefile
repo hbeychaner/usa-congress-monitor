@@ -4,7 +4,8 @@
 .PHONY: up down restart stack-status env-init es-api-key start services stop local local-stop local-down stack-up stack-down stack-logs contracts-sync deps uv-sync uv-test worker worker-index worker-maintenance worker-monitor beat ingest-service-install ingest-service-uninstall ingest-service-status status health-check backend-api frontend-dev help
 
 COMPOSE := docker compose
-.PHONY: stack-capacity
+API_URL ?= http://localhost:8000
+.PHONY: stack-capacity ensure-ollama
 STACK_PROFILES ?= operations
 export COMPOSE_PROFILES = $(STACK_PROFILES)
 
@@ -35,10 +36,12 @@ local: env-init
 	@echo "OpenSearch stack started."
 
 status:
-	@uv run python scripts/job_status.py
+	@curl --fail --show-error --silent --max-time 30 "$(API_URL)/api/v1/admin/system-status"
+	@printf '\n'
 
 health-check:
-	@uv run python scripts/health_check.py
+	@curl --fail --show-error --silent --max-time 30 "$(API_URL)/ready"
+	@printf '\n'
 
 local-down: require-docker
 	@echo "Stopping local OpenSearch stack..."
@@ -55,9 +58,14 @@ stack-up:
 	@echo "Starting Compose stack with profiles: $(STACK_PROFILES)"
 	@$(MAKE) env-init ensure-docker
 	@$(MAKE) stack-capacity
+	@$(MAKE) ensure-ollama
 	@$(MAKE) local
 	@$(COMPOSE) -f docker-compose.fullstack.yml up -d --build --wait --wait-timeout 180 --renew-anon-volumes --remove-orphans
+	@$(COMPOSE) -f docker-compose.fullstack.yml exec -T backend python scripts/ensure_ollama.py --check-only
 	@echo "Full stack started: frontend=http://localhost:5173 backend=http://localhost:8000"
+
+ensure-ollama:
+	@uv run --frozen python scripts/ensure_ollama.py
 
 stack-capacity: require-docker
 	@uv run --frozen python scripts/check_stack_capacity.py --profiles "$(STACK_PROFILES)"
@@ -114,15 +122,6 @@ uv-test:
 	uv run pytest -q
 
 worker:
-	@if [ "$${MONITOR:-1}" = "1" ]; then \
-		if [ "$$(uname)" = "Darwin" ] && command -v osascript >/dev/null 2>&1; then \
-			osascript -e 'tell application "Terminal" to do script "cd \"$(CURDIR)\" && uv run python scripts/monitor_ingest_progress.py"'; \
-			echo "Opened progress monitor in a new Terminal window (set MONITOR=0 to disable)."; \
-		else \
-			echo "Run this in a second terminal for aggregate progress:"; \
-			echo "  uv run python scripts/monitor_ingest_progress.py"; \
-		fi; \
-	fi
 	uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=ingest@%h --pool=prefork --concurrency=8 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-ingest
 
 worker-index:
@@ -132,13 +131,14 @@ worker-maintenance:
 	uv run celery -A cdm.workers.celery_app:celery_app worker --hostname=maintenance@%h --pool=prefork --concurrency=1 --max-tasks-per-child=50 --loglevel=INFO --queues=congress-maintenance
 
 worker-monitor:
-	uv run python scripts/monitor_ingest_progress.py
+	@curl --fail --show-error --silent --max-time 30 "$(API_URL)/api/v1/admin/ingest-progress"
+	@printf '\n'
 
 beat:
 	uv run celery -A cdm.workers.celery_app:celery_app beat --loglevel=INFO
 
 ingest-service-install ingest-service-uninstall ingest-service-status:
-	@printf 'Native agents are retired. See documentation/OPERATIONS_RUNBOOK.md for migration; use make up and make stack-status afterward.\n' >&2
+	@printf 'Managed services use Compose. Use make up and make stack-status; see documentation/OPERATIONS_RUNBOOK.md.\n' >&2
 	@exit 1
 
 backend-api:
@@ -154,18 +154,19 @@ help:
 	@printf "  local       - Start local infrastructure via Docker Compose v2\n"
 	@printf "  local-stop  - Stop containers while preserving Docker volumes\n"
 	@printf "  local-down  - Stop containers and remove Docker volumes\n"
-	@printf "  deps        - Install dependencies via pip (legacy)\n"
+	@printf "  deps        - Install requirements via pip\n"
 	@printf "  uv-sync     - Install deps via uv into .venv (reads pyproject.toml)\n"
 	@printf "  uv-test     - Run pytest via uv run\n"
-	@printf "  worker      - Start Celery worker and auto-open aggregate ingest monitor (MONITOR=0 disables)\n"
-	@printf "  worker-monitor - Run aggregate ingest progress monitor\n"
+	@printf "  worker      - Start a foreground ingestion worker (isolated development only)\n"
+	@printf "  worker-monitor - Fetch current ingest progress from the API\n"
 	@printf "  beat        - Start the daily Celery scheduler\n"
-	@printf "  status      - Show durable job states and ingest coverage\n"
-	@printf "  health-check- Check SQLite, Celery, Redis, OpenSearch, backlog, and failures\n"
+	@printf "  status      - Fetch indexed counts and durable job summary from the API\n"
+	@printf "  health-check- Check API/search readiness (not full-system health)\n"
 	@printf "  backend-api - Start FastAPI backend (reload)\n"
 	@printf "  frontend-dev- Install frontend deps and run Vite dev server\n"
 	@printf "  stack-up    - Start full containerized stack (infra, api, worker, beat, frontend)\n"
 	@printf "  stack-down  - Stop full containerized stack\n"
 	@printf "  stack-logs  - Tail logs for full containerized stack\n"
 	@printf "  stack-capacity - Read-only memory/disk admission check for STACK_PROFILES\n"
+	@printf "  ensure-ollama - Start/reuse native Ollama and verify the configured label model\n"
 	@printf "  contracts-sync - Regenerate frontend API types from backend OpenAPI\n"

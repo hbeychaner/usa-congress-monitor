@@ -1,13 +1,11 @@
-# Congress Tracker — OpenSearch Index Mappings
-# Revised: 2026-06-06
+# Congress Tracker — Elasticsearch Index Mappings
 #
 # Conventions
 # ───────────
 #   id format    : "{resource}:{key_parts}"  e.g. "bill:119:hr:1"
 #   date format  : strict_date_optional_time||yyyy-MM-dd
 #                  (handles "2025-01-01T00:00:00Z" and bare "2025-01-02")
-#   dynamic      : false  — unmapped fields silently dropped;
-#                  flip to "strict" once schema stabilises
+#   dynamic      : false — unmapped fields remain in _source, not indexed
 #   text+keyword : searchable text fields carry .keyword and .lemma sub-fields.
 #                  For every text field with a .lemma multi-field, the loader
 #                  (cdm.store.index_manager.load_definitions) injects a sibling
@@ -16,7 +14,7 @@
 #                  free text (titles, summaries, full text, purposes, topics)
 #                  used by semantic search and topic modeling. Names, committee
 #                  names, and formulaic action strings are keyword-only.#
-# Index consolidations (20 raw resources → 15 primary + 2 bridge indices)
+# Resource projections
 # ─────────────────────────────────────────────────────────────────────────
 #   legislation         ← bill + law          (source_type: "bill" | "law")
 #   communication       ← house_communication + senate_communication
@@ -26,25 +24,21 @@
 #   summaries           → denormalised as nested legislation.summaries[]
 #                         join key: {congress}:{bill_type_lower}:{number}
 #
-# Bridge / join indices (derived; populated after item-level fetches)
+# Declared bridge / join indices (no implemented population path)
 # ─────────────────────────────────────────────────────────────────────
 #   sponsorship   links member ↔ legislation (sponsor + cosponsor rows)
-#                 populated from: legislation item fetch
-#                 key query: "all bills for member X" / "all sponsors of bill Y"
-#                 enables: co-sponsorship network graphs
+#                 graph builders read legislation sponsor/cosponsor arrays
 #
 #   vote_position links member ↔ house_vote with Yea/Nay/Present/Not Voting
-#                 populated from: house_vote.source_data_url (clerk XML)
-#                 key query: "voting record of member X" / "who voted Yea on HR 1"
-#                 enables: party-unity scores, cross-aisle vote analysis
+#                 voting graphs read roll-call voter arrays
 #
 #   district stores imported 119th-Congress district boundaries for map reads.
 #
-# Indices: 17 total (15 primary + 2 bridge)
+# Indices: 21 total
 #   legislation, amendment, communication, committee, committee_meeting,
 #   committee_print, committee_report, congressional_record, hearing,
-#   house_vote, member, nomination, treaty, congress_ref, house_requirement,
-#   sponsorship, vote_position
+#   house_vote, member, district, nomination, treaty, crsreport, congress_ref,
+#   house_requirement, sponsorship, vote_position, rollcall, analysis_graph
 #
 # Usage: PUT /{index_name}  with the block below as the request body.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -966,6 +960,7 @@ analysis_graph:
       graph_version:  { type: keyword }
       built_at:       { type: date }
       source_model_version: { type: keyword }
+      previous:       { type: object, enabled: false }
       congresses:     { type: integer }
       member:         { type: keyword }            # bioguide id
       neighbor:       { type: keyword }

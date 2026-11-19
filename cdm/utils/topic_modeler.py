@@ -1,13 +1,8 @@
 """Batch BERTopic modeling over legislation titles and summaries.
 
-Discovery-phase tooling per planning/TOPIC_ANALYSIS_IMPLEMENTATION_PLAN.md:
-the model informs taxonomy work and drift detection; it does not produce
-canonical production labels. The corpus is bounded (bills back to 1949 with a
-small daily trickle), so a full batch fit plus ``topics_over_time`` gives far
-better topics than online ``partial_fit`` (which forces a fixed cluster count
-and loses HDBSCAN outlier handling). New documents are assigned with
-``transform``; periodic refits (or ``merge_models``) pick up genuinely new
-topics.
+Fits corpus embeddings and lemma-preferred topic representations, derives
+keywords and time bins, and assigns documents with ``transform``.
+Validated publication is owned by the durable topic-training lifecycle.
 """
 
 from __future__ import annotations

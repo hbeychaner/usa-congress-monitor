@@ -93,6 +93,7 @@ class JobRecoveryService:
         JobKind.TOPIC_TRAINING.value,
         JobKind.MEMBER_GRAPH.value,
         JobKind.PERSPECTIVES.value,
+        JobKind.ANALYTICS_CLEANUP.value,
     )
     # Index jobs are re-sent only when the broker queue is nearly empty,
     # topping it up to the high watermark.

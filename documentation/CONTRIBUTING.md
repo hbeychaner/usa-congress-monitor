@@ -128,12 +128,10 @@ The ignored `documentation/wiki` directory contains:
 
 The wiki publishes current implementation and operating reference only: the
 documentation home, architecture, runbook, maintenance guide, and chapters under
-`guides/` and `reference/`. Root-level plans, incident reports and other internal
-records are not published. Keep their repository copies for provenance.
-Repository-only historical sections inside an otherwise current chapter use
-paired `<!-- wiki:repository-only:start -->` and
-`<!-- wiki:repository-only:end -->` markers on their own lines. The builder
-omits those sections from the wiki and rejects unmatched or nested markers.
+`guides/` and `reference/`. Keep these chapters focused on current architecture,
+contracts and operating procedures. Keep implementation plans, incident reports
+and private working notes outside version control; the changelog owns release
+history. Local-only records are not documentation inputs or publication sources.
 
 Internal chapter links become wiki page links. Source, diagram, mapping,
 upstream snapshot and other non-wiki links become absolute GitHub repository
@@ -177,10 +175,11 @@ deployment token or write-enabled CI action.
 
 When changing a subsystem, update its narrative chapter and source reference
 together. Update the root README and changelog for user-visible documentation
-changes. Keep dated incident reports clearly historical.
+changes. Use present-tense contracts and operating procedures. Preserve release history in the
+changelog, not in architecture chapters or the user README.
 
 Before asserting that a field is indexed, inspect the mapping **and** the
 projection/writer. Before asserting a relationship, check the actual identifier
 construction and query. Before asserting a retry guarantee, check the failure
-path and the checkpoint/acknowledgement order. Do not copy stale claims from
-upstream snapshots or old planning documents into current architecture pages.
+path and the checkpoint/acknowledgement order. Upstream snapshots describe the
+source API; inspect application code to establish application behavior.

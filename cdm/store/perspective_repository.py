@@ -27,6 +27,7 @@ class PerspectivePublication(BaseModel):
     model_version: str = Field(min_length=1)
     built_at: AwareDatetime
     results: list[TopicPerspectives]
+    previous: PerspectivePublication | None = None
 
     @staticmethod
     def document_id(congress: int) -> str:
@@ -184,6 +185,12 @@ class PerspectiveRepository:
         before = expected if expected is not None else self.snapshot(congress)
         if before.congress != congress:
             raise ValueError("Cannot publish against another Congress's snapshot")
+        if before.publication is not None:
+            publication = publication.model_copy(
+                update={
+                    "previous": before.publication.model_copy(update={"previous": None})
+                }
+            )
         if before.publication is None:
             self.client.index(
                 index=self.index,

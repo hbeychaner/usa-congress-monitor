@@ -131,16 +131,15 @@ class TestDocumentationBuilder:
         with pytest.raises(ValueError, match="overwrite"):
             builder.build_wiki(docs, check=False)
 
-    def test_wiki_publishes_current_reference_not_plans_or_incidents(
+    def test_wiki_publishes_only_documented_chapters(
         self, tmp_path: Path
     ) -> None:
         docs = tmp_path / "documentation"
         docs.mkdir()
         for name in (
             "README.md",
-            "IMPLEMENTATION_PLAN.md",
-            "FUTURE_PLANS.md",
-            "FAILURE_RECONCILIATION_2026-09-07.md",
+            "LOCAL_NOTES.md",
+            "PRIVATE_REPORT.md",
         ):
             (docs / name).write_text(f"# {name}\n", encoding="utf-8")
         reference = docs / "reference"
@@ -154,8 +153,24 @@ class TestDocumentationBuilder:
             "_Sidebar.md",
             "_Footer.md",
         }
-        assert "IMPLEMENTATION_PLAN" not in (wiki / "_Sidebar.md").read_text()
-        assert (docs / "IMPLEMENTATION_PLAN.md").exists()
+        assert "LOCAL_NOTES" not in (wiki / "_Sidebar.md").read_text()
+        assert (docs / "LOCAL_NOTES.md").exists()
+
+    def test_local_reports_are_not_link_validation_inputs(
+        self, tmp_path: Path
+    ) -> None:
+        (tmp_path / "README.md").write_text("# Repository\n")
+        docs = tmp_path / "documentation"
+        docs.mkdir()
+        chapter = docs / "README.md"
+        chapter.write_text("# Documentation\n")
+        report = docs / "PRIVATE_REPORT.md"
+        report.write_text("[unavailable](private-local-evidence.json)\n")
+        builder = self.builder(tmp_path)
+        builder.validate_links()
+        chapter.write_text("[missing](missing-current-reference.md)\n")
+        with pytest.raises(ValueError, match="missing-current-reference.md"):
+            builder.validate_links()
 
     def test_wiki_omits_repository_only_history_without_changing_source(
         self, tmp_path: Path

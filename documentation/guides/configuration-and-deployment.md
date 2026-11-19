@@ -72,6 +72,7 @@ and `ApiConfig.cors_origins_csv` uses `CORS_ORIGINS`.
 | `embedding` | `EMBEDDING_MODEL`, `EMBEDDING_BATCH_DOCS` | Vector model identity and batching |
 | `metasubject` | `METASUBJECT_TARGET_GROUPS`, matching/confidence settings | Group construction and identity carry-over |
 | `perspective` | `PERSPECTIVE_*` | Evidence thresholds, exclusions, stability and display rules |
+| `analytics_retention` | `ANALYTICS_MODEL_ROOT`, `ANALYTICS_LIVE_API_URL`, `ANALYTICS_CLEANUP_BATCH`, `ANALYTICS_CLEANUP_TIMEOUT`, `ANALYTICS_GENERATION_LIMIT` | Owned model root (`models/topics`), worker-reachable API (`http://backend:8000/api/v1`), deletion batches (500), request timeout (300 seconds) and exact-inventory bound (1,000 generations per scope); match the root when using training's `--model-dir` |
 | `ollama` | `OLLAMA_URL`, `OLLAMA_MODEL`, timeouts and temperature | Optional local labeling/summarization |
 | `openai` | `OPENAI_API_KEY` | Declared optional credential; not a replacement for the Ollama implementation |
 | `api` | `CORS_ORIGINS`, `LOG_LEVEL` | Browser origins and application logging |
@@ -89,30 +90,52 @@ Operational task discovery uses `OperationsContainer`, without importing
 training/graph/perspective implementations. Analytics-consuming workers register
 their implementation module through Celery's loader during `worker_init`, before
 the pool is created. All Python imports remain at module level; nothing is
-imported lazily inside a job. The serialized analytics task name, routing and
-time limits remain unchanged.
-The worker command, concurrency, child-rotation count and memory allocation
-are unchanged. Do not move this warmup into execution children or increase
+imported lazily inside a job. Analytics task names, routing and time limits
+follow the durable task contract; deployment config owns worker concurrency,
+child rotation and memory allocation. Do not move warmup into execution children or increase
 worker limits to hide duplicated model memory.
 
 For **all declared field types**, see the generated
 [config reference](../reference/symbols/config.md). It is a static declaration
-reference, not a dump of effective values or secrets. Older snippets referring
-to a top-level `settings` module are obsolete. Trace the actual constructor
-and composition root when changing a configuration value.
+reference, not a dump of effective values or secrets. Trace the typed
+configuration section, constructor and composition root when changing a value.
 
 ## Local runtime choices
 
 ### Managed stack: Compose
 
+Startup includes native Ollama for topic/group labels. Install Ollama and pull
+`OLLAMA_MODEL` once (default `ollama pull llama3.1`). `make ensure-ollama`
+reuses a responding server; otherwise it starts the default local endpoint
+through Homebrew's Ollama service on macOS, the installed Ollama app when no
+Homebrew formula exists, or an already configured `systemctl --user` Ollama
+service on Linux. Missing installations/service registrations fail explicitly;
+install/configure them before retrying. No standalone background shell process
+or competing Docker Ollama container is created.
+
+`make up` checks native readiness/model installation after Docker capacity
+admission and before starting Compose, then checks the effective container
+endpoint/model from the backend before printing success. Each HTTP probe is
+bounded by `OLLAMA_PROBE_TIMEOUT_SECS`; the post-start readiness wait uses
+`OLLAMA_TIMEOUT_SECS`. A failed final check leaves containers running for
+diagnosis, but the command exits nonzero. An unreachable custom/remote URL is
+never replaced with a different local server. Remote endpoints must be started
+by their own operator. Set `OLLAMA_URL` for the host-side check and, if needed,
+`CONTAINER_OLLAMA_URL` for Docker routing to the same server.
+
+Missing models stop startup with an explicit `ollama pull` instruction rather
+than an implicit multi-gigabyte download. The checks do not load a model for
+inference; budget native model memory in addition to the Docker VM before
+running analytics. Docker admission does not account for native model weights.
+`make down` leaves the potentially shared native service running. Starting the
+server does not retroactively relabel published topics: use the existing
+analytics publication workflow and inspect label provenance/fallback reasons.
+
 All managed Python services share `ledger-data:/var/lib/congress` and
 `JOB_DB_PATH=/var/lib/congress/jobs.sqlite3`. With project name
 `congresstracker`, the volume is `congresstracker_ledger-data`.
-Native tools retain their separate configured path; the old checkout database
-is not the live managed ledger. Do not mix the two.
-Before upgrading an existing deployment, stop writers and migrate a verified,
-consistent Docker-side backup into the volume; otherwise a new empty volume
-would appear to lose the old job history. See the
+Host-native tools must not open the managed live ledger. Use Docker-side
+readers and consistent backup/restore procedures. See the
 [ledger boundary and restoration procedure](../OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary).
 Normal shutdown preserves the volume. Do not remove it with `down --volumes`.
 
@@ -124,10 +147,9 @@ make down
 ```
 
 `make up`, `make start`, `make services`, and `make stack-up` use the same
-Compose path. Native launchd installation/background-process management is
-retired. [Migrate existing agents explicitly](../OPERATIONS_RUNBOOK.md#retiring-native-agents)
-before starting Compose; startup refuses old registrations rather than stopping
-them or silently creating duplicate Beat/worker processes.
+Compose path. Startup refuses conflicting service registrations without stopping
+them. Keep one process owner per role and inspect any conflict before retrying;
+see [restart procedures](../OPERATIONS_RUNBOOK.md#restart).
 
 The default `STACK_PROFILES=operations` is deliberately controlled:
 
@@ -185,8 +207,8 @@ The check never resizes Docker, lowers heap, deletes state or stops containers.
 `ANALYTICS_CPUS` and `REDIS_MEMORY` are explicit overrides; do not lower search
 heap or discard retained state just to force the stack into memory.
 
-[stack.sh](../../scripts/stack.sh) is only a compatibility delegator and
-read-only legacy-registration guard. No shell helper spawns detached processes
+[stack.sh](../../scripts/stack.sh) delegates stack commands and performs
+read-only registration checks. No shell helper spawns detached processes
 or stops processes by a command-name match. Compose owns application containers;
 Docker Desktop must be running on macOS. Restart policies do not wake a sleeping
 Mac, start the Docker engine, or restart a merely unhealthy-but-running process.
@@ -205,6 +227,34 @@ make beat
 Run each in its own terminal/process manager. Inspect the
 [Makefile](../../Makefile) for queue, pool, concurrency and worker names.
 Configured Celery concurrency is not the same as the active-ingest-job bound.
+
+## Supported operational entry points
+
+Keep the small `scripts/` directory: these are operator-facing adapters around
+application services. Start with Make and
+the admin UI; use a script only for the corresponding explicit operation.
+Run ledger-writing/submission commands inside the owning Docker environment
+for the managed deployment.
+
+| Purpose | Maintained entry points |
+|---|---|
+| Local setup and startup | [`bootstrap_env.py`](../../scripts/bootstrap_env.py), [`check_stack_capacity.py`](../../scripts/check_stack_capacity.py), [`ensure_ollama.py`](../../scripts/ensure_ollama.py), [`stack.sh`](../../scripts/stack.sh) (registration checks and command delegation) |
+| Search provisioning and staging | [`create_indices.py`](../../scripts/create_indices.py) |
+| Legislative acquisition | [`submit_ingest.py`](../../scripts/submit_ingest.py) (one bounded scope), [`queue_full_ingest.py`](../../scripts/queue_full_ingest.py) (planned ranges), [`queue_govinfo_bulk.py`](../../scripts/queue_govinfo_bulk.py), [`report_govinfo_coverage.py`](../../scripts/report_govinfo_coverage.py) |
+| Specialized source imports | [`ingest_votes.py`](../../scripts/ingest_votes.py), [`ingest_district_boundaries.py`](../../scripts/ingest_district_boundaries.py); district import remains necessary for a fresh map deployment |
+| Analytics and labels | [`train_topic_model.py`](../../scripts/train_topic_model.py), [`build_member_graph.py`](../../scripts/build_member_graph.py), [`build_perspectives.py`](../../scripts/build_perspectives.py), [`set_metasubject_override.py`](../../scripts/set_metasubject_override.py) |
+| Guarded replay, repair and rollback | [`reconcile_govinfo_bulk.py`](../../scripts/reconcile_govinfo_bulk.py), [`stage_graph_repair.py`](../../scripts/stage_graph_repair.py), [`repair_graph_sources.py`](../../scripts/repair_graph_sources.py), [`promote_voting_graph.py`](../../scripts/promote_voting_graph.py), [`preview_analytics_retirement.py`](../../scripts/preview_analytics_retirement.py); infrequent recovery use does not make these disposable |
+| API contracts | [`export_openapi.py`](../../scripts/export_openapi.py), invoked by the [frontend contract generator](../../frontend/app/scripts/generate-contracts.mjs) |
+| Documentation and CI | [`build_documentation.py`](../../tools/build_documentation.py), its [frontend reader](../../tools/build_frontend_reference.mjs), and [`release_smoke_probe.py`](../../tools/release_smoke_probe.py) (test-only image/worker verification) |
+| GCP image publishing | [`deploy/gcp/build_push.sh`](../../deploy/gcp/build_push.sh) |
+
+`make status` prints the API's system/job summary; `make worker-monitor`
+prints one ingestion-progress JSON snapshot, without launching a terminal or
+opening SQLite on the host. Repeat deliberately or use the admin UI for live
+monitoring. `make health-check` checks API/search readiness only. All three
+propagate HTTP/connection errors, use a 30-second timeout, and accept `API_URL`.
+`make worker` runs a foreground ingestion worker without starting another
+terminal or monitor.
 
 ### Full-stack development Compose
 
@@ -235,16 +285,12 @@ retained archives. Docker Desktop may return freed sparse-disk space to macOS
 after a short delay; verify actual host free disk before resuming guarded jobs.
 Changing a build target does not shrink an existing image or replace a running
 container. Build and verify a replacement separately before a planned cutover.
-An isolated operational-image verification measured **2.03 GB**, versus the
-previous **11.30 GB** analytics-bearing operations image (about **82% smaller**).
-Operational task imports and actual NLP inference passed without Torch, NVIDIA,
-BERTopic or sentence-transformers installed, with networking disabled and a
-1 GiB/1 CPU limit. These are logical image sizes; shared layers are
-not additional disk usage for every container. The verified build did not
-recreate the live worker or remove its in-use image.
+Operational images exclude Torch, NVIDIA, BERTopic and sentence-transformers.
+Logical image sizes and shared-layer disk usage are different measurements;
+shared layers are not additional disk usage for every container.
 
 All Python services share the checkout at `/workspace` and at its original
-absolute path. This preserves existing absolute archive paths in queued native
+absolute path. This resolves absolute archive paths in queued
 job payloads without rewriting source data. Keep running Compose from that same
 checkout; external archive locations need explicit matching mounts. Beat keeps
 its schedule under `data/`. Routine shutdown preserves named data volumes;
@@ -386,8 +432,8 @@ on the worker VM. Treat file-backed admin controls as a deployment limitation,
 not a completed distributed-control plane.
 
 The application uses `elasticsearch-py` 9 and the supplied images run
-Elasticsearch. The historical `opensearch` module/mapping names are **not a
-compatibility promise for an OpenSearch server**.
+Elasticsearch. Server compatibility is defined by this client and runtime,
+not inferred from module or mapping filenames.
 
 Vertex AI permissions do not implement a Vertex client: labels/summaries still
 use the configured Ollama path until an explicit alternative is implemented.
@@ -402,8 +448,8 @@ make stack-status
 curl --fail http://127.0.0.1:8000/ready
 ```
 
-Do not run host-native `make status` or `make health-check` against the
-Docker-managed live ledger; use its owning container for ledger inspection.
+`make status` and `make health-check` use the serving API.
+Use the owning container for explicit ledger inspection.
 
 Inspect source coverage, active worker queues, archive retention, Redis pending
 entries and the exact search aliases. Use the

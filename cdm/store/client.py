@@ -1,4 +1,4 @@
-"""Connection helpers for the local or hosted OpenSearch-compatible cluster."""
+"""Connection helpers for local or hosted Elasticsearch."""
 
 from __future__ import annotations
 
@@ -38,9 +38,9 @@ class ElasticClientFactory:
         url = url or self.config.es_local_url
         api_key = api_key or self.config.es_local_api_key
         if not url:
-            raise SearchConfigurationError("OpenSearch URL is not configured")
+            raise SearchConfigurationError("Elasticsearch URL is not configured")
         if not api_key:
-            raise SearchConfigurationError("OpenSearch API key is not configured")
+            raise SearchConfigurationError("Elasticsearch API key is not configured")
         try:
             return Elasticsearch(url, api_key=api_key)
         except ValueError as exc:

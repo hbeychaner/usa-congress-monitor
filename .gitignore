@@ -62,5 +62,26 @@ models/
 
 scripts/preview_topic_labels.py
 
+# Local-only operational utilities.
+/scripts/backfill_bill_member_links.py
+/scripts/backfill_committee_activities.py
+/scripts/health_check.py
+/scripts/job_status.py
+/scripts/monitor_ingest_progress.py
+/scripts/relemmatize_indices.py
+/scripts/reparse_govinfo.py
+/scripts/resume_queued_jobs.py
+/tools/find_missing_docstrings.py
+/tools/swagger_to_endpoint_specs.py
+/elastic-start-local/start.sh
+/elastic-start-local/stop.sh
+/elastic-start-local/uninstall.sh
+/tests/unit/test_health_check.py
+
+# Local planning and incident records are not repository documentation.
+/documentation/IMPLEMENTATION_PLAN.md
+/documentation/FAILURE_RECONCILIATION_2026-09-07.md
+/frontend/WEB_APP_IMPLEMENTATION_PLAN.md
+
 # Generated publication copy; repository documentation remains canonical.
 /documentation/wiki/

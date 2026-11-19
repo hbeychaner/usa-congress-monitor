@@ -64,3 +64,15 @@ No declarations in this module.
 - function: [`DockerCapacityProbe.__init__(self, root: Path, policy: LocalCapacityPolicy) -> None`](../../../cdm/deployment/capacity.py#L161)
 - function: [`DockerCapacityProbe._run(self, arguments: list[str], cwd: Path) -> str`](../../../cdm/deployment/capacity.py#L166)
 - function: [`DockerCapacityProbe.inspect(self, profiles: list[str]) -> CapacityReport`](../../../cdm/deployment/capacity.py#L177)
+
+## cdm/deployment/ollama.py
+
+[Source](../../../cdm/deployment/ollama.py)
+
+- class: [`ModelRequest(BaseModel)`](../../../cdm/deployment/ollama.py#L17)
+- field: [`ModelRequest.model: str`](../../../cdm/deployment/ollama.py#L18)
+- class: [`OllamaStartup()`](../../../cdm/deployment/ollama.py#L21)
+- function: [`OllamaStartup.__init__(self, config: OllamaConfig, session: requests.Session) -> None`](../../../cdm/deployment/ollama.py#L22)
+- function: [`OllamaStartup._available(self) -> bool`](../../../cdm/deployment/ollama.py#L26)
+- function: [`OllamaStartup.ensure(self, *, check_only: bool=False) -> None`](../../../cdm/deployment/ollama.py#L37)
+- function: [`OllamaStartup._start(self) -> None`](../../../cdm/deployment/ollama.py#L59)

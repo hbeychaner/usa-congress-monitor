@@ -22,7 +22,7 @@ navigation alongside this operational guide.
 ## Reconcile existing data before historical acquisition
 
 Historical gap filling starts with indexed identity presence, not the age or
-absence of a newer hydration assessment. An existing bill can contain useful
+absence of a hydration assessment. An existing bill can contain useful
 data without certified collection completeness. Do not re-download or replay
 that bill merely to replace an unknown assessment with a complete one.
 Full detail and full text wherever available remain required. Identity presence
@@ -31,8 +31,8 @@ document. Field enrichment and freshness are separate, bounded phases of the sam
 coverage goal.
 
 1. Establish the intended cluster, physical indices and read/write aliases.
-   Compare canonical bill identities across serving and relevant legacy
-   representations, not just document counts or one source-type filter.
+   Compare canonical bill identities across bill and law projections,
+   not just document counts or one source-type filter.
    Normalize archive introduced-date suffixes using the normal indexer's
    four-part bill identity; keep original payloads and variants intact.
    An amendment or committee report with a bill-like identifier is not the
@@ -86,13 +86,13 @@ for a separately approved repair of existing fields.
 Compare actual indexed fields with retained item/detail/text payloads before
 planning additional acquisition. An archived identity already being indexed does
 not prove that every archived field was incorporated. Conversely, an absent
-modern assessment does not prove that the content is missing.
+versioned assessment does not prove that the content is missing.
 
 For each bill and required collection/text version:
 
 1. Reuse content already indexed. Inspect nonblank stored `full_text`, actual
    expanded records and text-version formats/URLs, not only lemma existence,
-   nested-row totals or legacy `hydration_status` labels.
+   nested-row totals or unversioned `hydration_status` labels.
 2. Compare retained central archives, record-library variants and staged recovery
    archives against those fields. Preserve richer indexed values and flag
    conflicting variants for semantic reconciliation; exact-value differences
@@ -173,7 +173,7 @@ Published text uses `full_text_version_code` values such as
 `public-law-95-367` or `private-law-95-138`. The existing bill-detail API exposes
 both text and code; the Text tab labels these **Enacted public/private law text**.
 USLM plain text is rendered literally, without HTML/entity reinterpretation.
-Ordinary bill-version labels and legacy text presentation are unchanged.
+Ordinary bill versions use their source-listed version labels.
 
 Provenance uses `govinfo:statute` in `source_metadata`, with the original PDF
 package/reference, official volume XML URL, XML component and volume SHA-256,
@@ -210,8 +210,8 @@ fresh serving projection → owned shadow → live canary → conditional public
 → exact source/version/API checks**. Recovery settings are injected through
 [`StatuteRecoverySettings`](../../cdm/config/statute_recovery.py).
 These adapters do not download, schedule jobs or write Elasticsearch themselves.
-The acquisition/OCR/publication controllers used for the local recovery are
-retained operational evidence, not a packaged automatic ingestion command.
+Acquisition, OCR and publication require an explicit operator-controlled
+workflow; these adapters are not automatic ingestion commands.
 
 PDF recovery requires the `historical` dependency group (`pypdf`), also included
 by the normal `dev` group. A separate minimal environment can install it with
@@ -220,10 +220,9 @@ need not install the PDF parser. Native extraction is bounded to 64 MiB per PDF,
 1,000 pages and 16 MiB text. Missing native page text is an explicit failure, not
 silently omitted content. OCR witnesses can corroborate a native header; when
 OCR supplies the text instead, every source page must be represented.
-The retained recovery used local macOS Vision OCR; no document was uploaded to
-an external OCR service.
+OCR evidence records the local extraction program and source page-image hashes.
 
-HTTP 200 alone does not establish a source exists: old STATUTE HTML/PDF paths
+HTTP 200 alone does not establish a source exists: STATUTE HTML/PDF paths
 can return a GovInfo "Page Not Found" page. Check content type and PDF parsing,
 not status alone. Never infer availability from an invented neighboring filename
 or use fuzzy title matching to resolve a bill-number conflict.
@@ -244,11 +243,6 @@ independently corroborates page 503. The complete XML text is indexed, both page
 values and the witness are retained, and the original PDF link is marked partial.
 This narrow citation exception does not waive law identity, primary bill,
 approval date or other matching requirements.
-
-The retained volumes 89-92 contain **1,532 scoped Congress 94/95 enacted laws**;
-all now have verified text. Three older reprints are outside that scope.
-This closes that catalog only, not earlier bill drafts, all historical bills,
-full-detail retrieval or current freshness.
 
 ## Congress API: entry points and planning
 
@@ -325,7 +319,7 @@ These are configured scheduler capabilities, not proof that acquisition is
 running or that every available detail/text endpoint succeeds. The controlled
 `operations` profile still excludes Beat and acquisition workers. The GovInfo
 package scheduler remains discovery-only for previously unseen package jobs;
-it is not the mechanism used for this recurring Congress API catch-up.
+it does not perform recurring Congress API refresh.
 
 The Compose `scheduler` profile sets `CELERY_BILL_REFRESH_ONLY=true`: Beat
 publishes only the 02:00 UTC bill-refresh task to the existing maintenance
@@ -387,7 +381,7 @@ runtime bounds, and reads:
 
 * `list_checkpoint.json`: exact request-context parameters plus next offset.
 * `list_records.sqlite3`: compressed validated list records by page offset.
-* Legacy `list_records.jsonl`, only as a compatibility input when needed.
+* `list_records.jsonl`, accepted as a resume input when the SQLite cache is absent.
 
 A checkpoint is usable only when its parameters match and its offset is an
 integer at least `-1`; `-1` marks completed discovery. A mismatch removes the
@@ -399,7 +393,7 @@ For each page, the runner extracts and validates list records, deduplicates
 model identities, writes the list cache, then advances the atomic checkpoint.
 It reports discovered count/checkpoint offset through the progress sink.
 Bill metadata with an introduced date uses an augmented list identity so
-legacy entries sharing a bill key can remain distinct.
+entries sharing a bill key can remain distinct.
 
 For list-only runs, newly fetched validated list records are archived and
 published while each page is handled. Cached pages restored on resume are not
@@ -423,8 +417,8 @@ Follow the runner's job/resource-local files when diagnosing worker resume.
 After discovery, the runner applies the item limit, excludes already archived
 identities/signatures, and optionally applies
 [`StaleBillFilter`](../../cdm/ingest/stale_bills.py).
-Archived IDs are read from resource and parent job roots; legacy attempt
-JSONL files are compatibility inputs. Bill dates ending in midnight are
+Archived IDs are read from resource and parent job roots; attempt
+JSONL files are also accepted as resume inputs. Bill dates ending in midnight are
 normalized for identity comparisons.
 
 Bill resume also compares signatures comprising congress/type/number/title
@@ -435,7 +429,7 @@ skeletons without subject/policy data need refresh. It is not a byte-level or
 full-timestamp freshness check.
 
 `_fetch_single_item()` derives item parameters and obtains the typed detail.
-For legacy bill entries with `introduced_date`, it can select the matching
+For bill entries with `introduced_date`, it can select the matching
 version from `detailUrl` responses before coercion, then appends that date to
 the archived item ID. The indexer later collapses the date suffix back to
 the four-part bill identity.
@@ -455,7 +449,7 @@ empty evidence. Object-shaped subjects preserve policy area and expand
 `legislativeSubjects`; a missing list is not an empty list.
 
 Counts follow actual endpoint semantics, not just array lengths. Pagination
-accepts `count` and the legacy `total` spelling, rejects contradictory totals
+accepts `count` and `total`, rejects contradictory totals
 and detects changes between pages. Co-sponsors are identified by member identity
 **and sponsorship date**: withdrawing and later rejoining is two preserved
 episodes, not a conflicting duplicate person. Contradictions within the same
@@ -580,20 +574,18 @@ The runner and indexer derive `hydration_status` from the versioned
 `HydrationAssessment`, never from successful return alone. The assessment records
 source, assessment time, per-detail counts/state/reasons and the scoped status.
 `complete` requires all nine complete details; `partial` has assessed unresolved
-details; `unknown` has no certified retrieval evidence. Legacy root labels and
-old detail reports alone are not proof. Only an actual assessment supplies the
+details; `unknown` has no certified retrieval evidence. Unversioned root labels
+and detail reports alone are not proof. Only an actual assessment supplies the
 hydration timestamp/source markers. The assessment is retained in `_source`,
 not added as searchable mappings; the existing root status remains searchable.
 
 Bill detail API responses expose `hydration`; the UI warns for unknown/partial
-without hiding source records, and treats older servers omitting the field as
-unknown. Corrupt versioned proof fails validation rather than silently becoming
+without hiding source records; an absent field is unknown. Corrupt versioned proof fails validation rather than silently becoming
 complete. GovInfo BILLSTATUS v3 and BILLSUM v2 normalization emit source-specific
 unknown API assessments in new immutable snapshots; existing snapshots are not
 rewritten. Full text, other sources, freshness, and resource/history coverage
 remain independent obligations.
-Existing assessment records remain readable with the new optional count fields;
-this change does not retroactively recertify or relabel them.
+Optional count fields do not recertify an assessment when absent.
 
 Successful items are archived before publication under a write lock.
 Ordinary item exceptions are logged and counted, and processing continues.
@@ -693,9 +685,9 @@ normalized record using **package ID** within an immutable artifact/parser/check
 snapshot directory, publishes it, creates
 an expected-count-one index job, and marks acquisition succeeded.
 Its index payload includes source attempt so re-parsing does not collide
-with a previously succeeded index job.
-The index job points to that snapshot only; older snapshots and legacy package
-archives remain retained. Cached reparsing reuses the actual HTTP fetch time,
+with another source attempt's index job.
+The index job points to that snapshot only; retained snapshots and package
+archives remain immutable. Cached reparsing reuses the actual HTTP fetch time,
 not the parser's wall clock, and identical snapshots deduplicate.
 Dispatch failure after durable index-row creation can be recovered later.
 `GovInfoBatchRunner` only fans out package IDs; its success is not package
@@ -715,15 +707,15 @@ stores the text-version record under its own ID.
 
 ## GovInfo replay and reconciliation
 
-[`reparse_govinfo.py`](../../scripts/reparse_govinfo.py) selects succeeded
-package jobs by collection/congress, deduplicates package IDs, and can report
-a dry run before requeueing. Re-parsing executes adapters/archive/publication
-again, while the verified local download cache may avoid network access.
-Legacy archives keep their original first payload; new snapshots do not rewrite
-them. A parser change must have a new parser version to distinguish its output.
+[`reconcile_govinfo_bulk.py`](../../scripts/reconcile_govinfo_bulk.py)
+provides read-only archive previews and explicit durable staging replay. A
+source/parser repair still requires its own approved scope and evidence;
+staging replay is not a replacement for rerunning a changed XML adapter.
+Archives preserve their first payload; immutable snapshots bind artifact,
+parser and check identity. A parser change requires a distinct parser version.
 
 [`BillReconciler`](../../cdm/ingest/reconciliation.py) groups canonical parent
-bill identities, including legacy introduction-date suffixes. Conflicting
+bill identities, including archive introduction-date suffixes. Conflicting
 Congress/type/number attributes or incompatible introduction identities are
 errors, not permission to combine different records. Text-version IDs are excluded.
 [`SourcePolicy`](../../cdm/config/source_policy.py) centralizes authority:
@@ -739,7 +731,7 @@ Missing or unusable evidence gets an explicit reason, never invented authority.
 For each proven-complete field, choose its authoritative source and newest
 comparable version within that source. Explicit empty/null values may remove old
 values; sparse/missing fields cannot. Equal-version contradictory values block
-writes. Unproven legacy values are conservatively retained/unioned with conflict
+writes. Values without completeness proof are retained/unioned with conflict
 and unverified-field diagnostics; their presence does not establish completeness.
 Empty complete actions/subjects also clear derived latest action/policy area.
 Source metadata retains package URLs, artifact hashes and parser versions.
@@ -771,7 +763,7 @@ Freshness is the age of a verified successful HTTP source check (24-hour target)
 not publication date or replay time. Keep the latest check per contributing source;
 the oldest of those governs combined freshness, so a fresh summary cannot mask
 stale status data. Unknown checks remain explicit. Normal live additive indexing
-is unchanged and strips snapshot/check controls; archive evidence and staging
+strips snapshot/check controls; archive evidence and staging
 field authority are audit data, not implicitly searchable serving fields.
 
 ## Voteview CSV ingestion

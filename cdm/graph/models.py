@@ -200,6 +200,7 @@ class GraphVersionPointer(BaseModel):
     built_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     source_model_version: str | None = None
     congresses: list[int] | None = None
+    previous: GraphVersionPointer | None = None
 
     @computed_field
     @property

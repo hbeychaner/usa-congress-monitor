@@ -2,7 +2,7 @@
 
 Capped runs and --dry-run skip model/index/cache writes and LLM calls.
 The job ledger and third-party model-download caches may still be written. Published
-models require a new validated full run; legacy rows are never auto-published.
+models require a validated full run; unvalidated rows are never auto-published.
 Use --publish-version VERSION to switch to a previously validated complete run.
 """
 

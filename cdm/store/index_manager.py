@@ -1,4 +1,4 @@
-"""OpenSearch index lifecycle management.
+"""Elasticsearch index lifecycle management.
 
 Loads index definitions from ``documentation/opensearch_mappings.yaml`` and
 provides helpers to create, update, or delete indices against a live cluster.
@@ -11,7 +11,7 @@ Typical usage
     mgr.create_all()           # create every index (skips existing)
     mgr.create("legislation")  # create one index
     mgr.update("legislation")  # PUT updated mapping onto existing index
-    mgr.delete("legislation")  # ⚠ destructive – asks for confirmation
+    mgr.delete("legislation", confirm=True)  # Destructive.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ MAPPING_VERSION = "2026-09-01.1"
 
 
 def _prefixed(name: str) -> str:
-    """Return the full OpenSearch index name: ``congress-{name}``."""
+    """Return the full Elasticsearch index name: ``congress-{name}``."""
     return index_name(name)
 
 
@@ -109,14 +109,12 @@ def lemma_field_paths(name: str) -> tuple[tuple[str, ...], ...]:
 
 
 class IndexManager:
-    """Manages OpenSearch index lifecycle against a live cluster.
+    """Manages Elasticsearch index lifecycle against a live cluster.
 
     Parameters
     ----------
     client:
-        An ``elasticsearch.Elasticsearch`` client instance pointed at the
-        OpenSearch cluster (OpenSearch is compatible with the ES 8 client via
-        the ``compatibility_mode`` header).
+        An ``elasticsearch.Elasticsearch`` client pointed at the cluster.
     dry_run:
         When ``True``, log what *would* happen but make no API calls.
     """
@@ -223,7 +221,7 @@ class IndexManager:
         return idx
 
     def reindex_to_versioned(self, name: str, version: int = 2) -> dict:
-        """Copy a live index into versioned staging using OpenSearch reindex."""
+        """Copy a live index into versioned staging using Elasticsearch reindex."""
         if name not in self.definitions:
             raise KeyError(f"Unknown index definition: {name}")
         if version < 1:
@@ -429,7 +427,7 @@ class IndexManager:
     def audit(self) -> dict:
         """Inspect declared and physical indices without changing the cluster.
 
-        The result is intended for migration review and deletion manifests. It
+        The result supports schema review and deletion manifests. It
         includes declared targets, physical indices outside the mapping file,
         aliases, document counts, and live mappings.
         """

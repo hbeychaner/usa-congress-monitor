@@ -345,6 +345,7 @@ class TopicTrainingJob:
         baseline = self._publications.snapshot()
         if self._options.publish_version:
             self._stage("publishing completed run", self._progress.index)
+            self._publications.ensure_index()
             completed = self._publications.publish(
                 self._options.publish_version, baseline
             )

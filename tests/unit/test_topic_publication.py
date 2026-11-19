@@ -12,6 +12,7 @@ from cdm.store.metasubject_repository import MetasubjectRepository
 from cdm.store.topic_publication import (
     CompletedTopicRun,
     TopicPublicationPointer,
+    TopicPublicationSnapshot,
     TopicPublicationStore,
     TopicRunCounts,
     TopicRunSpecification,
@@ -244,6 +245,23 @@ class TestCompleteRunWrites:
 
 
 class TestPointerPublication:
+    def test_publication_and_rollback_preserve_the_actual_previous_run(
+        self, client: Mock, completed: CompletedTopicRun,
+    ) -> None:
+        store = TopicPublicationStore(client, "analysis")
+        previous = TopicPublicationPointer(run=completed)
+        for version in ("v2", "v3", "v2"):
+            target = completed.model_copy(update={"model_version": version})
+            client.get.return_value = {"_source": target.model_dump(mode="json")}
+            store.publish(
+                version,
+                TopicPublicationSnapshot(pointer=previous, seq_no=1, primary_term=1),
+            )
+            previous = TopicPublicationPointer.model_validate(client.index.call_args.kwargs["document"])
+        assert previous.run.model_version == "v2"
+        assert previous.previous is not None
+        assert previous.previous.model_version == "v3"
+
     def test_existing_pointer_uses_compare_and_swap(
         self, client: Mock, completed: CompletedTopicRun
     ) -> None:

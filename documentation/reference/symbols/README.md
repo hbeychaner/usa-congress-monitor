@@ -16,21 +16,21 @@ remain authoritative in source. Follow the narrative chapters for intent.
 |---|---:|---:|
 | [backend](backend.md) | 40 | 409 |
 | [composition](composition.md) | 2 | 30 |
-| [config](config.md) | 10 | 292 |
+| [config](config.md) | 10 | 299 |
 | [contracts](contracts.md) | 7 | 584 |
 | [data_collection](data_collection.md) | 23 | 63 |
-| [deployment](deployment.md) | 2 | 49 |
+| [deployment](deployment.md) | 3 | 56 |
 | [frontend](frontend.md) | 51 | 2109 |
-| [graph](graph.md) | 11 | 430 |
+| [graph](graph.md) | 11 | 431 |
 | [ingest](ingest.md) | 19 | 744 |
-| [jobs](jobs.md) | 4 | 161 |
+| [jobs](jobs.md) | 4 | 162 |
 | [models](models.md) | 15 | 870 |
 | [perspectives](perspectives.md) | 13 | 190 |
-| [scripts](scripts.md) | 27 | 123 |
-| [store](store.md) | 14 | 254 |
-| [tools](tools.md) | 4 | 105 |
-| [topics](topics.md) | 3 | 55 |
+| [scripts](scripts.md) | 20 | 68 |
+| [store](store.md) | 14 | 256 |
+| [tools](tools.md) | 2 | 103 |
+| [topics](topics.md) | 4 | 100 |
 | [utils](utils.md) | 15 | 216 |
-| [workers](workers.md) | 16 | 210 |
+| [workers](workers.md) | 16 | 213 |
 
-Total: 276 source files; 6894 declarations.
+Total: 269 source files; 6903 declarations.

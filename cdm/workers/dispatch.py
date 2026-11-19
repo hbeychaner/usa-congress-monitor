@@ -15,6 +15,7 @@ from cdm.utils.json_types import JsonObject
 
 class TaskName(StrEnum):
     RUN_ANALYTICS = "cdm.workers.tasks.run_analytics_job"
+    RUN_ANALYTICS_CLEANUP = "cdm.workers.tasks.run_analytics_cleanup"
     RUN_INGEST = "cdm.workers.tasks.run_ingest_job"
     RUN_INDEX = "cdm.workers.tasks.run_index_job"
     RUN_GOVINFO_BULK = "cdm.workers.tasks.run_govinfo_bulk_job"
@@ -32,6 +33,9 @@ class JobDispatcher:
     def __init__(self, app: Celery, queues: QueueConfig) -> None:
         self._app = app
         self._routes: dict[JobKind, tuple[TaskName, str]] = {
+            JobKind.ANALYTICS_CLEANUP: (
+                TaskName.RUN_ANALYTICS_CLEANUP, queues.celery_maintenance_queue,
+            ),
             **{
                 kind: (TaskName.RUN_ANALYTICS, queues.celery_analytics_queue)
                 for kind in (

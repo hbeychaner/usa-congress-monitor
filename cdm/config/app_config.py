@@ -24,6 +24,14 @@ class _Section(BaseSettings):
     )
 
 
+class AnalyticsRetentionConfig(_Section):
+    analytics_model_root: Path = Path("models/topics")
+    analytics_live_api_url: str = "http://backend:8000/api/v1"
+    analytics_cleanup_timeout: int = Field(default=300, gt=0)
+    analytics_cleanup_batch: int = Field(default=500, gt=0, le=2000)
+    analytics_generation_limit: int = Field(default=1000, ge=2, le=10000)
+
+
 class ElasticConfig(_Section):
     es_local_url: str = ""
     es_local_api_key: str = ""
@@ -253,6 +261,9 @@ class AppConfig(BaseModel):
     api: ApiConfig = Field(default_factory=ApiConfig)
     query_reads: QueryReadConfig = Field(default_factory=QueryReadConfig)
     graph_repair: GraphRepairConfig = Field(default_factory=GraphRepairConfig)
+    analytics_retention: AnalyticsRetentionConfig = Field(
+        default_factory=AnalyticsRetentionConfig
+    )
 
 
 @lru_cache

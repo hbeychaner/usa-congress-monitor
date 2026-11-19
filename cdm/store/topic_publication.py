@@ -82,6 +82,7 @@ class TopicPublicationPointer(BaseModel):
 
     kind: Literal[TopicKind.POINTER] = TopicKind.POINTER
     run: CompletedTopicRun
+    previous: CompletedTopicRun | None = None
 
 
 class TopicPublicationSnapshot(BaseModel):
@@ -232,7 +233,14 @@ class TopicPublicationStore:
             )
         self._verify_counts(run)
         self._verify_cache(run)
-        pointer = TopicPublicationPointer(run=run)
+        previous = None
+        if expected:
+            previous = (
+                expected.pointer.previous
+                if expected.pointer.run.model_version == model_version
+                else expected.pointer.run
+            )
+        pointer = TopicPublicationPointer(run=run, previous=previous)
         if expected is None:
             self.client.index(
                 index=self.index,

@@ -17,7 +17,11 @@ from cdm.perspectives.job import PerspectiveBuildJob
 from cdm.perspectives.lexicon import BoilerplateLexicon
 from cdm.perspectives.models import PerspectiveBill, TopicPerspectives
 from cdm.perspectives.runner import NoTopicModelError, PerspectiveRunner
-from cdm.store.perspective_repository import PerspectiveRepository
+from cdm.store.perspective_repository import (
+    PerspectivePublication,
+    PerspectiveRepository,
+    PerspectiveSnapshot,
+)
 from cdm.workers.analytics_runner import AnalysisCancelled
 
 
@@ -46,6 +50,25 @@ def test_empty_refresh_does_not_delete_previous_rows(client: Mock) -> None:
     client.delete_by_query.assert_not_called()
     client.index.assert_called_once()
     assert client.index.call_args.kwargs["document"]["results"] == []
+
+
+def test_refresh_keeps_only_one_previous_complete_snapshot(client: Mock) -> None:
+    repository = PerspectiveRepository(client, "analysis")
+    previous = PerspectivePublication(
+        congress=119, model_version="v1", built_at=datetime.now(UTC), results=[topic()],
+    )
+    for version in ("v2", "v3"):
+        repository.replace(
+            119, version, datetime.now(UTC), [],
+            expected=PerspectiveSnapshot(
+                congress=119, publication=previous, sequence_number=1, primary_term=1,
+            ),
+        )
+        previous = PerspectivePublication.model_validate(client.index.call_args.kwargs["document"])
+    assert previous.model_version == "v3"
+    assert previous.previous is not None
+    assert previous.previous.model_version == "v2"
+    assert previous.previous.previous is None
 
 
 def test_snapshot_read_does_not_scan_or_mix_legacy_rows(client: Mock) -> None:

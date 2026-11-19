@@ -57,6 +57,7 @@ class PerspectiveSchema:
             PerspectiveField.CONGRESS: {"type": "integer"},
             PerspectiveField.BUILT_AT: {"type": "date"},
             "results": {"type": "object", "enabled": False},
+            "previous": {"type": "object", "enabled": False},
         }
 
 
@@ -279,4 +280,5 @@ class TopicAnalysisSchema:
             "topic_ids": {"type": "integer"},
             "centroid": {"type": "float", "index": False, "doc_values": False},
             "run": {"type": "object", "enabled": False},
+            "previous": {"type": "object", "enabled": False},
         }

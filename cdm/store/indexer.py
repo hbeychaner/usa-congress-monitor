@@ -1,4 +1,4 @@
-"""Transform ingested model dicts into OpenSearch documents.
+"""Transform ingested model dicts into Elasticsearch documents.
 
 The indexer is the boundary between the cdm models and the CDM
 storage layer. It may enrich, normalise, or flatten fields before indexing.

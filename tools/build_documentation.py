@@ -305,14 +305,11 @@ class DocumentationBuilder:
             raise ValueError(f"Unclosed repository-only wiki block: {path}")
         return "".join(lines)
 
-    def build_wiki(self, output: Path, *, check: bool) -> None:
-        if output.resolve() == self.config.documentation.resolve():
-            raise ValueError("Wiki output must not overwrite canonical documentation")
-        sources = {
+    def _chapter_paths(self) -> set[Path]:
+        return {
             path.resolve()
             for path in self.config.documentation.rglob("*.md")
-            if output.resolve() not in path.resolve().parents
-            and "wiki" not in path.relative_to(self.config.documentation).parts
+            if "wiki" not in path.relative_to(self.config.documentation).parts
             and "original" not in path.relative_to(self.config.documentation).parts
             and (
                 path.relative_to(self.config.documentation).as_posix()
@@ -320,6 +317,15 @@ class DocumentationBuilder:
                 or path.relative_to(self.config.documentation).parts[0]
                 in self.config.wiki_directories
             )
+        }
+
+    def build_wiki(self, output: Path, *, check: bool) -> None:
+        if output.resolve() == self.config.documentation.resolve():
+            raise ValueError("Wiki output must not overwrite canonical documentation")
+        sources = {
+            path
+            for path in self._chapter_paths()
+            if output.resolve() not in path.parents
         }
         names = [self.wiki_name(path) for path in sources]
         if len(set(names)) != len(names):
@@ -376,12 +382,7 @@ class DocumentationBuilder:
         missing: list[str] = []
         sources = [
             self.config.root / "README.md",
-            *(
-                path
-                for path in self.config.documentation.rglob("*.md")
-                if "wiki" not in path.relative_to(self.config.documentation).parts
-                and "original" not in path.relative_to(self.config.documentation).parts
-            ),
+            *sorted(self._chapter_paths()),
         ]
         for path in sources:
             for match in re.finditer(

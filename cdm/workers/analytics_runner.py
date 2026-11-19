@@ -13,7 +13,7 @@ from cdm.jobs.analytics import (
     PerspectiveRequest,
     TopicRequest,
 )
-from cdm.jobs.store import JobStatus, JobStore
+from cdm.jobs.store import JobKind, JobStatus, JobStore
 from cdm.perspectives.job import PerspectiveBuildJob
 from cdm.topics.training import TopicTrainingJob
 from cdm.workers.results import JobResult, SkippedClaim
@@ -35,14 +35,19 @@ class AnalyticsJobRunner:
             [PerspectiveRequest, Callable[[AnalysisProgress], None]],
             PerspectiveBuildJob,
         ],
+        cleanup: Callable[[str], None],
     ) -> None:
         self._store = store
         self._training = training
         self._graph = graph
         self._perspectives = perspectives
+        self._cleanup = cleanup
 
     def run(self, job_id: str) -> JobResult:
-        row = self._store.mark_running(job_id, update_windows=False, max_active=1)
+        row = self._store.mark_running(
+            job_id, update_windows=False, max_active=1,
+            exclusive_kinds=JobKind.analytics(),
+        )
         if row is None:
             return SkippedClaim(self._store).result(job_id)
         request = TypeAdapter(AnalysisRequest).validate_python(row["payload"])
@@ -70,5 +75,11 @@ class AnalyticsJobRunner:
         else:
             self._perspectives(request, report).run(request)
         report(AnalysisProgress(progress=1.0))
+        preview = (
+            isinstance(request, TopicRequest) and request.options.preview
+            or isinstance(request, PerspectiveRequest) and request.dry_run
+        )
+        if not preview:
+            self._cleanup(job_id)
         completed = self._store.mark_succeeded(job_id)
         return JobResult(job_id=job_id, status=completed["status"])

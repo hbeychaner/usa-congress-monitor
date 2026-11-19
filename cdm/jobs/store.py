@@ -46,6 +46,14 @@ class JobKind(StrEnum):
     TOPIC_TRAINING = "topic_training"
     MEMBER_GRAPH = "member_graph"
     PERSPECTIVES = "perspectives"
+    ANALYTICS_CLEANUP = "analytics_cleanup"
+
+    @classmethod
+    def analytics(cls) -> tuple[JobKind, ...]:
+        return (
+            cls.TOPIC_TRAINING, cls.MEMBER_GRAPH,
+            cls.PERSPECTIVES, cls.ANALYTICS_CLEANUP,
+        )
 
 
 class JobStatus(StrEnum):
@@ -109,8 +117,7 @@ _INGEST_WINDOWS_PERIOD_INDEX = "ingest_windows_period_idx"
 _INGEST_WINDOWS_STATUS_INDEX = "ingest_windows_status_idx"
 
 
-# Index names are declared separately because SQLAlchemy's Table metadata does
-# not need to change the existing SQLite schema during this migration.
+# Named indices support bounded status and coverage-window queries.
 from sqlalchemy import Index, event
 
 Index(_JOBS_STATUS_INDEX, _JOBS.c.status)
@@ -408,6 +415,7 @@ class JobStore:
         *,
         update_windows: bool = True,
         max_active: int | None = None,
+        exclusive_kinds: tuple[JobKind, ...] = (),
     ) -> JobRow | None:
         """Atomically claim a job for execution, returning ``None`` if already claimed.
 
@@ -445,7 +453,7 @@ class JobStore:
                 return None
             if (
                 max_active is not None
-                and self._running_count(connection, job_id) > max_active
+                and self._running_count(connection, job_id, exclusive_kinds) > max_active
             ):
                 raise JobSlotsBusy(job_id)
             if update_windows:
@@ -461,14 +469,20 @@ class JobStore:
         return self.get(job_id)
 
     @staticmethod
-    def _running_count(connection: Connection, job_id: str) -> int:
-        """RUNNING jobs of the same kind as ``job_id``, including itself."""
+    def _running_count(
+        connection: Connection, job_id: str,
+        exclusive_kinds: tuple[JobKind, ...] = (),
+    ) -> int:
+        """Count the job's execution group, including itself."""
         kind = select(_JOBS.c.kind).where(_JOBS.c.id == job_id).scalar_subquery()
         return int(
             connection.execute(
                 select(func.count())
                 .select_from(_JOBS)
-                .where(_JOBS.c.kind == kind)
+                .where(
+                    _JOBS.c.kind.in_(exclusive_kinds)
+                    if exclusive_kinds else _JOBS.c.kind == kind
+                )
                 .where(_JOBS.c.status == JobStatus.RUNNING.value)
             ).scalar_one()
         )

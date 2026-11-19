@@ -1,4 +1,4 @@
-"""Import 119th-Congress district boundaries into OpenSearch once."""
+"""Import 119th-Congress district boundaries into Elasticsearch."""
 
 from __future__ import annotations
 

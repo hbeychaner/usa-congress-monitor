@@ -1,4 +1,4 @@
-"""Create the local .env from .env.example and mint the OpenSearch API key."""
+"""Create the local .env from .env.example and mint the Elasticsearch API key."""
 
 from __future__ import annotations
 

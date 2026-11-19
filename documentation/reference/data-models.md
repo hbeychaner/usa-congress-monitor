@@ -22,7 +22,7 @@ selected definitions; they are not independent persistence schemas.
 Most API inputs use camelCase aliases, while ingest normally emits
 `model_dump(mode="json", exclude_none=True)`, using Python field names unless
 the model itself names a field differently. Dates and URLs become JSON values.
-Do not assume all legacy fields are snake_case: list models include `recordType`,
+Do not assume all source fields are snake_case: list models include `recordType`,
 and `BillTextResponse`/`BillRelatedBillsResponse` retain API collection names.
 Nor do all models share one extra-field policy: many use Pydantic's default,
 while committee-print and committee-meeting detail models allow extra fields.
@@ -127,7 +127,7 @@ The amendment ID builder uses the `amendment:` prefix for complete identity.
 
 `Treaty` models congress received/considered, treaty number/suffix, countries
 or parties, transmitted/in-force/update dates, index terms, parts, related
-documents, resolution text, topic, titles, and legacy numbering.
+documents, resolution text, topic, titles, and source numbering.
 `TreatyListItem` is the lighter received/considered congress, number, parts,
 suffix, topic, dates, and URL shape. Do not equate `congress_received` with the
 bill-style `congress` attribute.
@@ -219,7 +219,7 @@ row per member vote.
 results: bill identity/reference plus summary text, action/update dates,
 chamber, action description/version, and last-summary update date.
 The ingest worker deliberately does not queue direct `summaries` indexing.
-`RecordTypeBase` supplies legacy list record-type metadata. `Subject` is a
+`RecordTypeBase` supplies list record-type metadata. `Subject` is a
 small name/update-date model alongside the report `Topic` fragment; neither
 is a trained analytical topic or metasubject.
 
@@ -244,7 +244,7 @@ Archive fallback identity, by contrast, uses SHA-256 over canonical JSON.
 `reference_id` from URL and append integer start/end page bounds to a base ID.
 It resolves dotted paths, including numeric list indices. `unique_from` is
 declared on `EndpointSpec.IdStrategy` but is not consumed by this applier.
-The indexer normalizes legacy `referenceId` to `reference_id`.
+The indexer normalizes source `referenceId` to `reference_id`.
 
 ### Indexed identity and relationship reference
 
@@ -305,6 +305,7 @@ can therefore affect serialized job identity.
 | `GovInfoPackagePayload` | Collection/congress/measure type/package ID/URL/session/version, output root, optional target and replacement flag. |
 | `GovInfoBatchPayload` | List of independently durable package-job IDs. |
 | `ReconcilePayload` | Archive root, target index, report path, and preserve-raw flag. |
+| `CleanupRequest` | Idempotent request ID and optional successful analytics parent job ID; no arbitrary deletion paths or query payloads. |
 
 [`JobStore`](../../cdm/jobs/store.py) uses SQLite through SQLAlchemy:
 
@@ -315,7 +316,8 @@ can therefore affect serialized job identity.
   start/progress/completion timestamps, and last error. These are coverage
   observations, not proof that every expected search document exists.
 
-Kinds are ingest, index, GovInfo package/batch, and reconciliation. Statuses
+Kinds are ingest, index, GovInfo package/batch, reconciliation, topic training,
+member graph, perspectives and analytics cleanup. Statuses
 are queued/running/retrying/succeeded/failed/cancelled; coverage stages are
 discovery/hydration. `JobRow`, `CoverageRow`, and `PrunedJob` are TypedDicts,
 not Pydantic models. WAL mode, connection timeouts, and file locks coordinate
@@ -398,3 +400,14 @@ Analytical persistence is intentionally separate from API models:
 use model/build versions and kind discriminators to store/read them.
 Manual names use append-only `OverrideVersion` records, where null names are
 tombstones rather than deletion of history.
+
+Publication models retain one predecessor: `TopicPublicationPointer.previous`
+is a `CompletedTopicRun`; `GraphVersionPointer.previous` is a graph pointer with
+no nested predecessor; `PerspectivePublication.previous` is a complete snapshot
+for the same Congress with no nested predecessor. Atomic pointer/snapshot
+replacement keeps that bound independent of cleanup timing.
+[CleanupPlan](../../cdm/topics/cleanup.py) records protected model IDs, exact
+generation deletions, owned model directories and cache-index UUIDs.
+`CleanupResult` records logical document deletions, removed model bytes and
+directories, and deleted cache indices; it does not claim immediate segment
+disk reclamation.

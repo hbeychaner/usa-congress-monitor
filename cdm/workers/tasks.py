@@ -89,6 +89,12 @@ def run_ingest_job(self: object, job_id: str) -> JsonObject:
     return _execute(self, job_id, _container().ingest_runner.run)
 
 
+@celery_app.task(bind=True, name=TaskName.RUN_ANALYTICS_CLEANUP.value)
+def run_analytics_cleanup(self: object, job_id: str) -> JsonObject:
+    """Verify live analytics and prune superseded derived generations."""
+    return _execute(self, job_id, _container().analytics_cleanup.run)
+
+
 @celery_app.task(bind=True, name=TaskName.RUN_GOVINFO_BULK.value)
 def run_govinfo_bulk_job(self: object, job_id: str) -> JsonObject:
     """Run one durable GovInfo package job."""

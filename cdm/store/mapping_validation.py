@@ -1,4 +1,4 @@
-"""Audit transformed documents against their declared OpenSearch mappings."""
+"""Audit transformed documents against their declared Elasticsearch mappings."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ def _properties(resource: str) -> tuple[str, dict]:
     target, _ = resource_target(resource)
     definition = load_definitions().get(target)
     if definition is None:
-        raise ValueError(f"No OpenSearch mapping defined for {target}")
+        raise ValueError(f"No Elasticsearch mapping defined for {target}")
     return target, definition.get("mappings", {}).get("properties", {})
 
 

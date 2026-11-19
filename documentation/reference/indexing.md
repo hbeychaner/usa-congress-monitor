@@ -2,21 +2,18 @@
 
 The executable mapping source is
 [`documentation/opensearch_mappings.yaml`](../opensearch_mappings.yaml), loaded
-by [`load_definitions()`](../../cdm/store/index_manager.py). Its introductory
-comments are historical: there are **21** logical definitions, not 17.
+by [`load_definitions()`](../../cdm/store/index_manager.py). It declares
+**21** logical index definitions.
 The runtime also creates analytical indices outside this YAML.
 For individual declarations, use the [store](symbols/store.md) and
 [worker](symbols/workers.md) symbol indexes.
 
 The [shipped deployment](../../README.md) runs self-managed Elasticsearch 9.
-The project retains OpenSearch in filenames and many APIs, but uses the Python
-`elasticsearch.Elasticsearch` client and its bulk helpers.
+The application uses the Python `elasticsearch.Elasticsearch` client and its
+bulk helpers.
 [`ElasticClientFactory`](../../cdm/store/client.py) constructs
-`Elasticsearch(url, api_key=...)` from injected configuration; it does not set
-the compatibility header described in an older `IndexManager` docstring.
-Historical names are not evidence of an OpenSearch deployment, and OpenSearch
-is not a verified drop-in replacement. Dense-vector/kNN APIs in particular
-require actual server compatibility.
+`Elasticsearch(url, api_key=...)` from injected configuration.
+Dense-vector/kNN APIs require compatibility with the deployed server.
 
 ## Resource routing and names
 
@@ -41,7 +38,7 @@ subjects and graph signature reads. Law detail reads additionally require
 agreement between the canonical ID, Congress, bill type and number; contradictory
 identity fields fail explicitly rather than disappearing as a missing record.
 Standalone text/non-bill records remain excluded. Exact canonical-ID search
-bypasses query lemmatization; ordinary natural-language queries are unchanged.
+bypasses query lemmatization; natural-language queries use the configured lemmatizer.
 [`BillSourceIdentity`](../../cdm/store/create_only.py) remains strictly bill-only
 for controlled create-only ingestion. Broader reads do not authorize rewriting
 law classifications or recreating indexed records.
@@ -89,9 +86,8 @@ multi-field.
 `sponsorship` and `vote_position` are declared bridge schemas. The normal
 Congress ingest/index runners do not derive their rows from bill or clerk
 payloads. Do not infer automatic bridge population from YAML comments.
-The maintained bill-member backfill instead writes relationship ID arrays
-onto bill documents:
-[`backfill_bill_member_links.py`](../../scripts/backfill_bill_member_links.py).
+The normal [`to_document()`](../../cdm/store/indexer.py) bill projection writes
+sponsor/cosponsor relationship ID arrays onto bill documents.
 Voteview writes aggregate rollcall documents, not `vote_position` rows.
 
 ### Legislation object layout
@@ -132,7 +128,7 @@ The versioned `hydration_assessment` is explicitly `object, enabled: false`:
 validated evidence remains in `_source` for the API, without dynamically indexing
 endpoint keys or duplicating searchable status fields. Queries use the existing
 `hydration_status` keyword, which the projection derives from that assessment;
-legacy labels alone do not prove completeness.
+unversioned labels alone do not prove completeness.
 Searchable enactment fields include `is_enacted`, `law_number`, `law_type`,
 and nested `laws`; a `Law.is_law` model attribute alone does not populate them.
 
@@ -222,8 +218,8 @@ Each chunk runs inside its own `Language.memory_zone()`; only materialized lemma
 escape, never spaCy Docs or Tokens. Temporary vocabulary, tokenizer and
 participating component caches are released afterward. Index-time failures
 remain explicit; query-time failures retain the logged best-effort behavior.
-Raw text, model identity, stop-word/punctuation filtering and public helper
-signatures are unchanged. Linguistic context resets at chunk boundaries;
+Stop-word and punctuation filtering applies within each chunk.
+Linguistic context resets at chunk boundaries;
 derived lemmas may therefore differ near a boundary. This does not truncate
 stored source text or increase the total allowance.
 
@@ -331,7 +327,7 @@ Mappings receive `_meta.mapping_version="2026-09-01.1"` at creation/update.
 Staging validation is count/mapping/sample validation, not a full content
 diff. Its source is the canonical physical name, not whichever index an alias
 currently targets; the switching helper also assumes that canonical source.
-Do not assume it implements arbitrary repeated rolling migrations.
+Do not assume it supports repeated alias cutovers from arbitrary physical sources.
 
 ## Redis consumption, acknowledgment, and replay
 
@@ -390,17 +386,25 @@ candidates as results. This index is not created by YAML `create_all()`.
 Topic/metasubject/perspective repositories also receive configured index names.
 [`MetasubjectRepository`](../../cdm/store/metasubject_repository.py) produces
 `metasubject:{model_version}:{id}` and
-`metasubject_over_time:{model_version}:{ordinal}` documents; its newest-model
-read sorts by training timestamp and examines at most 200 hits.
+`metasubject_over_time:{model_version}:{ordinal}` documents; reads are pinned to
+the validated published topic run rather than selecting the newest rows.
 Its additional mappings include assignment metadata/topic IDs and unindexed
 centroid arrays.
 
 [`PerspectiveRepository`](../../cdm/store/perspective_repository.py) stores
-`party_topic:{model_version}:{congress}:{topic_id}`. `replace()` removes that
-Congress's prior party-topic documents before bulk writing; this is not an
-atomic swap. Large nested party-bill/term/bilateral/perspective payloads are
-stored as disabled objects. Reads sort by build time, select the first hit's
-model version, and return matching hits within a 10,000-document scan.
+one `party_topic_publication:{congress}` document. `replace()` atomically
+publishes a validated complete snapshot using sequence-number/primary-term
+compare-and-swap. Its `previous` field embeds exactly one complete predecessor.
+Both `results` and `previous` are disabled objects: retained in `_source`, not
+expanded into searchable fields. Reads prefer this canonical snapshot;
+standalone `party_topic:{model_version}:{congress}:{topic_id}` records are read
+only when no canonical publication exists.
+
+Topic pointers embed the current completed run and one previous completed run.
+Graph pointers embed one previous pointer per signal, with its source-model
+lineage and Congress scope. A separate [cleanup job](../guides/analytics.md#6-rebuilds-retention-and-operational-checks)
+verifies live API generations and deletes only explicitly scoped older
+derived kinds/versions and unneeded owned caches. Source indices are not targets.
 
 [`MetasubjectOverrideStore`](../../cdm/store/metasubject_override_store.py)
 creates its own integer-ID/version, keyword-name, date mapping. New edits use

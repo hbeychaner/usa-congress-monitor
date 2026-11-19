@@ -31,6 +31,9 @@ celery_app.conf.update(
         "cdm.workers.tasks.run_analytics_job": {
             "queue": get_config().queue.celery_analytics_queue
         },
+        "cdm.workers.tasks.run_analytics_cleanup": {
+            "queue": get_config().queue.celery_maintenance_queue
+        },
         "cdm.workers.tasks.run_index_job": {
             "queue": get_config().queue.celery_index_queue
         },

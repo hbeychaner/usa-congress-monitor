@@ -53,9 +53,7 @@ for the supported topology and resource checks.
    marking an acquisition job complete.
 4. Bills from multiple sources converge on canonical bill IDs. Full text is
    stored on bill documents, not in a separate bill-text index.
-5. Elasticsearch serves indexed entities and derived analysis. Python modules
-   retain historical `opensearch` names; the shipped containers use
-   **Elasticsearch**, not interchangeable OpenSearch binaries.
+5. Elasticsearch serves indexed entities and derived analysis.
 6. FastAPI exposes typed responses; React renders them. Offline analytics and
    admin-triggered builds add projections, not new authoritative source facts.
 
@@ -67,11 +65,10 @@ before drawing conclusions about missing records.
 
 | Reference | Status |
 |---|---|
-| [Mapping definitions](opensearch_mappings.yaml) | Executable mapping input, despite the historical filename |
+| [Mapping definitions](opensearch_mappings.yaml) | Executable Elasticsearch mapping input |
 | [Generated endpoint specifications](generated_endpoint_specs.json) | Captured endpoint catalogue; runtime specs live in [source](../cdm/data_collection/specs) |
 | [Original upstream endpoint docs](original) | Upstream reference snapshots, not application API documentation |
 | [Original OpenAPI JSON](original/swagger.json) / [YAML](original/swagger.yaml) | Congress.gov snapshots, not FastAPI's `/openapi.json` |
-| [Spec comparison report](specs_swagger_report.json) | Historical comparison artifact |
 | [Frontend style guide](../frontend/STYLE_GUIDE.md) | UI design conventions |
 
 ## Visuals and wiki
@@ -79,7 +76,7 @@ before drawing conclusions about missing records.
 The [visual atlas](reference/visuals.md) embeds Mermaid diagrams for rendering
 on GitHub and in the wiki. Editable `.mmd` files remain in
 [diagrams](diagrams); the worker C4 container view remains at the repository
-[root](../worker-architecture.mmd) for existing links.
+[root](../worker-architecture.mmd).
 
 To regenerate references and prepare a local, unpublished wiki:
 

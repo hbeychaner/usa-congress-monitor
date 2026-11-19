@@ -58,7 +58,7 @@ Managed Python services share a Docker-volume SQLite ledger at
 `/var/lib/congress/jobs.sqlite3`, not the macOS checkout-mounted WAL.
 Archives and the record library remain separate replay stores. See the
 [ledger operating boundary](OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary)
-before migration or restoration.
+before replacing storage or restoring a backup.
 
 See the [ingestion guide](guides/ingestion.md) for precise retry and acknowledgement
 ordering, and [indexing reference](reference/indexing.md) for the distinction
@@ -97,11 +97,10 @@ extends the operational root with topic training, graph building and perspective
 construction. Operations workers do not import the analysis implementations.
 Celery registers [analytics tasks](../cdm/workers/analytics_tasks.py) at startup,
 before forking, only for workers consuming the configured analytics queue;
-the serialized task name and routing remain unchanged. Python imports stay at
+the serialized task name and routing follow the durable job contract. Python imports stay at
 module level rather than being deferred inside execution functions.
-Analysis factories are not imported by the API or submission CLIs. Four single-use metasubject
-factory wrappers were removed; training collaborators are wired directly at
-their one construction boundary. Graph/perspective builds share a stateless
+Analysis factories are not imported by the API or submission CLIs.
+Training collaborators are wired directly at their construction boundary. Graph/perspective builds share a stateless
 topic-model reader.
 
 The `analysis` dependency group is included in normal development installs but
@@ -119,9 +118,8 @@ Tests can pass fakes directly or replace providers. A service should receive
 its client/store/config dependencies, rather than silently constructing a new
 database connection or consulting unrelated global settings.
 
-Follow the actual caller when changing a setting. Older instructions may refer
-to a removed top-level `settings` module; use the typed configuration and
-composition roots rather than copying those obsolete imports.
+Follow the actual caller, typed configuration section and composition root
+when changing a setting.
 
 ## Data contracts and identifiers
 
@@ -144,12 +142,20 @@ field list with its Elasticsearch mapping or an API's response fields.
 
 ## Reliability model
 
+Analytics publication retains one predecessor: a topic run, a pointer per graph
+signal, and a complete perspective snapshot per Congress. Successful builds
+enqueue a separate maintenance job that verifies live HTTP generations before
+pruning older owned artifacts, derived rows and unneeded embedding cache indices.
+Analytics and cleanup share an atomic ledger execution slot; source ingestion
+retains its own concurrency controls. Live dependencies can pin additional topic
+generations. See the [retention policy](guides/analytics.md#6-rebuilds-retention-and-operational-checks).
+
 The system is designed around replay and idempotent projections, **not an
 exactly-once transaction spanning SQLite, RabbitMQ, Redis and Elasticsearch**.
 Canonical document IDs make redelivery converge; archive/checkpoint and stream
 acknowledgement ordering control what must be replayed after an interruption.
 
-Useful incident questions are:
+Useful diagnostic questions are:
 
 1. Was a durable job recorded?
 2. Was its task message delivered to a live worker?
@@ -167,7 +173,7 @@ a perceived gap by deleting ledgers, manifests, broker volumes, or archives.
 
 Compose is the sole supported managed local path. Its controlled default runs
 Elasticsearch, RabbitMQ, Redis, FastAPI, React/Vite and a one-slot
-index/maintenance worker. Native launchd agents are retired. Acquisition,
+index/maintenance worker. Acquisition,
 analytics, dedicated workers and Beat are explicit opt-in application profiles;
 Kibana is an opt-in infrastructure profile. The logical diagrams show available
 capabilities, not proof that every role is running. See the

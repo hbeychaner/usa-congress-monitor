@@ -1,4 +1,4 @@
-"""OpenSearch index management and bulk upsert helpers."""
+"""Elasticsearch index management and bulk upsert helpers."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def resource_target(resource: str) -> tuple[str, dict[str, str]]:
 
 
 def index_name(resource: str) -> str:
-    """Return the canonical OpenSearch index name for *resource*."""
+    """Return the canonical Elasticsearch index name for *resource*."""
     target, _ = resource_target(resource)
     return f"{INDEX_PREFIX}-{target.replace('_', '-')}"
 

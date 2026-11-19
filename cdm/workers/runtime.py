@@ -204,4 +204,5 @@ class WorkerContainer(OperationsContainer):
             self.topic_training_job,
             self.graph_build_job,
             self.perspective_build_job,
+            self.enqueue_analytics_cleanup,
         )

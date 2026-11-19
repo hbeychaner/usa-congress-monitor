@@ -74,11 +74,13 @@ class RunnerHarness:
         self.training = Mock(spec=TopicTrainingJob)
         self.graph = Mock(spec=GraphBuildJob)
         self.perspectives = Mock(spec=PerspectiveBuildJob)
+        self.cleanup = Mock()
         self.training_effect: Callable[[Callable[[AnalysisProgress], None]], None] = (
             self._train
         )
         self.runner = AnalyticsJobRunner(
-            self.store, self.make_training, self.make_graph, self.make_perspectives
+            self.store, self.make_training, self.make_graph, self.make_perspectives,
+            self.cleanup,
         )
 
     def _train(self, report: Callable[[AnalysisProgress], None]) -> None:
@@ -122,6 +124,35 @@ class TestAdmissionAndStatus:
             == TopicTrainingStatus()
         )
         assert jobs.status(JobKind.MEMBER_GRAPH, GraphBuildStatus) == GraphBuildStatus()
+
+    @pytest.mark.parametrize(
+        ("analysis_request", "cleanup"),
+        [
+            (TopicRequest(), True),
+            (TopicRequest(options=TopicTrainingOptions(dry_run=True)), False),
+            (TopicRequest(options=TopicTrainingOptions(max_docs=1)), False),
+            (GraphRequest(), True),
+            (PerspectiveRequest(), True),
+            (PerspectiveRequest(dry_run=True), False),
+        ],
+    )
+    def test_only_completed_publications_schedule_cleanup(
+        self, jobs: AnalyticsJobs, analysis_request: AnalysisRequest, cleanup: bool,
+    ) -> None:
+        submitted = jobs.submit(analysis_request)
+        harness = RunnerHarness(jobs)
+        harness.runner.run(submitted.job_id)
+        assert harness.cleanup.call_args_list == (
+            [((submitted.job_id,), {})] if cleanup else []
+        )
+
+    def test_failed_training_does_not_schedule_cleanup(self, jobs: AnalyticsJobs) -> None:
+        submitted = jobs.submit(TopicRequest())
+        harness = RunnerHarness(jobs)
+        harness.training_effect = Mock(side_effect=RuntimeError("training failed"))
+        with pytest.raises(RuntimeError, match="training failed"):
+            harness.runner.run(submitted.job_id)
+        harness.cleanup.assert_not_called()
 
     def test_concurrent_processes_admit_exactly_one_job(self, tmp_path: Path) -> None:
         path = str(tmp_path / "concurrent.sqlite3")

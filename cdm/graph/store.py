@@ -107,6 +107,13 @@ class GraphStore:
 
     def ensure_index(self) -> None:
         if self.client.indices.exists(index=self.index):
+            mapping = self.client.indices.get_mapping(index=self.index).body[self.index]["mappings"]
+            if "previous" not in mapping.get("properties", {}):
+                result = self.client.indices.put_mapping(
+                    index=self.index, properties={"previous": {"type": "object", "enabled": False}}
+                )
+                if not result["acknowledged"]:
+                    raise RuntimeError("Graph predecessor mapping was not acknowledged")
             self.require_schema()
             return
         IndexManager(self.client).create(self._settings.index)
@@ -192,6 +199,13 @@ class GraphStore:
         before = expected if expected is not None else self.pointer_snapshot(pointer.signal)
         if before.signal != pointer.signal:
             raise ValueError("Cannot publish against another graph signal's snapshot")
+        if before.pointer is not None:
+            previous = (
+                before.pointer.previous
+                if before.pointer.graph_version == pointer.graph_version
+                else before.pointer.model_copy(update={"previous": None})
+            )
+            pointer = pointer.model_copy(update={"previous": previous})
         if before.pointer is None:
             self.client.index(
                 index=self.index,

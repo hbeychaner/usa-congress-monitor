@@ -6,10 +6,13 @@ import requests
 from redis import Redis
 
 from cdm.container import Container
+from cdm.graph.store import GraphStore
 from cdm.ingest.govinfo import GovInfoDiscovery
 from cdm.ingest.record_library import RecordLibrary
 from cdm.ingest.stale_bills import IndexedBillStateReader
+from cdm.jobs.store import JobKind
 from cdm.store.opensearch import read_alias
+from cdm.topics.cleanup import AnalyticsCleanup, CleanupRequest
 from cdm.utils.rate_limiter import SharedTokenBucket, TokenBucket
 from cdm.workers.celery_app import celery_app
 from cdm.workers.failures import FailureClassifier
@@ -38,6 +41,24 @@ from cdm.workers.results import TaskRetrier
 
 class OperationsContainer(Container):
     """Builds operational services without importing analytics implementations."""
+
+    @cached_property
+    def analytics_cleanup(self) -> AnalyticsCleanup:
+        return AnalyticsCleanup(
+            self.elastic_client, self.topic_publications, GraphStore(self.elastic_client),
+            self.perspective_repository, self.retirement_reporter, self.job_store,
+            requests.Session(), self.config.analytics_retention,
+            self.config.elastic.embeddings_index,
+        )
+
+    def enqueue_analytics_cleanup(self, parent_job_id: str) -> None:
+        self.job_submitter.submit(
+            JobKind.ANALYTICS_CLEANUP,
+            CleanupRequest(
+                request_id=parent_job_id, parent_job_id=parent_job_id,
+            ).model_dump(mode="json"),
+            dispatch_existing=False,
+        )
 
     @cached_property
     def redis_client(self) -> Redis:

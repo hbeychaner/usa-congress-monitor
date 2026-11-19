@@ -23,8 +23,7 @@ from cdm.models.endpoint_spec import EndpointSpec
 from cdm.utils.logger import get_logger
 from cdm.utils.rate_limiter import TokenBucket
 
-# Default request rate used when no rate_limiter is injected. Matches the
-# previous hardcoded client-side throttle (5000 requests/hour).
+# Default request rate when no shared limiter is injected.
 DEFAULT_RATE_PER_HOUR = 5000.0
 
 logger = get_logger(__name__)
@@ -89,8 +88,7 @@ class CDGClient:
                 Callers that fan out work across multiple threads/clients
                 (e.g. `IngestRunner`) should inject the SAME instance so all
                 requests are throttled against one shared budget. If omitted,
-                a private `TokenBucket` at `DEFAULT_RATE_PER_HOUR` is created,
-                preserving this client's previous standalone behavior.
+                a private `TokenBucket` at `DEFAULT_RATE_PER_HOUR` is created.
         """
         self.base_url = urljoin(ROOT_URL, api_version) + "/"
         self._id_strategy = id_strategy or IdStrategyApplier()

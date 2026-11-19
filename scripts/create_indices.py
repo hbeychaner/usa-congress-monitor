@@ -1,8 +1,8 @@
-"""CLI: create or update OpenSearch indices from opensearch_mappings.yaml.
+"""CLI: create or update Elasticsearch indices from opensearch_mappings.yaml.
 
 Usage
 ─────
-    # Create all 17 indices (skip already-existing)
+    # Create all declared indices (skip already-existing)
     uv run scripts/create_indices.py
 
     # Create a single index
@@ -37,9 +37,9 @@ Options
     --reindex-version VERSION  Copy one index into its versioned staging index
     --validate-version VERSION  Validate one versioned staging index
     --dry-run      Print actions without executing them
-    --url URL      OpenSearch base URL (default: http://localhost:9200)
+    --url URL      Elasticsearch base URL (default: http://localhost:9200)
     --user USER    Basic-auth username (default: admin)
-    --password PW  Basic-auth password (default: from OPENSEARCH_PASSWORD env)
+    --password PW  Basic-auth password (default: from ES_LOCAL_PASSWORD env)
 """
 
 from __future__ import annotations
@@ -61,7 +61,7 @@ from cdm.store.index_manager import IndexManager
 
 
 def _load_env_defaults() -> dict:
-    """Load OpenSearch connection defaults from the application config."""
+    """Load Elasticsearch connection defaults from the application config."""
     elastic = get_config().elastic
     return {
         "api_key": elastic.elastic_api_key or None,
@@ -116,7 +116,7 @@ def main() -> None:
     _env = _load_env_defaults()
 
     parser = argparse.ArgumentParser(
-        description="Create or update OpenSearch indices from opensearch_mappings.yaml."
+        description="Create or update Elasticsearch indices from opensearch_mappings.yaml."
     )
     parser.add_argument(
         "--index", metavar="NAME", help="Target a single index (default: all)"
@@ -145,7 +145,7 @@ def main() -> None:
     parser.add_argument(
         "--dry-run", action="store_true", help="Print actions, don't execute"
     )
-    parser.add_argument("--url", default=_env["url"], help="OpenSearch base URL")
+    parser.add_argument("--url", default=_env["url"], help="Elasticsearch base URL")
     parser.add_argument("--user", default="elastic", help="Basic-auth username")
     parser.add_argument(
         "--password",
