@@ -191,7 +191,7 @@ class GraphStore:
         pointer: GraphVersionPointer,
         *,
         expected: GraphPointerSnapshot | None = None,
-    ) -> None:
+    ) -> GraphVersionPointer:
         self.require_schema()
         refreshed = self.client.indices.refresh(index=self.index)
         if refreshed["_shards"]["failed"]:
@@ -223,6 +223,7 @@ class GraphStore:
                 if_primary_term=before.primary_term,
                 refresh=True,
             )
+        return pointer
 
     def active_pointer(self, signal: Signal) -> GraphVersionPointer | None:
         try:

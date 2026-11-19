@@ -194,13 +194,14 @@ def test_graph_publication_keeps_one_previous_pointer(graph_client: Mock) -> Non
     store = GraphStore(graph_client)
     previous = GraphVersionPointer(signal=Signal.TOPIC, graph_version="v1", source_model_version="m1")
     for version in ("v2", "v3"):
-        store.publish(
+        published = store.publish(
             GraphVersionPointer(signal=Signal.TOPIC, graph_version=version, source_model_version=version),
             expected=GraphPointerSnapshot(
                 signal=Signal.TOPIC, pointer=previous, sequence_number=1, primary_term=1,
             ),
         )
         previous = GraphVersionPointer.model_validate(graph_client.index.call_args.kwargs["document"])
+        assert published == previous
     assert previous.previous is not None
     assert previous.previous.graph_version == "v2"
     assert previous.previous.previous is None

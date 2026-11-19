@@ -436,10 +436,10 @@ No declarations in this module.
 - function: [`GraphStore.require_schema(self) -> None`](../../../cdm/graph/store.py#L141)
 - function: [`GraphStore.write_edges(self, edges: Iterable[MemberEdge]) -> int`](../../../cdm/graph/store.py#L148)
 - function: [`GraphStore.pointer_snapshot(self, signal: Signal) -> GraphPointerSnapshot`](../../../cdm/graph/store.py#L173)
-- function: [`GraphStore.publish(self, pointer: GraphVersionPointer, *, expected: GraphPointerSnapshot \| None=None) -> None`](../../../cdm/graph/store.py#L189)
-- function: [`GraphStore.active_pointer(self, signal: Signal) -> GraphVersionPointer \| None`](../../../cdm/graph/store.py#L227)
-- function: [`GraphStore.active_version(self, signal: Signal) -> str \| None`](../../../cdm/graph/store.py#L236)
-- function: [`GraphStore.edge_count(self, signal: Signal, graph_version: str) -> int`](../../../cdm/graph/store.py#L240)
+- function: [`GraphStore.publish(self, pointer: GraphVersionPointer, *, expected: GraphPointerSnapshot \| None=None) -> GraphVersionPointer`](../../../cdm/graph/store.py#L189)
+- function: [`GraphStore.active_pointer(self, signal: Signal) -> GraphVersionPointer \| None`](../../../cdm/graph/store.py#L228)
+- function: [`GraphStore.active_version(self, signal: Signal) -> str \| None`](../../../cdm/graph/store.py#L237)
+- function: [`GraphStore.edge_count(self, signal: Signal, graph_version: str) -> int`](../../../cdm/graph/store.py#L241)
 
 ## cdm/graph/topics.py
 

@@ -631,6 +631,9 @@ The policy retains:
   over forcing a two-model cap.
 
 Publication records carry one predecessor, not an accumulating history.
+`GraphStore.publish()` returns the actual published pointer, including its
+predecessor; repair bundles and publication receipts use that returned value
+rather than the staged pointer specification.
 For publications without predecessor metadata, cleanup conservatively keeps the
 nearest older indexed generation; this does not certify it as a complete
 rollback snapshot. Only future atomic perspective publications can preserve a

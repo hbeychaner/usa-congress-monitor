@@ -603,8 +603,8 @@ class GraphRepairRehearsal:
                 != staged.written
             ):
                 raise ValueError("Candidate export count does not match written edges")
-            result.write(BundleFile.POINTER, staged.pointer)
-            store.publish(staged.pointer)
+            published = store.publish(staged.pointer)
+            result.write(BundleFile.POINTER, published)
             for identity, before in originals.items():
                 if identity in repairs:
                     current = StoredDocument.model_validate(
@@ -625,7 +625,7 @@ class GraphRepairRehearsal:
             current = StoredDocument.model_validate(
                 self.client.get(index=store.index, id=pointer_id).body
             )
-            if current.source != staged.pointer.model_dump(mode="json"):
+            if current.source != published.model_dump(mode="json"):
                 raise ValueError("Concurrent pointer change during rollback rehearsal")
             before_pointer = state.pointers[Signal.VOTING]
             if before_pointer is None:

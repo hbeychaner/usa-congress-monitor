@@ -65,8 +65,7 @@ def publish(store: GraphStore, version: str) -> GraphVersionPointer:
         )
         == 1
     )
-    store.publish(pointer)
-    return pointer
+    return store.publish(pointer)
 
 
 def test_published_lineage_round_trips_and_prior_versions_remain(
@@ -90,9 +89,9 @@ def test_stale_create_update_and_signal_scoped_rollback(store: GraphStore) -> No
         store.publish(original, expected=original_snapshot)
     assert store.active_pointer(Signal.TOPIC) == newer
     current = store.pointer_snapshot(Signal.TOPIC)
-    store.publish(original, expected=current)
+    original = store.publish(original, expected=current)
     assert store.active_pointer(Signal.TOPIC) == original
-    store.publish(newer, expected=store.pointer_snapshot(Signal.TOPIC))
+    newer = store.publish(newer, expected=store.pointer_snapshot(Signal.TOPIC))
     assert store.active_pointer(Signal.TOPIC) == newer
     assert store.edge_count(Signal.TOPIC, original.graph_version) == 1
 
