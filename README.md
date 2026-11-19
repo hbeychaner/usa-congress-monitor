@@ -157,3 +157,4 @@ test failures. Repairing some bills does not clear a job for an entire scope.
 - [Development and validation](documentation/guides/configuration-and-deployment.md#testing-and-contracts):
   local checks and hosted CI.
 - [Changelog](CHANGELOG.md).
+- [Security policy](.github/SECURITY.md): supported versions and private reporting.

@@ -363,6 +363,31 @@ The [API/frontend chapter](../reference/api-and-frontend.md) explains contract
 generation; regenerating TypeScript contracts needs the backend OpenAPI schema.
 No live application is required to build the static source reference.
 
+### Automated security checks
+
+The [security policy](../../.github/SECURITY.md) defines supported versions and
+private reporting. The [security workflow](../../.github/workflows/security.yml)
+runs CodeQL for Python and JavaScript/TypeScript on pushes and pull requests to
+`main`, weekly, and on manual dispatch. Analysis uses GitHub-hosted runners
+without starting the application, installing its dependencies or accessing local
+data. Findings appear in the repository's **Security** tab; a successful scan
+does not mean the code has no vulnerabilities.
+
+[Dependabot](../../.github/dependabot.yml) checks uv, npm and GitHub Actions
+weekly. Minor/patch version updates are grouped per ecosystem, major updates
+remain separate, and each ecosystem allows up to three open version-update PRs.
+Security-update PRs are managed separately by GitHub. Review changes and passing
+CI before merging; no automatic merging is configured. The existing npm audit
+gate remains enabled.
+
+Repository owners must also enable dependency graph, Dependabot alerts and
+security updates, private vulnerability reporting, secret scanning and push
+protection where available under **Settings > Advanced Security**. These
+repository settings are not enabled by committing workflow files. Use the
+checked-in CodeQL workflow rather than enabling a second default-setup scan.
+Rotate exposed credentials immediately; scanners cannot prove the absence of
+secrets or replace a security review.
+
 ## Google Cloud
 
 The [Terraform root](../../infra/terraform) provisions:

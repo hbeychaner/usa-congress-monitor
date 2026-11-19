@@ -4,6 +4,11 @@
 
 ### Fixed
 
+- Publish a main-branch-only security policy with private GitHub vulnerability
+  reporting. Add CodeQL scanning for Python and JavaScript/TypeScript on pushes,
+  pull requests and a weekly schedule, plus weekly Dependabot update PRs for uv,
+  npm and GitHub Actions. Keep dependency updates reviewable, retain the npm
+  audit gate, and document the separate owner-managed GitHub security settings.
 - Use Node.js 24-based checkout, Node setup, uv setup and artifact-upload actions
   in both hosted CI jobs, eliminating the deprecated Node.js 20 action-runtime
   warning without changing the frontend's Node.js 22 runtime or test commands.
