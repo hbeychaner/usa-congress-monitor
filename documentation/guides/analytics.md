@@ -654,6 +654,8 @@ Use the Docker-managed [cleanup procedure](../OPERATIONS_RUNBOOK.md#analytics-re
 to preview exact targets or explicitly submit a maintenance job. The cleanup
 task does not require an analytics worker or enable recurring acquisition,
 training or general archive-retention schedules.
+Hosted contract CI runs the cleanup safety and predecessor-publication tests
+alongside the real-index publication/rollback integration checks.
 
 [GraphHealthChecker.check](../../cdm/graph/health.py) checks published pointer
 presence, edge count, age (warning after nine days), last-build state, and topic

@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Run analytics cleanup, predecessor publication, read-only retirement and
+  native Ollama startup regression tests in hosted contract CI.
 - Bind graph repair bundles and rollback checks to the actual published pointer,
   including its retained predecessor; preserve exact source snapshots on restore.
 - Retain the live topic model and one predecessor, each graph signal's current

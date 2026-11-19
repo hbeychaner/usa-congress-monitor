@@ -138,7 +138,7 @@ For failed jobs, restarts or backups, use the
 Inspect a failed analysis job and resolve any reported capacity warning before
 resubmitting it; an analysis failure does not mean the underlying legislation
 needs downloading again.
-Successful analytics builds enqueue verified cleanup, retaining the served model
+Successful analytics builds enqueue separate verified cleanup jobs, retaining the served model
 and one predecessor. See the [analytics retention policy](documentation/guides/analytics.md#6-rebuilds-retention-and-operational-checks);
 downloaded base models and source data are not removed.
 Failed training and preview runs do not remove working models.

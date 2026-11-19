@@ -82,6 +82,12 @@ jobs:
           tests/test_config_container.py
           tests/unit/test_topic_training_job.py
           tests/unit/test_analytics_jobs.py
+          tests/unit/test_analytics_cleanup.py
+          tests/unit/test_ollama_startup.py
+          cdm/topics/cleanup.py
+          cdm/deployment/ollama.py
+          scripts/ensure_ollama.py
+          scripts/preview_analytics_retirement.py
           cdm/container.py
           cdm/workers/runtime.py
           scripts/set_metasubject_override.py
@@ -144,6 +150,11 @@ jobs:
           tests/unit/test_member_activity.py
           tests/test_vote_service.py
           tests/unit/test_analytics_jobs.py
+          tests/unit/test_analytics_cleanup.py
+          tests/unit/test_ollama_startup.py
+          tests/unit/test_topic_publication.py
+          tests/unit/test_perspective_publication.py
+          tests/unit/test_retirement_preview.py
           tests/unit/test_index_runner.py
           tests/unit/test_opensearch_bulk.py
           tests/unit/test_archive.py
