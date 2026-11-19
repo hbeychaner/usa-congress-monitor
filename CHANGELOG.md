@@ -4,6 +4,9 @@
 
 ### Fixed
 
+- Use Node.js 24-based checkout, Node setup, uv setup and artifact-upload actions
+  in both hosted CI jobs, eliminating the deprecated Node.js 20 action-runtime
+  warning without changing the frontend's Node.js 22 runtime or test commands.
 - Run analytics cleanup, predecessor publication, read-only retirement and
   native Ollama startup regression tests in hosted contract CI.
 - Bind graph repair bundles and rollback checks to the actual published pointer,

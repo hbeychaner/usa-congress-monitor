@@ -322,6 +322,11 @@ removes volumes and is destructive.** Do not use it as a routine restart.
 
 ## Testing and contracts
 
+The [hosted workflow](../../.github/workflows/contracts.yml) uses Node.js
+24-based actions on `ubuntu-latest` for checkout, tool setup and failure-artifact
+uploads in the contract and manual release-smoke jobs. This action runtime is
+separate from the frontend's explicitly selected Node.js 22; Python remains 3.13.
+
 ```bash
 uv run pytest -q
 # Focused backend/unit work:

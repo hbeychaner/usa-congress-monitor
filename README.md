@@ -154,5 +154,6 @@ test failures. Repairing some bills does not clear a job for an entire scope.
 - [Data collection and replay](documentation/guides/ingestion.md).
 - [Architecture and visual guides](documentation/reference/visuals.md).
 - [Analytics guide](documentation/guides/analytics.md).
-- [Development and validation](documentation/guides/configuration-and-deployment.md#testing-and-contracts).
+- [Development and validation](documentation/guides/configuration-and-deployment.md#testing-and-contracts):
+  local checks and hosted CI.
 - [Changelog](CHANGELOG.md).
