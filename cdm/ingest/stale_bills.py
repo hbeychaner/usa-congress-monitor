@@ -36,11 +36,24 @@ class IndexedBillState(BaseModel):
         )
         update_date = source.get("update_date")
         text_update = source.get("update_date_including_text")
+        metadata = source.get("source_metadata")
+        entries = (
+            metadata
+            if isinstance(metadata, list)
+            else [metadata]
+            if isinstance(metadata, dict)
+            else []
+        )
+        govinfo_hydrated = any(
+            isinstance(entry, dict)
+            and entry.get("source") == "govinfo:billstatus"
+            for entry in entries
+        )
         return cls(
             update_date=str(update_date) if update_date else None,
             update_date_including_text=str(text_update) if text_update else None,
             has_subject_data=bool(legislative) or bool(source.get("policy_area")),
-            hydrated=bool(source.get("hydrated_at")),
+            hydrated=bool(source.get("hydrated_at")) or govinfo_hydrated,
         )
 
 
@@ -51,6 +64,7 @@ class IndexedBillStateReader:
         "update_date",
         "update_date_including_text",
         "hydrated_at",
+        "source_metadata",
         "subjects.legislative_subjects",
         "policy_area",
     )

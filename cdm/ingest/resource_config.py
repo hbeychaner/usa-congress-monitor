@@ -182,8 +182,8 @@ RESOURCE_CONFIGS: dict[Resource, ResourceConfig] = {
             ResourceConfig(
                 resource=Resource.HOUSE_VOTE,
                 scope="static",
-                fetch_items_default=True,
-                notes="Global list; item URLs may include session details",
+                fetch_items_default=False,
+                notes="Voteview bulk CSVs provide primary roll-call coverage; API is list-only by default",
             ),
         ),
         (

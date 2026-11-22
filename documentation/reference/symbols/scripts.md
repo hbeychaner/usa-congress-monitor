@@ -103,9 +103,9 @@ Generated from declarations; see the catalogue scope in the index.
 
 - function: [`_date(value: str) -> date`](../../../scripts/queue_full_ingest.py#L25)
 - function: [`parse_args() -> argparse.Namespace`](../../../scripts/queue_full_ingest.py#L29)
-- function: [`_config(args: argparse.Namespace) -> FullIngestConfig`](../../../scripts/queue_full_ingest.py#L57)
-- function: [`_print_job(job: FullIngestJob) -> None`](../../../scripts/queue_full_ingest.py#L71)
-- function: [`main() -> None`](../../../scripts/queue_full_ingest.py#L75)
+- function: [`_config(args: argparse.Namespace) -> FullIngestConfig`](../../../scripts/queue_full_ingest.py#L62)
+- function: [`_print_job(job: FullIngestJob) -> None`](../../../scripts/queue_full_ingest.py#L77)
+- function: [`main() -> None`](../../../scripts/queue_full_ingest.py#L81)
 
 ## scripts/queue_govinfo_bulk.py
 

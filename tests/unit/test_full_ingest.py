@@ -26,6 +26,20 @@ def test_full_plan_covers_static_date_and_congress_scopes() -> None:
     assert all(job.payload["item_resources"] == ["bill"] for job in jobs)
 
 
+def test_full_plan_skips_modern_bill_item_hydration_when_govinfo_bulk_enabled() -> None:
+    config = FullIngestConfig(
+        first_congress=107,
+        last_congress=108,
+        start_date=date(2002, 1, 1),
+        end_date=date(2004, 1, 1),
+        window_days=365,
+        govinfo_bulk_bills=True,
+    )
+    jobs = {job.label: job.payload for job in plan_full_ingest(config)}
+    assert jobs["date:bill:2002-01-01:2002-12-31"]["item_resources"] == ["bill"]
+    assert jobs["date:bill:2003-01-01:2003-12-31"]["item_resources"] == []
+
+
 def test_smoke_job_is_bounded() -> None:
     job = smoke_job(FullIngestConfig())
 

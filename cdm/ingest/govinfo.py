@@ -27,7 +27,7 @@ from cdm.ingest.source_contract import BillStatusEvidence
 class GovInfoHttpSession(Protocol):
     """Minimal HTTP session contract used by discovery and download code."""
 
-    def get(self, url: str, **kwargs: Any) -> Any: ...
+    def get(self, url: Any, **kwargs: Any) -> Any: ...
 
 
 @dataclass(frozen=True)
@@ -471,7 +471,7 @@ class GovInfoBillStatusParser:
             ),
             None,
         )
-        committees = []
+        committees: list[dict[str, Any]] = []
         if container is None:
             return committees
         for element in container:
@@ -492,7 +492,7 @@ class GovInfoBillStatusParser:
             ),
             None,
         )
-        related = []
+        related: list[dict[str, str]] = []
         if container is None:
             return related
         for element in container:
@@ -580,32 +580,32 @@ class GovInfoBillStatusParser:
             for item in format_items:
                 if cls._local_name(item.tag) not in {"item", "format"}:
                     continue
-                values = {
+                fmt_values = {
                     "type": cls._first_text(item, "type"),
                     "url": cls._first_text(item, "url"),
                 }
-                if not values["type"] and values["url"]:
-                    values["type"] = (
-                        Path(values["url"].split("?", 1)[0]).suffix.lstrip(".").upper()
+                if not fmt_values["type"] and fmt_values["url"]:
+                    fmt_values["type"] = (
+                        Path(fmt_values["url"].split("?", 1)[0]).suffix.lstrip(".").upper()
                     )
-                if any(values.values()):
+                if any(fmt_values.values()):
                     formats.append({
-                        key: value for key, value in values.items() if value
+                        key: value for key, value in fmt_values.items() if value
                     })
-            values: dict[str, Any] = {
+            version_values: dict[str, Any] = {
                 "type": cls._first_text(element, "type"),
                 "date": cls._first_text(element, "date"),
                 "package_id": cls._first_text(element, "packageId"),
                 "source_url": cls._first_text(element, "url"),
             }
-            if not values["package_id"] and values["source_url"]:
-                values["package_id"] = Path(
-                    values["source_url"].split("?", 1)[0].rstrip("/").split("/")[-1]
+            if not version_values["package_id"] and version_values["source_url"]:
+                version_values["package_id"] = Path(
+                    version_values["source_url"].split("?", 1)[0].rstrip("/").split("/")[-1]
                 ).stem
             if formats:
-                values["formats"] = formats
-            if any(value for key, value in values.items() if key != "formats"):
-                versions.append({key: value for key, value in values.items() if value})
+                version_values["formats"] = formats
+            if any(value for key, value in version_values.items() if key != "formats"):
+                versions.append({key: value for key, value in version_values.items() if value})
         return versions
 
     @classmethod
@@ -624,7 +624,7 @@ class GovInfoBillStatusParser:
     def _titles(cls, root: ET.Element) -> list[dict[str, str]]:
         """Alternate titles: <titles><item><titleType>/<title>/...</item>."""
         container = next(cls._elements(root, "titles"), None)
-        titles = []
+        titles: list[dict[str, str]] = []
         if container is None:
             return titles
         for element in container:
@@ -644,7 +644,7 @@ class GovInfoBillStatusParser:
     def _amendments(cls, root: ET.Element) -> list[dict[str, str]]:
         """<amendments><amendment><number>/<congress>/<type>/<purpose>..."""
         container = next(cls._elements(root, "amendments"), None)
-        amendments = []
+        amendments: list[dict[str, str]] = []
         if container is None:
             return amendments
         for element in container:
@@ -667,7 +667,7 @@ class GovInfoBillStatusParser:
     def _cbo_cost_estimates(cls, root: ET.Element) -> list[dict[str, str]]:
         """<cboCostEstimates><item><pubDate>/<title>/<url>/<description>."""
         container = next(cls._elements(root, "cboCostEstimates"), None)
-        estimates = []
+        estimates: list[dict[str, str]] = []
         if container is None:
             return estimates
         for element in container:
@@ -867,7 +867,7 @@ class GovInfoDiscovery:
     def __init__(
         self,
         *,
-        session: GovInfoHttpSession | None = None,
+        session: GovInfoHttpSession | requests.Session | None = None,
         timeout: int = 60,
     ) -> None:
         if timeout < 1:
@@ -892,6 +892,27 @@ class GovInfoDiscovery:
             collection=normalized_collection,
             congress=congress,
             measure_type=measure_type.lower(),
+            url=url,
+        )
+
+    def collection_zip_package(
+        self, collection: str, congress: int, measure_type: str
+    ) -> GovInfoPackage:
+        """Return the official bulk ZIP archive URL for a measure-type collection."""
+        normalized_collection = collection.upper()
+        if normalized_collection not in {"BILLSTATUS", "BILLSUM"}:
+            raise ValueError("bulk ZIP collection must be BILLSTATUS or BILLSUM")
+        normalized_type = measure_type.lower()
+        package_id = f"{normalized_collection}-{congress}{normalized_type}"
+        url = (
+            f"{self.BASE_URL}/{normalized_collection}/{congress}/{normalized_type}/"
+            f"{package_id}.zip"
+        )
+        return GovInfoPackage(
+            package_id=package_id,
+            collection=normalized_collection,
+            congress=congress,
+            measure_type=normalized_type,
             url=url,
         )
 
@@ -983,8 +1004,10 @@ class GovInfoDiscovery:
 
         packages: list[GovInfoPackage] = []
         for entry in entries:
+            name: Any = None
+            entry_url: Any = None
             if isinstance(entry, str):
-                name, entry_url = entry, None
+                name = entry
             elif isinstance(entry, dict):
                 name = entry.get("name") or entry.get("path") or entry.get("file")
                 entry_url = (
@@ -996,6 +1019,7 @@ class GovInfoDiscovery:
                 continue
             package_id = Path(name).stem
             package_session: int | None = session
+            version: str | None = None
             if normalized_collection == "BILLS":
                 match = GovInfoBillsParser._PACKAGE_ID.match(package_id)
                 package_session = (
@@ -1007,11 +1031,9 @@ class GovInfoDiscovery:
             elif normalized_collection == "BILLSUM":
                 match = GovInfoBillSummaryParser._PACKAGE_ID.match(package_id)
                 package_session = None
-                version = None
             else:
                 match = GovInfoBillStatusParser._PACKAGE_ID.match(package_id)
                 package_session = None
-                version = None
             if not match:
                 continue
             package_url = str(entry_url or name)
@@ -1040,12 +1062,20 @@ class GovInfoDiscovery:
         measure_types: tuple[str, ...] = MEASURE_TYPES,
         collections: tuple[str, ...] = ("BILLSTATUS", "BILLSUM", "BILLS"),
         sessions: tuple[int, ...] = (1, 2),
+        prefer_zip: bool = False,
     ) -> list[GovInfoPackage]:
         """Discover all supported official packages for one Congress."""
         packages: dict[str, GovInfoPackage] = {}
         for collection in collections:
+            normalized = collection.upper()
             for measure_type in measure_types:
-                collection_sessions = sessions if collection.upper() == "BILLS" else (1,)
+                if prefer_zip and normalized in {"BILLSTATUS", "BILLSUM"}:
+                    package = self.collection_zip_package(
+                        normalized, congress, measure_type
+                    )
+                    packages.setdefault(package.package_id, package)
+                    continue
+                collection_sessions = sessions if normalized == "BILLS" else (1,)
                 for session in collection_sessions:
                     for package in self.list_measure_packages(
                         collection,
@@ -1129,7 +1159,7 @@ class GovInfoDownloader:
         self,
         root: Path,
         *,
-        session: GovInfoHttpSession | None = None,
+        session: GovInfoHttpSession | requests.Session | None = None,
         timeout: int = 60,
         manifest_store: GovInfoManifestStore | None = None,
         rate_limiter: Any | None = None,

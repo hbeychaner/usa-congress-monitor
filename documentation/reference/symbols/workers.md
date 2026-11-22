@@ -71,12 +71,15 @@ No declarations in this module.
 - class: [`GovInfoPackageRunner()`](../../../cdm/workers/govinfo_runner.py#L62)
 - function: [`GovInfoPackageRunner.__init__(self, store: JobStore, redis_client: Redis, submitter: JobSubmitter, dispatcher: JobDispatcher, redis_config: RedisConfig, session: requests.Session, rate_limiter: TokenBucket) -> None`](../../../cdm/workers/govinfo_runner.py#L65)
 - function: [`GovInfoPackageRunner.run(self, job_id: str) -> JobResult`](../../../cdm/workers/govinfo_runner.py#L94)
-- class: [`GovInfoBatchRunner()`](../../../cdm/workers/govinfo_runner.py#L198)
-- function: [`GovInfoBatchRunner.__init__(self, store: JobStore, dispatcher: JobDispatcher) -> None`](../../../cdm/workers/govinfo_runner.py#L201)
-- function: [`GovInfoBatchRunner.run(self, batch_id: str) -> JobResult`](../../../cdm/workers/govinfo_runner.py#L205)
-- class: [`ReconciliationRunner()`](../../../cdm/workers/govinfo_runner.py#L216)
-- function: [`ReconciliationRunner.__init__(self, store: JobStore, client: Elasticsearch) -> None`](../../../cdm/workers/govinfo_runner.py#L219)
-- function: [`ReconciliationRunner.run(self, job_id: str) -> JobResult`](../../../cdm/workers/govinfo_runner.py#L223)
+- function: [`GovInfoPackageRunner._parse_one_record(self, spec: GovInfoCollectionSpec, xml_bytes: bytes, package: GovInfoPackage, *, artifact_hash: str, check: SourceCheck, checked_at: str \| None) -> JsonObject`](../../../cdm/workers/govinfo_runner.py#L211)
+- function: [`GovInfoPackageRunner._parse_zip_records(self, downloader: GovInfoDownloader, spec: GovInfoCollectionSpec, package: GovInfoPackage, artifact: Path, *, artifact_hash: str, check: SourceCheck, checked_at: str \| None) -> list[tuple[str, JsonObject]]`](../../../cdm/workers/govinfo_runner.py#L240)
+- field: [`GovInfoPackageRunner._parse_zip_records.parsed: list[tuple[str, JsonObject]]`](../../../cdm/workers/govinfo_runner.py#L257)
+- class: [`GovInfoBatchRunner()`](../../../cdm/workers/govinfo_runner.py#L280)
+- function: [`GovInfoBatchRunner.__init__(self, store: JobStore, dispatcher: JobDispatcher) -> None`](../../../cdm/workers/govinfo_runner.py#L283)
+- function: [`GovInfoBatchRunner.run(self, batch_id: str) -> JobResult`](../../../cdm/workers/govinfo_runner.py#L287)
+- class: [`ReconciliationRunner()`](../../../cdm/workers/govinfo_runner.py#L298)
+- function: [`ReconciliationRunner.__init__(self, store: JobStore, client: Elasticsearch) -> None`](../../../cdm/workers/govinfo_runner.py#L301)
+- function: [`ReconciliationRunner.run(self, job_id: str) -> JobResult`](../../../cdm/workers/govinfo_runner.py#L305)
 
 ## cdm/workers/heartbeat.py
 

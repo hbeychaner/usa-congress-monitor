@@ -250,8 +250,8 @@ The current catalog classifies resources as follows:
 |---|---|---|
 | `bill`, `member` | Date-windowed | Default off; opt in through `item_resources`. |
 | `committee`, `committee_meeting`, `committee_print`, `nomination`, `treaty` | Date-windowed | Default on. |
-| `amendment`, `committee_report`, `congress`, `crsreport`, `hearing`, `house_communication`, `senate_communication`, `house_vote` | Static | Default on. |
-| `bound_congressional_record`, `daily_congressional_record`, `house_requirement` | Static | Default off; opt in selectively. |
+| `amendment`, `committee_report`, `congress`, `crsreport`, `hearing`, `house_communication`, `senate_communication` | Static | Default on. |
+| `bound_congressional_record`, `daily_congressional_record`, `house_requirement`, `house_vote` | Static | Default off; opt in selectively (`house_vote` roll calls are covered by Voteview bulk CSVs). |
 | `law` | Congress-scoped | List-only by normal policy; the registered list spec requires congress. |
 | `summaries` | Date-windowed | List-only; no independent item endpoint. |
 
@@ -619,8 +619,13 @@ transaction spanning HTTP, SQLite, Redis, broker, and search server.
 
 [`GovInfoDiscovery`](../../cdm/ingest/govinfo.py) supports `BILLSTATUS`,
 `BILLSUM`, and `BILLS`, and the eight standard bill/resolution type slugs.
-It can construct measure/text package descriptors, probe availability, or
+It can construct measure/text package descriptors, construct measure-type bulk
+`.zip` archive descriptors (`collection_zip_package()`), probe availability, or
 enumerate official JSON directories with HTML-listing fallback.
+When `prefer_zip=True` is passed to `list_congress_packages()`, `BILLSTATUS` and
+`BILLSUM` are discovered as per-measure-type `.zip` archives (16 requests per
+Congress instead of tens of thousands of individual XML requests), while `BILLS`
+continues to enumerate individual published text-version packages.
 BILLS text packages have session/version metadata; measure-level packages
 do not require session. A 404 probe is `not_available`, distinct from a
 network failure.
@@ -632,8 +637,8 @@ It uses ETag/last-modified headers where present, writes `.part` then replaces
 the destination, and records byte count/hash/provenance in `manifest.json`
 and optional SQLite manifest storage. A BILLS bulk URL 404 triggers a content
 URL fallback. Errors remove the partial file and persist failure state.
-`extract_zip()` separately validates extraction paths; package runners parse
-the returned XML artifact directly rather than automatically using ZIP mode.
+`extract_zip()` safely validates extraction paths when a `.zip` package is
+processed by `GovInfoPackageRunner`.
 
 The downloader cache is not proof that upstream never changed: a local
 matching `complete` record can short-circuit network revalidation.
@@ -645,9 +650,11 @@ not a global automatic cache-invalidation system.
 
 [`GovInfoPackageRunner`](../../cdm/workers/govinfo_runner.py) claims a package,
 downloads it, chooses an adapter, marks the manifest parsed, archives the
-normalized record using **package ID** within an immutable artifact/parser/check
-snapshot directory, publishes it, creates
-an expected-count-one index job, and marks acquisition succeeded.
+normalized record(s) using **package ID** within an immutable artifact/parser/check
+snapshot directory, publishes them to the job's Redis stream, creates
+an index job with `expected_count` matching the parsed record count (1 for
+single XML packages, or the constituent XML count for bulk `.zip` archives),
+and marks acquisition succeeded.
 Its index payload includes source attempt so re-parsing does not collide
 with another source attempt's index job.
 The index job points to that snapshot only; retained snapshots and package

@@ -34,9 +34,13 @@ class FullIngestConfig:
     fetch_items: bool = True
     force_item_fetch: bool = False
     # Resources hydrated despite fetch_items_default=False (bills need item
-    # fetch for actions/cosponsors/subjects/text).
+    # fetch for actions/cosponsors/subjects/text when not covered by GovInfo bulk).
     item_resources: tuple[str, ...] = ("bill",)
     preserve_raw: bool = False
+    # When True, skip Congress.gov 11-endpoint bill item hydration for date windows
+    # starting in or after the 108th Congress (2003-01-01), where GovInfo BILLSTATUS
+    # bulk ZIPs provide complete bill details.
+    govinfo_bulk_bills: bool = False
 
     def __post_init__(self) -> None:
         if self.first_congress < 1:
@@ -107,6 +111,14 @@ def plan_full_ingest(config: FullIngestConfig) -> list[FullIngestJob]:
                 "from_date": _timestamp(start),
                 "to_date": _timestamp(end, end_of_day=True),
             }
+            if (
+                config.govinfo_bulk_bills
+                and resource is Resource.BILL
+                and start >= date(2003, 1, 1)
+            ):
+                payload["item_resources"] = [
+                    r for r in config.item_resources if r != Resource.BILL.value
+                ]
             jobs.append(
                 FullIngestJob(
                     f"date:{resource.value}:{start.isoformat()}:{end.isoformat()}",

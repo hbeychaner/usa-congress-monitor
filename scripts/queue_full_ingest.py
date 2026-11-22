@@ -37,6 +37,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--concurrency", type=int, default=4)
     parser.add_argument("--index-batch-size", type=int, default=500)
     parser.add_argument("--preserve-raw", action="store_true")
+    parser.add_argument(
+        "--govinfo-bulk-bills",
+        action="store_true",
+        help="Skip 11-endpoint Congress.gov bill hydration from 2003+ (covered by GovInfo BILLSTATUS bulk ZIPs)",
+    )
     parser.add_argument("--smoke", action="store_true", help="Queue one bounded smoke job")
     parser.add_argument("--dry-run", action="store_true", help="Print jobs without queueing")
     parser.add_argument(
@@ -65,6 +70,7 @@ def _config(args: argparse.Namespace) -> FullIngestConfig:
         concurrency=args.concurrency,
         index_batch_size=args.index_batch_size,
         preserve_raw=args.preserve_raw,
+        govinfo_bulk_bills=args.govinfo_bulk_bills,
     )
 
 

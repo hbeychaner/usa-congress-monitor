@@ -133,14 +133,48 @@ def test_discovery_builds_measure_and_text_package_urls():
     discovery = GovInfoDiscovery()
 
     status = discovery.measure_package("billstatus", 118, "hr", 1)
+    zip_pkg = discovery.collection_zip_package("billstatus", 118, "hr")
     text = discovery.text_package(118, 1, "hr", 1, "ih")
 
     assert status.package_id == "BILLSTATUS-118hr1"
     assert status.url.endswith("/BILLSTATUS/118/hr/BILLSTATUS-118hr1.xml")
+    assert zip_pkg.package_id == "BILLSTATUS-118hr"
+    assert zip_pkg.url.endswith("/BILLSTATUS/118/hr/BILLSTATUS-118hr.zip")
     assert text.package_id == "BILLS-118hr1ih"
     assert text.url.endswith("/BILLS/118/1/hr/BILLS-118hr1ih.xml")
     assert text.session == 1
     assert text.version_code == "ih"
+
+
+def test_discovery_prefer_zip_returns_collection_zips_without_directory_fetches():
+    class FailIfCalledForStatusSession:
+        def __init__(self):
+            self.calls = []
+
+        def get(self, url, **kwargs):
+            self.calls.append(url)
+            if "BILLSTATUS" in url or "BILLSUM" in url:
+                raise AssertionError("BILLSTATUS/BILLSUM should use direct ZIP URLs")
+            return StubResponse(
+                json_payload={"files": [{"name": "BILLS-118hr1ih.xml"}]}
+            )
+
+    session = FailIfCalledForStatusSession()
+    packages = GovInfoDiscovery(session=session).list_congress_packages(
+        118,
+        measure_types=("hr", "s"),
+        collections=("BILLSTATUS", "BILLSUM", "BILLS"),
+        sessions=(1,),
+        prefer_zip=True,
+    )
+
+    ids = {p.package_id: p.url for p in packages}
+    assert ids["BILLSTATUS-118hr"].endswith("/BILLSTATUS/118/hr/BILLSTATUS-118hr.zip")
+    assert ids["BILLSTATUS-118s"].endswith("/BILLSTATUS/118/s/BILLSTATUS-118s.zip")
+    assert ids["BILLSUM-118hr"].endswith("/BILLSUM/118/hr/BILLSUM-118hr.zip")
+    assert ids["BILLSUM-118s"].endswith("/BILLSUM/118/s/BILLSUM-118s.zip")
+    assert "BILLS-118hr1ih" in ids
+    assert len(session.calls) == 2
 
 
 @pytest.mark.parametrize(

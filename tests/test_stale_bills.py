@@ -99,6 +99,12 @@ def test_state_reads_subjects_and_policy_area() -> None:
     empty = IndexedBillState.from_source({"subjects": {"legislative_subjects": []}})
     assert not empty.has_subject_data
     assert not empty.hydrated
+    govinfo_state = IndexedBillState.from_source({
+        "update_date": "2025-01-03T08:06:15Z",
+        "source_metadata": [{"source": "govinfo:billstatus"}],
+    })
+    assert govinfo_state.hydrated
+    assert not _filter(**{"9533": govinfo_state}).needs_refresh(_meta())
 
 
 def test_latest_archive_replaces_older_record(tmp_path: Path) -> None:

@@ -48,6 +48,11 @@ def main() -> None:
         action="store_true",
         help="dispatch one Celery task per package instead of durable batches",
     )
+    parser.add_argument(
+        "--xml-packages",
+        action="store_true",
+        help="discover individual XML files for BILLSTATUS/BILLSUM instead of bulk ZIP archives",
+    )
     args = parser.parse_args()
 
     if args.batch_size < 1:
@@ -57,7 +62,7 @@ def main() -> None:
         c.strip().upper() for c in args.collections.split(",") if c.strip()
     )
     packages = GovInfoDiscovery().list_congress_packages(
-        args.congress, collections=collections
+        args.congress, collections=collections, prefer_zip=not args.xml_packages
     )
     counts = Counter(package.collection for package in packages)
     print(f"Congress {args.congress}: {len(packages)} packages")

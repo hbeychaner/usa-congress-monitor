@@ -85,9 +85,10 @@ default, `make up` runs the web UI, the FastAPI backend, and one lightweight
 indexing/maintenance worker.
 
 When you are ready to load legislative records:
-1. Follow the [ingestion guide](documentation/guides/ingestion.md) and start
-   with a small date window or single Congress rather than a full-history
-   backfill.
+1. Follow the [ingestion guide](documentation/guides/ingestion.md) and prefer
+   bulk GovInfo ZIP packages (`scripts/queue_govinfo_bulk.py`) and Voteview CSVs
+   (`scripts/ingest_votes.py`) for full Congress backfills, using the
+   Congress.gov API for bounded date windows or non-bulk resources.
 2. Review the [worker profiles and capacity requirements](documentation/guides/configuration-and-deployment.md#managed-stack-compose)
    to enable the `acquisition` or `analytics` Docker Compose profiles when
    running collection or training jobs.

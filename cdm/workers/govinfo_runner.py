@@ -113,38 +113,47 @@ class GovInfoPackageRunner:
             ) from None
         outdir = Path(payload.outdir) / job_id
         manifest = GovInfoManifestStore(outdir / "govinfo.sqlite3")
-        artifact = GovInfoDownloader(
+        downloader = GovInfoDownloader(
             outdir,
             manifest_store=manifest,
             session=self._session,
             rate_limiter=self._rate_limiter,
-        ).download(package)
-        record = spec.parser.parse(artifact.read_bytes(), package)
+        )
+        artifact = downloader.download(package)
         metadata = manifest.get(package)
         if metadata is None:
             raise RuntimeError(
                 f"Missing durable source-fetch evidence: {package.package_id}"
             )
         check = SourceCheck.model_validate(metadata)
-        record["source_checked_at"] = (
+        checked_at = (
             check.fetched_at.isoformat() if check.fetched_at is not None else None
         )
         artifact_hash = GovInfoDownloader._sha256(artifact)
-        provenance = SourceMetadata.model_validate(record["source_metadata"])
-        provenance.sha256 = artifact_hash
-        provenance.parser_version = spec.parser_version
-        record["source_metadata"] = provenance.model_dump(
-            mode="json", exclude_none=True
-        )
-        if spec.resource == "bill":
-            record["hydration_assessment"] = HydrationAssessment(
-                source=provenance.source,
-                reason="GovInfo source evidence does not assess Congress API detail retrieval.",
-            ).model_dump(mode="json")
-        if "source_snapshot" in record:
-            snapshot = SnapshotEvidence.model_validate(record["source_snapshot"])
-            snapshot.checked_at = check.fetched_at
-            record["source_snapshot"] = snapshot.model_dump(mode="json")
+        if artifact.suffix.lower() == ".zip":
+            records = self._parse_zip_records(
+                downloader,
+                spec,
+                package,
+                artifact,
+                artifact_hash=artifact_hash,
+                check=check,
+                checked_at=checked_at,
+            )
+        else:
+            records = [
+                (
+                    package.package_id,
+                    self._parse_one_record(
+                        spec,
+                        artifact.read_bytes(),
+                        package,
+                        artifact_hash=artifact_hash,
+                        check=check,
+                        checked_at=checked_at,
+                    ),
+                )
+            ]
         manifest.upsert(
             package,
             status="parsed",
@@ -152,29 +161,34 @@ class GovInfoPackageRunner:
             byte_count=artifact.stat().st_size,
             sha256=artifact_hash,
             parser_version=spec.parser_version,
-            fetched_at=check.fetched_at.isoformat()
-            if check.fetched_at is not None
-            else None,
+            fetched_at=checked_at,
         )
         snapshot_root = outdir.with_name(
-            f"{job_id}:{artifact_hash}:{spec.parser_version}:{record['source_checked_at']}"
+            f"{job_id}:{artifact_hash}:{spec.parser_version}:{checked_at}"
         )
-        JsonlRecordArchive(snapshot_root, int(job["attempts"])).write(
-            spec.resource,
-            record,
-            record_id=package.package_id,
-        )
+        archive = JsonlRecordArchive(snapshot_root, int(job["attempts"]))
         stream_name = RedisRecordStream.stream_name(job_id, spec.resource)
-        RedisRecordStream(
+        stream = RedisRecordStream(
             self._redis, stream_name, maxlen=self._redis_config.redis_stream_maxlen
-        ).publish(spec.resource, record)
+        )
+        if len(records) == 1:
+            record_id, record = records[0]
+            archive.write(spec.resource, record, record_id=record_id)
+            stream.publish(spec.resource, record)
+        else:
+            archive.write_many(
+                spec.resource, [record for _, record in records]
+            )
+            for _, record in records:
+                stream.publish(spec.resource, record)
+        expected_count = len(records)
         index_payload = IndexPayload(
             stream=stream_name,
             resource=spec.resource,
-            batch_size=1,
+            batch_size=1 if expected_count <= 1 else min(500, expected_count),
             preserve_raw=True,
             consumer_group=self._redis_config.redis_consumer_group,
-            expected_count=1,
+            expected_count=expected_count,
             archive_root=str(snapshot_root),
             target_index=payload.target_index,
             replace=payload.replace,
@@ -193,6 +207,74 @@ class GovInfoPackageRunner:
         return JobResult(
             job_id=job_id, index_jobs=[index_job["id"]], resource=spec.resource
         )
+
+    def _parse_one_record(
+        self,
+        spec: GovInfoCollectionSpec,
+        xml_bytes: bytes,
+        package: GovInfoPackage,
+        *,
+        artifact_hash: str,
+        check: SourceCheck,
+        checked_at: str | None,
+    ) -> JsonObject:
+        record = spec.parser.parse(xml_bytes, package)
+        record["source_checked_at"] = checked_at
+        provenance = SourceMetadata.model_validate(record["source_metadata"])
+        provenance.sha256 = artifact_hash
+        provenance.parser_version = spec.parser_version
+        record["source_metadata"] = provenance.model_dump(
+            mode="json", exclude_none=True
+        )
+        if spec.resource == "bill":
+            record["hydration_assessment"] = HydrationAssessment(
+                source=provenance.source,
+                reason="GovInfo source evidence does not assess Congress API detail retrieval.",
+            ).model_dump(mode="json")
+        if "source_snapshot" in record:
+            snapshot = SnapshotEvidence.model_validate(record["source_snapshot"])
+            snapshot.checked_at = check.fetched_at
+            record["source_snapshot"] = snapshot.model_dump(mode="json")
+        return record
+
+    def _parse_zip_records(
+        self,
+        downloader: GovInfoDownloader,
+        spec: GovInfoCollectionSpec,
+        package: GovInfoPackage,
+        artifact: Path,
+        *,
+        artifact_hash: str,
+        check: SourceCheck,
+        checked_at: str | None,
+    ) -> list[tuple[str, JsonObject]]:
+        extracted_dir = downloader.extract_zip(package, artifact)
+        xml_files = sorted(extracted_dir.rglob("*.xml"))
+        if not xml_files:
+            raise ValueError(
+                f"GovInfo ZIP package contains no XML entries: {package.package_id}"
+            )
+        parsed: list[tuple[str, JsonObject]] = []
+        for xml_path in xml_files:
+            entry_package = GovInfoPackage(
+                package_id=xml_path.stem,
+                collection=package.collection,
+                congress=package.congress,
+                measure_type=package.measure_type,
+                url=package.url,
+                session=package.session,
+                version_code=package.version_code,
+            )
+            record = self._parse_one_record(
+                spec,
+                xml_path.read_bytes(),
+                entry_package,
+                artifact_hash=artifact_hash,
+                check=check,
+                checked_at=checked_at,
+            )
+            parsed.append((entry_package.package_id, record))
+        return parsed
 
 
 class GovInfoBatchRunner:

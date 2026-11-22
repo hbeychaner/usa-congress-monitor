@@ -22,7 +22,7 @@ remain authoritative in source. Follow the narrative chapters for intent.
 | [deployment](deployment.md) | 3 | 56 |
 | [frontend](frontend.md) | 51 | 2122 |
 | [graph](graph.md) | 11 | 432 |
-| [ingest](ingest.md) | 19 | 744 |
+| [ingest](ingest.md) | 19 | 754 |
 | [jobs](jobs.md) | 4 | 163 |
 | [models](models.md) | 15 | 816 |
 | [perspectives](perspectives.md) | 13 | 190 |
@@ -31,6 +31,6 @@ remain authoritative in source. Follow the narrative chapters for intent.
 | [tools](tools.md) | 2 | 104 |
 | [topics](topics.md) | 4 | 100 |
 | [utils](utils.md) | 15 | 216 |
-| [workers](workers.md) | 16 | 213 |
+| [workers](workers.md) | 16 | 216 |
 
-Total: 269 source files; 6870 declarations.
+Total: 269 source files; 6883 declarations.

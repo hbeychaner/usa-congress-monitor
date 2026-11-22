@@ -384,7 +384,9 @@ class GovInfoRefreshScheduler:
     def run(self, now: datetime) -> tuple[int, list[str]]:
         congress = congress_for_year(now.year)
         queued: list[str] = []
-        for package in self._discovery.list_congress_packages(congress):
+        for package in self._discovery.list_congress_packages(
+            congress, prefer_zip=True
+        ):
             payload = GovInfoPackagePayload(
                 collection=package.collection,
                 congress=package.congress,

@@ -147,6 +147,65 @@ class TestGovInfoSnapshotRetention:
         assert isinstance(metadata, list)
         assert len(metadata) == 2
 
+    def test_zip_package_runner_extracts_archives_and_batches_index_job(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import zipfile
+
+        artifact = tmp_path / "BILLSTATUS-119hr.zip"
+        with zipfile.ZipFile(artifact, "w") as handle:
+            handle.writestr(
+                "BILLSTATUS-119hr1.xml",
+                "<billStatus><bill><updateDate>2026-01-02T00:00:00Z</updateDate>"
+                "<title>First Bill</title><actions/></bill></billStatus>",
+            )
+            handle.writestr(
+                "BILLSTATUS-119hr2.xml",
+                "<billStatus><bill><updateDate>2026-01-02T00:00:00Z</updateDate>"
+                "<title>Second Bill</title><actions/></bill></billStatus>",
+            )
+        root = tmp_path / "archives"
+        payload = GovInfoPackagePayload(
+            package_id="BILLSTATUS-119hr",
+            collection="BILLSTATUS",
+            congress=119,
+            measure_type="hr",
+            url="https://www.govinfo.gov/bulkdata/BILLSTATUS/119/hr/BILLSTATUS-119hr.zip",
+            outdir=str(root),
+        )
+        store = Mock(spec=JobStore)
+        store.mark_running.return_value = {
+            "payload": payload.to_json(),
+            "attempts": 1,
+        }
+        submitter = Mock(spec=JobSubmitter)
+        submitter.submit.return_value = {"id": "index:zip-batch"}
+        monkeypatch.setattr(GovInfoDownloader, "download", Mock(return_value=artifact))
+        monkeypatch.setattr(
+            GovInfoManifestStore,
+            "get",
+            Mock(return_value={"fetched_at": "2026-01-03T00:00:00Z"}),
+        )
+        runner = GovInfoPackageRunner(
+            store,
+            Mock(spec=Redis),
+            submitter,
+            Mock(spec=JobDispatcher),
+            RedisConfig(),
+            Mock(spec=requests.Session),
+            Mock(spec=TokenBucket),
+        )
+        runner.run("govinfo_bulk:zip-test")
+        index = IndexPayload.model_validate(submitter.submit.call_args.args[1])
+        assert index.expected_count == 2
+        assert index.batch_size == 2
+        assert index.archive_root is not None
+        archive = SQLiteRecordArchive(Path(index.archive_root), 1, read_only=True)
+        archived = archive.records("bill")
+        archive.engine.dispose()
+        assert [r["id"] for r in archived] == ["bill:119:hr:1", "bill:119:hr:2"]
+        assert [r["title"] for r in archived] == ["First Bill", "Second Bill"]
+
     def test_staging_write_rejects_preview_limit_before_building_clients(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
