@@ -69,3 +69,4 @@ packages = ["cdm"]
 [tool.pytest.ini_options]
 # pytest.ini already present; these are duplicated here for uv-managed envs
 testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "function"

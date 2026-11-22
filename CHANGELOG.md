@@ -12,6 +12,9 @@
   (`react-dom`, `@types/react-dom`, and `@vitejs/plugin-react`) with React 18
   and Vite 6 so `npm ci` resolves cleanly in CI, and mock missing index state in
   `tests/test_party_service.py::test_repository_snapshot_carries_version_and_identity`.
+- Set `asyncio_default_fixture_loop_scope = function` in `pytest.ini` and
+  `pyproject.toml` so `pytest -W error::UserWarning` in CI does not fail on
+  `pytest-asyncio`'s unset loop scope deprecation warning.
 - Publish a main-branch-only security policy with private GitHub vulnerability
   reporting. Add CodeQL scanning for Python and JavaScript/TypeScript on pushes,
   pull requests and a weekly schedule, plus weekly Dependabot update PRs for uv,
