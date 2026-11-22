@@ -114,6 +114,7 @@ def test_topic_hides_clusters_that_failed_the_gate() -> None:
 
 def test_repository_snapshot_carries_version_and_identity() -> None:
     client = MagicMock(spec=Elasticsearch, indices=MagicMock())
+    client.indices.exists.return_value = False
     repository = PerspectiveRepository(client, "analysis")
 
     assert (

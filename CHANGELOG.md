@@ -4,6 +4,14 @@
 
 ### Fixed
 
+- Upgrade vulnerable Python dependencies in `pyproject.toml`, `requirements.txt`,
+  and `uv.lock` (`anyio`, `certifi`, `filelock`, `pyjwt`, `pytest`,
+  `python-dotenv`, `setuptools`, `soupsieve`, `urllib3`) to resolve all 46
+  open Dependabot security alerts.
+- Align `frontend/app/package.json` and `frontend/app/package-lock.json`
+  (`react-dom`, `@types/react-dom`, and `@vitejs/plugin-react`) with React 18
+  and Vite 6 so `npm ci` resolves cleanly in CI, and mock missing index state in
+  `tests/test_party_service.py::test_repository_snapshot_carries_version_and_identity`.
 - Publish a main-branch-only security policy with private GitHub vulnerability
   reporting. Add CodeQL scanning for Python and JavaScript/TypeScript on pushes,
   pull requests and a weekly schedule, plus weekly Dependabot update PRs for uv,
