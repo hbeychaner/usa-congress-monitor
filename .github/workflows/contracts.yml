@@ -67,77 +67,19 @@ jobs:
       - run: npm run contracts:check
         working-directory: frontend/app
       - name: Lint pipeline acceptance
+        run: uvx ruff==0.17.3 check cdm scripts tools tests
+      - name: Check static types
         run: >-
-          uvx ruff==0.17.3 check
-          tests/integration/test_pipeline_failures.py
-          tests/integration/test_release_images.py
-          tests/unit/test_deployment.py
-          tests/unit/test_local_capacity.py
-          cdm/deployment/capacity.py
-          cdm/config/local_capacity.py
-          scripts/check_stack_capacity.py
-          cdm/models/people.py
-          tests/unit/test_job_lifecycle.py
-          tests/unit/test_read_boundary.py
-          tests/test_config_container.py
-          tests/unit/test_topic_training_job.py
-          tests/unit/test_analytics_jobs.py
-          tests/unit/test_analytics_cleanup.py
-          tests/unit/test_ollama_startup.py
-          cdm/topics/cleanup.py
-          cdm/deployment/ollama.py
-          scripts/ensure_ollama.py
-          scripts/preview_analytics_retirement.py
+          uv run mypy
+          cdm/config
+          cdm/contracts
+          cdm/jobs
+          cdm/graph
+          cdm/perspectives
+          cdm/deployment
+          cdm/topics
           cdm/container.py
-          cdm/workers/runtime.py
-          scripts/set_metasubject_override.py
-          cdm/jobs/store.py
-          cdm/store/opensearch.py
-          cdm/store/batch_indexing.py
-          cdm/workers/index_runner.py
-          cdm/graph/store.py
-          cdm/graph/repair.py
-          cdm/graph/live_repair.py
-          cdm/graph/promotion.py
-          cdm/graph/job.py
-          cdm/config/topic_analysis.py
-          cdm/config/app_config.py
-          scripts/stage_graph_repair.py
-          scripts/repair_graph_sources.py
-          scripts/promote_voting_graph.py
           tools/build_documentation.py
-          tests/unit/test_documentation.py
-          tests/unit/test_graph_repair.py
-          tests/integration/test_graph_repair_integration.py
-          cdm/graph/models.py
-          cdm/graph/health.py
-          cdm/graph/topics.py
-          cdm/backend/services/graph_service.py
-          cdm/ingest/voteview.py
-          cdm/ingest/reconciliation.py
-          cdm/config/source_policy.py
-          cdm/contracts/hydration.py
-          cdm/models/bills.py
-          cdm/ingest/runner.py
-          cdm/backend/services/bill_service.py
-          cdm/contracts/api.py
-          cdm/ingest/source_contract.py
-          cdm/ingest/archive.py
-          cdm/ingest/govinfo.py
-          cdm/store/indexer.py
-          cdm/workers/govinfo_runner.py
-          scripts/reconcile_govinfo_bulk.py
-          tests/unit/test_source_contract.py
-          tests/unit/test_hydration_contract.py
-          tests/unit/test_graph_lineage.py
-          tests/test_voteview.py
-          tests/test_graph_health.py
-          tests/test_neighborhood_service.py
-          tests/integration/test_indexing_projection.py
-          tests/unit/test_index_runner.py
-          tests/unit/test_opensearch_bulk.py
-          tests/unit/test_reconciliation.py
-          tests/integration/test_graph_publication_integration.py
           tools/release_smoke_probe.py
       - name: Check contracts and durable recovery
         run: >-

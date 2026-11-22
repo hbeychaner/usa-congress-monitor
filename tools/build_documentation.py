@@ -333,13 +333,16 @@ class DocumentationBuilder:
         pages: dict[Path, str] = {}
         for path in sorted(sources):
             text = self.wiki_text(path)
-            text = re.sub(
-                self.config.link_pattern,
-                lambda match, path=path: match.group(0).replace(
-                    match.group(1), self.wiki_link(path, match.group(1), sources)
-                ),
-                text,
-            )
+
+            def rewrite_match(
+                match: re.Match[str], current_path: Path = path
+            ) -> str:
+                return match.group(0).replace(
+                    match.group(1),
+                    self.wiki_link(current_path, match.group(1), sources),
+                )
+
+            text = re.sub(self.config.link_pattern, rewrite_match, text)
             canonical = (
                 f"{self.config.repository_url}/blob/"
                 f"{quote(self.config.source_ref, safe='')}/"

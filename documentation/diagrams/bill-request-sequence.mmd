@@ -19,13 +19,14 @@ sequenceDiagram
     Service->>ES: Get exact canonical document
     alt Bill document found
         ES-->>Service: Source document
-        Service-->>Route: Typed bill response
-        Route-->>Client: Serialized response
+        Service-->>Route: Typed BillDetailResponse
+        Route-->>Client: 200 OK JSON response
         Client-->>Page: Bill data
         Page-->>Reader: Render details and tabs
     else Missing document or non-bill input
-        ES-->>Service: Missing result or mismatched document
-        Note over Service,Route: Missing-document / ValueError is not explicitly mapped to 404
-        Route-->>Client: Request fails
-        Client-->>Page: Shared HTTP error handling
+        ES-->>Service: NotFoundError or out-of-scope document
+        Service-->>Route: Raise EntityNotFoundError
+        Note over Route,Client: APIErrorHandlers.missing maps EntityNotFoundError to HTTP 404
+        Route-->>Client: 404 ErrorResponse
+        Client-->>Page: Shared HTTP 404 state
     end

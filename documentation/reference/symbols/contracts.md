@@ -595,6 +595,7 @@ No declarations in this module.
 - field: [`BillDetailFetcher.fetch.expected: int \| None`](../../../cdm/contracts/hydration.py#L350)
 - field: [`BillDetailFetcher.fetch.expected_active: int \| None`](../../../cdm/contracts/hydration.py#L351)
 - field: [`BillDetailFetcher.fetch.next_endpoint: str \| None`](../../../cdm/contracts/hydration.py#L352)
+- field: [`BillDetailFetcher.fetch.response: JsonObject`](../../../cdm/contracts/hydration.py#L361)
 - field: [`BillDetailFetcher.fetch.fetched_relationship_count: int \| None`](../../../cdm/contracts/hydration.py#L461)
 - field: [`BillDetailFetcher.fetch.repeated_records: list[RepeatedDetailRecord]`](../../../cdm/contracts/hydration.py#L483)
 - field: [`BillDetailFetcher.fetch.data: list[JsonObject] \| JsonObject`](../../../cdm/contracts/hydration.py#L512)

@@ -1078,7 +1078,20 @@ No declarations in this module.
 
 [Source](../../../frontend/app/src/routing/routes.tsx)
 
-- FunctionDeclaration: [`AppRoutes()`](../../../frontend/app/src/routing/routes.tsx#L18)
+- VariableDeclaration: [`AdminIngestPage`](../../../frontend/app/src/routing/routes.tsx#L6)
+- VariableDeclaration: [`BillDetailPage`](../../../frontend/app/src/routing/routes.tsx#L9)
+- VariableDeclaration: [`BillsPage`](../../../frontend/app/src/routing/routes.tsx#L12)
+- VariableDeclaration: [`CommitteeDetailPage`](../../../frontend/app/src/routing/routes.tsx#L15)
+- VariableDeclaration: [`MemberGraphPage`](../../../frontend/app/src/routing/routes.tsx#L18)
+- VariableDeclaration: [`MemberProfilePage`](../../../frontend/app/src/routing/routes.tsx#L21)
+- VariableDeclaration: [`MemberSearchPage`](../../../frontend/app/src/routing/routes.tsx#L24)
+- VariableDeclaration: [`PartiesPage`](../../../frontend/app/src/routing/routes.tsx#L27)
+- VariableDeclaration: [`SearchPage`](../../../frontend/app/src/routing/routes.tsx#L30)
+- VariableDeclaration: [`StateDetailPage`](../../../frontend/app/src/routing/routes.tsx#L33)
+- VariableDeclaration: [`StatesPage`](../../../frontend/app/src/routing/routes.tsx#L36)
+- VariableDeclaration: [`TopicDetailPage`](../../../frontend/app/src/routing/routes.tsx#L39)
+- VariableDeclaration: [`TopicsPage`](../../../frontend/app/src/routing/routes.tsx#L42)
+- FunctionDeclaration: [`AppRoutes()`](../../../frontend/app/src/routing/routes.tsx#L46)
 
 ## frontend/app/src/shared/billText.ts
 

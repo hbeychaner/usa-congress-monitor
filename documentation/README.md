@@ -1,90 +1,92 @@
 # Congress Tracker documentation
 
-Understand how source records become searchable bills, member activity, votes,
-topics, and graphs. These repository pages are the **canonical documentation**.
-The [GitHub wiki](https://github.com/hbeychaner/usa-congress-monitor/wiki) is a
-publication target, not a second editing location.
+Welcome to the Congress Tracker technical documentation. These pages explain
+how legislative records are collected, indexed into Elasticsearch, analyzed
+with NLP and graph models, and served through FastAPI and React.
 
-The managed local stack serves the API/UI and one index/maintenance worker.
-Additional acquisition, analytics and scheduler roles require explicit profile
-selection and capacity admission. See [configuration and deployment](guides/configuration-and-deployment.md)
-for the supported topology and resource checks.
+These repository files are the **canonical documentation**; the
+[GitHub wiki](https://github.com/hbeychaner/usa-congress-monitor/wiki) is
+generated automatically from this directory.
+
+By default, the local Docker Compose stack runs the web UI, the FastAPI
+backend, Elasticsearch, RabbitMQ, Redis, and one indexing/maintenance worker.
+Data acquisition, machine-learning analytics, and scheduled refresh jobs are
+opt-in profiles described in
+[configuration and deployment](guides/configuration-and-deployment.md).
 
 ## Start here
 
 | Your question | Read |
 |---|---|
-| How do I install and start using the app? | [Getting started](../README.md#quick-start) |
-| What runs, and why are there several databases? | [Architecture](architecture.md) |
-| Can I see the system rather than just read about it? | [Visual atlas: C4, data flow, relationships, and request sequence](reference/visuals.md) |
-| What are the records, identifiers, fields, and relationships? | [Data structures](reference/data-models.md) |
-| Where does each record go, and what can be searched? | [Indexing and storage reference](reference/indexing.md) |
-| How are records fetched, retried, replayed, and refreshed? | [Ingestion guide](guides/ingestion.md) |
-| What do topics, perspectives, similarity, and graph edges mean? | [Analytics guide](guides/analytics.md) |
-| Which page calls which endpoint and service? | [API and frontend reference](reference/api-and-frontend.md) |
-| Which class, function, or field implements this? | [Generated source symbol index](reference/symbols/README.md) |
-| How do I configure, run, test, or deploy it? | [Configuration and deployment](guides/configuration-and-deployment.md) |
-| How do I recover failed jobs or restore state? | [Operations runbook](OPERATIONS_RUNBOOK.md) |
-| How do I update the docs and prepare the wiki? | [Documentation maintenance](CONTRIBUTING.md) |
+| How do I install and run the app locally? | [Getting started](../README.md#quick-start) |
+| How do the services and databases fit together? | [Architecture](architecture.md) |
+| Can I view system and data-flow diagrams? | [Visual atlas: C4, data flow, relationships, and request sequence](reference/visuals.md) |
+| What data models and identifiers are used? | [Data structures](reference/data-models.md) |
+| How are records stored and searched in Elasticsearch? | [Indexing and storage reference](reference/indexing.md) |
+| How do we collect data from Congress.gov, GovInfo, and Voteview? | [Ingestion guide](guides/ingestion.md) |
+| How do topics, party perspectives, and member graphs work? | [Analytics guide](guides/analytics.md) |
+| Which frontend pages call which API endpoints? | [API and frontend reference](reference/api-and-frontend.md) |
+| Where is a specific class, function, or field defined? | [Generated source symbol index](reference/symbols/README.md) |
+| How do I configure settings, run tests, or deploy? | [Configuration and deployment](guides/configuration-and-deployment.md) |
+| How do I troubleshoot jobs, restart services, or back up data? | [Operations runbook](OPERATIONS_RUNBOOK.md) |
+| How do I update docs and regenerate diagrams/symbol tables? | [Documentation maintenance](CONTRIBUTING.md) |
 
 ### Suggested reading paths
 
-- **First-time user:** [getting started](../README.md#quick-start) ->
-  [using the app](../README.md#using-the-app). Read the ingestion guide when
-  you are ready to collect data.
-- **System reader:** architecture -> visual atlas -> data structures ->
-  ingestion -> indexing -> API and frontend.
-- **Data investigator:** data structures -> indexing -> analytics -> source
-  symbols for the relevant package. A diagram edge is a logical identifier
-  reference, not a database-enforced foreign key.
-- **Operator:** root [quick start](../README.md#quick-start) -> configuration
-  and deployment -> ingestion -> operations runbook.
-- **Contributor:** architecture -> subsystem guide -> exact source declaration ->
-  related tests -> documentation maintenance.
+- **New user:** [Getting started](../README.md#quick-start) →
+  [Using the app](../README.md#using-the-app) →
+  [Ingestion guide](guides/ingestion.md) when you want to import data.
+- **Developer onboarding:** [Architecture](architecture.md) →
+  [Visual atlas](reference/visuals.md) →
+  [Data structures](reference/data-models.md) →
+  [API and frontend reference](reference/api-and-frontend.md).
+- **Data & ML engineer:** [Data structures](reference/data-models.md) →
+  [Indexing reference](reference/indexing.md) →
+  [Analytics guide](guides/analytics.md) →
+  [Source symbol index](reference/symbols/README.md).
+- **Operator:** [Quick start](../README.md#quick-start) →
+  [Configuration and deployment](guides/configuration-and-deployment.md) →
+  [Operations runbook](OPERATIONS_RUNBOOK.md).
 
-## The mental model
+## How the system works in 6 steps
 
-1. Congress.gov and GovInfo supply legislative records; Voteview supplies
-   additional roll calls, positions, and voting metadata.
-2. SQLite owns durable job history and replayable acquisition state.
-   RabbitMQ delivers work; it is not the job ledger.
-3. Acquisition publishes records into Redis Streams. Indexing turns them into
-   searchable projections; acknowledging a stream record is not the same as
-   marking an acquisition job complete.
-4. Bills from multiple sources converge on canonical bill IDs. Full text is
-   stored on bill documents, not in a separate bill-text index.
-5. Elasticsearch serves indexed entities and derived analysis.
-6. FastAPI exposes typed responses; React renders them. Offline analytics and
-   admin-triggered builds add projections, not new authoritative source facts.
+1. **External sources:** Congress.gov and GovInfo provide bills, summaries,
+   text, committees, and communications; Voteview provides historical roll-call
+   votes and member positions.
+2. **Job tracking & task delivery:** SQLite records durable job state and
+   stores raw downloaded archives for local replay. RabbitMQ delivers Celery
+   tasks to workers.
+3. **Stream handoff:** Acquisition workers write normalized records to Redis
+   Streams; indexing workers consume those streams and bulk-write projections
+   into Elasticsearch.
+4. **Canonical bill documents:** Records from multiple sources (Congress.gov
+   API, GovInfo bulk XML, and Statutes at Large) merge onto canonical bill IDs
+   (`bill:<congress>:<type>:<number>`), with full text stored directly on the
+   bill document.
+5. **Search & analytics store:** Elasticsearch serves both core entity
+   projections (bills, members, committees, votes) and derived analytics
+   (embeddings, BERTopic clusters, party perspectives, and member graphs).
+6. **Typed API & web UI:** FastAPI validates queries and returns typed Pydantic
+   response contracts; the React/TypeScript frontend renders them.
 
-## Reference material and provenance
+## Reference files in this folder
 
-The prose documents source behavior, not a claim that a particular deployment
-has completed all historical backfills. Check durable coverage and live health
-before drawing conclusions about missing records.
-
-| Reference | Status |
+| Reference | Description |
 |---|---|
-| [Mapping definitions](opensearch_mappings.yaml) | Executable Elasticsearch mapping input |
-| [Generated endpoint specifications](generated_endpoint_specs.json) | Captured endpoint catalogue; runtime specs live in [source](../cdm/data_collection/specs) |
-| [Original upstream endpoint docs](original) | Upstream reference snapshots, not application API documentation |
-| [Original OpenAPI JSON](original/swagger.json) / [YAML](original/swagger.yaml) | Congress.gov snapshots, not FastAPI's `/openapi.json` |
-| [Frontend style guide](../frontend/STYLE_GUIDE.md) | UI design conventions |
+| [Mapping definitions](opensearch_mappings.yaml) | Elasticsearch index mapping definitions loaded at runtime |
+| [Generated endpoint specifications](generated_endpoint_specs.json) | Captured Congress.gov endpoint catalog; runtime specs live in [cdm/data_collection/specs](../cdm/data_collection/specs) |
+| [Original upstream endpoint docs](original) | Reference snapshots of Congress.gov API documentation |
+| [Original OpenAPI JSON](original/swagger.json) / [YAML](original/swagger.yaml) | Congress.gov upstream OpenAPI snapshots |
+| [Frontend style guide](../frontend/STYLE_GUIDE.md) | UI conventions and layout guidelines |
 
-## Visuals and wiki
+## Building visuals and the wiki
 
-The [visual atlas](reference/visuals.md) embeds Mermaid diagrams for rendering
-on GitHub and in the wiki. Editable `.mmd` files remain in
-[diagrams](diagrams); the worker C4 container view remains at the repository
-[root](../worker-architecture.mmd).
-
-To regenerate references and prepare a local, unpublished wiki:
+The [visual atlas](reference/visuals.md) and
+[source symbol index](reference/symbols/README.md) are generated from the
+`.mmd` diagram files in [diagrams/](diagrams) (plus
+[worker-architecture.mmd](../worker-architecture.mmd)) and the codebase AST:
 
 ```bash
 uv run python tools/build_documentation.py --wiki documentation/wiki
 uv run python tools/build_documentation.py --check --wiki documentation/wiki
 ```
-
-The output includes `Home.md`, `_Sidebar.md`, `_Footer.md`, and flat wiki page
-names with rewritten internal links. The output directory is ignored by Git.
-Nothing is uploaded, committed, or pushed by these commands.

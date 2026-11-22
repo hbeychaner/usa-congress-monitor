@@ -97,6 +97,56 @@ class TopicReadConfig(BaseModel):
     topic_limit: int = 10000
 
 
+class TopicModelerConfig(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    top_n_words: int = 15
+    alpha_token_pattern: str = r"(?u)\b[^\W\d_]{3,}\b"
+    boilerplate_stopwords: tuple[str, ...] = (
+        "act",
+        "acts",
+        "amend",
+        "amended",
+        "amendment",
+        "amendments",
+        "bill",
+        "code",
+        "congress",
+        "designate",
+        "entitled",
+        "expressing",
+        "federal",
+        "law",
+        "prohibit",
+        "provide",
+        "public",
+        "purposes",
+        "recognizing",
+        "relating",
+        "require",
+        "resolution",
+        "section",
+        "sense",
+        "states",
+        "title",
+        "united",
+        "authorize",
+        "authorizes",
+        "certain",
+        "direct",
+        "directs",
+        "establish",
+        "establishes",
+        "fiscal",
+        "make",
+        "makes",
+        "secretary",
+        "shall",
+        "year",
+        "years",
+    )
+
+
 class GraphHealthConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
     max_age: timedelta = timedelta(days=9)

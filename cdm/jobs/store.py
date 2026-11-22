@@ -354,23 +354,22 @@ class JobStore:
         self, package: GovInfoPackage, *, outdir: Path | str
     ) -> JobRow:
         """Create an idempotent durable job for one GovInfo package."""
-        payload = {
-            "collection": str(package.collection),
-            "congress": int(package.congress),
-            "measure_type": str(package.measure_type),
-            "package_id": str(package.package_id),
+        collection = str(package.collection)
+        congress = int(package.congress)
+        measure_type = str(package.measure_type)
+        package_id = str(package.package_id)
+        payload: JsonObject = {
+            "collection": collection,
+            "congress": congress,
+            "measure_type": measure_type,
+            "package_id": package_id,
             "url": str(package.url),
             "session": package.session,
             "version_code": package.version_code,
             "outdir": str(outdir),
         }
         idempotency_key = "govinfo:" + ":".join(
-            (
-                payload["collection"],
-                str(payload["congress"]),
-                payload["measure_type"],
-                payload["package_id"],
-            )
+            (collection, str(congress), measure_type, package_id)
         )
         return self.create(JobKind.GOVINFO_BULK.value, idempotency_key, payload)
 

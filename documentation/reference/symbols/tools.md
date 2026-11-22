@@ -53,11 +53,12 @@ Generated from declarations; see the catalogue scope in the index.
 - function: [`DocumentationBuilder._chapter_paths(self) -> set[Path]`](../../../tools/build_documentation.py#L308)
 - function: [`DocumentationBuilder.build_wiki(self, output: Path, *, check: bool) -> None`](../../../tools/build_documentation.py#L322)
 - field: [`DocumentationBuilder.build_wiki.pages: dict[Path, str]`](../../../tools/build_documentation.py#L333)
-- function: [`DocumentationBuilder.validate_links(self) -> None`](../../../tools/build_documentation.py#L381)
-- field: [`DocumentationBuilder.validate_links.missing: list[str]`](../../../tools/build_documentation.py#L382)
-- function: [`DocumentationBuilder.run(self, *, check: bool, wiki: Path \| None, wiki_only: bool=False) -> None`](../../../tools/build_documentation.py#L409)
-- class: [`DocumentationCommand()`](../../../tools/build_documentation.py#L420)
-- function: [`DocumentationCommand.run(self) -> None`](../../../tools/build_documentation.py#L421)
+- function: [`DocumentationBuilder.build_wiki.rewrite_match(match: re.Match[str], current_path: Path=path) -> str`](../../../tools/build_documentation.py#L337)
+- function: [`DocumentationBuilder.validate_links(self) -> None`](../../../tools/build_documentation.py#L384)
+- field: [`DocumentationBuilder.validate_links.missing: list[str]`](../../../tools/build_documentation.py#L385)
+- function: [`DocumentationBuilder.run(self, *, check: bool, wiki: Path \| None, wiki_only: bool=False) -> None`](../../../tools/build_documentation.py#L412)
+- class: [`DocumentationCommand()`](../../../tools/build_documentation.py#L423)
+- function: [`DocumentationCommand.run(self) -> None`](../../../tools/build_documentation.py#L424)
 
 ## tools/release_smoke_probe.py
 

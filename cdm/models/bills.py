@@ -34,9 +34,11 @@ from cdm.data_collection.id_utils import UrlIdParser
 from cdm.models.people import Chamber, Member, Sponsor, SponsorRef
 from cdm.models.shared import (
     Activity,
+    Chamber,
     CountUrl,
     EntityBase,
     Format,
+    LawType,
     Note,
     SourceSystem,
     Title,
@@ -305,21 +307,6 @@ class LegislativeSubject(BaseModel):
         datetime | None,
         Field(alias="updateDate", description="When the subject was last updated."),
     ] = None
-
-
-class LawType(StrEnum):
-    """Enumeration of law types with API slug helpers."""
-
-    PUBLIC = "Public Law"
-    PRIVATE = "Private Law"
-
-    def __init__(self, value: str):
-        """Initialize the enum and derive the API slug for the law type."""
-        self._value_ = value
-        if value == "Public Law":
-            self.type_url = "pub"
-        elif value == "Private Law":
-            self.type_url = "priv"
 
 
 class LatestAction(BaseModel):

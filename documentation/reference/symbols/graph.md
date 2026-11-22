@@ -302,6 +302,7 @@ No declarations in this module.
 - function: [`VotingGraphPromotion._query(version: str) -> JsonObject`](../../../cdm/graph/promotion.py#L175)
 - function: [`VotingGraphPromotion._edges(candidate: Path, pointer: GraphVersionPointer) -> Iterator[MemberEdge]`](../../../cdm/graph/promotion.py#L187)
 - field: [`VotingGraphPromotion._edges.seen: set[str]`](../../../cdm/graph/promotion.py#L188)
+- field: [`VotingGraphPromotion._edges.parser: TypeAdapter[JsonObject]`](../../../cdm/graph/promotion.py#L189)
 - function: [`VotingGraphPromotion._candidate(self, applied: AppliedRepair, candidate: Path) -> VotingPromotionPlan`](../../../cdm/graph/promotion.py#L227)
 - function: [`VotingGraphPromotion._documents(self, index: str, candidate: Path, plan: VotingPromotionPlan) -> Iterator[StoredDocument]`](../../../cdm/graph/promotion.py#L289)
 - function: [`VotingGraphPromotion._preserved(self, applied: AppliedRepair, repair_output: Path, output: Path, plan: VotingPromotionPlan, pointer: StoredDocument \| None=None) -> None`](../../../cdm/graph/promotion.py#L306)

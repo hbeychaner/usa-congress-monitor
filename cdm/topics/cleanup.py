@@ -255,9 +255,9 @@ class AnalyticsCleanup:
                 for version, count in versions.items()
                 if version not in keep and version < min(keep)
             )
-        for congress, snapshot in state.perspectives.items():
-            current = snapshot.publication
-            if current is None:
+        for congress, perspective_snapshot in state.perspectives.items():
+            perspective = perspective_snapshot.publication
+            if perspective is None:
                 raise ValueError(
                     f"Cleanup requires a published perspective snapshot: {congress}"
                 )
@@ -267,12 +267,12 @@ class AnalyticsCleanup:
                 congress=congress,
             )
             keep = CleanupPolicy.keep(
-                current.model_version,
-                current.previous.model_version if current.previous else None,
+                perspective.model_version,
+                perspective.previous.model_version if perspective.previous else None,
                 set(versions),
             )
-            if current.previous is not None:
-                retained.add(CleanupPolicy.version(current.previous.model_version))
+            if perspective.previous is not None:
+                retained.add(CleanupPolicy.version(perspective.previous.model_version))
             plan.generations.extend(
                 GenerationDeletion(
                     index=self._topics.index,

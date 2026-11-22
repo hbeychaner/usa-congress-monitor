@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from cdm.models.shared import Chamber, LawType
 
 
-# Enums imported lazily inside functions to avoid circular imports
-def convert_law_type(value: str):
-    """Convert raw law type strings into the LawType enum.
-
-    Import enums lazily to avoid circular imports with model modules.
-    """
-    from cdm.models.bills import LawType
-
+def convert_law_type(value: str | LawType) -> LawType:
+    """Convert raw law type strings into the LawType enum."""
+    if isinstance(value, LawType):
+        return value
     if value == "Public Law":
         return LawType.PUBLIC
     if value == "Private Law":
@@ -20,15 +16,10 @@ def convert_law_type(value: str):
     raise ValueError("Invalid law type")
 
 
-def normalize_chamber(v):
-    """Normalize various chamber string forms into `Chamber` enum or None.
-
-    Import `Chamber` lazily to avoid circular imports.
-    """
+def normalize_chamber(v: object) -> Chamber | None:
+    """Normalize various chamber string forms into `Chamber` enum or None."""
     if v is None:
         return None
-    from cdm.models.people import Chamber
-
     if isinstance(v, Chamber):
         return v
     raw = str(v).strip().lower()

@@ -21,6 +21,7 @@ from bertopic.representation import MaximalMarginalRelevance
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, CountVectorizer
 
+from cdm.config.topic_analysis import TopicModelerConfig
 from cdm.store.embedding_store import EmbeddingStore
 from cdm.utils.cached_embedder import EMBED_CHUNK_SIZE, CachedEmbedder, EmbeddingJob
 from cdm.utils.metasubjects import TopicVector
@@ -29,56 +30,11 @@ from cdm.utils.topic_terms import dedupe_terms, keyword_label
 
 _HTML_TAG = re.compile(r"<[^>]+>")
 _WHITESPACE = re.compile(r"\s+")
+_DEFAULT_CONFIG = TopicModelerConfig()
 
-# Legislative boilerplate that otherwise dominates c-TF-IDF representations.
-BOILERPLATE_STOPWORDS = [
-    "act",
-    "acts",
-    "amend",
-    "amended",
-    "amendment",
-    "amendments",
-    "bill",
-    "code",
-    "congress",
-    "designate",
-    "entitled",
-    "expressing",
-    "federal",
-    "law",
-    "prohibit",
-    "provide",
-    "public",
-    "purposes",
-    "recognizing",
-    "relating",
-    "require",
-    "resolution",
-    "section",
-    "sense",
-    "states",
-    "title",
-    "united",
-    "authorize",
-    "authorizes",
-    "certain",
-    "direct",
-    "directs",
-    "establish",
-    "establishes",
-    "fiscal",
-    "make",
-    "makes",
-    "secretary",
-    "shall",
-    "year",
-    "years",
-]
-
-TOP_N_WORDS = 15
-
-# Alphabetic words of 3+ letters, so years and other numbers never become keywords.
-ALPHA_TOKEN_PATTERN = r"(?u)\b[^\W\d_]{3,}\b"
+BOILERPLATE_STOPWORDS = list(_DEFAULT_CONFIG.boilerplate_stopwords)
+TOP_N_WORDS = _DEFAULT_CONFIG.top_n_words
+ALPHA_TOKEN_PATTERN = _DEFAULT_CONFIG.alpha_token_pattern
 
 
 @dataclass(frozen=True)
@@ -202,11 +158,13 @@ class TopicModeler:
         min_topic_size: int = 25,
         nr_topics: int | str | None = None,
         embedding_store: EmbeddingStore | None = None,
+        config: TopicModelerConfig = _DEFAULT_CONFIG,
     ) -> None:
         self.embedding_model_name = embedding_model
         self.min_topic_size = min_topic_size
         self.nr_topics = nr_topics
         self.embedding_store = embedding_store
+        self.config = config
         self._model: Any = None
         self._embedding_model: Any = None
         self._documents: list[TopicDocument] = []
@@ -249,7 +207,9 @@ class TopicModeler:
         if not documents:
             raise ValueError("no documents to fit")
         self._documents = documents
-        stop_words = list(ENGLISH_STOP_WORDS.union(BOILERPLATE_STOPWORDS))
+        stop_words = list(
+            ENGLISH_STOP_WORDS.union(self.config.boilerplate_stopwords)
+        )
         embedder = self._embedder()
         self._model = BERTopic(
             embedding_model=embedder,
@@ -257,12 +217,12 @@ class TopicModeler:
                 stop_words=stop_words,
                 ngram_range=(1, 2),
                 min_df=5,
-                token_pattern=ALPHA_TOKEN_PATTERN,
+                token_pattern=self.config.alpha_token_pattern,
             ),
             representation_model=MaximalMarginalRelevance(diversity=0.4),
             min_topic_size=self.min_topic_size,
             nr_topics=self.nr_topics,
-            top_n_words=TOP_N_WORDS,
+            top_n_words=self.config.top_n_words,
             calculate_probabilities=False,
             verbose=True,
         )

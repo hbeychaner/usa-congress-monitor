@@ -7,10 +7,10 @@ config:
     rankSpacing: 100
 ---
 flowchart LR
-    pages["Web: React routes and pages<br/>Entities / search / graphs / admin"]
-    wrappers["Web: handwritten API wrappers<br/>Shared apiGet / apiPost"]
-    types["Web: OpenAPI schema types<br/>Generated; partially adopted by wrappers"]
-    routes["API: typed route handlers<br/>Request validation / dependency declarations"]
+    pages["Web: React routes and lazy-loaded pages<br/>Entities / search / graphs / admin"]
+    wrappers["Web: typed API client modules<br/>Shared apiGet / apiPost"]
+    types["Web: generated OpenAPI schema types<br/>Contract-verified at build time"]
+    routes["API: typed route handlers<br/>Request validation / error mapping"]
     providers["API: dependency providers<br/>Container composition and cached services"]
     query["API: entity and search services<br/>Bills / members / committees / states / votes"]
     analysis["API: analysis query services<br/>Topics / perspectives / graphs / neighborhoods"]

@@ -82,7 +82,7 @@ class AnalyticsJobs:
             job_id=job["id"], started=started, status=JobStatus(job["status"])
         )
 
-    def status[Status: TopicTrainingStatus | GraphBuildStatus](
+    def status[Status: (TopicTrainingStatus, GraphBuildStatus)](
         self, kind: JobKind, schema: type[Status], *, job_id: str | None = None
     ) -> Status:
         job = self.store.get(job_id) if job_id else self.store.latest(kind)

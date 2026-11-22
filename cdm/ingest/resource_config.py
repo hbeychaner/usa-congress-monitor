@@ -15,6 +15,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+import cdm.data_collection.specs  # noqa: F401
+from cdm.data_collection.endpoint_registry import get_spec
 from cdm.ingest.runner import Resource
 from cdm.models.endpoint_spec import ParamLocation
 
@@ -258,11 +260,6 @@ def get_config(resource: Resource) -> ResourceConfig:
 
 def list_spec_requires_congress(resource: Resource) -> bool:
     """Return whether the registered list endpoint requires a congress path value."""
-    # Importing the specs package registers every list/item spec. Keep this lazy
-    # so importing the configuration catalog does not trigger model registration.
-    import cdm.data_collection.specs  # noqa: F401
-    from cdm.data_collection.endpoint_registry import get_spec
-
     list_spec = get_spec(f"{resource.value}_list")
     return any(
         param.location == ParamLocation.PATH

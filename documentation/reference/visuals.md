@@ -18,10 +18,10 @@ config:
     rankSpacing: 100
 ---
 flowchart LR
-    pages["Web: React routes and pages<br/>Entities / search / graphs / admin"]
-    wrappers["Web: handwritten API wrappers<br/>Shared apiGet / apiPost"]
-    types["Web: OpenAPI schema types<br/>Generated; partially adopted by wrappers"]
-    routes["API: typed route handlers<br/>Request validation / dependency declarations"]
+    pages["Web: React routes and lazy-loaded pages<br/>Entities / search / graphs / admin"]
+    wrappers["Web: typed API client modules<br/>Shared apiGet / apiPost"]
+    types["Web: generated OpenAPI schema types<br/>Contract-verified at build time"]
+    routes["API: typed route handlers<br/>Request validation / error mapping"]
     providers["API: dependency providers<br/>Container composition and cached services"]
     query["API: entity and search services<br/>Bills / members / committees / states / votes"]
     analysis["API: analysis query services<br/>Topics / perspectives / graphs / neighborhoods"]
@@ -77,15 +77,16 @@ sequenceDiagram
     Service->>ES: Get exact canonical document
     alt Bill document found
         ES-->>Service: Source document
-        Service-->>Route: Typed bill response
-        Route-->>Client: Serialized response
+        Service-->>Route: Typed BillDetailResponse
+        Route-->>Client: 200 OK JSON response
         Client-->>Page: Bill data
         Page-->>Reader: Render details and tabs
     else Missing document or non-bill input
-        ES-->>Service: Missing result or mismatched document
-        Note over Service,Route: Missing-document / ValueError is not explicitly mapped to 404
-        Route-->>Client: Request fails
-        Client-->>Page: Shared HTTP error handling
+        ES-->>Service: NotFoundError or out-of-scope document
+        Service-->>Route: Raise EntityNotFoundError
+        Note over Route,Client: APIErrorHandlers.missing maps EntityNotFoundError to HTTP 404
+        Route-->>Client: 404 ErrorResponse
+        Client-->>Page: Shared HTTP 404 state
     end
 ```
 
@@ -147,14 +148,17 @@ flowchart TB
         fastapi["FastAPI :8000"]
         operations["Celery operations worker<br/>Index + maintenance queues / one slot"]
         infra["Retained Docker infrastructure<br/>Elasticsearch, RabbitMQ, Redis"]
+        ollama["Native host Ollama :11434<br/>Verified at startup"]
         disk[("Repository data / models / logs")]
         optins["Off by default<br/>Acquisition / analytics / Beat / Kibana"]
         vite --> fastapi
         fastapi --> infra
+        fastapi --> ollama
         operations --> infra
         operations --> disk
         fastapi --> disk
         operations -.->|"Separate profile approval"| optins
+        optins -.->|"Analytics labels"| ollama
     end
 
     subgraph cloud["GCP design - not certified by local acceptance"]
@@ -293,6 +297,7 @@ flowchart LR
     operator["Operator<br/>Person"]
     sources["Congress.gov / GovInfo<br/>External data sources"]
     voteview["Voteview<br/>External voting datasets"]
+    ollama["Native host Ollama<br/>Local LLM label service"]
     web["Web application<br/>React / TypeScript"]
     api["API application<br/>FastAPI / Python"]
     cli["Operator commands<br/>Python CLIs and analytics builds"]
@@ -315,6 +320,7 @@ flowchart LR
     cli -->|"Publish tasks"| broker
     cli -->|"Vote imports / analysis"| search
     cli -->|"Build artifacts"| files
+    cli -->|"Generate topic labels"| ollama
     voteview --> cli
     beat -->|"Scheduled tasks"| broker
     broker -->|"Deliver"| workers
@@ -323,6 +329,7 @@ flowchart LR
     workers -->|"Persist replay source"| archives
     workers -->|"Publish / consume / acknowledge"| redis
     workers -->|"Validated bulk writes"| search
+    workers -->|"Generate topic labels"| ollama
 
     classDef app fill:#1168bd,stroke:#08427b,color:#ffffff
     classDef store fill:#e4f0fb,stroke:#1168bd,color:#172b4d

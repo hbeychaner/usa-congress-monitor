@@ -22,22 +22,10 @@ make es-api-key
 `make es-api-key` creates the local application search credential.
 Avoid running either against a deployment you do not own.
 
-The managed API retains development hot reload, scoped to `/workspace/cdm`.
-Do not watch the entire bind-mounted checkout: retained acquisition directories,
-archives and frontend dependencies can otherwise create an unbounded inotify
-watch set and consume the API container's memory outside Python RSS. Changes to
-application Python still reload; Compose/environment changes require restarting
-the affected service. Frontend hot reload is independent.
-
-The sustained-operation observer uses Python's nonadjustable
-`mach_absolute_time()` clock for elapsed time and Darwin's suspend-inclusive
-`CLOCK_MONOTONIC_RAW` for independent sleep detection. It compares elapsed
-increments, never the clocks' unrelated absolute origins. Both scheduling
-gaps and sleep discrepancies retain the original two-second limit; the
-required day remains 86,400 seconds. UTC timestamps remain in journals, but
-ordinary automatic NTP corrections must not masquerade as suspended execution.
-Do not disable time synchronization or change the machine clock to force a pass.
-The controller explicitly rejects an unsupported clock implementation.
+The managed API uses development hot reload scoped to `/workspace/cdm` so
+large local data directories and frontend `node_modules` are not watched by
+`uvicorn`. Python code changes reload automatically; Docker Compose or `.env`
+changes require restarting the affected container.
 
 ## Settings ownership
 

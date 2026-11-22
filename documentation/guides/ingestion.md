@@ -21,65 +21,29 @@ navigation alongside this operational guide.
 
 ## Reconcile existing data before historical acquisition
 
-Historical gap filling starts with indexed identity presence, not the age or
-absence of a hydration assessment. An existing bill can contain useful
-data without certified collection completeness. Do not re-download or replay
-that bill merely to replace an unknown assessment with a complete one.
-Full detail and full text wherever available remain required. Identity presence
-is only the first gate, not permission to skip missing content in an existing
-document. Field enrichment and freshness are separate, bounded phases of the same
-coverage goal.
+Before launching a large historical download from Congress.gov or GovInfo,
+check what is already indexed in Elasticsearch and what raw archives are
+already saved on disk:
 
-1. Establish the intended cluster, physical indices and read/write aliases.
-   Compare canonical bill identities across bill and law projections,
-   not just document counts or one source-type filter.
-   Normalize archive introduced-date suffixes using the normal indexer's
-   four-part bill identity; keep original payloads and variants intact.
-   An amendment or committee report with a bill-like identifier is not the
-   corresponding bill document.
-2. Leave already indexed identities alone for presence-based gap filling.
-   Preserve richer GovInfo data, source history and analysis/publication state.
-   A failed historical job is evidence about that job, not proof that each of
-   its records is missing.
-3. For genuinely missing identities, inspect retained archives, list caches and
-   GovInfo downloads before making upstream requests. Central job archives and
-   the record library use `records.sqlite3`; discovery caches use
-   `bill/list_records.sqlite3`. Read them without mutation. Validate identities
-   against payload fields rather than trusting filenames alone.
-4. Distinguish archived bill payloads from list metadata. A cached title,
-   introduction date and latest action are reusable data, but do not imply that
-   summaries, relationships or full text were downloaded. Local metadata can
-   support a metadata-only projection, with unknown detail evidence retained;
-   decide the required output before calling that projection complete.
-5. Rehearse the normal projection for only the missing identities, validate
-   mapping/API behavior and preserve original local inputs. Recheck presence
-   before submission and use a create-only boundary that cannot overwrite a
-   document appearing since the inventory. Verify exact readback and skipped
-   existing identities separately. Ordinary additive upsert is not that
-   no-overwrite boundary.
+1. **Check existing bill IDs:** Compare canonical bill IDs across bill and law
+   projections (`bill:<congress>:<type>:<number>`). Do not re-download a bill
+   simply because its completeness badge is `unknown`.
+2. **Preserve indexed records:** Leave already indexed bills untouched during
+   missing-record backfills so existing GovInfo text and analytics are
+   preserved.
+3. **Reuse local SQLite archives first:** Central job archives and the record
+   library (`records.sqlite3`) and list discovery caches
+   (`bill/list_records.sqlite3`) often already contain the needed records.
+4. **Distinguish list metadata from full detail:** List caches provide title,
+   introduced date, and latest action, whereas full item archives include
+   summaries, committees, and text versions.
+5. **Write missing bills safely:** Use
+   [`CreateOnlyBillWriter`](../../cdm/store/create_only.py) with a pinned
+   [`CreateOnlyTarget`](../../cdm/config/create_only.py) when replaying
+   missing records so existing documents are never overwritten.
 
-Only acquire upstream data that is required and absent from both Elasticsearch
-and usable local inputs. A list-only cache is not proof of full-detail
-availability, but neither is it a reason to download the same metadata again.
-[`CreateOnlyBillWriter`](../../cdm/store/create_only.py) provides the controlled
-replay write boundary. Inject a client, a pinned
-[`CreateOnlyTarget`](../../cdm/config/create_only.py) and bounded settings.
-Every bulk action is `create`, never update/upsert/replacement. A conflict is
-reported as already present only after canonical source-identity validation.
-Created rows must match their exact acknowledged source and sequence/primary
-term. A partially rejected batch raises with both verified successes and explicit
-rejections; callers retain intents before requests and persist those outcomes.
-An ambiguous transport response is not a success. Reconciliation may safely
-repeat the same create-only action, but must not claim an unacknowledged earlier
-creation as acknowledged. Seal inputs, projections and controller bytes before
-execution, and verify exact identities afterward.
-
-This boundary does not change ordinary `IndexPayload`/Redis upsert semantics or
-turn `--refresh-stale` into missing-only selection. Controlled replay is a
-separate, explicitly approved operation; existing workers need not be expanded
-or source acquisition enabled.
 See [manual serving repair safety](../OPERATIONS_RUNBOOK.md#manual-serving-repair-safety)
-for a separately approved repair of existing fields.
+for targeted repairs of already indexed fields.
 
 ### Full-detail and full-text coverage
 

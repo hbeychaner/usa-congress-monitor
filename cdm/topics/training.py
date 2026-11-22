@@ -130,12 +130,12 @@ class TopicTrainingOutput(BaseModel):
             if row.frequency < 0:
                 raise ValueError("Negative topic trend frequency")
             topic_totals[row.topic_id] += row.frequency
-        for row in self.metasubject_over_time:
-            if row.metasubject_id not in groups:
+        for group_row in self.metasubject_over_time:
+            if group_row.metasubject_id not in groups:
                 raise ValueError("Metasubject trend references an unknown metasubject")
-            if row.frequency < 0:
+            if group_row.frequency < 0:
                 raise ValueError("Negative metasubject trend frequency")
-            group_totals[row.metasubject_id] += row.frequency
+            group_totals[group_row.metasubject_id] += group_row.frequency
         if topic_totals != dated_topics or group_totals != dated_groups:
             raise ValueError("Trend frequencies do not cover the dated corpus")
         return self

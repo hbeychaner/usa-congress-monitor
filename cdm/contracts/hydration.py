@@ -358,7 +358,7 @@ class BillDetailFetcher:
             if next_endpoint is None:
                 raise RuntimeError(f"Missing next endpoint for {kind}")
             visited.add(next_endpoint)
-            response = TypeAdapter(JsonObject).validate_python(
+            response: JsonObject = TypeAdapter(JsonObject).validate_python(
                 self._client.get_json(next_endpoint)
             )
             if kind not in response:

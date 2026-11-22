@@ -3,11 +3,30 @@
 from __future__ import annotations
 
 from datetime import datetime
+from enum import StrEnum
 from typing import Annotated
 
 from pydantic import BaseModel, Field, HttpUrl
 
 from cdm.data_collection.id_utils import UrlIdParser
+
+
+class Chamber(StrEnum):
+    """Enumeration of chambers a member or record can belong to."""
+
+    HOUSE = "House"
+    SENATE = "Senate"
+
+
+class LawType(StrEnum):
+    """Enumeration of law types with API slug helpers."""
+
+    PUBLIC = "Public Law"
+    PRIVATE = "Private Law"
+
+    def __init__(self, value: str) -> None:
+        self._value_ = value
+        self.type_url = "pub" if value == "Public Law" else "priv"
 
 
 class Format(BaseModel):

@@ -112,7 +112,7 @@ errors still fail the build rather than being hidden as a successful fallback.
 
 ## 1. Corpus construction and cached embeddings
 
-[build_topic_documents](../../cdm/utils/topic_modeler.py#L157) converts search hits
+[build_topic_documents](../../cdm/utils/topic_modeler.py#L113) converts search hits
 to `TopicDocument` objects. For each bill it:
 
 - strips HTML tags, unescapes HTML, and collapses whitespace;
@@ -128,9 +128,9 @@ Consequently, a bill without a usable title/summary can still contribute subject
 terms. These inputs are not the complete operative bill text. Natural-language
 embedding input and lemma-preferred keyword input are intentionally different.
 
-[TopicDocument.embedding_input](../../cdm/utils/topic_modeler.py#L100) returns
+[TopicDocument.embedding_input](../../cdm/utils/topic_modeler.py#L56) returns
 `embed_text` when available, otherwise `text`.
-[TopicModeler._embed](../../cdm/utils/topic_modeler.py#L221) uses `CachedEmbedder`
+[TopicModeler._embed](../../cdm/utils/topic_modeler.py#L179) uses `CachedEmbedder`
 when an embedding store is injected; the configured default transformer is
 `all-mpnet-base-v2`.
 
@@ -170,7 +170,7 @@ for `source_type=bill` with `congress >= --min-congress`; the default is 113.
 This intentionally excludes earlier title-dominated Congresses unless overridden.
 `--max-docs` caps the scanned corpus and is intended for bounded experiments.
 
-[TopicModeler.fit](../../cdm/utils/topic_modeler.py#L243) creates BERTopic with:
+[TopicModeler.fit](../../cdm/utils/topic_modeler.py#L201) creates BERTopic with:
 
 - supplied sentence embeddings;
 - `CountVectorizer` English plus legislative stopwords;
@@ -185,7 +185,7 @@ The `_assignments` adapter uses zero if the library supplies no probability and
 takes the maximum if a per-document vector is supplied. These values should not
 be described as calibrated policy-classification confidence.
 
-[TopicModeler.transform](../../cdm/utils/topic_modeler.py#L277) assigns new documents
+[TopicModeler.transform](../../cdm/utils/topic_modeler.py#L237) assigns new documents
 without refitting. It exists as a callable utility; the batch training script
 performs a fresh `fit`, not online `partial_fit`.
 The transform method encodes directly rather than using `_embed`'s cache path.
@@ -204,7 +204,7 @@ empty response to callers, which use their naming fallback.
 Default URL/model are `http://localhost:11434` / `llama3.1`; this remains
 configuration, not a guarantee of local execution in every deployment.
 
-[TopicModeler.topics_over_time](../../cdm/utils/topic_modeler.py#L286) analyzes
+[TopicModeler.topics_over_time](../../cdm/utils/topic_modeler.py#L246) analyzes
 dated fitted documents, using `--nr-bins` (default 60).
 Missing timestamps are excluded, and no dated documents is an error.
 These BERTopic time bins are not the fixed calendar-quarter bins used for

@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import logging
 import logging.handlers
-import os
 import queue
 
 _state: dict = {"configured": False, "queue_listener": None}
 
 
-def configure_logging(level: str | None = None) -> None:
+def configure_logging(level: str = "INFO") -> None:
     """Configure root logging once for the application.
 
     Uses a background `QueueListener` + `QueueHandler` so logging emits
@@ -18,7 +17,7 @@ def configure_logging(level: str | None = None) -> None:
     """
     if _state["configured"]:
         return
-    log_level = (level or os.getenv("LOG_LEVEL", "INFO")).upper()
+    log_level = level.upper()
 
     fmt = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
 

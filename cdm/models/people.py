@@ -18,16 +18,9 @@ from pydantic import (
 )
 
 from cdm.data_collection.id_utils import UrlIdParser
-from cdm.models.shared import CountUrl, EntityBase
+from cdm.models.shared import Chamber, CountUrl, EntityBase
 
 logger = logging.getLogger(__name__)
-
-
-class Chamber(StrEnum):
-    """Enumeration of chambers a member or record can belong to."""
-
-    HOUSE = "House"
-    SENATE = "Senate"
 
 
 class Session(BaseModel):

@@ -4,188 +4,141 @@
 
 ## Purpose and boundaries
 
-Congress Tracker acquires legislative data, preserves replayable inputs,
-projects typed records into Elasticsearch, and serves search and analysis
-through FastAPI and React. It is not a legislative source of record, a
-transactional relational mirror of Congress.gov, or a real-time guarantee
-that every source has been fetched.
+Congress Tracker collects U.S. legislative data, saves raw archives so data can
+be replayed locally without re-downloading, indexes normalized records into
+Elasticsearch, and serves search and analysis through a FastAPI backend and
+React frontend.
 
-The design deliberately separates **work delivery**, **job history**,
-**record handoff**, and **searchable projections**. A healthy broker alone
-does not prove a healthy corpus. Equally, a completed acquisition job does not
-prove that every downstream record is indexed.
+To keep long-running data collection reliable on a single machine, the system
+separates four responsibilities:
+- **Task delivery (RabbitMQ):** Routes background tasks to Celery workers.
+- **Durable job history & archives (SQLite):** Tracks job status, retries, and
+  downloaded source payloads so interrupted runs can resume or replay cleanly.
+- **Record handoff (Redis Streams):** Buffers fetched records between
+  acquisition workers and indexing workers.
+- **Search & analysis store (Elasticsearch):** Holds searchable entity
+  documents, cached embeddings, topic models, party perspectives, and member
+  graphs.
 
 ## C4 zoom levels
 
-| View | Question | Diagram |
+| View | Question answered | Diagram |
 |---|---|---|
-| C4 level 1: context | Who uses this system, and what supplies it? | [Context](reference/visuals.md#system-context) |
-| C4 level 2: containers | Which independently running applications and stores cooperate? | [Container view](reference/visuals.md#worker-architecture) |
-| C4 level 3: components | How does the serving application delegate requests? | [Backend components](reference/visuals.md#backend-components) |
-| Data-flow view | Where does data move and become durable? | [Ingest flow](reference/visuals.md#ingest-dataflow) |
-| Logical data view | Which identifiers connect source and derived records? | [Data relationships](reference/visuals.md#data-model) |
-| Request sequence | What happens when someone opens a bill? | [Request sequence](reference/visuals.md#bill-request-sequence) |
-| Deployment view | What differs between local operation and GCP? | [Deployment](reference/visuals.md#deployment) |
-
-The context view treats Congress Tracker as one system. The container view
-shows processes/stores, not one container per Python class. Component diagrams
-zoom inside an application; the same code may be deployed natively, through
-Docker, or as a worker image.
-
-The C4 views use labeled Mermaid flowchart shapes to preserve C4 abstraction
-levels while allowing automatic edge routing around nodes. Mermaid's
-experimental native C4 renderer uses fixed-position straight connectors, which
-can obscure people and system cards. Editable sources and the rendered atlas
-use the routed representation rather than that overlapping layout.
+| C4 level 1: context | Who uses Congress Tracker, and which external systems feed it? | [Context](reference/visuals.md#system-context) |
+| C4 level 2: containers | Which applications, workers, and data stores run together? | [Container view](reference/visuals.md#worker-architecture) |
+| C4 level 3: components | How do the React frontend and FastAPI backend handle a request? | [Backend components](reference/visuals.md#backend-components) |
+| Data-flow view | How does a record move from Congress.gov/GovInfo into Elasticsearch? | [Ingest flow](reference/visuals.md#ingest-dataflow) |
+| Logical data view | How do IDs link bills, members, votes, topics, and graph edges? | [Data relationships](reference/visuals.md#data-model) |
+| Request sequence | What happens step-by-step when a user opens a bill page? | [Request sequence](reference/visuals.md#bill-request-sequence) |
+| Deployment view | How does the local Docker Compose stack compare to the GCP design? | [Deployment](reference/visuals.md#deployment) |
 
 ## Runtime responsibilities
 
-| Runtime | Responsibility | Does not own |
+| Component | Primary responsibility | What it does not own |
 |---|---|---|
-| Operator CLIs | Plan and submit work; inspect jobs; initiate rebuilds | Canonical upstream facts |
-| Celery Beat | Submit scheduled tasks | Durable job results or corpus coverage by itself |
-| RabbitMQ | Route Celery task messages to workers | Job identity and final history |
-| Celery workers | Execute acquisition, indexing, and maintenance orchestration | The web UI request lifecycle |
-| SQLite job ledger | Idempotency, job status/attempts/errors and coverage bookkeeping | Full-text search |
-| SQLite archives/manifests/library | Replay inputs, progress and retained records | A cross-resource serving database |
-| Redis | Stream handoff/consumer state and coordination | Permanent source archive |
-| Elasticsearch | Indexed entity projections, lookup keys and analytics documents | Acquisition retry scheduling |
-| FastAPI | Validate requests and construct typed service responses | Bulk historical acquisition during ordinary reads |
-| React/Vite | Route pages, call typed API wrappers and render results | Server-side indexing or durable jobs |
-| Ollama | Optional locally configured labels and summaries | Source evidence, identifiers, or authoritative votes |
+| Operator CLIs (`scripts/`) | Plan and submit jobs, inspect status, run imports/rebuilds | Serving live web traffic |
+| Celery Beat | Enqueue scheduled refresh tasks when the `scheduler` profile is enabled | Job state history |
+| RabbitMQ | Deliver Celery task messages to worker queues | Permanent job history |
+| Celery workers | Run acquisition, indexing, maintenance, and analytics jobs | HTTP API request handling |
+| SQLite job ledger | Track job identity, status, heartbeats, retries, and date coverage | Full-text search |
+| SQLite archives & library | Store raw downloaded pages/items for local replay | Serving end-user search queries |
+| Redis | Buffer records in Redis Streams and coordinate rate limits | Long-term archival storage |
+| Elasticsearch | Store and query bills, members, votes, embeddings, topics, and graphs | Task scheduling |
+| FastAPI | Validate HTTP parameters and return typed Pydantic responses | Background data collection |
+| React / Vite | Render pages, charts, and interactive graphs | Direct database access |
+| Native host Ollama | Generate human-readable labels for topics and metasubjects | Authoritative legislative facts |
 
-Managed Python services share a Docker-volume SQLite ledger at
-`/var/lib/congress/jobs.sqlite3`, not the macOS checkout-mounted WAL.
-Archives and the record library remain separate replay stores. See the
-[ledger operating boundary](OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary)
-before replacing storage or restoring a backup.
-
-See the [ingestion guide](guides/ingestion.md) for precise retry and acknowledgement
-ordering, and [indexing reference](reference/indexing.md) for the distinction
-between configured mapping families and actively populated indices.
+All managed Docker Compose Python containers mount a shared SQLite job ledger
+volume at `/var/lib/congress/jobs.sqlite3`. See the
+[live SQLite operating boundary](OPERATIONS_RUNBOOK.md#live-sqlite-operating-boundary)
+before backing up or restoring the ledger, and see the
+[ingestion guide](guides/ingestion.md) and
+[indexing reference](reference/indexing.md) for pipeline details.
 
 ## Code map
 
-| Area | Role | Primary reading |
+| Package / Folder | Role | Learn more |
 |---|---|---|
-| [config](../cdm/config) | Typed environment-backed configuration sections | [Configuration guide](guides/configuration-and-deployment.md) |
-| [Container](../cdm/container.py) | Composition root for serving and durable job submission, without training imports | [Composition symbols](reference/symbols/composition.md) |
-| [data_collection](../cdm/data_collection) | Endpoint specs, identifiers, HTTP and pagination | [Ingestion](guides/ingestion.md) |
-| [models](../cdm/models) | Pydantic upstream record families and validators | [Data models](reference/data-models.md) |
-| [ingest](../cdm/ingest) | Resource planning, fetching, hydration, archives and replay | [Ingestion](guides/ingestion.md) |
-| [jobs](../cdm/jobs) | Typed job payloads and SQLite lifecycle | [Data models](reference/data-models.md) |
-| [workers](../cdm/workers) | Celery entry points and injected worker services | [Ingestion](guides/ingestion.md) |
-| [store](../cdm/store) | Projection, mapping, bulk writing and derived repositories | [Indexing](reference/indexing.md) |
-| [graph](../cdm/graph) | Collaboration, voting and topic graph builds | [Analytics](guides/analytics.md) |
-| [perspectives](../cdm/perspectives) | Evidence-backed party/topic contrasts | [Analytics](guides/analytics.md) |
-| [utils](../cdm/utils) | NLP, embeddings, topic training, labels and upkeep helpers | [Analytics](guides/analytics.md) |
-| [backend](../cdm/backend) | FastAPI routes, dependencies and query services | [Serving reference](reference/api-and-frontend.md) |
-| [contracts](../cdm/contracts) | Typed backend request/response shapes | [Serving reference](reference/api-and-frontend.md) |
-| [frontend](../frontend/app/src) | React pages, components and API wrappers | [Serving reference](reference/api-and-frontend.md) |
-| [scripts](../scripts) | Operational entry points | [Operations](OPERATIONS_RUNBOOK.md) |
-| [infra](../infra/terraform) / [deploy](../deploy/gcp) | GCP resources and production image deployment | [Deployment guide](guides/configuration-and-deployment.md) |
+| [cdm/config](../cdm/config) | Typed `pydantic-settings` configuration sections | [Configuration guide](guides/configuration-and-deployment.md) |
+| [cdm/container.py](../cdm/container.py) | Main composition root for the API and CLI tools | [Composition symbols](reference/symbols/composition.md) |
+| [cdm/data_collection](../cdm/data_collection) | Congress.gov endpoint specs, URL parsers, HTTP client, pagination | [Ingestion guide](guides/ingestion.md) |
+| [cdm/models](../cdm/models) | Pydantic models for upstream Congress.gov records | [Data models](reference/data-models.md) |
+| [cdm/ingest](../cdm/ingest) | Ingestion planning, item hydration, SQLite archives, GovInfo & Voteview | [Ingestion guide](guides/ingestion.md) |
+| [cdm/jobs](../cdm/jobs) | Typed job payloads and SQLite `JobStore` lifecycle | [Data models](reference/data-models.md) |
+| [cdm/workers](../cdm/workers) | Celery worker entry points and task dispatch | [Ingestion guide](guides/ingestion.md) |
+| [cdm/store](../cdm/store) | Elasticsearch index manager, projections, bulk indexing, repositories | [Indexing reference](reference/indexing.md) |
+| [cdm/graph](../cdm/graph) | Member collaboration, voting agreement, and topic-similarity graphs | [Analytics guide](guides/analytics.md) |
+| [cdm/perspectives](../cdm/perspectives) | Party-topic framing clusters and distinguishing phrase extraction | [Analytics guide](guides/analytics.md) |
+| [cdm/topics](../cdm/topics) & [cdm/utils](../cdm/utils) | Lemmatization, cached embeddings, BERTopic training, Ollama labeling | [Analytics guide](guides/analytics.md) |
+| [cdm/backend](../cdm/backend) | FastAPI application, dependency providers, error handlers, query services | [API and frontend reference](reference/api-and-frontend.md) |
+| [cdm/contracts](../cdm/contracts) | Typed Pydantic request and response models for the HTTP API | [API and frontend reference](reference/api-and-frontend.md) |
+| [frontend/app/src](../frontend/app/src) | React pages, visualization components, and typed API client wrappers | [API and frontend reference](reference/api-and-frontend.md) |
+| [scripts](../scripts) | CLI utilities for setup, ingestion, analytics, and maintenance | [Operations runbook](OPERATIONS_RUNBOOK.md) |
+| [infra](../infra/terraform) / [deploy](../deploy/gcp) | Terraform and Docker Compose templates for Google Cloud deployment | [Deployment guide](guides/configuration-and-deployment.md) |
 
 ## Configuration and dependency injection
 
-[AppConfig](../cdm/config/app_config.py) groups settings into sections.
-[Container](../cdm/container.py) receives the configuration, constructs
-collaborators and caches shared clients/services. FastAPI dependency providers
-expose those services to routes. The existing
-[OperationsContainer](../cdm/workers/operations.py) extends that root with
-ingestion, indexing and maintenance. [WorkerContainer](../cdm/workers/runtime.py)
-extends the operational root with topic training, graph building and perspective
-construction. Operations workers do not import the analysis implementations.
-Celery registers [analytics tasks](../cdm/workers/analytics_tasks.py) at startup,
-before forking, only for workers consuming the configured analytics queue;
-the serialized task name and routing follow the durable job contract. Python imports stay at
-module level rather than being deferred inside execution functions.
-Analysis factories are not imported by the API or submission CLIs.
-Training collaborators are wired directly at their construction boundary. Graph/perspective builds share a stateless
-topic-model reader.
-
-The `analysis` dependency group is included in normal development installs but
-excluded from the opt-in Docker `api` target. The last/default Docker target,
-`analysis`, keeps the full worker runtime. The approved local Compose deployment
-selects `api` for FastAPI, operational workers and Beat; only the analytics
-worker selects `analysis`. spaCy, its pinned model
-and NumPy remain serving
-dependencies because search still uses the same lemma fields and normalization.
-When training packages are installed, spaCy's optional integrations can also
-import PyTorch; the API-only image proves those packages are absent, rather
-than hiding them with lazy imports or disabling normalization.
-
-Tests can pass fakes directly or replace providers. A service should receive
-its client/store/config dependencies, rather than silently constructing a new
-database connection or consulting unrelated global settings.
-
-Follow the actual caller, typed configuration section and composition root
-when changing a setting.
+- **[AppConfig](../cdm/config/app_config.py)** organizes all environment
+  settings into typed `pydantic-settings` sections (`elastic`, `congress_api`,
+  `queue`, `redis`, `ledger`, `ollama`, `api`, etc.).
+- **[Container](../cdm/container.py)** is the composition root for the FastAPI
+  server and job-submission CLIs. It constructs and caches clients and query
+  services without importing heavy ML training libraries (`torch`, `bertopic`,
+  `sentence-transformers`).
+- **[OperationsContainer](../cdm/workers/operations.py)** extends `Container`
+  with ingestion, indexing, and maintenance runners.
+- **[WorkerContainer](../cdm/workers/runtime.py)** extends
+  `OperationsContainer` with [analytics tasks](../cdm/workers/analytics_tasks.py)
+  (BERTopic training, graph building, and party perspectives) and is loaded
+  only by workers consuming the analytics queue.
+- Docker builds two targets from `Dockerfile.python` / `Dockerfile.prod`:
+  - `api`: Used by FastAPI, operational workers, and Celery Beat (excludes the
+    heavy `analysis` dependency group while keeping `spacy` and `numpy` for
+    query lemmatization).
+  - `analysis`: Used only by `worker-analytics` (adds `bertopic` and
+    `sentence-transformers`).
 
 ## Data contracts and identifiers
 
-An upstream response, a queued payload, an archived record, an indexed document,
-and an HTTP response are **different contracts**, even when they describe the
-same bill.
+A single legislative concept passes through several distinct typed models as it
+moves through the pipeline:
 
-- Pydantic validates upstream and application boundaries.
-- Canonical IDs unify records from overlapping windows and sources.
-- Search documents flatten selected references for inexpensive filtering.
-- Rich nested fields preserve detail without creating database joins.
-- API response contracts select and transform the fields a page actually needs.
-- Analysis records carry derived assignments or evidence, not replacements for
-  upstream entities.
+1. **Upstream validation (`cdm/models/`):** Validates raw JSON or XML from
+   Congress.gov, GovInfo, or Voteview.
+2. **Canonical IDs:** Unifies records across sources (for example,
+   `bill:119:hr:1` or `member:A000360`).
+3. **Elasticsearch documents (`cdm/store/`):** Flattens key fields for fast
+   filtering and stores full text and lemmatized text directly on the bill
+   document.
+4. **API response contracts (`cdm/contracts/`):** Defines the exact JSON shape
+   returned by FastAPI and mirrored into TypeScript via OpenAPI generation.
 
-The [data structures chapter](reference/data-models.md) describes the exact
-families and keys; the [source index](reference/symbols/README.md) gives every
-declared field and function a source link. Do not equate a Python model's full
-field list with its Elasticsearch mapping or an API's response fields.
+See [Data structures](reference/data-models.md) and the
+[Generated source symbol index](reference/symbols/README.md) for field-level
+details.
 
 ## Reliability model
 
-Analytics publication retains one predecessor: a topic run, a pointer per graph
-signal, and a complete perspective snapshot per Congress. Successful builds
-enqueue a separate maintenance job that verifies live HTTP generations before
-pruning older owned artifacts, derived rows and unneeded embedding cache indices.
-Analytics and cleanup share an atomic ledger execution slot; source ingestion
-retains its own concurrency controls. Live dependencies can pin additional topic
-generations. See the [retention policy](guides/analytics.md#6-rebuilds-retention-and-operational-checks).
-
-The system is designed around replay and idempotent projections, **not an
-exactly-once transaction spanning SQLite, RabbitMQ, Redis and Elasticsearch**.
-Canonical document IDs make redelivery converge; archive/checkpoint and stream
-acknowledgement ordering control what must be replayed after an interruption.
-
-Useful diagnostic questions are:
-
-1. Was a durable job recorded?
-2. Was its task message delivered to a live worker?
-3. Which source pages/items were durably archived?
-4. Which records were handed off to Redis?
-5. Which entries are pending, acknowledged, or no longer retained?
-6. Which index or alias received the writes?
-7. Is the API reading that same projection?
-8. Does a derived analysis need rebuilding after the underlying corpus changed?
-
-Use the [operations runbook](OPERATIONS_RUNBOOK.md) for recovery. Never repair
-a perceived gap by deleting ledgers, manifests, broker volumes, or archives.
+- **Idempotent indexing & local replay:** Raw fetched pages and items are saved
+  to SQLite archives before being pushed to Redis Streams. Indexing workers use
+  canonical document IDs and null-safe merges so replaying an archive or
+  retrying a batch converges cleanly without duplicating documents.
+- **Versioned analytics publication:** Topic models, member graphs, and party
+  perspectives publish immutable versioned snapshots and retain one previous
+  generation for rollback. After a successful build, a maintenance cleanup job
+  verifies the live HTTP version before pruning older artifacts. See the
+  [analytics retention policy](guides/analytics.md#6-rebuilds-retention-and-operational-checks)
+  and the [operations runbook](OPERATIONS_RUNBOOK.md).
 
 ## Local versus production
 
-Compose is the sole supported managed local path. Its controlled default runs
-Elasticsearch, RabbitMQ, Redis, FastAPI, React/Vite and a one-slot
-index/maintenance worker. Acquisition,
-analytics, dedicated workers and Beat are explicit opt-in application profiles;
-Kibana is an opt-in infrastructure profile. The logical diagrams show available
-capabilities, not proof that every role is running. See the
-[profile/resource table](guides/configuration-and-deployment.md#managed-stack-compose)
-before expanding that scope. Foreground developer processes remain an isolated
-development option, not a second supervisor alongside the managed stack.
-
-The GCP design puts frontend/API on Cloud Run behind HTTPS/IAP, with worker
-and search VMs on a private network. Worker-local ledger, status, model and log
-files do not automatically appear on the Cloud Run API filesystem. Thus a
-successful cloud deployment does not by itself prove that file-backed admin
-status and rebuild controls work across that boundary.
-
-See [deployment constraints](guides/configuration-and-deployment.md#google-cloud)
-before relying on those controls.
+- **Local (Docker Compose):** Runs Elasticsearch, RabbitMQ, Redis, FastAPI,
+  React/Vite, and one `operations` worker (handling indexing and maintenance)
+  by default, talking to native host Ollama. Acquisition workers, analytics
+  workers, Celery Beat, and Kibana are opt-in Compose profiles; see the
+  [profile table](guides/configuration-and-deployment.md#managed-stack-compose).
+- **Google Cloud (`infra/` & `deploy/`):** Deploys the frontend and FastAPI
+  backend on Cloud Run behind HTTPS/IAP, connecting over a private VPC to
+  worker and Elasticsearch VMs. See
+  [Google Cloud deployment constraints](guides/configuration-and-deployment.md#google-cloud)
+  for details on cross-VM file boundaries.

@@ -6,14 +6,17 @@ flowchart TB
         fastapi["FastAPI :8000"]
         operations["Celery operations worker<br/>Index + maintenance queues / one slot"]
         infra["Retained Docker infrastructure<br/>Elasticsearch, RabbitMQ, Redis"]
+        ollama["Native host Ollama :11434<br/>Verified at startup"]
         disk[("Repository data / models / logs")]
         optins["Off by default<br/>Acquisition / analytics / Beat / Kibana"]
         vite --> fastapi
         fastapi --> infra
+        fastapi --> ollama
         operations --> infra
         operations --> disk
         fastapi --> disk
         operations -.->|"Separate profile approval"| optins
+        optins -.->|"Analytics labels"| ollama
     end
 
     subgraph cloud["GCP design - not certified by local acceptance"]

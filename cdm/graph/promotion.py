@@ -186,7 +186,7 @@ class VotingGraphPromotion:
     @staticmethod
     def _edges(candidate: Path, pointer: GraphVersionPointer) -> Iterator[MemberEdge]:
         seen: set[str] = set()
-        parser = TypeAdapter(JsonObject)
+        parser: TypeAdapter[JsonObject] = TypeAdapter(JsonObject)
         with (candidate / BundleFile.EDGES).open() as handle:
             for line in handle:
                 source = parser.validate_json(line)

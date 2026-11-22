@@ -105,12 +105,9 @@ ensure-docker: check-compose
 	fi
 
 
-# Install dependencies via pip as a fallback
-deps:
-	@echo "Installing Python deps from requirements.txt (pip)..."
-	@python -m pip install -r requirements.txt
-
 # Install dependencies using uv (reads pyproject.toml, creates .venv + uv.lock)
+deps: uv-sync
+
 uv-sync:
 	@command -v uv >/dev/null 2>&1 || (echo "uv not found; install with: brew install uv"; exit 1)
 	@echo "Running uv sync..."
@@ -154,7 +151,7 @@ help:
 	@printf "  local       - Start local infrastructure via Docker Compose v2\n"
 	@printf "  local-stop  - Stop containers while preserving Docker volumes\n"
 	@printf "  local-down  - Stop containers and remove Docker volumes\n"
-	@printf "  deps        - Install requirements via pip\n"
+	@printf "  deps        - Alias for uv-sync\n"
 	@printf "  uv-sync     - Install deps via uv into .venv (reads pyproject.toml)\n"
 	@printf "  uv-test     - Run pytest via uv run\n"
 	@printf "  worker      - Start a foreground ingestion worker (isolated development only)\n"
