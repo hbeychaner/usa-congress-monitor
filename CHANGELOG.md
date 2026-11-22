@@ -7,10 +7,15 @@
 - Upgrade GovInfo bulk acquisition (`GovInfoDiscovery.collection_zip_package`,
   `list_congress_packages(..., prefer_zip=True)`, `GovInfoPackageRunner`,
   `GovInfoRefreshScheduler`, and `scripts/queue_govinfo_bulk.py`) to download,
-  extract, archive, and batch-index official per-measure-type `.zip` archives
-  for `BILLSTATUS` and `BILLSUM` (16 HTTP requests per Congress instead of
-  ~30,000+ individual XML downloads) while retaining individual `.xml` package
-  handling for `BILLS` text versions; disable redundant default Congress.gov
+  extract, archive, and batch-index official hyphenated per-measure-type `.zip`
+  archives for `BILLSTATUS`, `BILLSUM`, and `BILLS` (`BILLSTATUS-119-hr.zip`,
+  `BILLSUM-119-hr.zip`, `BILLS-119-1-hr.zip` — 32 HTTP requests per Congress
+  instead of ~50,000+ individual XML downloads); preserve canonical per-file
+  `.xml` URLs in `source_metadata` when extracting from `.zip` archives; read
+  the explicit `<latestAction>` element in `GovInfoBillStatusParser` instead of
+  defaulting to the oldest `<actions>` item; preserve existing API-verified
+  `hydration_status: "complete"` during Painless script merges in
+  `cdm/store/opensearch.py`; disable redundant default Congress.gov
   API item fetching on `house_vote` (covered by Voteview bulk CSVs); recognize
   `govinfo:billstatus`-hydrated bills in `IndexedBillState.from_source()` so
   `StaleBillFilter` does not redundantly re-fetch them across 11 Congress.gov

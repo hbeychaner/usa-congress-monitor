@@ -256,12 +256,17 @@ class GovInfoPackageRunner:
             )
         parsed: list[tuple[str, JsonObject]] = []
         for xml_path in xml_files:
+            entry_url = (
+                f"{package.url.rsplit('/', 1)[0]}/{xml_path.name}"
+                if "/" in package.url
+                else package.url
+            )
             entry_package = GovInfoPackage(
                 package_id=xml_path.stem,
                 collection=package.collection,
                 congress=package.congress,
                 measure_type=package.measure_type,
-                url=package.url,
+                url=entry_url,
                 session=package.session,
                 version_code=package.version_code,
             )

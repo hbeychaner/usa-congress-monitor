@@ -697,6 +697,19 @@ class GovInfoBillStatusParser:
 
     @classmethod
     def _latest_action(cls, root: ET.Element) -> dict[str, str] | None:
+        container = next(
+            (
+                element
+                for element in root
+                if cls._local_name(element.tag) == "latestAction"
+            ),
+            None,
+        )
+        if container is not None:
+            date = cls._first_text(container, "actionDate")
+            text = cls._first_text(container, "text")
+            if date or text:
+                return {"action_date": date, "text": text}
         actions = cls._actions(root)
         return actions[-1] if actions else None
 
@@ -896,14 +909,38 @@ class GovInfoDiscovery:
         )
 
     def collection_zip_package(
-        self, collection: str, congress: int, measure_type: str
+        self,
+        collection: str,
+        congress: int,
+        measure_type: str,
+        *,
+        session: int | None = None,
     ) -> GovInfoPackage:
         """Return the official bulk ZIP archive URL for a measure-type collection."""
         normalized_collection = collection.upper()
-        if normalized_collection not in {"BILLSTATUS", "BILLSUM"}:
-            raise ValueError("bulk ZIP collection must be BILLSTATUS or BILLSUM")
         normalized_type = measure_type.lower()
-        package_id = f"{normalized_collection}-{congress}{normalized_type}"
+        if normalized_collection == "BILLS":
+            resolved_session = session or 1
+            package_id = (
+                f"BILLS-{congress}-{resolved_session}-{normalized_type}"
+            )
+            url = (
+                f"{self.BASE_URL}/BILLS/{congress}/{resolved_session}/"
+                f"{normalized_type}/{package_id}.zip"
+            )
+            return GovInfoPackage(
+                package_id=package_id,
+                collection=normalized_collection,
+                congress=congress,
+                measure_type=normalized_type,
+                url=url,
+                session=resolved_session,
+            )
+        if normalized_collection not in {"BILLSTATUS", "BILLSUM"}:
+            raise ValueError(
+                "bulk ZIP collection must be BILLSTATUS, BILLSUM, or BILLS"
+            )
+        package_id = f"{normalized_collection}-{congress}-{normalized_type}"
         url = (
             f"{self.BASE_URL}/{normalized_collection}/{congress}/{normalized_type}/"
             f"{package_id}.zip"
@@ -1074,6 +1111,13 @@ class GovInfoDiscovery:
                         normalized, congress, measure_type
                     )
                     packages.setdefault(package.package_id, package)
+                    continue
+                if prefer_zip and normalized == "BILLS":
+                    for session in sessions:
+                        package = self.collection_zip_package(
+                            normalized, congress, measure_type, session=session
+                        )
+                        packages.setdefault(package.package_id, package)
                     continue
                 collection_sessions = sessions if normalized == "BILLS" else (1,)
                 for session in collection_sessions:

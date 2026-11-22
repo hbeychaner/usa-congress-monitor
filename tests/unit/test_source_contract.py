@@ -205,6 +205,10 @@ class TestGovInfoSnapshotRetention:
         archive.engine.dispose()
         assert [r["id"] for r in archived] == ["bill:119:hr:1", "bill:119:hr:2"]
         assert [r["title"] for r in archived] == ["First Bill", "Second Bill"]
+        assert [r["source_metadata"]["url"] for r in archived] == [
+            "https://www.govinfo.gov/bulkdata/BILLSTATUS/119/hr/BILLSTATUS-119hr1.xml",
+            "https://www.govinfo.gov/bulkdata/BILLSTATUS/119/hr/BILLSTATUS-119hr2.xml",
+        ]
 
     def test_staging_write_rejects_preview_limit_before_building_clients(
         self, monkeypatch: pytest.MonkeyPatch

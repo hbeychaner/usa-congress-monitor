@@ -622,10 +622,10 @@ transaction spanning HTTP, SQLite, Redis, broker, and search server.
 It can construct measure/text package descriptors, construct measure-type bulk
 `.zip` archive descriptors (`collection_zip_package()`), probe availability, or
 enumerate official JSON directories with HTML-listing fallback.
-When `prefer_zip=True` is passed to `list_congress_packages()`, `BILLSTATUS` and
-`BILLSUM` are discovered as per-measure-type `.zip` archives (16 requests per
-Congress instead of tens of thousands of individual XML requests), while `BILLS`
-continues to enumerate individual published text-version packages.
+When `prefer_zip=True` is passed to `list_congress_packages()`, `BILLSTATUS`,
+`BILLSUM`, and `BILLS` are discovered as per-measure-type `.zip` archives
+(`BILLSTATUS-119-hr.zip`, `BILLSUM-119-hr.zip`, `BILLS-119-1-hr.zip` — 32
+requests per Congress instead of ~50,000+ individual XML requests).
 BILLS text packages have session/version metadata; measure-level packages
 do not require session. A 404 probe is `not_available`, distinct from a
 network failure.

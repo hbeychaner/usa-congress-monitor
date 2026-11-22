@@ -134,12 +134,16 @@ def test_discovery_builds_measure_and_text_package_urls():
 
     status = discovery.measure_package("billstatus", 118, "hr", 1)
     zip_pkg = discovery.collection_zip_package("billstatus", 118, "hr")
+    bills_zip = discovery.collection_zip_package("bills", 118, "hr", session=2)
     text = discovery.text_package(118, 1, "hr", 1, "ih")
 
     assert status.package_id == "BILLSTATUS-118hr1"
     assert status.url.endswith("/BILLSTATUS/118/hr/BILLSTATUS-118hr1.xml")
-    assert zip_pkg.package_id == "BILLSTATUS-118hr"
-    assert zip_pkg.url.endswith("/BILLSTATUS/118/hr/BILLSTATUS-118hr.zip")
+    assert zip_pkg.package_id == "BILLSTATUS-118-hr"
+    assert zip_pkg.url.endswith("/BILLSTATUS/118/hr/BILLSTATUS-118-hr.zip")
+    assert bills_zip.package_id == "BILLS-118-2-hr"
+    assert bills_zip.url.endswith("/BILLS/118/2/hr/BILLS-118-2-hr.zip")
+    assert bills_zip.session == 2
     assert text.package_id == "BILLS-118hr1ih"
     assert text.url.endswith("/BILLS/118/1/hr/BILLS-118hr1ih.xml")
     assert text.session == 1
@@ -147,34 +151,31 @@ def test_discovery_builds_measure_and_text_package_urls():
 
 
 def test_discovery_prefer_zip_returns_collection_zips_without_directory_fetches():
-    class FailIfCalledForStatusSession:
+    class FailIfCalledSession:
         def __init__(self):
             self.calls = []
 
         def get(self, url, **kwargs):
             self.calls.append(url)
-            if "BILLSTATUS" in url or "BILLSUM" in url:
-                raise AssertionError("BILLSTATUS/BILLSUM should use direct ZIP URLs")
-            return StubResponse(
-                json_payload={"files": [{"name": "BILLS-118hr1ih.xml"}]}
-            )
+            raise AssertionError("prefer_zip=True should use direct ZIP URLs")
 
-    session = FailIfCalledForStatusSession()
+    session = FailIfCalledSession()
     packages = GovInfoDiscovery(session=session).list_congress_packages(
         118,
         measure_types=("hr", "s"),
         collections=("BILLSTATUS", "BILLSUM", "BILLS"),
-        sessions=(1,),
+        sessions=(1, 2),
         prefer_zip=True,
     )
 
     ids = {p.package_id: p.url for p in packages}
-    assert ids["BILLSTATUS-118hr"].endswith("/BILLSTATUS/118/hr/BILLSTATUS-118hr.zip")
-    assert ids["BILLSTATUS-118s"].endswith("/BILLSTATUS/118/s/BILLSTATUS-118s.zip")
-    assert ids["BILLSUM-118hr"].endswith("/BILLSUM/118/hr/BILLSUM-118hr.zip")
-    assert ids["BILLSUM-118s"].endswith("/BILLSUM/118/s/BILLSUM-118s.zip")
-    assert "BILLS-118hr1ih" in ids
-    assert len(session.calls) == 2
+    assert ids["BILLSTATUS-118-hr"].endswith("/BILLSTATUS/118/hr/BILLSTATUS-118-hr.zip")
+    assert ids["BILLSTATUS-118-s"].endswith("/BILLSTATUS/118/s/BILLSTATUS-118-s.zip")
+    assert ids["BILLSUM-118-hr"].endswith("/BILLSUM/118/hr/BILLSUM-118-hr.zip")
+    assert ids["BILLSUM-118-s"].endswith("/BILLSUM/118/s/BILLSUM-118-s.zip")
+    assert ids["BILLS-118-1-hr"].endswith("/BILLS/118/1/hr/BILLS-118-1-hr.zip")
+    assert ids["BILLS-118-2-s"].endswith("/BILLS/118/2/s/BILLS-118-2-s.zip")
+    assert len(session.calls) == 0
 
 
 @pytest.mark.parametrize(
@@ -506,6 +507,34 @@ def test_billstatus_parser_normalizes_namespaced_xml_and_provenance():
     ]
     assert record["committee_reports"] == [{"citation": "H. Rept. 118-1"}]
     assert record["source_metadata"]["source"] == "govinfo:billstatus"
+
+
+def test_billstatus_parser_prefers_explicit_latest_action_element():
+    xml = """
+        <billStatus>
+            <bill>
+                <latestAction>
+                    <actionDate>2025-01-03</actionDate>
+                    <text>Motion to reconsider laid on the table.</text>
+                </latestAction>
+                <actions>
+                    <item>
+                        <actionDate>2025-01-03</actionDate>
+                        <text>Motion to reconsider laid on the table.</text>
+                    </item>
+                    <item>
+                        <actionDate>2025-01-03</actionDate>
+                        <text>Introduced in Senate</text>
+                    </item>
+                </actions>
+            </bill>
+        </billStatus>
+    """
+    record = GovInfoBillStatusParser().parse(xml, package())
+    assert record["latest_action"] == {
+        "action_date": "2025-01-03",
+        "text": "Motion to reconsider laid on the table.",
+    }
 
 
 def test_billstatus_parser_keeps_text_versions_when_count_is_present():
