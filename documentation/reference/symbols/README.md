@@ -24,7 +24,7 @@ remain authoritative in source. Follow the narrative chapters for intent.
 | [graph](graph.md) | 11 | 432 |
 | [ingest](ingest.md) | 19 | 744 |
 | [jobs](jobs.md) | 4 | 163 |
-| [models](models.md) | 15 | 859 |
+| [models](models.md) | 15 | 816 |
 | [perspectives](perspectives.md) | 13 | 190 |
 | [scripts](scripts.md) | 20 | 68 |
 | [store](store.md) | 14 | 256 |
@@ -33,4 +33,4 @@ remain authoritative in source. Follow the narrative chapters for intent.
 | [utils](utils.md) | 15 | 216 |
 | [workers](workers.md) | 16 | 213 |
 
-Total: 269 source files; 6913 declarations.
+Total: 269 source files; 6870 declarations.

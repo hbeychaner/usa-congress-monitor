@@ -1,12 +1,11 @@
-"""Pydantic models for bills, amendments, laws, committees, and related metadata.
+"""Pydantic models for bills, amendments, laws, committees, and related metadata."""
 
-Each model includes per-field descriptions that explain what each attribute answers.
-"""
+from __future__ import annotations
 
 import logging
 from datetime import datetime, time
 from enum import StrEnum
-from typing import Annotated, Any, Optional, Union
+from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
@@ -34,7 +33,6 @@ from cdm.data_collection.id_utils import UrlIdParser
 from cdm.models.people import Chamber, Member, Sponsor, SponsorRef
 from cdm.models.shared import (
     Activity,
-    Chamber,
     CountUrl,
     EntityBase,
     Format,
@@ -49,296 +47,154 @@ from cdm.utils.json_types import JsonObject
 logger = logging.getLogger(__name__)
 
 
-# The API returns CountUrl envelopes for these fields (never expanded lists).
-# Keep the typing succinct: these fields are `CountUrl` when present.
+def _normalize_committee_codes(items: list) -> list:
+    for sc in items:
+        if isinstance(sc, dict):
+            if sc.get("systemCode") and not sc.get("system_code"):
+                sc["system_code"] = sc["systemCode"]
+            if sc.get("system_code") and not sc.get("systemCode"):
+                sc["systemCode"] = sc["system_code"]
+    return items
+
+
+def _url_or_hash_id(entity: BaseModel, fallback_token: str) -> str:
+    try:
+        url = getattr(entity, "url", None)
+        if url:
+            try:
+                return UrlIdParser.parse(str(url))
+            except (TypeError, ValueError):
+                logger.exception("Failed to parse URL to id in build_id")
+        return f"record:{abs(hash(str(entity.model_dump()))) % (10**12)}"
+    except (AttributeError, TypeError, ValueError):
+        return f"record:{abs(hash(fallback_token)) % (10**12)}"
 
 
 class Hearing(BaseModel):
     """Hearing metadata with title, chamber, committee, and timing details."""
 
-    title: Annotated[
-        str | None,
-        Field(
-            default=None,
-            description="What the hearing title is (can be absent in some API records).",
-        ),
-    ] = None
-    url: Annotated[
-        HttpUrl | None,
-        Field(default=None, description="Where to retrieve the hearing in the API."),
-    ] = None
-    chamber: Annotated[
-        Chamber | None, Field(description="Which chamber held the hearing.")
-    ] = None
-    committee_name: Annotated[
-        str | None, Field(description="Which committee held the hearing.")
-    ] = None
-    hearing_date: Annotated[
-        datetime | None, Field(description="When the hearing took place.")
-    ] = None
-    type: Annotated[str | None, Field(description="What type of hearing this is.")] = (
-        None
+    title: str | None = None
+    url: HttpUrl | None = None
+    chamber: Chamber | None = None
+    committee_name: str | None = None
+    hearing_date: datetime | None = None
+    type: str | None = None
+    citation: str | None = None
+    jacket_number: int | None = Field(default=None, alias="jacketNumber")
+    library_of_congress_identifier: str | None = Field(
+        default=None, alias="libraryOfCongressIdentifier"
     )
-    # Additional API-provided fields preserved from the hearing envelope
-    citation: Annotated[
-        str | None, Field(default=None, description="Official hearing citation.")
-    ] = None
-    jacket_number: Annotated[
-        int | None,
-        Field(
-            default=None,
-            alias="jacketNumber",
-            description="Jacket number assigned by the source.",
-        ),
-    ] = None
-    library_of_congress_identifier: Annotated[
-        str | None,
-        Field(
-            default=None,
-            alias="libraryOfCongressIdentifier",
-            description="Library of Congress identifier.",
-        ),
-    ] = None
-    congress: Annotated[
-        int | None,
-        Field(default=None, description="Which Congress the hearing belongs to."),
-    ] = None
-    dates: Annotated[
-        list[dict] | None,
-        Field(default=None, description="Raw dates array from the API."),
-    ] = None
-    formats: Annotated[
-        list[dict] | None,
-        Field(
-            default=None,
-            description="Raw formats array (may include formatted text/PDF entries).",
-        ),
-    ] = None
-    associated_meeting: Annotated[
-        dict | None,
-        Field(
-            default=None,
-            alias="associatedMeeting",
-            description="Associated committee meeting object when present.",
-        ),
-    ] = None
-    part: Annotated[
-        int | None,
-        Field(
-            default=None, description="Part number when a hearing spans multiple parts."
-        ),
-    ] = None
-    number: Annotated[
-        int | None,
-        Field(default=None, description="Hearing number when provided."),
-    ] = None
-    update_date: Annotated[
-        datetime | None,
-        Field(
-            default=None,
-            alias="updateDate",
-            description="When the hearing record was last updated.",
-        ),
-    ] = None
-    committees: Annotated[
-        list[dict] | None,
-        Field(
-            default=None,
-            description="Raw committee objects included in the hearing envelope.",
-        ),
-    ] = None
-    # Preserve the original API envelope when available (kept for forensics)
-    hearing: Annotated[
-        dict | None,
-        Field(
-            default=None,
-            alias="hearing",
-            description="Original API hearing envelope (preserved for forensics).",
-        ),
-    ] = None
+    congress: int | None = None
+    dates: list[dict] | None = None
+    formats: list[dict] | None = None
+    associated_meeting: dict | None = Field(default=None, alias="associatedMeeting")
+    part: int | None = None
+    number: int | None = None
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    committees: list[dict] | None = None
+    hearing: dict | None = Field(default=None, alias="hearing")
 
     @model_validator(mode="before")
     def _populate_url_from_formats(cls, values: dict):
-        # If the API returns a `formats` list with URLs, use the first URL
         if not values.get("url"):
             fmts = values.get("formats")
-            if isinstance(fmts, list) and fmts:
-                first = fmts[0]
-                if isinstance(first, dict) and first.get("url"):
-                    values["url"] = first.get("url")
+            if isinstance(fmts, list) and fmts and isinstance(fmts[0], dict):
+                if fmts[0].get("url"):
+                    values["url"] = fmts[0]["url"]
         return values
 
     @model_validator(mode="before")
     def _extract_from_envelope(cls, values: dict):
-        # If the API response included a `hearing` envelope, preserve it
-        # and populate a few convenient flattened fields when absent.
         env = values.get("hearing")
-        # Some callers pass the envelope directly (candidate = r.get('hearing')),
-        # so treat the incoming dict itself as the envelope when no wrapper
-        # key is present. When we detect that case, preserve a copy under
-        # the `hearing` key for forensic output.
         if not isinstance(env, dict) and any(
             k in values for k in ("committees", "dates", "title", "formats")
         ):
             env = values
-            # Preserve the original envelope as a shallow copy so we don't
-            # keep a self-referential structure.
             if "hearing" not in values:
                 values["hearing"] = dict(values)
         if isinstance(env, dict):
-            # Title
-            if not values.get("title") and env.get("title"):
-                values["title"] = env.get("title")
+            for key in ("title", "url", "chamber"):
+                if not values.get(key) and env.get(key):
+                    values[key] = env[key]
 
-            # URL (prefer explicit top-level, otherwise formats/url)
-            if not values.get("url") and env.get("url"):
-                values["url"] = env.get("url")
-
-            # Chamber
-            if not values.get("chamber") and env.get("chamber"):
-                values["chamber"] = env.get("chamber")
-
-            # Committee name: prefer first committee entry
             if not values.get("committee_name"):
-                # Support either a `committee` object or `committees` list
-                if isinstance(env.get("committee"), dict) and env.get(
-                    "committee", {}
-                ).get("name", ""):
-                    values["committee_name"] = env.get("committee", {}).get("name")
-                elif isinstance(env.get("committees"), list) and env.get("committees"):
-                    first = env.get("committees", [])[0]
-                    if isinstance(first, dict) and first.get("name", ""):
-                        values["committee_name"] = first.get("name")
+                comm = env.get("committee")
+                comms = env.get("committees")
+                if isinstance(comm, dict) and comm.get("name"):
+                    values["committee_name"] = comm["name"]
+                elif isinstance(comms, list) and comms and isinstance(comms[0], dict):
+                    if comms[0].get("name"):
+                        values["committee_name"] = comms[0]["name"]
 
-            # Normalize committee system id keys so downstream code can
-            # reliably access either `systemCode` or `system_code`.
             if isinstance(env.get("committees"), list):
-                normalized_committees = []
-                for sc in env.get("committees", []):
-                    if isinstance(sc, dict):
-                        if sc.get("systemCode") and not sc.get("system_code"):
-                            sc["system_code"] = sc.get("systemCode")
-                        if sc.get("system_code") and not sc.get("systemCode"):
-                            sc["systemCode"] = sc.get("system_code")
-                    normalized_committees.append(sc)
-                values["committees"] = normalized_committees
+                values["committees"] = _normalize_committee_codes(
+                    env.get("committees", [])
+                )
 
-            # Hearing date: prefer first `dates` entry, but accept singular `date` or `hearingDate` keys
             if not values.get("hearing_date"):
-                if isinstance(env.get("dates"), list) and env.get("dates"):
-                    first = env.get("dates", [])[0]
-                    if isinstance(first, dict) and first.get("date"):
-                        values["hearing_date"] = first.get("date")
+                dates = env.get("dates")
+                if isinstance(dates, list) and dates and isinstance(dates[0], dict):
+                    if dates[0].get("date"):
+                        values["hearing_date"] = dates[0]["date"]
                 elif env.get("date"):
-                    values["hearing_date"] = env.get("date")
+                    values["hearing_date"] = env["date"]
                 elif env.get("hearingDate"):
-                    values["hearing_date"] = env.get("hearingDate")
-
-            # Jacket number and other numeric fields are preserved in the envelope
+                    values["hearing_date"] = env["hearingDate"]
         return values
 
     @field_validator("chamber", mode="before")
     def _normalize_chamber(cls, v):
-        """Normalize chamber values like 'NoChamber' into a `Chamber` or None."""
         return normalize_chamber(v)
 
 
 class BehalfType(StrEnum):
     """Enumeration for on-behalf-of sponsorship types."""
 
-    # This can be "Submitted on behalf of" the sponsor and/or "Proposed on behalf of" the sponsor. Assign value based on first word of input
     SUBMITTED = "Submitted"
     PROPOSED = "Proposed"
 
     @property
-    def type_url(self):
-        """Return the URL-friendly token for the behalf type."""
+    def type_url(self) -> str:
         return self.value.split()[0]
-
-
 
 
 class TextVersion(BaseModel):
     """Text version for a bill or amendment, including formats and publish date."""
 
-    date: Annotated[
-        datetime | None,
-        Field(
-            default=None,
-            description="When the text version was published, when supplied.",
-        ),
-    ] = None
-    formats: Annotated[
-        list[Format], Field(description="Which formats are available for this text.")
-    ]
-    type: Annotated[str, Field(description="What type of text version this is.")]
-
-
-class BillTextResponse(BaseModel):
-    """Response wrapper for bill text endpoints (list of text versions)."""
-
-    pagination: Annotated[
-        dict | None,
-        Field(default=None, description="Pagination metadata if present"),
-    ] = None
-    request: Annotated[
-        dict | None, Field(default=None, description="Original request metadata")
-    ] = None
-    textVersions: Annotated[
-        list[TextVersion], Field(description="List of available text versions")
-    ] = Field(default_factory=list)
+    date: datetime | None = None
+    formats: list[Format]
+    type: str
 
 
 class PolicyArea(BaseModel):
     """Policy area classification assigned to a bill."""
 
-    name: Annotated[str, Field(description="What the policy area name is.")]
-    update_date: Annotated[
-        datetime | None,
-        Field(alias="updateDate", description="When the policy area was last updated."),
-    ] = None
+    name: str
+    update_date: datetime | None = Field(default=None, alias="updateDate")
 
 
 class LegislativeSubject(BaseModel):
     """Legislative subject classification assigned to a bill."""
 
-    name: Annotated[str, Field(description="What the legislative subject name is.")]
-    update_date: Annotated[
-        datetime | None,
-        Field(alias="updateDate", description="When the subject was last updated."),
-    ] = None
+    name: str
+    update_date: datetime | None = Field(default=None, alias="updateDate")
 
 
 class LatestAction(BaseModel):
     """Latest action metadata with date and action text."""
 
-    action_date: Annotated[
-        datetime | None,
-        Field(alias="actionDate", description="When the latest action occurred."),
-    ] = None
-    text: Annotated[str, Field(description="What the latest action text says.")]
+    action_date: datetime | None = Field(default=None, alias="actionDate")
+    text: str
 
 
 class Summary(BaseModel):
     """Bill summary metadata including action and version information."""
 
-    action_date: Annotated[
-        datetime,
-        Field(alias="actionDate", description="When the summary action occurred."),
-    ]
-    action_desc: Annotated[
-        str, Field(alias="actionDesc", description="What the summary action describes.")
-    ]
-    text: Annotated[str, Field(description="What the summary text says.")]
-    updateDate: Annotated[
-        datetime,
-        Field(alias="updateDate", description="When the summary was last updated."),
-    ]
-    version_code: Annotated[
-        str, Field(alias="versionCode", description="Which summary version this is.")
-    ]
-
-
+    action_date: datetime = Field(alias="actionDate")
+    action_desc: str = Field(alias="actionDesc")
+    text: str
+    updateDate: datetime = Field(alias="updateDate")
+    version_code: str = Field(alias="versionCode")
 
 
 class IdentifyingEntity(StrEnum):
@@ -346,7 +202,7 @@ class IdentifyingEntity(StrEnum):
 
     HOUSE = "House"
     SENATE = "Senate"
-    CRS = "CRS"  # Congressional Research Service
+    CRS = "CRS"
     LIBRARY_OF_CONGRESS = "Library of Congress"
     GOVERNMENT_PUBLISHING_OFFICE = "U.S. Government Publishing Office"
 
@@ -354,11 +210,8 @@ class IdentifyingEntity(StrEnum):
 class RelationshipDetail(BaseModel):
     """Details describing how a relationship between bills was identified."""
 
-    identified_by: Annotated[
-        IdentifyingEntity | None,
-        Field(alias="identifiedBy", description="Who identified the relationship."),
-    ] = None
-    type: Annotated[str, Field(description="What type of relationship this is.")]
+    identified_by: IdentifyingEntity | None = Field(default=None, alias="identifiedBy")
+    type: str
 
 
 class ChamberCode(StrEnum):
@@ -371,185 +224,75 @@ class ChamberCode(StrEnum):
 class BillType(StrEnum):
     """Enumeration of bill types with API slug helpers."""
 
-    def __init__(self, value: str):
-        """Initialize the enum and cache a URL-friendly slug.
-
-        Args:
-            value: The enum's string value (e.g., 'HR', 'S').
-        """
+    def __init__(self, value: str) -> None:
         self._value_ = value
         self.type_url = value.lower()
 
-    HR = "HR"  # Bill introduced in House
-    S = "S"  # Bill introduced in Senate
-    HJRES = "HJRES"  # Joint resolution introduced in House
-    SJRES = "SJRES"  # Joint resolution introduced in Senate
-    HCONRES = "HCONRES"  # Concurrent resolution introduced in House
-    SCONRES = "SCONRES"  # Concurrent resolution introduced in Senate
-    HRES = "HRES"  # Simple resolution introduced in House
-    SRES = "SRES"  # Simple resolution introduced in Senate
+    HR = "HR"
+    S = "S"
+    HJRES = "HJRES"
+    SJRES = "SJRES"
+    HCONRES = "HCONRES"
+    SCONRES = "SCONRES"
+    HRES = "HRES"
+    SRES = "SRES"
 
 
 class LawMetadata(BaseModel):
     """Law metadata attached to a bill (law number and type)."""
 
-    number: Annotated[str, Field(description="What the law number is.")]
-    law_type: Annotated[
-        LawType, Field(alias="type", description="What type of law this is.")
-    ]
+    number: str
+    law_type: LawType = Field(alias="type")
 
     @field_validator("law_type", mode="before")
     def convert_law_type(cls, value: str):
-        """Field validator to coerce incoming law type strings.
-
-        Accepts values like 'Public Law' or 'Private Law' and returns the
-        corresponding ``LawType`` enum via the shared ``convert_law_type``
-        helper. This runs in ``before`` mode to allow string inputs.
-
-        Args:
-            value: Incoming raw value for the ``law_type`` field.
-
-        Returns:
-            Converted enum value accepted by the field.
-        """
         return convert_law_type(value)
 
 
-# General Committee model (API entity)
 class Committee(BaseModel):
     """Committee entity with activities and subcommittee hierarchy."""
 
-    name: Annotated[str, Field(description="What the committee name is.")]
-    chamber: Annotated[
-        str | None, Field(description="Which chamber the committee belongs to.")
-    ] = None
-    type: Annotated[
-        str | None, Field(description="What type of committee this is.")
-    ] = None
-    system_code: Annotated[
-        str, Field(alias="systemCode", description="What the committee system code is.")
-    ]
-    url: Annotated[
-        HttpUrl, Field(description="Where to retrieve the committee in the API.")
-    ]
-    # Preserve historical activity list when present in API responses
-    history: Annotated[
-        list[dict],
-        Field(
-            default_factory=list, description="Historical snapshots of the committee"
-        ),
-    ]
-    # Present in some API responses
-    is_current: Annotated[
-        bool | None,
-        Field(
-            alias="isCurrent",
-            default=None,
-            description="Whether this committee is current",
-        ),
-    ] = None
-    update_date: Annotated[
-        datetime | None,
-        Field(
-            alias="updateDate",
-            default=None,
-            description="When committee was last updated",
-        ),
-    ] = None
-    activities: Annotated[
-        list[Activity],
-        Field(description="Which activities are recorded for the committee."),
-    ] = Field(default_factory=list)
-    subcommittees: Annotated[
-        list["Committee"],
-        Field(description="Which subcommittees belong to the committee."),
-    ] = Field(default_factory=list)
-
-    # Preserve additional API-provided fields that are not always present.
-    # Some endpoints return these as either a list of items or a count/url wrapper
-    # object (e.g. {"count":0, "url":"..."}). Accept both shapes.
-    bills: Annotated[
-        CountUrl | None,
-        Field(
-            default=None,
-            description="Bills associated with the committee as provided by the API (CountUrl envelope)",
-        ),
-    ] = None
-    committee_website_url: Annotated[
-        HttpUrl | None,
-        Field(
-            alias="committeeWebsiteUrl",
-            default=None,
-            description="Committee website URL as provided by the API",
-        ),
-    ] = None
-    communications: Annotated[
-        CountUrl | None,
-        Field(
-            default=None,
-            description="Communications associated with the committee (CountUrl envelope)",
-        ),
-    ] = None
-    nominations: Annotated[
-        CountUrl | None,
-        Field(
-            default=None,
-            description="Nominations associated with the committee (CountUrl envelope)",
-        ),
-    ] = None
-    parent: Annotated[
-        dict | None,
-        Field(
-            default=None,
-            description="Parent committee object when present in API responses",
-        ),
-    ] = None
-    reports: Annotated[
-        CountUrl | None,
-        Field(
-            default=None,
-            description="Reports associated with the committee (CountUrl envelope)",
-        ),
-    ] = None
+    name: str
+    chamber: str | None = None
+    type: str | None = None
+    system_code: str = Field(alias="systemCode")
+    url: HttpUrl
+    history: list[dict] = Field(default_factory=list)
+    is_current: bool | None = Field(default=None, alias="isCurrent")
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    activities: list[Activity] = Field(default_factory=list)
+    subcommittees: list[Committee] = Field(default_factory=list)
+    bills: CountUrl | None = None
+    committee_website_url: HttpUrl | None = Field(
+        default=None, alias="committeeWebsiteUrl"
+    )
+    communications: CountUrl | None = None
+    nominations: CountUrl | None = None
+    parent: dict | None = None
+    reports: CountUrl | None = None
 
     def __init__(self, **data):
-        """Initialize committee and normalize nested subcommittee objects."""
         super().__init__(**data)
-        # Ensure subcommittees are Committee instances
         self.subcommittees = [
             Committee(**sc) if isinstance(sc, dict) else sc for sc in self.subcommittees
         ]
 
     @model_validator(mode="before")
     def _normalize_api_payload(cls, values: dict):
-        """Normalize common API shapes into the Committee model's expected fields.
-
-        - Extract a human-friendly `name` from `history[0].officialName` or
-          `history[0].libraryOfCongressName` when `name` is not provided.
-        - Populate `chamber` from `type` when absent.
-        - Ensure a canonical `url` exists by combining `chamber` and `systemCode`.
-        This keeps endpoint-specific shaping colocated with the model that
-        consumes it while avoiding client-level special casing.
-        """
         if not values.get("name"):
             hist = values.get("history")
-            if isinstance(hist, list) and hist:
-                first = hist[0]
-                if isinstance(first, dict):
-                    name = first.get("officialName") or first.get(
-                        "libraryOfCongressName"
-                    )
-                    if name:
-                        values["name"] = name
+            if isinstance(hist, list) and hist and isinstance(hist[0], dict):
+                name = hist[0].get("officialName") or hist[0].get(
+                    "libraryOfCongressName"
+                )
+                if name:
+                    values["name"] = name
 
-        if not values.get("chamber"):
-            t = values.get("type")
-            if isinstance(t, str):
-                values["chamber"] = t
+        if not values.get("chamber") and isinstance(values.get("type"), str):
+            values["chamber"] = values["type"]
 
         if not values.get("url"):
             system_code = values.get("systemCode") or values.get("system_code")
-            # Ensure canonical internal key exists for downstream code
             if system_code and not values.get("system_code"):
                 values["system_code"] = system_code
             chamber = values.get("chamber") or (
@@ -559,125 +302,70 @@ class Committee(BaseModel):
                 values["url"] = (
                     f"https://api.congress.gov/v3/committee/{str(chamber).lower()}/{system_code}"
                 )
-        # Ensure nested subcommittee entries are normalized to include at least
-        # a chamber, type, systemCode (or system_code), and url so that
-        # constructing Committee(**subcommittee_dict) doesn't fail when the
-        # API returns minimal subcommittee objects (e.g. only name/url).
+
         parent_chamber = values.get("chamber")
         parent_type = values.get("type")
         subs = values.get("subcommittees")
         if isinstance(subs, list) and subs:
-            normalized = []
+            _normalize_committee_codes(subs)
             for sc in subs:
                 if not isinstance(sc, dict):
-                    normalized.append(sc)
                     continue
-                # Fill missing chamber/type from parent if available
                 if not sc.get("chamber") and parent_chamber:
                     sc["chamber"] = parent_chamber
                 if not sc.get("type") and parent_type:
                     sc["type"] = parent_type
-                # Accept either systemCode or system_code
-                # Accept either systemCode or system_code and normalize both
-                if sc.get("systemCode") and not sc.get("system_code"):
-                    sc["system_code"] = sc.get("systemCode")
-                if sc.get("system_code") and not sc.get("systemCode"):
-                    sc["systemCode"] = sc.get("system_code")
-                # If url missing but we have chamber and a system id, construct it
                 system_id = sc.get("systemCode") or sc.get("system_code")
                 if not sc.get("url") and system_id and sc.get("chamber"):
                     sc["url"] = (
-                        f"https://api.congress.gov/v3/committee/{str(sc.get('chamber')).lower()}/{system_id}"
+                        f"https://api.congress.gov/v3/committee/{str(sc['chamber']).lower()}/{system_id}"
                     )
-                normalized.append(sc)
-            values["subcommittees"] = normalized
-        # Coerce CountUrl-shaped dicts into `CountUrl` instances for the
-        # fields that the API represents as envelopes. If other shapes
-        # appear, leave them so validation can surface unexpected cases.
+
         for envelope_field in ("bills", "communications", "nominations", "reports"):
             val = values.get(envelope_field)
             if isinstance(val, dict) and {"count", "url"}.issubset(val):
                 try:
                     values[envelope_field] = CountUrl(**val)
                 except ValidationError:
-                    # fall through and leave original shape — downstream code
-                    # will surface a validation error if it's truly invalid
                     logger.debug("Invalid CountUrl envelope for %s", envelope_field)
         return values
 
 
-# Metadata-only model for committee lists
 class CommitteeMetadata(BaseModel):
     """List-level committee metadata used in related records."""
 
-    activities: Annotated[
-        list[Activity] | None,
-        Field(description="Which activities are recorded for the committee."),
-    ] = None
-    chamber: Annotated[
-        str | None, Field(description="Which chamber the committee belongs to.")
-    ] = None
-    name: Annotated[str, Field(description="What the committee name is.")]
-    system_code: Annotated[
-        str | None,
-        Field(alias="systemCode", description="What the committee system code is."),
-    ] = None
-    type: Annotated[str | None, Field(description="What type of committee this is.")] = None
-    url: Annotated[
-        HttpUrl | None, Field(description="Where to retrieve the committee in the API.")
-    ] = None
+    activities: list[Activity] | None = None
+    chamber: str | None = None
+    name: str
+    system_code: str | None = Field(default=None, alias="systemCode")
+    type: str | None = None
+    url: HttpUrl | None = None
+
 
 class RecordedVote(BaseModel):
     """Recorded vote metadata tied to actions or roll calls."""
 
-    roll_number: Annotated[
-        int, Field(alias="rollNumber", description="What the roll call number is.")
-    ]
-    url: Annotated[
-        HttpUrl | None, Field(description="Where to retrieve the vote in the API.")
-    ] = None
-    chamber: Annotated[
-        Chamber, Field(alias="chamber", description="Which chamber held the vote.")
-    ]
-    congress: Annotated[int, Field(description="Which Congress the vote belongs to.")]
-    date: Annotated[datetime, Field(description="When the vote occurred.")]
-    session_number: Annotated[
-        int,
-        Field(alias="sessionNumber", description="Which session the vote occurred in."),
-    ]
+    roll_number: int = Field(alias="rollNumber")
+    url: HttpUrl | None = None
+    chamber: Chamber = Field(alias="chamber")
+    congress: int
+    date: datetime
+    session_number: int = Field(alias="sessionNumber")
 
 
 class Action(BaseModel):
     """Action entry for a bill or amendment, including timing and committees."""
 
-    action_date: Annotated[
-        datetime | None,
-        Field(alias="actionDate", description="When the action occurred."),
-    ] = None
-    action_code: Annotated[
-        str, Field(alias="actionCode", description="What the action code is.")
-    ] = ""
-    source_system: Annotated[
-        SourceSystem | None,
-        Field(alias="sourceSystem", description="Which system provided the action."),
-    ] = None
-    text: Annotated[str, Field(description="What the action text says.")] = ""
-    type: Annotated[str | None, Field(description="What type of action this is.")] = ""
-    committees: Annotated[
-        list[CommitteeMetadata] | None,
-        Field(description="Which committees are associated with the action."),
-    ] = Field(default_factory=list)
-    action_time: Annotated[
-        datetime | time | None,
-        Field(alias="actionTime", description="What time the action occurred."),
-    ] = None
-    recorded_votes: Annotated[
-        list[RecordedVote],
-        Field(
-            alias="recordedVotes",
-            description="Which recorded votes are tied to the action.",
-        ),
-    ] = Field(default_factory=list)
+    action_date: datetime | None = Field(default=None, alias="actionDate")
+    action_code: str = Field(default="", alias="actionCode")
+    source_system: SourceSystem | None = Field(default=None, alias="sourceSystem")
+    text: str = ""
+    type: str | None = ""
+    committees: list[CommitteeMetadata] | None = Field(default_factory=list)
+    action_time: datetime | time | None = Field(default=None, alias="actionTime")
+    recorded_votes: list[RecordedVote] = Field(
+        default_factory=list, alias="recordedVotes"
+    )
 
     @model_validator(mode="after")
     def _combine_time_only_action_time(self):
@@ -693,136 +381,79 @@ class Action(BaseModel):
 class AmendmentMetadata(BaseModel):
     """List-level metadata describing an amendment reference."""
 
-    congress: Annotated[
-        int, Field(description="Which Congress the amendment belongs to.")
-    ]
-    latest_action: Annotated[
-        LatestAction | None,
-        Field(alias="latestAction", description="What the latest action is."),
-    ] = None
-    number: Annotated[int, Field(description="What the amendment number is.")]
-    purpose: Annotated[str, Field(description="What purpose the amendment states.")]
-    type: Annotated[str, Field(description="What type of amendment this is.")]
-    update_date: Annotated[
-        datetime,
-        Field(alias="updateDate", description="When the amendment was last updated."),
-    ]
-    url: Annotated[
-        HttpUrl, Field(description="Where to retrieve the amendment in the API.")
-    ]
+    congress: int
+    latest_action: LatestAction | None = Field(default=None, alias="latestAction")
+    number: int
+    purpose: str
+    type: str
+    update_date: datetime = Field(alias="updateDate")
+    url: HttpUrl
 
 
 class Treaty(BaseModel):
     """Treaty reference used in amendment or bill metadata."""
 
-    congress: Annotated[
-        int | None, Field(description="Which Congress the treaty belongs to.")
-    ] = None
-    treaty_number: Annotated[
-        str | None,
-        Field(alias="treatyNumber", description="What the treaty number is."),
-    ] = None
-    url: Annotated[
-        HttpUrl | None, Field(description="Where to retrieve the treaty in the API.")
-    ] = None
-    congress_received: Annotated[int | None, Field(alias="congressReceived")] = None
-    congress_considered: Annotated[int | None, Field(alias="congressConsidered")] = None
+    congress: int | None = None
+    treaty_number: str | None = Field(default=None, alias="treatyNumber")
+    url: HttpUrl | None = None
+    congress_received: int | None = Field(default=None, alias="congressReceived")
+    congress_considered: int | None = Field(default=None, alias="congressConsidered")
     number: int | None = None
-    countries_parties: Annotated[
-        list[JsonObject], Field(alias="countriesParties")
-    ] = []
-    in_force_date: Annotated[str | None, Field(alias="inForceDate")] = None
-    index_terms: Annotated[list[JsonObject], Field(alias="indexTerms")] = []
-    old_number: Annotated[str | None, Field(alias="oldNumber")] = None
-    old_number_display_name: Annotated[
-        str | None, Field(alias="oldNumberDisplayName")
-    ] = None
-    parts: JsonObject = {}
-    related_docs: list[JsonObject] = []
+    countries_parties: list[JsonObject] = Field(
+        default_factory=list, alias="countriesParties"
+    )
+    in_force_date: str | None = Field(default=None, alias="inForceDate")
+    index_terms: list[JsonObject] = Field(default_factory=list, alias="indexTerms")
+    old_number: str | None = Field(default=None, alias="oldNumber")
+    old_number_display_name: str | None = Field(
+        default=None, alias="oldNumberDisplayName"
+    )
+    parts: JsonObject = Field(default_factory=dict)
+    related_docs: list[JsonObject] = Field(default_factory=list)
     resolution_text: str | None = None
     suffix: str | None = None
     topic: str | None = None
-    titles: list[JsonObject] = []
-    transmitted_date: Annotated[str | None, Field(alias="transmittedDate")] = None
-    update_date: Annotated[str | None, Field(alias="updateDate")] = None
+    titles: list[JsonObject] = Field(default_factory=list)
+    transmitted_date: str | None = Field(default=None, alias="transmittedDate")
+    update_date: str | None = Field(default=None, alias="updateDate")
 
 
 class Subjects(BaseModel):
     """Subject bundle containing legislative subjects and policy area."""
 
-    legislative_subjects: Annotated[
-        list[LegislativeSubject],
-        Field(
-            alias="legislativeSubjects", description="Which legislative subjects apply."
-        ),
-    ] = []
-    policy_area: Annotated[
-        PolicyArea | None,
-        Field(alias="policyArea", description="What the policy area is."),
-    ] = None
+    legislative_subjects: list[LegislativeSubject] = Field(
+        default_factory=list, alias="legislativeSubjects"
+    )
+    policy_area: PolicyArea | None = Field(default=None, alias="policyArea")
 
 
 class BillMetadata(EntityBase):
     """List-level bill metadata used for related bill references."""
 
-    congress: Annotated[int, Field(description="Which Congress the bill belongs to.")]
-    latest_action: Annotated[
-        LatestAction | None,
-        Field(alias="latestAction", description="What the latest action is."),
-    ] = None
-    introduced_date: Annotated[
-        str | None,
-        Field(
-            alias="introducedDate",
-            description="When this historical bill entry was introduced.",
-        ),
-    ] = None
-    number: Annotated[
-        str,
-        Field(description="What the bill number is, as supplied by the source."),
-    ]
-    relationship_details: Annotated[
-        list[RelationshipDetail],
-        Field(
-            alias="relationshipDetails",
-            description="What relationship details are recorded.",
-        ),
-    ] = Field(default_factory=list)
-    title: Annotated[str, Field(description="What the bill title is.")]
-    type: Annotated[str, Field(description="What type of bill this is.")]
-    url: Annotated[HttpUrl, Field(description="Where to retrieve the bill in the API.")]
-
-    origin_chamber: Annotated[
-        str | None,
-        Field(alias="originChamber", description="Origin chamber name for the bill."),
-    ] = None
-
-    origin_chamber_code: Annotated[
-        str | None,
-        Field(alias="originChamberCode", description="Origin chamber short code."),
-    ] = None
-
-    update_date_including_text: Annotated[
-        str | None,
-        Field(
-            alias="updateDateIncludingText",
-            description="Update date including text availability.",
-        ),
-    ] = None
-    update_date: Annotated[
-        str | None,
-        Field(alias="updateDate", description="When the bill record was last updated."),
-    ] = None
+    congress: int
+    latest_action: LatestAction | None = Field(default=None, alias="latestAction")
+    introduced_date: str | None = Field(default=None, alias="introducedDate")
+    number: str
+    relationship_details: list[RelationshipDetail] = Field(
+        default_factory=list, alias="relationshipDetails"
+    )
+    title: str
+    type: str
+    url: HttpUrl
+    origin_chamber: str | None = Field(default=None, alias="originChamber")
+    origin_chamber_code: str | None = Field(default=None, alias="originChamberCode")
+    update_date_including_text: str | None = Field(
+        default=None, alias="updateDateIncludingText"
+    )
+    update_date: str | None = Field(default=None, alias="updateDate")
 
     @field_validator("number", mode="before")
     @classmethod
     def _coerce_number_to_string(cls, value: Any) -> str:
-        """Preserve source identifiers such as fractional bill numbers."""
         return str(value)
 
     @model_validator(mode="after")
     def _populate_id_if_missing(self):
-        """Ensure a deterministic `id` is present when possible."""
         if not getattr(self, "id", None):
             try:
                 self.id = self.build_id()
@@ -831,18 +462,12 @@ class BillMetadata(EntityBase):
         return self
 
     def build_id(self) -> str:
-        """Return a canonical id for this bill metadata entry.
-
-        Prefer explicit congress/type/number composition; fall back to
-        parsing the URL. Raises ValueError when an id cannot be constructed.
-        """
+        """Return a canonical id for this bill metadata entry."""
         congress = getattr(self, "congress", None)
         bill_type = getattr(self, "type", None)
         number = getattr(self, "number", None)
         if congress and bill_type and number:
-            t = str(bill_type).lower()
-            return f"bill:{congress}:{t}:{number}"
-        # fallback: try to parse URL into an id
+            return f"bill:{congress}:{str(bill_type).lower()}:{number}"
         url = getattr(self, "url", None)
         if url:
             return UrlIdParser.parse(str(url))
@@ -854,87 +479,33 @@ class BillMetadata(EntityBase):
 class Amendment(BaseModel):
     """Amendment record with sponsors, actions, and text versions."""
 
-    # Fields added by collecting additional data with client object
-    actions: Annotated[
-        Union[list[Action], "CountUrl"] | None,
-        Field(description="Which actions are associated with the amendment."),
-    ] = None
-    cosponsors: Annotated[
-        Union[list[Member], "CountUrl"] | None,
-        Field(description="Which members cosponsored the amendment."),
-    ] = None
-    text_versions: Annotated[
-        Union[list[TextVersion], "CountUrl"] | None,
-        Field(
-            alias="textVersions",
-            description="Which text versions are available for the amendment.",
-        ),
-    ] = None
-    # Normal fields
-    congress: Annotated[
-        int, Field(description="Which Congress the amendment belongs to.")
-    ]
-    description: Annotated[
-        str | None, Field(description="What the amendment description says.")
-    ] = None
-    purpose: Annotated[
-        str | None, Field(description="What purpose the amendment states.")
-    ] = None
-    latest_action: Annotated[
-        LatestAction | None,
-        Field(alias="latestAction", description="What the latest action is."),
-    ] = None
-    number: Annotated[int, Field(description="What the amendment number is.")]
-    type: Annotated[str, Field(description="What type of amendment this is.")]
-    update_date: Annotated[
-        datetime,
-        Field(alias="updateDate", description="When the amendment was last updated."),
-    ]
-    url: Annotated[
-        HttpUrl | None,
-        Field(description="Where to retrieve the amendment in the API."),
-    ] = None
-    sponsors: Annotated[
-        list[Member | SponsorRef],
-        Field(description="Which members or refs sponsored the amendment."),
-    ] = []
-    on_behalf_of_sponsor: Annotated[
-        list[Member | SponsorRef] | None,
-        Field(
-            alias="onBehalfOfSponsor",
-            description="Who introduced the amendment on behalf of the sponsor.",
-        ),
-    ] = None
-    behalf_type: Annotated[
-        BehalfType | None,
-        Field(
-            alias="behalfType",
-            description="What type of on-behalf-of sponsorship applies.",
-        ),
-    ] = None
-    proposed_date: Annotated[
-        datetime | None,
-        Field(alias="proposedDate", description="When the amendment was proposed."),
-    ] = None
-    submitted_date: Annotated[
-        datetime | None,
-        Field(alias="submittedDate", description="When the amendment was submitted."),
-    ] = None
-    chamber: Annotated[
-        Chamber | None,
-        Field(
-            alias="chamber",
-            description="Which chamber the amendment is associated with.",
-        ),
-    ] = None
+    actions: list[Action] | CountUrl | None = None
+    cosponsors: list[Member] | CountUrl | None = None
+    text_versions: list[TextVersion] | CountUrl | None = Field(
+        default=None, alias="textVersions"
+    )
+    congress: int
+    description: str | None = None
+    purpose: str | None = None
+    latest_action: LatestAction | None = Field(default=None, alias="latestAction")
+    number: int
+    type: str
+    update_date: datetime = Field(alias="updateDate")
+    url: HttpUrl | None = None
+    sponsors: list[Member | SponsorRef] = Field(default_factory=list)
+    on_behalf_of_sponsor: list[Member | SponsorRef] | None = Field(
+        default=None, alias="onBehalfOfSponsor"
+    )
+    behalf_type: BehalfType | None = Field(default=None, alias="behalfType")
+    proposed_date: datetime | None = Field(default=None, alias="proposedDate")
+    submitted_date: datetime | None = Field(default=None, alias="submittedDate")
+    chamber: Chamber | None = Field(default=None, alias="chamber")
+    amended_bill: BillMetadata | None = Field(default=None, alias="amendedBill")
+    links: list[dict] | None = Field(default=None, alias="links")
+    full_text: str = ""
 
     @field_validator("chamber", mode="before")
     def _normalize_chamber(cls, v):
-        """Normalize slightly different chamber strings into the `Chamber` enum.
-
-        Accepts values like 'House of Representatives', 'house', 'H', 'Senate',
-        'S', and various casing/abbreviations and returns a `Chamber` value.
-        """
         return normalize_chamber(v)
 
     @field_validator("number", mode="before")
@@ -946,38 +517,18 @@ class Amendment(BaseModel):
         except (TypeError, ValueError):
             return v
 
-    amended_bill: Annotated[
-        Optional["BillMetadata"],
-        Field(alias="amendedBill", description="Which bill is amended, if applicable."),
-    ] = None
-
-    links: Annotated[
-        list[dict] | None,
-        Field(
-            alias="links", description="Related links associated with the amendment."
-        ),
-    ] = None
-    full_text: Annotated[str, Field(description="What the full amendment text is.")] = (
-        ""
-    )
-
     def add_full_text(self, client: CDGClient) -> str:
         """Fetch and return the full amendment text from formatted text versions."""
         if not self.text_versions or not isinstance(self.text_versions, list):
             return ""
-
         for text_version in self.text_versions:
-            formats = getattr(text_version, "formats", []) or []
-            for fmt in formats:
-                ftype = getattr(fmt, "type", "")
-                if "Formatted" in ftype:
+            for fmt in getattr(text_version, "formats", []) or []:
+                if "Formatted" in getattr(fmt, "type", ""):
                     try:
                         resp = client.session.get(
                             str(getattr(fmt, "url", "")), timeout=(10, 120)
                         )
-                        html = resp.text
-                        soup = BeautifulSoup(html, "html.parser")
-                        full_text = soup.get_text()
+                        return BeautifulSoup(resp.text, "html.parser").get_text()
                     except requests.RequestException as e:
                         raise FullTextDownloadError(
                             f"Network error retrieving full text for text version {self.type}: {e}"
@@ -986,9 +537,7 @@ class Amendment(BaseModel):
                         raise RuntimeError(
                             f"Parsing error for full text in text version {self.type}: {e}"
                         ) from e
-                    return full_text
         return ""
-
 
     def build_id(self) -> str:
         """Return a canonical id for this amendment instance."""
@@ -997,172 +546,65 @@ class Amendment(BaseModel):
         number = getattr(self, "number", None)
         if congress and number:
             return f"amendment:{congress}:{str(a_type).lower() if a_type else 'amendment'}:{number}"
-        # try parsing URL to derive id, else stable hash fallback
-        try:
-            url = getattr(self, "url", None)
-            if url:
-                try:
-                    return UrlIdParser.parse(str(url))
-                except (TypeError, ValueError):
-                    logger.exception("Failed to parse URL to id in build_id")
-            mapping = self.model_dump() if hasattr(self, "model_dump") else dict(self)
-            return f"record:{abs(hash(str(mapping))) % (10**12)}"
-        except (AttributeError, TypeError, ValueError):
-            return (
-                f"record:{abs(hash(str(number or congress or 'amendment'))) % (10**12)}"
-            )
+        return _url_or_hash_id(self, str(number or congress or "amendment"))
 
 
 class Bill(EntityBase):
     """Bill record with core metadata and optional expanded relationships."""
 
-    # Fields added by collecting additional data with client object
-    actions: Annotated[
-        Union[list[Action], "CountUrl"] | None,
-        Field(description="Which actions are associated with the bill."),
-    ] = None
-    amendments: Annotated[
-        Union[list[Amendment], "CountUrl"] | None,
-        Field(description="Which amendments are associated with the bill."),
-    ] = None
-    committees: Annotated[
-        Union[list[CommitteeMetadata], "CountUrl"] | None,
-        Field(description="Which committees are associated with the bill."),
-    ] = None
-    cosponsors: Annotated[
-        Union[list[Sponsor], "CountUrl"] | None,
-        Field(description="Which members cosponsored the bill."),
-    ] = None
-    related_bills: Annotated[
-        Union[list[BillMetadata], "CountUrl"] | None,
-        Field(
-            description="Which related bills are linked to this bill.",
-            alias="relatedBills",
-        ),
-    ] = None
-    subjects: Annotated[
-        Union[Subjects, "CountUrl"] | None,
-        Field(description="What subject metadata is available for the bill."),
-    ] = None
-    summaries: Annotated[
-        Union[list[Summary], "CountUrl"] | None,
-        Field(description="Which summaries are available for the bill."),
-    ] = None
-    text_versions: Annotated[
-        Union[list[TextVersion], "CountUrl"] | None,
-        Field(
-            description="Which text versions are available for the bill.",
-            alias="textVersions",
-        ),
-    ] = None
-    titles: Annotated[
-        Union[list[Title], "CountUrl"] | None,
-        Field(description="Which titles are recorded for the bill."),
-    ] = None
-    full_text: Annotated[str, Field(description="What the full bill text is.")] = ""
-    detail_hydration: Annotated[
-        dict[BillDetailKind, DetailEvidence],
-        Field(description="Pagination and completeness metadata for bill details."),
-    ] = Field(default_factory=dict)
-    hydration_assessment: HydrationAssessment = Field(default_factory=HydrationAssessment)
-
-    # Fields from original data
-    congress: Annotated[int, Field(description="Which Congress the bill belongs to.")]
-    constitutional_authority_statement_text: Annotated[
-        str,
-        Field(
-            alias="constitutionalAuthorityStatementText",
-            description="What constitutional authority statement is recorded.",
-        ),
-    ] = ""
-    introduced_date: Annotated[
-        datetime | None,
-        Field(alias="introducedDate", description="When the bill was introduced."),
-    ] = None
-    latest_action: Annotated[
-        LatestAction | None,
-        Field(
-            default=None,
-            alias="latestAction",
-            description="What the latest action is, when supplied.",
-        ),
-    ] = None
-    laws: Annotated[
-        list[LawMetadata],
-        Field(alias="laws", description="Which laws are associated with the bill."),
-    ] = Field(default_factory=list)
-    number: Annotated[str, Field(description="What the bill number is.")]
-    origin_chamber: Annotated[
-        Chamber,
-        Field(alias="originChamber", description="Which chamber introduced the bill."),
-    ]
-    origin_chamber_code: Annotated[
-        ChamberCode,
-        Field(
-            alias="originChamberCode", description="What the origin chamber code is."
-        ),
-    ]
-    policy_area: Annotated[
-        PolicyArea | None,
-        Field(
-            alias="policyArea",
-            description="What policy area the bill is classified under.",
-        ),
-    ] = None
-    sponsors: Annotated[
-        Union[list[Sponsor], "CountUrl"] | None,
-        Field(description="Which members sponsored the bill."),
-    ] = None
-    title: Annotated[str, Field(description="What the bill title is.")]
-    type: Annotated[BillType, Field(description="What type of bill this is.")]
-    update_date: Annotated[
-        datetime,
-        Field(alias="updateDate", description="When the bill was last updated."),
-    ]
-    update_date_including_text: Annotated[
-        datetime,
-        Field(
-            alias="updateDateIncludingText",
-            description="When the bill or its text was last updated.",
-        ),
-    ]
-    notes: Annotated[
-        Union[list[Note], "CountUrl"] | None,
-        Field(alias="notes", description="What notes are attached to the bill."),
-    ] = None
-
-    url: Annotated[
-        HttpUrl | None,
-        Field(
-            default=None,
-            alias="legislationUrl",
-            description="Canonical legislation URL (API uses `legislationUrl`).",
-        ),
-    ] = None
+    actions: list[Action] | CountUrl | None = None
+    amendments: list[Amendment] | CountUrl | None = None
+    committees: list[CommitteeMetadata] | CountUrl | None = None
+    cosponsors: list[Sponsor] | CountUrl | None = None
+    related_bills: list[BillMetadata] | CountUrl | None = Field(
+        default=None, alias="relatedBills"
+    )
+    subjects: Subjects | CountUrl | None = None
+    summaries: list[Summary] | CountUrl | None = None
+    text_versions: list[TextVersion] | CountUrl | None = Field(
+        default=None, alias="textVersions"
+    )
+    titles: list[Title] | CountUrl | None = None
+    full_text: str = ""
+    detail_hydration: dict[BillDetailKind, DetailEvidence] = Field(default_factory=dict)
+    hydration_assessment: HydrationAssessment = Field(
+        default_factory=HydrationAssessment
+    )
+    congress: int
+    constitutional_authority_statement_text: str = Field(
+        default="", alias="constitutionalAuthorityStatementText"
+    )
+    introduced_date: datetime | None = Field(default=None, alias="introducedDate")
+    latest_action: LatestAction | None = Field(default=None, alias="latestAction")
+    laws: list[LawMetadata] = Field(default_factory=list, alias="laws")
+    number: str
+    origin_chamber: Chamber = Field(alias="originChamber")
+    origin_chamber_code: ChamberCode = Field(alias="originChamberCode")
+    policy_area: PolicyArea | None = Field(default=None, alias="policyArea")
+    sponsors: list[Sponsor] | CountUrl | None = None
+    title: str
+    type: BillType
+    update_date: datetime = Field(alias="updateDate")
+    update_date_including_text: datetime = Field(alias="updateDateIncludingText")
+    notes: list[Note] | CountUrl | None = Field(default=None, alias="notes")
+    url: HttpUrl | None = Field(default=None, alias="legislationUrl")
 
     @model_validator(mode="before")
     def _populate_url_from_legislation_url(cls, values: dict):
-        # Accept the API's `legislationUrl` key and map it to `url` so the
-        # canonical `url` attribute is populated on Bill instances.
         if not isinstance(values, dict):
             return values
         if values.get("legislationUrl") and not values.get("url"):
             values["url"] = values.get("legislationUrl")
-        # Remove the raw key so downstream model parsing uses `url` uniformly
-        if "legislationUrl" in values:
-            values.pop("legislationUrl", None)
+        values.pop("legislationUrl", None)
         return values
 
     def add_full_text(self, client: CDGClient) -> str:
         """Fetch and return the full bill text from formatted text versions."""
         if not self.text_versions or not isinstance(self.text_versions, list):
             return ""
-
         for text_version in self.text_versions:
-            formats = getattr(text_version, "formats", []) or []
-            for fmt in formats:
-                ftype = getattr(fmt, "type", "")
-                if ftype == "Formatted Text":
+            for fmt in getattr(text_version, "formats", []) or []:
+                if getattr(fmt, "type", "") == "Formatted Text":
                     try:
                         resp = client.session.get(
                             str(getattr(fmt, "url", "")), timeout=(10, 120)
@@ -1171,8 +613,7 @@ class Bill(EntityBase):
                         html = resp.text
                         if not html.strip():
                             raise ValueError("Formatted bill text response is empty")
-                        soup = BeautifulSoup(html, "html.parser")
-                        full_text = soup.get_text()
+                        return BeautifulSoup(html, "html.parser").get_text()
                     except requests.RequestException as e:
                         raise FullTextDownloadError(
                             f"Network error retrieving full text for text version {self.type}: {e}"
@@ -1181,7 +622,6 @@ class Bill(EntityBase):
                         raise RuntimeError(
                             f"Parsing error for full text in text version {self.type}: {e}"
                         ) from e
-                    return full_text
         return ""
 
     def add_bill_details(
@@ -1200,20 +640,37 @@ class Bill(EntityBase):
             previous = payload.get(kind)
             if isinstance(result.data, list):
                 if not result.evidence.complete and isinstance(previous, list):
-                    previous_records = TypeAdapter(list[JsonObject]).validate_python(previous)
-                    payload[kind] = fetcher.distinct(previous_records + result.data, kind)
+                    previous_records = TypeAdapter(list[JsonObject]).validate_python(
+                        previous
+                    )
+                    payload[kind] = fetcher.distinct(
+                        previous_records + result.data, kind
+                    )
                 else:
                     payload[kind] = result.data
             elif kind is BillDetailKind.SUBJECTS and "count" not in result.data:
-                if isinstance(previous, dict) and "count" not in previous and not result.evidence.complete:
-                    merged = {**previous, **{
-                        key: value for key, value in result.data.items() if value is not None
-                    }}
+                if (
+                    isinstance(previous, dict)
+                    and "count" not in previous
+                    and not result.evidence.complete
+                ):
+                    merged = {
+                        **previous,
+                        **{
+                            k: v
+                            for k, v in result.data.items()
+                            if v is not None
+                        },
+                    }
                     old_subjects = previous.get("legislativeSubjects")
                     new_subjects = result.data.get("legislativeSubjects")
-                    if isinstance(old_subjects, list) and isinstance(new_subjects, list):
+                    if isinstance(old_subjects, list) and isinstance(
+                        new_subjects, list
+                    ):
                         merged["legislativeSubjects"] = fetcher.distinct(
-                            TypeAdapter(list[JsonObject]).validate_python(old_subjects + new_subjects),
+                            TypeAdapter(list[JsonObject]).validate_python(
+                                old_subjects + new_subjects
+                            ),
                             kind,
                         )
                     payload[kind] = merged
@@ -1234,7 +691,6 @@ class Bill(EntityBase):
     def _fetch_detail_collection(
         client: BillDetailClient, endpoint: str, key: str, max_pages: int
     ) -> list[JsonObject] | JsonObject:
-        """Fetch every page of a detail collection or preserve its envelope."""
         records, _ = Bill._fetch_detail_collection_with_metadata(
             client, endpoint, key, max_pages
         )
@@ -1244,11 +700,18 @@ class Bill(EntityBase):
     def _fetch_detail_collection_with_metadata(
         client: BillDetailClient, endpoint: str, key: str, max_pages: int
     ) -> tuple[list[JsonObject] | JsonObject, JsonObject]:
-        """Fetch a detail collection and return records with completeness metadata."""
-        result = BillDetailFetcher(client, max_pages).fetch(endpoint, BillDetailKind(key))
+        result = BillDetailFetcher(client, max_pages).fetch(
+            endpoint, BillDetailKind(key)
+        )
         metadata = result.evidence.model_dump(
             mode="json",
-            include={"page_count", "expected_count", "fetched_count", "state", "complete"},
+            include={
+                "page_count",
+                "expected_count",
+                "fetched_count",
+                "state",
+                "complete",
+            },
         )
         return result.data, metadata
 
@@ -1257,312 +720,132 @@ class Bill(EntityBase):
         congress = getattr(self, "congress", None)
         bill_type = getattr(self, "type", None)
         number = getattr(self, "number", None)
-        # bill_type may be enum; coerce to str
         if congress and bill_type and number:
-            t = str(bill_type).lower()
-            return f"bill:{congress}:{t}:{number}"
-        # try parsing URL to derive id, else stable hash fallback
-        try:
-            url = getattr(self, "url", None)
-            if url:
-                try:
-                    return UrlIdParser.parse(str(url))
-                except (TypeError, ValueError):
-                    logger.exception("Failed to parse URL to id in Bill.build_id")
-            mapping = self.model_dump() if hasattr(self, "model_dump") else dict(self)
-            return f"record:{abs(hash(str(mapping))) % (10**12)}"
-        except (AttributeError, TypeError, ValueError):
-            return f"record:{abs(hash(str(number or congress or 'bill'))) % (10**12)}"
+            return f"bill:{congress}:{str(bill_type).lower()}:{number}"
+        return _url_or_hash_id(self, str(number or congress or "bill"))
 
 
 class Law(Bill):
     """Bill subtype representing an enacted law."""
 
-    is_law: Annotated[
-        bool, Field(description="Whether the bill is enacted into law.")
-    ] = True
+    is_law: bool = True
 
 
-# Committee Report model
 class CommitteeReport(EntityBase):
     """Committee report metadata with citation and issuance details."""
 
-    citation: Annotated[
-        str, Field(description="What the committee report citation is.")
-    ]
-    url: Annotated[
-        HttpUrl | None,
-        Field(
-            default=None,
-            description="Where to retrieve the committee report in the API.",
-        ),
-    ] = None
-    chamber: Annotated[Chamber, Field(description="Which chamber issued the report.")]
-    committee_name: Annotated[
-        str | None, Field(description="Which committee issued the report.")
-    ] = None
-    report_date: Annotated[
-        datetime | None, Field(description="When the report was issued.")
-    ] = None
-    type: Annotated[str | None, Field(description="What type of report this is.")] = (
-        None
-    )
+    citation: str
+    url: HttpUrl | None = None
+    chamber: Chamber
+    committee_name: str | None = None
+    report_date: datetime | None = None
+    type: str | None = None
 
 
-# Committee Print model
 class CommitteePrint(BaseModel):
     """Committee print metadata with title and issuance details."""
 
-    jacket_number: Annotated[
-        int | None,
-        Field(
-            default=None, alias="jacketNumber", description="What the jacket number is."
-        ),
-    ] = None
-    citation: Annotated[
-        str | None, Field(description="What the committee print citation is.")
-    ] = None
-    congress: Annotated[
-        int | None, Field(description="Which Congress produced the print.")
-    ] = None
-    number: Annotated[
-        int | None, Field(description="What number identifies the print.")
-    ] = None
-    title: Annotated[
-        str | None, Field(description="What the committee print title is.")
-    ] = None
-    url: Annotated[
-        HttpUrl | None,
-        Field(description="Where to retrieve the committee print in the API."),
-    ] = None
-    update_date: Annotated[
-        datetime | None,
-        Field(
-            default=None, alias="updateDate", description="When the print was updated."
-        ),
-    ] = None
-    chamber: Annotated[
-        Chamber | None, Field(description="Which chamber issued the print.")
-    ] = None
-    committee_name: Annotated[
-        str | None, Field(description="Which committee issued the print.")
-    ] = None
-    print_date: Annotated[
-        datetime | None, Field(description="When the print was issued.")
-    ] = None
-    type: Annotated[
-        str | None, Field(description="What type of committee print this is.")
-    ] = None
-    committees: Annotated[
-        list[JsonObject] | None,
-        Field(description="Committees associated with the print."),
-    ] = None
-    associated_bills: Annotated[
-        list[JsonObject] | None,
-        Field(
-            default=None,
-            alias="associatedBills",
-            description="Bills associated with the print.",
-        ),
-    ] = None
-    text: Annotated[
-        CountUrl | None, Field(description="Available print text formats.")
-    ] = None
+    jacket_number: int | None = Field(default=None, alias="jacketNumber")
+    citation: str | None = None
+    congress: int | None = None
+    number: int | None = None
+    title: str | None = None
+    url: HttpUrl | None = None
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    chamber: Chamber | None = None
+    committee_name: str | None = None
+    print_date: datetime | None = None
+    type: str | None = None
+    committees: list[JsonObject] | None = None
+    associated_bills: list[JsonObject] | None = Field(
+        default=None, alias="associatedBills"
+    )
+    text: CountUrl | None = None
 
     model_config = ConfigDict(extra="allow", populate_by_name=True)
 
 
-# Committee Meeting model
 class CommitteeMeeting(BaseModel):
     """Committee meeting metadata with date, chamber, and committee context."""
 
-    event_id: Annotated[
-        int | None,
-        Field(
-            default=None,
-            alias="eventId",
-            description="What the meeting event identifier is.",
-        ),
-    ] = None
-    congress: Annotated[
-        int | None, Field(description="Which Congress held the meeting.")
-    ] = None
-    title: Annotated[str | None, Field(description="What the meeting title is.")] = None
-    name: Annotated[str | None, Field(description="What the meeting name is.")] = None
-    url: Annotated[
-        HttpUrl | None, Field(description="Where to retrieve the meeting in the API.")
-    ] = None
-    update_date: Annotated[
-        datetime | None,
-        Field(
-            default=None,
-            alias="updateDate",
-            description="When the meeting was updated.",
-        ),
-    ] = None
-    chamber: Annotated[
-        Chamber | None, Field(description="Which chamber held the meeting.")
-    ] = None
-    meeting_status: Annotated[
-        str | None,
-        Field(
-            default=None,
-            alias="meetingStatus",
-            description="What status the meeting has.",
-        ),
-    ] = None
-    date: Annotated[datetime | None, Field(description="When the meeting occurs.")] = (
-        None
-    )
-    committee_name: Annotated[
-        str | None, Field(description="Which committee held the meeting.")
-    ] = None
-    meeting_date: Annotated[
-        datetime | None, Field(description="When the meeting occurred.")
-    ] = None
-    type: Annotated[str | None, Field(description="What type of meeting this is.")] = (
-        None
-    )
-    committees: Annotated[
-        list[JsonObject] | None,
-        Field(description="Committees holding the meeting."),
-    ] = None
-    continuations: Annotated[
-        list[JsonObject] | None,
-        Field(description="Continuation times for the meeting."),
-    ] = None
-    location: Annotated[
-        JsonObject | None, Field(description="Meeting location details.")
-    ] = None
-    videos: Annotated[
-        list[JsonObject] | None, Field(description="Available meeting videos.")
-    ] = None
+    event_id: int | None = Field(default=None, alias="eventId")
+    congress: int | None = None
+    title: str | None = None
+    name: str | None = None
+    url: HttpUrl | None = None
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    chamber: Chamber | None = None
+    meeting_status: str | None = Field(default=None, alias="meetingStatus")
+    date: datetime | None = None
+    committee_name: str | None = None
+    meeting_date: datetime | None = None
+    type: str | None = None
+    committees: list[JsonObject] | None = None
+    continuations: list[JsonObject] | None = None
+    location: JsonObject | None = None
+    videos: list[JsonObject] | None = None
 
     model_config = ConfigDict(extra="allow", populate_by_name=True)
 
 
-# Response wrapper models for bill sub-endpoints (defined after referenced types)
-class BillActionsResponse(BaseModel):
-    """Response wrapper for bill actions sub-endpoint.
+class _BillSubResponse(BaseModel):
+    """Shared pagination/request envelope for bill sub-endpoints."""
 
-    Attributes:
-        pagination: Optional pagination metadata from the API.
-        request: Optional original request metadata.
-        actions: List of ``Action`` objects for the bill.
-    """
-
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    actions: Annotated[list[Action], Field(default_factory=list)] = Field(
-        default_factory=list
-    )
+    pagination: dict | None = None
+    request: dict | None = None
 
 
-class BillAmendmentsResponse(BaseModel):
-    """Response wrapper for bill amendments sub-endpoint.
+class BillTextResponse(_BillSubResponse):
+    """Response wrapper for bill text endpoints (list of text versions)."""
 
-    Attributes:
-        pagination: Optional pagination metadata.
-        request: Optional original request metadata.
-        amendments: List of amendment metadata entries.
-    """
-
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    amendments: Annotated[list[AmendmentMetadata], Field(default_factory=list)] = Field(
-        default_factory=list
-    )
+    textVersions: list[TextVersion] = Field(default_factory=list)
 
 
-class BillCommitteesResponse(BaseModel):
-    """Response wrapper for bill committees sub-endpoint.
+class BillActionsResponse(_BillSubResponse):
+    """Response wrapper for bill actions sub-endpoint."""
 
-    Attributes:
-        pagination: Optional pagination metadata.
-        request: Optional original request metadata.
-        committees: List of committee metadata entries.
-    """
-
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    committees: Annotated[list[CommitteeMetadata], Field(default_factory=list)] = Field(
-        default_factory=list
-    )
+    actions: list[Action] = Field(default_factory=list)
 
 
-class BillCosponsorsResponse(BaseModel):
-    """Response wrapper for bill cosponsors sub-endpoint.
+class BillAmendmentsResponse(_BillSubResponse):
+    """Response wrapper for bill amendments sub-endpoint."""
 
-    Attributes:
-        pagination: Optional pagination metadata.
-        request: Optional original request metadata.
-        cosponsors: List of sponsor objects.
-    """
-
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    cosponsors: Annotated[list[Sponsor], Field(default_factory=list)] = Field(
-        default_factory=list
-    )
+    amendments: list[AmendmentMetadata] = Field(default_factory=list)
 
 
-class BillRelatedBillsResponse(BaseModel):
-    """Response wrapper for related bills sub-endpoint.
+class BillCommitteesResponse(_BillSubResponse):
+    """Response wrapper for bill committees sub-endpoint."""
 
-    Attributes:
-        pagination: Optional pagination metadata.
-        request: Optional original request metadata.
-        relatedBills: List of related bill metadata entries.
-    """
+    committees: list[CommitteeMetadata] = Field(default_factory=list)
 
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    relatedBills: Annotated[list[BillMetadata], Field(default_factory=list)] = Field(
+
+class BillCosponsorsResponse(_BillSubResponse):
+    """Response wrapper for bill cosponsors sub-endpoint."""
+
+    cosponsors: list[Sponsor] = Field(default_factory=list)
+
+
+class BillRelatedBillsResponse(_BillSubResponse):
+    """Response wrapper for related bills sub-endpoint."""
+
+    relatedBills: list[BillMetadata] = Field(
         default_factory=list, alias="relatedBills"
     )
 
 
-class BillSubjectsResponse(BaseModel):
-    """Response wrapper for bill subjects sub-endpoint.
+class BillSubjectsResponse(_BillSubResponse):
+    """Response wrapper for bill subjects sub-endpoint."""
 
-    Attributes:
-        pagination: Optional pagination metadata.
-        request: Optional original request metadata.
-        subjects: Optional Subjects object describing classifications.
-    """
-
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    subjects: Annotated[Subjects | None, Field(default=None)] = None
+    subjects: Subjects | None = None
 
 
-class BillSummariesResponse(BaseModel):
-    """Response wrapper for bill summaries sub-endpoint.
+class BillSummariesResponse(_BillSubResponse):
+    """Response wrapper for bill summaries sub-endpoint."""
 
-    Attributes:
-        pagination: Optional pagination metadata.
-        request: Optional original request metadata.
-        summaries: List of Summary objects.
-    """
-
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    summaries: Annotated[list[Summary], Field(default_factory=list)] = Field(
-        default_factory=list
-    )
+    summaries: list[Summary] = Field(default_factory=list)
 
 
-class BillTitlesResponse(BaseModel):
-    """Response wrapper for bill titles sub-endpoint.
+class BillTitlesResponse(_BillSubResponse):
+    """Response wrapper for bill titles sub-endpoint."""
 
-    Attributes:
-        pagination: Optional pagination metadata.
-        request: Optional original request metadata.
-        titles: List of Title objects for the bill.
-    """
-
-    pagination: Annotated[dict | None, Field(default=None)] = None
-    request: Annotated[dict | None, Field(default=None)] = None
-    titles: Annotated[list[Title], Field(default_factory=list)] = Field(
-        default_factory=list
-    )
+    titles: list[Title] = Field(default_factory=list)

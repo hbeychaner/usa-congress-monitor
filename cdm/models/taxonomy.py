@@ -4,33 +4,27 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class RecordTypeBase(BaseModel):
     """Base model that carries the knowledgebase record type."""
 
-    recordType: str = Field(
-        default="", description="Which knowledgebase index this record belongs to."
-    )
+    recordType: str = ""
 
 
 class Subject(BaseModel):
     """Structured subject label with optional update timing."""
 
-    name: str = Field(description="What the subject name is.")
-    update_date: datetime | None = Field(
-        default=None, description="When the subject was last updated."
-    )
+    name: str
+    update_date: datetime | None = None
 
 
 class Topic(BaseModel):
     """Structured topic label with optional update timing."""
 
-    topic: str = Field(description="What the topic label is.")
-    update_date: datetime | None = Field(
-        default=None, description="When the topic was last updated."
-    )
+    topic: str
+    update_date: datetime | None = None
 
 
 __all__ = ["RecordTypeBase", "Subject", "Topic"]

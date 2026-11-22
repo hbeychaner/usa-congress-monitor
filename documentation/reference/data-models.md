@@ -272,12 +272,9 @@ Voteview House records. Voteview's own roll number remains part of its ID.
 The declared bridge position labels (`Yea`, `Nay`, `Present`, `Not Voting`)
 are not the same spelling as Voteview's lowercase position enum.
 
-[`identifiers.py`](../../cdm/models/identifiers.py) exports parameter wrappers
-for event/jacket/volume/issue/requirement/report/bill/law/amendment/
-communication/nomination/treaty numbers, treaty suffix, ordinal, and district,
-plus `CommitteeCode`, `ReportType`, `CommunicationType`, and `StateCode`.
-These constrain endpoint inputs; `District` here is a number wrapper, not the
-GeoJSON district search document.
+[`identifiers.py`](../../cdm/models/identifiers.py) exports `CommitteeCode`,
+`ReportType`, `CommunicationType`, and `StateCode` for endpoint parameter
+validation.
 
 The [district importer](../../scripts/ingest_district_boundaries.py) writes
 `district:119:{state_code}:{district}` with state code, integer district,

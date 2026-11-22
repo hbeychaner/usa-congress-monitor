@@ -1,12 +1,9 @@
-"""Pydantic models for people, Congress metadata, and membership terms.
+"""Pydantic models for people, Congress metadata, and membership terms."""
 
-Each model includes per-field descriptions that explain what each attribute answers.
-"""
+from __future__ import annotations
 
 import logging
 from datetime import datetime
-from enum import StrEnum
-from typing import Annotated
 
 from pydantic import (
     AliasChoices,
@@ -26,98 +23,45 @@ logger = logging.getLogger(__name__)
 class Session(BaseModel):
     """Single congressional session metadata with start/end dates and type."""
 
-    chamber: Annotated[str, Field(description="Which chamber the session belongs to.")]
-    end_date: Annotated[
-        datetime,
-        Field(alias="endDate", default=None, description="When the session ended."),
-    ]
-    number: Annotated[
-        int | None,
-        Field(alias="number", default=0, description="What the session number is."),
-    ]
-    start_date: Annotated[
-        datetime, Field(alias="startDate", description="When the session started.")
-    ]
-    type: Annotated[str, Field(description="What type of session this is.")]
+    chamber: str
+    end_date: datetime | None = Field(default=None, alias="endDate")
+    number: int | None = Field(default=0, alias="number")
+    start_date: datetime = Field(alias="startDate")
+    type: str
 
 
 class Congress(BaseModel):
     """Congress metadata including sessions and coverage years."""
 
-    number: Annotated[
-        int, Field(description="Which Congress number this record is for.")
-    ]
-    url: Annotated[
-        HttpUrl, Field(description="Where to retrieve the Congress record in the API.")
-    ]
-    update_date: Annotated[
-        datetime,
-        Field(
-            alias="updateDate", description="When the Congress record was last updated."
-        ),
-    ]
-    start_year: Annotated[
-        int, Field(alias="startYear", description="What year this Congress started.")
-    ]
-    end_year: Annotated[
-        int, Field(alias="endYear", description="What year this Congress ended.")
-    ]
-    name: Annotated[str, Field(description="What the display name of the Congress is.")]
-    sessions: Annotated[
-        list[Session],
-        Field(description="Which sessions are included in this Congress."),
-    ]
+    number: int
+    url: HttpUrl
+    update_date: datetime = Field(alias="updateDate")
+    start_year: int = Field(alias="startYear")
+    end_year: int = Field(alias="endYear")
+    name: str
+    sessions: list[Session]
 
 
 class CongressMetadata(BaseModel):
     """Minimal Congress metadata used in nested API responses."""
 
-    number: Annotated[
-        int | None,
-        Field(
-            default=None, description="Which Congress number this metadata refers to."
-        ),
-    ]
-    url: Annotated[
-        HttpUrl | None, Field(default=None, description="Link to the congress item")
-    ]
-    name: Annotated[
-        str | None, Field(default=None, description="Display name of the congress")
-    ] = None
-    update_date: Annotated[
-        datetime | None,
-        Field(
-            alias="updateDate",
-            default=None,
-            description="When the Congress record was last updated.",
-        ),
-    ] = None
+    number: int | None = None
+    url: HttpUrl | None = None
+    name: str | None = None
+    update_date: datetime | None = Field(default=None, alias="updateDate")
     sessions: list[Session] = []
-    start_year: Annotated[
-        int | None, Field(alias="startYear", default=None, description="Start year")
-    ] = None
-    end_year: Annotated[
-        int | None, Field(alias="endYear", default=None, description="End year")
-    ] = None
+    start_year: int | None = Field(default=None, alias="startYear")
+    end_year: int | None = Field(default=None, alias="endYear")
 
 
 class Depiction(BaseModel):
     """Member image metadata including attribution and image URL."""
 
-    attribution: Annotated[
-        str, Field(default="", description="Who to credit for the member image.")
-    ] = ""
-    image_url: Annotated[
-        HttpUrl | None,
-        Field(
-            alias="imageUrl",
-            default=None,
-            description="Where to fetch the member image.",
-        ),
-    ]
+    attribution: str = ""
+    image_url: HttpUrl | None = Field(default=None, alias="imageUrl")
 
     @staticmethod
-    def empty() -> "Depiction":
+    def empty() -> Depiction:
         """Return an empty depiction placeholder with no image URL."""
         return Depiction(attribution="", image_url=None)
 
@@ -125,255 +69,100 @@ class Depiction(BaseModel):
 class MemberAddress(BaseModel):
     """Member office/address contact details."""
 
-    city: Annotated[str | None, Field(default=None)] = None
-    district: Annotated[str | None, Field(default=None)] = None
-    office_address: Annotated[
-        str | None, Field(default=None, alias="officeAddress")
-    ] = None
-    phone_number: Annotated[str | None, Field(default=None, alias="phoneNumber")] = None
-    zip_code: Annotated[int | None, Field(default=None, alias="zipCode")] = None
+    city: str | None = None
+    district: str | None = None
+    office_address: str | None = Field(default=None, alias="officeAddress")
+    phone_number: str | None = Field(default=None, alias="phoneNumber")
+    zip_code: int | None = Field(default=None, alias="zipCode")
 
     model_config = {"populate_by_name": True}
-
-
 
 
 class Member(EntityBase):
     """Congressional member record with identity, affiliation, and depiction."""
 
-    bioguide_id: Annotated[
-        str, Field(alias="bioguideId", description="What the Bioguide identifier is.")
-    ]
-    first_name: Annotated[
-        str, Field(alias="firstName", description="What the member's first name is.")
-    ]
-    full_name: Annotated[
-        str,
-        Field(
-            serialization_alias="fullName",
-            validation_alias=AliasChoices(
-                "fullName", "name", "directOrderName", "invertedOrderName"
-            ),
-            description="What the member's full display name is.",
+    bioguide_id: str = Field(alias="bioguideId")
+    first_name: str = Field(alias="firstName")
+    full_name: str = Field(
+        serialization_alias="fullName",
+        validation_alias=AliasChoices(
+            "fullName", "name", "directOrderName", "invertedOrderName"
         ),
-    ]
-    last_name: Annotated[
-        str, Field(alias="lastName", description="What the member's last name is.")
-    ]
-    party: Annotated[
-        str | None,
-        Field(
-            default=None,
-            validation_alias=AliasChoices("party", "partyName"),
-            description="Which party the member belongs to.",
-        ),
-    ]
-    state: Annotated[
-        str, Field(description="Which state or territory the member represents.")
-    ]
-    url: Annotated[
-        HttpUrl | None,
-        Field(
-            default=None, description="Where to retrieve the member record in the API."
-        ),
-    ]
-    middle_name: Annotated[
-        str,
-        Field(
-            alias="middleName",
-            description="What the member's middle name or initial is.",
-        ),
-    ] = ""
-    district: Annotated[
-        int | None,
-        Field(description="Which congressional district the member represents."),
-    ] = None
-    is_original_cosponsor: Annotated[
-        bool,
-        Field(
-            alias="isOriginalCosponsor",
-            description="Whether the member was an original cosponsor.",
-        ),
-    ] = False
-    is_by_request: Annotated[
-        str,
-        Field(
-            alias="isByRequest",
-            description="Whether the measure was introduced by request.",
-        ),
-    ] = ""
-    depiction: Annotated[
-        Depiction,
-        Field(
-            alias="depiction",
-            description="What image information is available for the member.",
-        ),
-    ] = Depiction.empty()
-    address_information: Annotated[
-        MemberAddress | None,
-        Field(
-            default=None,
-            alias="addressInformation",
-            description="Member address/contact info.",
-        ),
-    ] = None
-    official_website_url: Annotated[
-        HttpUrl | None,
-        Field(
-            default=None,
-            alias="officialWebsiteUrl",
-            description="Member's official/personal website.",
-        ),
-    ] = None
-    leadership: Annotated[
-        list[dict] | None,
-        Field(
-            default=None,
-            alias="leadership",
-            description="Leadership role info when present.",
-        ),
-    ] = None
-
-    # Additional item-level fields returned by the API
-    birth_year: Annotated[
-        str | None, Field(default=None, alias="birthYear", description="Birth year")
-    ] = None
-    death_year: Annotated[
-        str | None, Field(default=None, alias="deathYear", description="Death year")
-    ] = None
-    current_member: Annotated[
-        bool | None,
-        Field(default=None, alias="currentMember", description="Is current member"),
-    ] = None
-    honorific_name: Annotated[
-        str | None,
-        Field(default=None, alias="honorificName", description="Honorific"),
-    ] = None
-    direct_order_name: Annotated[
-        str | None,
-        Field(
-            default=None,
-            alias="directOrderName",
-            description="Direct-order display name",
-        ),
-    ] = None
-    inverted_order_name: Annotated[
-        str | None,
-        Field(
-            default=None,
-            alias="invertedOrderName",
-            description="Inverted-order display name",
-        ),
-    ] = None
-
-    update_date: Annotated[
-        datetime | None,
-        Field(
-            default=None,
-            alias="updateDate",
-            description="When the member record was last updated",
-        ),
-    ] = None
-
-    member_type: Annotated[
-        str | None,
-        Field(
-            default=None,
-            alias="memberType",
-            description="Member type (e.g., Representative, Senator)",
-        ),
-    ] = None
-
-    state_code: Annotated[
-        str | None,
-        Field(default=None, alias="stateCode", description="State code for the member"),
-    ] = None
-
-    cosponsored_legislation: Annotated[
-        CountUrl | None,
-        Field(
-            default=None,
-            alias="cosponsoredLegislation",
-            description="Cosponsored legislation count/url",
-        ),
-    ] = None
-    sponsored_legislation: Annotated[
-        CountUrl | None,
-        Field(
-            default=None,
-            alias="sponsoredLegislation",
-            description="Sponsored legislation count/url",
-        ),
-    ] = None
+    )
+    last_name: str = Field(alias="lastName")
+    party: str | None = Field(
+        default=None, validation_alias=AliasChoices("party", "partyName")
+    )
+    state: str
+    url: HttpUrl | None = None
+    middle_name: str = Field(default="", alias="middleName")
+    district: int | None = None
+    is_original_cosponsor: bool = Field(default=False, alias="isOriginalCosponsor")
+    is_by_request: str = Field(default="", alias="isByRequest")
+    depiction: Depiction = Field(default_factory=Depiction.empty, alias="depiction")
+    address_information: MemberAddress | None = Field(
+        default=None, alias="addressInformation"
+    )
+    official_website_url: HttpUrl | None = Field(
+        default=None, alias="officialWebsiteUrl"
+    )
+    leadership: list[dict] | None = Field(default=None, alias="leadership")
+    birth_year: str | None = Field(default=None, alias="birthYear")
+    death_year: str | None = Field(default=None, alias="deathYear")
+    current_member: bool | None = Field(default=None, alias="currentMember")
+    honorific_name: str | None = Field(default=None, alias="honorificName")
+    direct_order_name: str | None = Field(default=None, alias="directOrderName")
+    inverted_order_name: str | None = Field(default=None, alias="invertedOrderName")
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    member_type: str | None = Field(default=None, alias="memberType")
+    state_code: str | None = Field(default=None, alias="stateCode")
+    cosponsored_legislation: CountUrl | None = Field(
+        default=None, alias="cosponsoredLegislation"
+    )
+    sponsored_legislation: CountUrl | None = Field(
+        default=None, alias="sponsoredLegislation"
+    )
 
     class PartyHistoryItem(BaseModel):
-        party_abbreviation: Annotated[
-            str | None, Field(default=None, alias="partyAbbreviation")
-        ]
-        party_name: Annotated[str | None, Field(default=None, alias="partyName")]
-        start_year: Annotated[int | None, Field(default=None, alias="startYear")]
+        party_abbreviation: str | None = Field(default=None, alias="partyAbbreviation")
+        party_name: str | None = Field(default=None, alias="partyName")
+        start_year: int | None = Field(default=None, alias="startYear")
 
-    party_history: Annotated[
-        list[PartyHistoryItem] | None,
-        Field(
-            default=None,
-            alias="partyHistory",
-            description="Historic party affiliations",
-        ),
-    ] = None
+    party_history: list[PartyHistoryItem] | None = Field(
+        default=None, alias="partyHistory"
+    )
 
     class PreviousName(BaseModel):
-        direct_order_name: Annotated[
-            str | None, Field(default=None, alias="directOrderName")
-        ]
-        end_date: Annotated[datetime | None, Field(default=None, alias="endDate")]
-        first_name: Annotated[str | None, Field(default=None, alias="firstName")]
-        honorific_name: Annotated[
-            str | None, Field(default=None, alias="honorificName")
-        ]
-        inverted_order_name: Annotated[
-            str | None, Field(default=None, alias="invertedOrderName")
-        ]
-        last_name: Annotated[str | None, Field(default=None, alias="lastName")]
-        middle_name: Annotated[str | None, Field(default=None, alias="middleName")]
-        start_date: Annotated[datetime | None, Field(default=None, alias="startDate")]
+        direct_order_name: str | None = Field(default=None, alias="directOrderName")
+        end_date: datetime | None = Field(default=None, alias="endDate")
+        first_name: str | None = Field(default=None, alias="firstName")
+        honorific_name: str | None = Field(default=None, alias="honorificName")
+        inverted_order_name: str | None = Field(default=None, alias="invertedOrderName")
+        last_name: str | None = Field(default=None, alias="lastName")
+        middle_name: str | None = Field(default=None, alias="middleName")
+        start_date: datetime | None = Field(default=None, alias="startDate")
 
-    previous_names: Annotated[
-        list[PreviousName] | None,
-        Field(
-            default=None, alias="previousNames", description="Previous name variants"
-        ),
-    ] = None
+    previous_names: list[PreviousName] | None = Field(
+        default=None, alias="previousNames"
+    )
 
     class MemberTermFull(BaseModel):
-        chamber: Annotated[str | None, Field(default=None)] = None
-        congress: Annotated[int | None, Field(default=None)] = None
-        district: Annotated[int | None, Field(default=None)] = None
-        end_year: Annotated[int | None, Field(default=None, alias="endYear")] = None
-        member_type: Annotated[str | None, Field(default=None, alias="memberType")] = (
-            None
-        )
-        start_year: Annotated[int | None, Field(default=None, alias="startYear")] = None
-        state_code: Annotated[str | None, Field(default=None, alias="stateCode")] = None
-        state_name: Annotated[str | None, Field(default=None, alias="stateName")] = None
+        chamber: str | None = None
+        congress: int | None = None
+        district: int | None = None
+        end_year: int | None = Field(default=None, alias="endYear")
+        member_type: str | None = Field(default=None, alias="memberType")
+        start_year: int | None = Field(default=None, alias="startYear")
+        state_code: str | None = Field(default=None, alias="stateCode")
+        state_name: str | None = Field(default=None, alias="stateName")
 
-    terms: Annotated[
-        list[MemberTermFull] | None,
-        Field(
-            default=None, alias="terms", description="Full term entries for the member"
-        ),
-    ] = None
+    terms: list[MemberTermFull] | None = Field(default=None, alias="terms")
 
     def build_id(self) -> str:
-        """Return a canonical id for this member instance.
-
-        Always returns a string. Falls back to a hashed record id when no
-        explicit identifier is present.
-        """
+        """Return a canonical id for this member instance."""
         bid = getattr(self, "bioguide_id", None)
         if bid:
             return f"person:{bid}"
-        # fallback: stable hashed id from model dump
         url = getattr(self, "url", None)
         if url:
             try:
@@ -381,19 +170,12 @@ class Member(EntityBase):
             except (TypeError, ValueError):
                 logger.exception("Failed to parse URL to id in Member.build_id")
         try:
-            mapping = self.model_dump()
-            return f"record:{abs(hash(str(mapping))) % (10**12)}"
+            return f"record:{abs(hash(str(self.model_dump()))) % (10**12)}"
         except (AttributeError, TypeError, ValueError):
             return f"record:{abs(hash(str(getattr(self, 'full_name', 'member')))) % (10**12)}"
 
     @model_validator(mode="after")
     def _populate_common_fields(self):
-        """Ensure `id`, `url`, `member_type`, and `state_code` are populated when possible.
-
-        - Sets `id` using `build_id()` when missing.
-        - Synthesizes an API `url` from `bioguide_id` when missing.
-        - Copies `member_type` and `state_code` from the first `terms` entry when absent.
-        """
         if not getattr(self, "id", None):
             try:
                 self.id = self.build_id()
@@ -410,23 +192,23 @@ class Member(EntityBase):
                 except (TypeError, ValueError, ValidationError):
                     logger.debug("Could not build a URL for Member %s", bid)
 
-        if not getattr(self, "member_type", None):
-            terms = getattr(self, "terms", None)
-            if isinstance(terms, list) and terms:
-                first = terms[0]
-                mt = first.get("memberType") if isinstance(first, dict) else None
-                if not mt:
-                    mt = getattr(first, "member_type", None)
+        terms = getattr(self, "terms", None)
+        if isinstance(terms, list) and terms:
+            first = terms[0]
+            if not getattr(self, "member_type", None):
+                mt = (
+                    first.get("memberType")
+                    if isinstance(first, dict)
+                    else getattr(first, "member_type", None)
+                )
                 if mt:
                     self.member_type = mt
-
-        if not getattr(self, "state_code", None):
-            terms = getattr(self, "terms", None)
-            if isinstance(terms, list) and terms:
-                first = terms[0]
-                sc = first.get("stateCode") if isinstance(first, dict) else None
-                if not sc:
-                    sc = getattr(first, "state_code", None)
+            if not getattr(self, "state_code", None):
+                sc = (
+                    first.get("stateCode")
+                    if isinstance(first, dict)
+                    else getattr(first, "state_code", None)
+                )
                 if sc:
                     self.state_code = sc
 
@@ -434,22 +216,18 @@ class Member(EntityBase):
 
     @model_validator(mode="before")
     def _populate_from_alternate_fields(cls, values: dict):
-        # Populate `fullName` from `directOrderName` or `invertedOrderName` when present
         if "fullName" not in values:
-            if "directOrderName" in values and values.get("directOrderName"):
-                values["fullName"] = values.get("directOrderName")
-            elif "invertedOrderName" in values and values.get("invertedOrderName"):
-                values["fullName"] = values.get("invertedOrderName")
+            if values.get("directOrderName"):
+                values["fullName"] = values["directOrderName"]
+            elif values.get("invertedOrderName"):
+                values["fullName"] = values["invertedOrderName"]
 
-        # Populate `party` from `partyHistory` if available
-        if "party" not in values or not values.get("party"):
+        if not values.get("party"):
             ph = values.get("partyHistory")
-            if isinstance(ph, list) and ph:
-                first = ph[0]
-                if isinstance(first, dict):
-                    values["party"] = first.get("partyName") or first.get(
-                        "partyAbbreviation"
-                    )
+            if isinstance(ph, list) and ph and isinstance(ph[0], dict):
+                values["party"] = ph[0].get("partyName") or ph[0].get(
+                    "partyAbbreviation"
+                )
 
         return values
 
@@ -460,7 +238,6 @@ class Sponsor(Member):
     @model_validator(mode="before")
     @classmethod
     def _tolerate_sparse_sponsor(cls, values: object) -> object:
-        # Historical sponsors arrive with blank dates and a null or missing state.
         if not isinstance(values, dict):
             return values
         cleaned = dict(values)
@@ -471,40 +248,32 @@ class Sponsor(Member):
             cleaned["state"] = ""
         return cleaned
 
-    sponsorship_date: Annotated[
-        datetime | None,
-        Field(
-            alias="sponsorshipDate", default=None, description="When sponsorship began."
-        ),
-    ]
-    is_original_cosponsor: Annotated[
-        bool,
-        Field(
-            alias="isOriginalCosponsor",
-            description="Whether the sponsor was an original cosponsor.",
-        ),
-    ] = False
-    sponsorship_withrawn_date: Annotated[
-        datetime | None,
-        Field(
-            alias="sponsorshipWithdrawnDate",
-            description="When sponsorship was withdrawn, if applicable.",
-        ),
-    ] = None
+    sponsorship_date: datetime | None = Field(default=None, alias="sponsorshipDate")
+    is_original_cosponsor: bool = Field(default=False, alias="isOriginalCosponsor")
+    sponsorship_withrawn_date: datetime | None = Field(
+        default=None, alias="sponsorshipWithdrawnDate"
+    )
 
 
 class SponsorRef(BaseModel):
-    """Permissive sponsor reference for non-person sponsors (committees, orgs).
+    """Permissive sponsor reference for non-person sponsors (committees, orgs)."""
 
-    Some API endpoints return sponsor entries that are committees or simple
-    references containing only a `name` or `url`. This lightweight model
-    accepts partial sponsor data so parent models can validate without
-    failing when a full `Member` object isn't available.
-    """
+    bioguide_id: str | None = Field(default=None, alias="bioguideId")
+    first_name: str | None = Field(default=None, alias="firstName")
+    last_name: str | None = Field(default=None, alias="lastName")
+    full_name: str | None = Field(default=None, alias="fullName")
+    state: str | None = None
+    url: HttpUrl | None = None
 
-    bioguide_id: Annotated[str | None, Field(default=None, alias="bioguideId")] = None
-    first_name: Annotated[str | None, Field(default=None, alias="firstName")] = None
-    last_name: Annotated[str | None, Field(default=None, alias="lastName")] = None
-    full_name: Annotated[str | None, Field(default=None, alias="fullName")] = None
-    state: Annotated[str | None, Field(default=None)] = None
-    url: Annotated[HttpUrl | None, Field(default=None)] = None
+
+__all__ = [
+    "Chamber",
+    "Congress",
+    "CongressMetadata",
+    "Depiction",
+    "Member",
+    "MemberAddress",
+    "Session",
+    "Sponsor",
+    "SponsorRef",
+]

@@ -5,8 +5,6 @@ from __future__ import annotations
 import re
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
-
 
 class CommitteeCode(str):
     """Validation wrapper for 4-alpha + 2-digit committee system codes (e.g., 'hspw00')."""
@@ -99,114 +97,9 @@ class StateCode(StrEnum):
     WY = "WY"
 
 
-class EventId(BaseModel):
-    """Wrapper for event identifiers used in hearings or meetings."""
-
-    event_id: str = Field(description="What the event identifier is.")
-
-
-class JacketNumber(BaseModel):
-    """Wrapper for jacket numbers assigned to hearings or reports."""
-
-    jacket_number: int = Field(description="What the jacket number is.")
-
-
-class VolumeNumber(BaseModel):
-    """Wrapper for volume numbers of the Congressional Record."""
-
-    volume_number: int = Field(description="What the volume number is.")
-
-
-class IssueNumber(BaseModel):
-    """Wrapper for issue numbers of the Congressional Record."""
-
-    issue_number: int = Field(description="What the issue number is.")
-
-
-class District(BaseModel):
-    """Wrapper for congressional district numbers."""
-
-    district: int = Field(description="What the district number is.")
-
-
-class RequirementNumber(BaseModel):
-    """Wrapper for House requirement identifiers."""
-
-    requirement_number: int = Field(description="What the requirement number is.")
-
-
-class Ordinal(BaseModel):
-    """Wrapper for ordinal values used in ordered lists."""
-
-    ordinal: int = Field(description="What the ordinal position is.")
-
-
-class TreatySuffix(BaseModel):
-    """Wrapper for treaty suffix designators."""
-
-    treaty_suffix: str = Field(description="What the treaty suffix is.")
-
-
-class ReportNumber(BaseModel):
-    """Wrapper for committee report numbers."""
-
-    report_number: int = Field(description="What the report number is.")
-
-
-class BillNumber(BaseModel):
-    """Wrapper for bill numbers in endpoint parameters."""
-
-    bill_number: int = Field(description="What the bill number is.")
-
-
-class LawNumber(BaseModel):
-    """Wrapper for law numbers assigned by NARA."""
-
-    law_number: int = Field(description="What the law number is.")
-
-
-class AmendmentNumber(BaseModel):
-    """Wrapper for amendment numbers in endpoint parameters."""
-
-    amendment_number: int = Field(description="What the amendment number is.")
-
-
-class CommunicationNumber(BaseModel):
-    """Wrapper for communication numbers in endpoint parameters."""
-
-    communication_number: int = Field(description="What the communication number is.")
-
-
-class NominationNumber(BaseModel):
-    """Wrapper for nomination numbers in endpoint parameters."""
-
-    nomination_number: int = Field(description="What the nomination number is.")
-
-
-class TreatyNumber(BaseModel):
-    """Wrapper for treaty numbers in endpoint parameters."""
-
-    treaty_number: int = Field(description="What the treaty number is.")
-
-
 __all__ = [
-    "AmendmentNumber",
-    "BillNumber",
     "CommitteeCode",
-    "CommunicationNumber",
     "CommunicationType",
-    "District",
-    "EventId",
-    "IssueNumber",
-    "JacketNumber",
-    "LawNumber",
-    "NominationNumber",
-    "Ordinal",
-    "ReportNumber",
     "ReportType",
-    "RequirementNumber",
     "StateCode",
-    "TreatyNumber",
-    "TreatySuffix",
-    "VolumeNumber",
 ]

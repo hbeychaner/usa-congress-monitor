@@ -8,15 +8,19 @@
   modules (`committees.py`, `communications.py`, `identifiers.py`,
   `legislation.py`, `nominations.py`, `people_lists.py`, `records.py`,
   `reports.py`, `taxonomy.py`) while retaining `other_models.py` as a
-  backward-compatible re-export module; remove runtime lazy imports in
-  `cdm/models/validators.py` and `cdm/ingest/resource_config.py`; move
-  `TopicModeler` constants into `TopicModelerConfig` in
-  `cdm/config/topic_analysis.py`; retire `requirements.txt` in favor of `uv`;
-  add `mypy` static type checking and whole-repo `ruff` checking to
-  `.github/workflows/contracts.yml`; add route-level lazy loading and vendor
-  chunk splitting in `frontend/app`; and refresh documentation and Mermaid
-  diagrams (`bill-request-sequence.mmd`, `worker-architecture.mmd`,
-  `deployment.mmd`, `backend-components.mmd`) in plain English.
+  backward-compatible re-export module; remove 15 unused single-field parameter
+  wrapper classes from `cdm/models/identifiers.py` and compact verbose field
+  wrappers and duplicate helpers across `cdm/models/bills.py`,
+  `cdm/models/people.py`, `cdm/models/shared.py`, and the domain model modules;
+  remove runtime lazy imports in `cdm/models/validators.py` and
+  `cdm/ingest/resource_config.py`; move `TopicModeler` constants into
+  `TopicModelerConfig` in `cdm/config/topic_analysis.py`; retire
+  `requirements.txt` in favor of `uv`; add `mypy` static type checking and
+  whole-repo `ruff` checking to `.github/workflows/contracts.yml`; add
+  route-level lazy loading and vendor chunk splitting in `frontend/app`; and
+  refresh documentation and Mermaid diagrams (`bill-request-sequence.mmd`,
+  `worker-architecture.mmd`, `deployment.mmd`, `backend-components.mmd`) in
+  plain English.
 - Upgrade vulnerable Python dependencies in `pyproject.toml`, `requirements.txt`,
   and `uv.lock` (`anyio`, `certifi`, `filelock`, `pyjwt`, `pytest`,
   `python-dotenv`, `setuptools`, `soupsieve`, `urllib3`) to resolve all 46

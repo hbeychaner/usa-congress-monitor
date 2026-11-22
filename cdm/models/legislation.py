@@ -38,139 +38,54 @@ def _record_candidate_style_detection() -> None:
 class VotePartyTotal(BaseModel):
     """Totals for a vote broken down by party or overall counts."""
 
-    yea: int | None = Field(
-        default=None, alias="yea", description="Number of yea votes."
-    )
-    nay: int | None = Field(
-        default=None, alias="nay", description="Number of nay votes."
-    )
-    present: int | None = Field(
-        default=None, alias="present", description="Number of present votes."
-    )
-    not_voting: int | None = Field(
-        default=None, alias="notVoting", description="Number of not voting."
-    )
+    yea: int | None = Field(default=None, alias="yea")
+    nay: int | None = Field(default=None, alias="nay")
+    present: int | None = Field(default=None, alias="present")
+    not_voting: int | None = Field(default=None, alias="notVoting")
 
 
 class VoteQuestion(BaseModel):
     """Structured information about the question being voted on."""
 
-    question: str | None = Field(
-        default=None, alias="question", description="Human-readable question text."
-    )
-    result: str | None = Field(
-        default=None, alias="result", description="Result for this question."
-    )
-    required: str | None = Field(
-        default=None,
-        alias="required",
-        description="What threshold was required for passage (e.g., 'majority').",
-    )
+    question: str | None = Field(default=None, alias="question")
+    result: str | None = Field(default=None, alias="result")
+    required: str | None = Field(default=None, alias="required")
 
 
 class VoteCandidateTotal(BaseModel):
     """Per-candidate totals present in some vote payloads (e.g. Speaker election)."""
 
-    candidate: str | None = Field(
-        default=None, alias="candidate", description="Candidate name."
-    )
-    total: int | None = Field(
-        default=None, alias="total", description="Total votes for candidate."
-    )
+    candidate: str | None = Field(default=None, alias="candidate")
+    total: int | None = Field(default=None, alias="total")
 
 
 class HouseRollCallVoteListItem(EntityBase, RecordTypeBase):
     """List-level roll call vote entry for the House."""
 
-    recordType: str = Field(
-        default="congress-house-votes",
-        description="Which knowledgebase index this record belongs to.",
-    )
-    start_date: datetime | None = Field(
-        default=None, alias="startDate", description="When the vote started."
-    )
-    update_date: datetime | None = Field(
-        default=None,
-        alias="updateDate",
-        description="When the vote record was last updated.",
-    )
-    identifier: int | str | None = Field(
-        default=None, description="What the roll call vote identifier is."
-    )
-    congress: int | None = Field(
-        default=None, description="Which Congress the vote belongs to."
-    )
-    session_number: int | None = Field(
-        default=None,
-        alias="sessionNumber",
-        description="Which session the vote occurred in.",
-    )
-    roll_call_number: int | None = Field(
-        default=None,
-        alias="rollCallNumber",
-        description="What the roll call number is.",
-    )
-    vote_type: str | None = Field(
-        default=None, alias="voteType", description="What type of vote this was."
-    )
-    result: str | None = Field(
-        default=None, description="What the vote result was."
-    )
-    legislation_type: str | None = Field(
-        default=None,
-        alias="legislationType",
-        description="What type of legislation the vote was on.",
-    )
-    legislation_number: int | None = Field(
-        default=None,
-        alias="legislationNumber",
-        description="What the legislation number was.",
-    )
-    amendment_type: str | None = Field(
-        default=None,
-        alias="amendmentType",
-        description="What type of amendment was voted on.",
-    )
-    amendment_number: int | None = Field(
-        default=None,
-        alias="amendmentNumber",
-        description="What the amendment number was.",
-    )
-    amendment_author: str | None = Field(
-        default=None,
-        alias="amendmentAuthor",
-        description="Who authored the amendment.",
-    )
+    recordType: str = "congress-house-votes"
+    start_date: datetime | None = Field(default=None, alias="startDate")
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    identifier: int | str | None = None
+    congress: int | None = None
+    session_number: int | None = Field(default=None, alias="sessionNumber")
+    roll_call_number: int | None = Field(default=None, alias="rollCallNumber")
+    vote_type: str | None = Field(default=None, alias="voteType")
+    result: str | None = None
+    legislation_type: str | None = Field(default=None, alias="legislationType")
+    legislation_number: int | None = Field(default=None, alias="legislationNumber")
+    amendment_type: str | None = Field(default=None, alias="amendmentType")
+    amendment_number: int | None = Field(default=None, alias="amendmentNumber")
+    amendment_author: str | None = Field(default=None, alias="amendmentAuthor")
     vote_party_total: VotePartyTotal | None = Field(
-        default=None,
-        alias="votePartyTotal",
-        description="Totals for the vote broken down by party or category.",
+        default=None, alias="votePartyTotal"
     )
-    vote_question: VoteQuestion | None = Field(
-        default=None,
-        alias="voteQuestion",
-        description="Structured details about the question being voted on.",
-    )
+    vote_question: VoteQuestion | None = Field(default=None, alias="voteQuestion")
     vote_candidate_total: list[VoteCandidateTotal] | None = Field(
-        default=None,
-        alias="voteCandidateTotal",
-        description="Per-candidate totals when present (preserved).",
+        default=None, alias="voteCandidateTotal"
     )
-    source_data_url: HttpUrl | None = Field(
-        default=None,
-        alias="sourceDataURL",
-        description="Where to retrieve the source vote data.",
-    )
-    url: HttpUrl | None = Field(
-        default=None,
-        alias="legislationUrl",
-        description="Where to retrieve the vote record in the API.",
-    )
-    api_url: HttpUrl | None = Field(
-        default=None,
-        alias="url",
-        description="Where to retrieve the vote in the API.",
-    )
+    source_data_url: HttpUrl | None = Field(default=None, alias="sourceDataURL")
+    url: HttpUrl | None = Field(default=None, alias="legislationUrl")
+    api_url: HttpUrl | None = Field(default=None, alias="url")
 
     model_config = {"populate_by_name": True}
 
@@ -187,10 +102,9 @@ class HouseRollCallVoteListItem(EntityBase, RecordTypeBase):
 
         vpt = values.get("votePartyTotal")
         if isinstance(vpt, list):
-            is_candidate_style = any(
+            if any(
                 isinstance(x, dict) and ("candidate" in x or "total" in x) for x in vpt
-            )
-            if is_candidate_style:
+            ):
                 values["voteCandidateTotal"] = vpt
                 values.pop("votePartyTotal", None)
                 _record_candidate_style_detection()
@@ -255,187 +169,84 @@ class HouseRollCallVoteListItem(EntityBase, RecordTypeBase):
 class AmendmentLatestAction(BaseModel):
     """Latest action metadata attached to an amendment list item."""
 
-    action_date: datetime | None = Field(
-        default=None,
-        alias="actionDate",
-        description="When the latest action occurred.",
-    )
-    action_time: str | None = Field(
-        default=None,
-        alias="actionTime",
-        description="What time the latest action occurred.",
-    )
-    text: str | None = Field(
-        default=None, description="What the latest action text says."
-    )
+    action_date: datetime | None = Field(default=None, alias="actionDate")
+    action_time: str | None = Field(default=None, alias="actionTime")
+    text: str | None = None
 
 
 class AmendmentListItem(EntityBase, RecordTypeBase):
     """List-level amendment entry with latest action and type."""
 
-    recordType: str = Field(
-        default="congress-amendments",
-        description="Which knowledgebase index this record belongs to.",
-    )
-    congress: int | None = Field(
-        default=None, description="Which Congress the amendment belongs to."
-    )
-    description: str | None = Field(
-        default=None, description="What the amendment description says."
-    )
+    recordType: str = "congress-amendments"
+    congress: int | None = None
+    description: str | None = None
     latest_action: AmendmentLatestAction | None = Field(
-        default=None, alias="latestAction", description="What the latest action is."
+        default=None, alias="latestAction"
     )
-    number: str | None = Field(
-        default=None, description="What the amendment number is."
-    )
-    purpose: str | None = Field(
-        default=None, description="What purpose the amendment states."
-    )
-    type: str | None = Field(
-        default=None, description="What type of amendment this is."
-    )
-    update_date: datetime | None = Field(
-        default=None,
-        alias="updateDate",
-        description="When the amendment was last updated.",
-    )
-    url: HttpUrl | None = Field(
-        default=None, description="Where to retrieve the amendment in the API."
-    )
+    number: str | None = None
+    purpose: str | None = None
+    type: str | None = None
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    url: HttpUrl | None = None
 
 
 class BillLatestAction(BaseModel):
     """Latest action metadata attached to a bill list item."""
 
-    action_date: datetime | None = Field(
-        default=None,
-        alias="actionDate",
-        description="When the latest action occurred.",
-    )
-    text: str | None = Field(
-        default=None, description="What the latest action text says."
-    )
+    action_date: datetime | None = Field(default=None, alias="actionDate")
+    text: str | None = None
 
 
 class LawEntry(BaseModel):
     """Law entry used in law list items (number and type)."""
 
-    number: str | None = Field(
-        default=None, description="What the law number is."
-    )
-    type: str | None = Field(
-        default=None, description="What type of law this is (public/private)."
-    )
+    number: str | None = None
+    type: str | None = None
 
 
 class _BillOrLawListItem(EntityBase, RecordTypeBase):
     """Shared list-item fields for bills and enacted laws."""
 
-    congress: int | None = Field(
-        default=None, description="Which Congress the bill belongs to."
-    )
-    latest_action: BillLatestAction | None = Field(
-        default=None, alias="latestAction", description="What the latest action is."
-    )
-    number: str | None = Field(
-        default=None, description="What the bill number is."
-    )
-    origin_chamber: str | None = Field(
-        default=None,
-        alias="originChamber",
-        description="Which chamber introduced the bill.",
-    )
-    origin_chamber_code: str | None = Field(
-        default=None,
-        alias="originChamberCode",
-        description="What the origin chamber code is.",
-    )
-    title: str | None = Field(
-        default=None, description="What the bill title is."
-    )
-    type: str | None = Field(
-        default=None, description="What type of bill this is."
-    )
-    update_date: datetime | None = Field(
-        default=None,
-        alias="updateDate",
-        description="When the bill was last updated.",
-    )
+    congress: int | None = None
+    latest_action: BillLatestAction | None = Field(default=None, alias="latestAction")
+    number: str | None = None
+    origin_chamber: str | None = Field(default=None, alias="originChamber")
+    origin_chamber_code: str | None = Field(default=None, alias="originChamberCode")
+    title: str | None = None
+    type: str | None = None
+    update_date: datetime | None = Field(default=None, alias="updateDate")
     update_date_including_text: datetime | None = Field(
-        default=None,
-        alias="updateDateIncludingText",
-        description="When the bill or its text was last updated.",
+        default=None, alias="updateDateIncludingText"
     )
-    url: HttpUrl | None = Field(
-        default=None, description="Where to retrieve the bill in the API."
-    )
+    url: HttpUrl | None = None
 
 
 class BillListItem(_BillOrLawListItem):
     """List-level bill entry with title and latest action."""
 
-    recordType: str = Field(
-        default="congress-bills",
-        description="Which knowledgebase index this record belongs to.",
-    )
+    recordType: str = "congress-bills"
 
 
 class LawListItem(_BillOrLawListItem):
     """List-level law entry derived from bill data."""
 
-    recordType: str = Field(
-        default="congress-laws",
-        description="Which knowledgebase index this record belongs to.",
-    )
-    laws: list[LawEntry] | None = Field(
-        default=None,
-        description="Which law entries are associated with the bill.",
-    )
+    recordType: str = "congress-laws"
+    laws: list[LawEntry] | None = None
 
 
 class TreatyListItem(EntityBase, RecordTypeBase):
     """List-level treaty entry with congress and numbering info."""
 
-    recordType: str = Field(
-        default="congress-treaties",
-        description="Which knowledgebase index this record belongs to.",
-    )
-    congress_received: int | None = Field(
-        default=None,
-        alias="congressReceived",
-        description="Which Congress received the treaty.",
-    )
-    congress_considered: int | None = Field(
-        default=None,
-        alias="congressConsidered",
-        description="Which Congress considered the treaty.",
-    )
-    number: int | None = Field(
-        default=None, description="What the treaty number is."
-    )
-    parts: dict[str, object] | None = Field(
-        default=None, description="What parts the treaty is divided into."
-    )
-    suffix: str | None = Field(
-        default=None, description="What suffix the treaty carries."
-    )
-    topic: str | None = Field(
-        default=None, description="What topic the treaty concerns."
-    )
-    transmitted_date: datetime | None = Field(
-        default=None,
-        alias="transmittedDate",
-        description="When the treaty was transmitted.",
-    )
-    update_date: datetime | None = Field(
-        default=None,
-        alias="updateDate",
-        description="When the treaty was last updated.",
-    )
-    url: HttpUrl | None = Field(
-        default=None, description="Where to retrieve the treaty in the API."
-    )
+    recordType: str = "congress-treaties"
+    congress_received: int | None = Field(default=None, alias="congressReceived")
+    congress_considered: int | None = Field(default=None, alias="congressConsidered")
+    number: int | None = None
+    parts: dict[str, object] | None = None
+    suffix: str | None = None
+    topic: str | None = None
+    transmitted_date: datetime | None = Field(default=None, alias="transmittedDate")
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    url: HttpUrl | None = None
 
 
 __all__ = [

@@ -41,20 +41,10 @@ def _normalize_page_keys(target: dict) -> None:
 class Section(BaseModel):
     """Section entry within a bound congressional record issue."""
 
-    start_page: int | None = Field(
-        default=None, alias="startPage", description="Starting page for the section."
-    )
-    end_page: int | None = Field(
-        default=None, alias="endPage", description="Ending page for the section."
-    )
-    title: str | None = Field(
-        default=None, alias="title", description="Section title if provided."
-    )
-    ordinal: int | None = Field(
-        default=None,
-        alias="ordinal",
-        description="Optional display order for the section.",
-    )
+    start_page: int | None = Field(default=None, alias="startPage")
+    end_page: int | None = Field(default=None, alias="endPage")
+    title: str | None = Field(default=None, alias="title")
+    ordinal: int | None = Field(default=None, alias="ordinal")
 
     model_config = {"populate_by_name": True}
 
@@ -65,22 +55,18 @@ Sections = list[Section]
 class EntireIssueEntry(BaseModel):
     """Entry in `fullIssue.entireIssue` (e.g. PDF or formatted text part)."""
 
-    part: int | None = Field(
-        default=None, alias="part", description="Part id when present"
-    )
-    type: str | None = Field(
-        default=None, alias="type", description="Format type"
-    )
-    url: HttpUrl | None = Field(
-        default=None, alias="url", description="Where to fetch this part"
-    )
+    part: int | None = Field(default=None, alias="part")
+    type: str | None = Field(default=None, alias="type")
+    url: HttpUrl | None = Field(default=None, alias="url")
 
     @model_validator(mode="before")
     def _coerce_part_to_int(cls, values: dict):
         p = values.get("part")
         if p is not None and not isinstance(p, int):
             try:
-                values["part"] = int(p) if isinstance(p, str) and p.isdigit() else int(str(p))
+                values["part"] = (
+                    int(p) if isinstance(p, str) and p.isdigit() else int(str(p))
+                )
             except Exception:
                 logger.exception("Failed to coerce entireIssue.part to int")
         return values
@@ -89,24 +75,10 @@ class EntireIssueEntry(BaseModel):
 class DailySection(BaseModel):
     """Section entry used in `fullIssue.sections` for daily congressional record."""
 
-    start_page: str | None = Field(
-        default=None,
-        alias="startPage",
-        description="Starting page token (may include letter prefix, e.g. 'D299').",
-    )
-    end_page: str | None = Field(
-        default=None,
-        alias="endPage",
-        description="Ending page token (may include letter prefix).",
-    )
-    name: str | None = Field(
-        default=None, alias="name", description="Section name"
-    )
-    text: list[Format] | None = Field(
-        default=None,
-        alias="text",
-        description="List of formatted text or PDF entries for the section.",
-    )
+    start_page: str | None = Field(default=None, alias="startPage")
+    end_page: str | None = Field(default=None, alias="endPage")
+    name: str | None = Field(default=None, alias="name")
+    text: list[Format] | None = Field(default=None, alias="text")
 
     model_config = {"populate_by_name": True}
 
@@ -114,15 +86,11 @@ class DailySection(BaseModel):
 class FullIssue(BaseModel):
     """Container for the `fullIssue` payload returned by the API."""
 
-    articles: CountUrl | None = Field(
-        default=None, alias="articles", description="Article count/url pair"
-    )
+    articles: CountUrl | None = Field(default=None, alias="articles")
     entire_issue: list[EntireIssueEntry] | None = Field(
-        default=None, alias="entireIssue", description="List of entireIssue parts"
+        default=None, alias="entireIssue"
     )
-    sections: list[DailySection] | None = Field(
-        default=None, alias="sections", description="Sections within the full issue"
-    )
+    sections: list[DailySection] | None = Field(default=None, alias="sections")
 
     model_config = {"populate_by_name": True}
 
@@ -130,45 +98,16 @@ class FullIssue(BaseModel):
 class DailyCongressionalRecordIssue(EntityBase, RecordTypeBase):
     """List-level daily congressional record issue entry."""
 
-    recordType: str = Field(
-        default="congress-daily-congressional-records",
-        description="Which knowledgebase index this record belongs to.",
-    )
-    congress: int | None = Field(
-        default=None, description="Which Congress the record issue belongs to."
-    )
-    issue_date: datetime | None = Field(
-        default=None, alias="issueDate", description="When the issue was published."
-    )
-    issue_number: int | str | None = Field(
-        default=None, alias="issueNumber", description="What the issue number is."
-    )
-    session_number: int | str | None = Field(
-        default=None,
-        alias="sessionNumber",
-        description="Which session the issue belongs to.",
-    )
-    update_date: datetime | None = Field(
-        default=None,
-        alias="updateDate",
-        description="When the issue was last updated.",
-    )
-    url: HttpUrl | None = Field(
-        default=None, description="Where to retrieve the issue record in the API."
-    )
-    full_issue: FullIssue | None = Field(
-        default=None,
-        alias="fullIssue",
-        description="Expanded fullIssue payload including sections and entireIssue parts.",
-    )
-    volume_number: int | str | None = Field(
-        default=None, alias="volumeNumber", description="What the volume number is."
-    )
-    issue: dict | None = Field(
-        default=None,
-        alias="issue",
-        description="Original API issue envelope (preserved for forensics).",
-    )
+    recordType: str = "congress-daily-congressional-records"
+    congress: int | None = None
+    issue_date: datetime | None = Field(default=None, alias="issueDate")
+    issue_number: int | str | None = Field(default=None, alias="issueNumber")
+    session_number: int | str | None = Field(default=None, alias="sessionNumber")
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    url: HttpUrl | None = None
+    full_issue: FullIssue | None = Field(default=None, alias="fullIssue")
+    volume_number: int | str | None = Field(default=None, alias="volumeNumber")
+    issue: dict | None = Field(default=None, alias="issue")
 
     def build_id(self) -> str:
         """Build deterministic id from `volume_number` + `issue_number` when possible."""
@@ -194,43 +133,19 @@ class DailyCongressionalRecordIssue(EntityBase, RecordTypeBase):
 class BoundCongressionalRecordListItem(EntityBase, RecordTypeBase):
     """List-level bound congressional record entry."""
 
-    recordType: str = Field(
-        default="congress-bound-congressional-records",
-        description="Which knowledgebase index this record belongs to.",
-    )
-    date: datetime | None = Field(
-        default=None, description="When the bound record was published."
-    )
-    volume_number: int | str | None = Field(
-        default=None, alias="volumeNumber", description="What the volume number is."
-    )
-    congress: int | str | None = Field(
-        default=None, description="Which Congress the bound record belongs to."
-    )
-    session_number: int | str | None = Field(
-        default=None,
-        alias="sessionNumber",
-        description="Which session the record belongs to.",
-    )
-    update_date: datetime | None = Field(
-        default=None,
-        alias="updateDate",
-        description="When the bound record was last updated.",
-    )
-    sections: Sections | None = Field(
-        default=None, alias="sections", description="Sections within the issue."
-    )
-    daily_digest: dict | None = Field(
-        default=None, alias="dailyDigest", description="Daily Digest information."
-    )
-    url: HttpUrl | None = Field(
-        default=None, description="Where to retrieve the bound record in the API."
-    )
+    recordType: str = "congress-bound-congressional-records"
+    date: datetime | None = None
+    volume_number: int | str | None = Field(default=None, alias="volumeNumber")
+    congress: int | str | None = None
+    session_number: int | str | None = Field(default=None, alias="sessionNumber")
+    update_date: datetime | None = Field(default=None, alias="updateDate")
+    sections: Sections | None = Field(default=None, alias="sections")
+    daily_digest: dict | None = Field(default=None, alias="dailyDigest")
+    url: HttpUrl | None = None
     reference_id: str | None = Field(
         default=None,
         alias="reference_id",
         validation_alias=AliasChoices("reference_id", "referenceId"),
-        description="Reference id parsed from the source URL (non-unique).",
     )
 
     @model_validator(mode="before")
@@ -349,39 +264,14 @@ class BoundCongressionalRecordListItem(EntityBase, RecordTypeBase):
 class CongressionalRecordIssue(EntityBase, RecordTypeBase):
     """Issue metadata from the Congressional Record feed."""
 
-    recordType: str = Field(
-        default="congress-congressional-records",
-        description="Which knowledgebase index this record belongs to.",
-    )
-    congress: str | None = Field(
-        default=None,
-        alias="Congress",
-        description="Which Congress the issue belongs to.",
-    )
-    source_id: int | None = Field(
-        default=None, alias="Id", description="What the issue identifier is."
-    )
-    issue: str | None = Field(
-        default=None, alias="Issue", description="What the issue number is."
-    )
-    links: dict[str, object] | None = Field(
-        default=None,
-        alias="Links",
-        description="What related links are provided for the issue.",
-    )
-    publish_date: str | None = Field(
-        default=None,
-        alias="PublishDate",
-        description="When the issue was published.",
-    )
-    session: str | None = Field(
-        default=None,
-        alias="Session",
-        description="Which session the issue belongs to.",
-    )
-    volume: str | None = Field(
-        default=None, alias="Volume", description="What the volume number is."
-    )
+    recordType: str = "congress-congressional-records"
+    congress: str | None = Field(default=None, alias="Congress")
+    source_id: int | None = Field(default=None, alias="Id")
+    issue: str | None = Field(default=None, alias="Issue")
+    links: dict[str, object] | None = Field(default=None, alias="Links")
+    publish_date: str | None = Field(default=None, alias="PublishDate")
+    session: str | None = Field(default=None, alias="Session")
+    volume: str | None = Field(default=None, alias="Volume")
 
 
 __all__ = [
